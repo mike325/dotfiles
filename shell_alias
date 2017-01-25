@@ -1,0 +1,77 @@
+################################################################################
+#                                                                              #
+#   Author: Mike 8a                                                            #
+#   Description: Some useful alias                                             #
+#                                                                              #
+################################################################################
+
+if hash nvim 2>/dev/null; then
+    export EDITOR='nvim'
+    alias vim=nvim
+    alias vi=/bin/vim
+    alias cdvim="cd ~/.config/nvim"
+    alias cdvi="cd ~/.vim"
+else
+    export EDITOR='vim'
+    alias cdvim="cd ~/.vim"
+fi
+
+################################################################################
+#                               Alias                                          #
+################################################################################
+alias grep="grep --color -n"
+alias grepo="grep -o"
+alias grepe="grep -E"
+
+alias ls='ls --color'
+alias la="ls -A"
+alias ll="ls -lh"
+alias lla="ls -lhA"
+alias bk="cd .."
+alias cl="clear"
+alias turnoff="sudo poweroff"
+
+alias salias="source ~/.shell_alias"
+
+#####################    systemctl     #######################
+if hash systemctl 2>/dev/null; then
+    alias sysctl="sudo systemctl"
+    alias ctls="sudo systemctl start"
+    alias ctlk="sudo systemctl stop"
+    alias ctlr="sudo systemctl restart"
+    alias ctlw="sudo systemctl status"
+fi
+
+#####################    GIT     #######################
+if hash git 2>/dev/null; then
+    alias clone="git clone"
+    alias ga="git add"
+    alias gs="git status"
+    alias gc="git commit -m "
+    alias gp="git push"
+    alias gpu="git pull"
+    alias gco="git checkout "
+    alias gr="git reset"
+    alias gss="git stash save"
+    alias gsp="git stash pop"
+    alias gsd="git stash drop"
+    alias gsa="git stash apply"
+fi
+
+#####################     VB      #######################
+alias vbkernel="sudo modprobe vboxdrv"
+
+################  package management ##################
+if hash docker 2>/dev/null; then
+    alias docker="sudo docker"
+    alias docker-compose="sudo docker-compose"
+    alias dkpa="docker ps -a"
+fi
+
+if hash yaourt 2>/dev/null; then
+    alias update="yaourt -Syyu"
+elif hash apt-get 2>/dev/null; then
+    alias update="sudo apt-get update && sudo apt-get upgrade"
+elif hash dnf 2>/dev/null; then
+    alias update="sudo dnf update"
+fi
