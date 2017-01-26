@@ -8,7 +8,7 @@
 unsetopt beep
 
 # Path to your oh-my-zsh installation.
-if [[ -f "$HOME/.oh-my-zsh" ]]; then
+if [[ -d "$HOME/.oh-my-zsh" ]]; then
     export ZSH="$HOME/.oh-my-zsh"
 fi
 
