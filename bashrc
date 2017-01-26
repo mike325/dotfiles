@@ -8,6 +8,8 @@
 # Path to the bash it configuration
 if [[ -d "$HOME/.bash-it" ]]; then
     export BASH_IT="$HOME/.bash-it"
+elif [[ -d "$HOME/.bash_it" ]]; then
+    export BASH_IT="$HOME/.bash_it"
 fi
 
 # Lock and Load a custom theme file
@@ -57,6 +59,14 @@ stty -ixon                                                                     #
 
 if [[ -d $HOME/bin ]]; then
     export PATH="$HOME/bin:$PATH"
+fi
+
+if [[ -d $HOME/.local/bin/ ]]; then
+    export PATH="$HOME/.local/bin/:$PATH"
+fi
+
+if [[ -d $HOME/bin/neovim/bin/ ]]; then
+    export PATH="$HOME/bin/neovim/bin:$PATH"
 fi
 
 if [[ -f ~/.shell_alias ]]; then
