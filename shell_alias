@@ -41,6 +41,7 @@ alias cl="clear"
 alias turnoff="sudo poweroff"
 
 alias salias="source ~/.shell_alias"
+alias sset="source ~/.shell_settings"
 
 #####################    systemctl     #######################
 if hash systemctl 2>/dev/null; then
