@@ -43,6 +43,10 @@ alias turnoff="sudo poweroff"
 alias salias="source ~/.shell_alias"
 alias sset="source ~/.shell_settings"
 
+if hash ctags 2>/dev/null; then
+    alias gtf="ctags -R ."
+fi
+
 #####################    systemctl     #######################
 if hash systemctl 2>/dev/null; then
     alias sysctl="sudo systemctl"
