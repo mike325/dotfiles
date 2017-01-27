@@ -38,7 +38,7 @@ export SCM_CHECK=true
 # Set Xterm/screen/Tmux title with only a short hostname.
 # Uncomment this (or set SHORT_HOSTNAME to something else),
 # Will otherwise fall back on $HOSTNAME.
-export SHORT_HOSTNAME=$(hostname -s)
+# export SHORT_HOSTNAME=$(hostname -s)
 
 # Set vcprompt executable path for scm advance info in prompt (demula theme)
 # https://github.com/djl/vcprompt
@@ -47,10 +47,6 @@ export SHORT_HOSTNAME=$(hostname -s)
 # (Advanced): Uncomment this to make Bash-it reload itself automatically
 # after enabling or disabling aliases, plugins, and completions.
 
-# Load Bash It
-if [[ -f "$BASH_IT/bash_it.sh" ]]; then
-    source $BASH_IT/bash_it.sh
-fi
 
 ################################################################################
 #                               Vim c-s compatibility                          #
@@ -69,10 +65,16 @@ if [[ -d $HOME/bin/neovim/bin/ ]]; then
     export PATH="$HOME/bin/neovim/bin:$PATH"
 fi
 
-if [[ -f ~/.shell_alias ]]; then
-    source ~/.shell_alias
-fi
-
 if [[ -f ~/.shell_settings ]]; then
     source ~/.shell_settings
+fi
+
+# Load Bash It after set host settings
+if [[ -f "$BASH_IT/bash_it.sh" ]]; then
+    source $BASH_IT/bash_it.sh
+fi
+
+# Load alias after bash-it to give them higher priority
+if [[ -f ~/.shell_alias ]]; then
+    source ~/.shell_alias
 fi

@@ -60,17 +60,6 @@ ENABLE_CORRECTION="true"
 # Will otherwise fall back on $HOSTNAME.
 export SHORT_HOSTNAME=$(hostname -s)
 
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-
-if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    source $ZSH/oh-my-zsh.sh
-    plugins=(pip battery git docker archlinux python colored-man-pages)
-fi
-# bindkey -v
-
 # User configuration
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -98,6 +87,16 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+# bindkey -v
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+# You can change default plugins in shell_settings file
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    plugins=(pip battery git docker archlinux python colored-man-pages)
+fi
 
 ################################################################################
 #                               Vim c-s compatibility                          #
@@ -108,10 +107,16 @@ if [[ -d $HOME/bin ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
-if [[ -f ~/.shell_alias ]]; then
-    source ~/.shell_alias
-fi
-
 if [[ -f ~/.shell_settings ]]; then
     source ~/.shell_settings
+fi
+
+# Load oh-my-zsh after set host settings
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source $ZSH/oh-my-zsh.sh
+fi
+
+# Load alias after bash-it to give them higher priority
+if [[ -f ~/.shell_alias ]]; then
+    source ~/.shell_alias
 fi
