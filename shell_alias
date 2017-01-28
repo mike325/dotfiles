@@ -5,6 +5,9 @@
 #                                                                              #
 ################################################################################
 
+# This way sudo commands get the alias of the account
+alias sudo='sudo '
+
 if hash nvim 2>/dev/null; then
     export EDITOR='nvim'
     alias vim=nvim
@@ -32,6 +35,7 @@ alias im="vim"
 alias q="exit"
 
 alias rl="rm *.log"
+
 alias ports="netstat -tulpn"
 
 alias grep="grep --color -n"
