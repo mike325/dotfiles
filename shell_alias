@@ -31,6 +31,9 @@ alias im="vim"
 
 alias q="exit"
 
+alias rl="rm *.log"
+alias ports="netstat -tulpn"
+
 alias grep="grep --color -n"
 alias grepo="grep -o"
 alias grepe="grep -E"
