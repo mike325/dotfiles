@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ################################################################################
 #                                                                              #
 #   Author: Mike 8a                                                            #
@@ -5,8 +7,66 @@
 #                                                                              #
 ################################################################################
 
-# This way sudo commands get the alias of the account
+################################################################################
+#   Some usefull functions taken from https://github.com/Bash-it/bash-it/      #
+################################################################################
+function mkcd()
+{
+    # create a dir an move to it
+    if [[ ! -z $1 ]]; then
+        mkdir "$1"
+        cd "$1"
+    fi
+}
+
+function usage ()
+{
+    # disk usage per directory in Linux
+    if [ -n "$1" ]; then
+        du -h --max-depth=1 "$1"
+    else
+        du -h --max-depth=1
+    fi
+}
+
+function ips ()
+{
+    # display all ip addresses for this host
+    if command -v ifconfig &>/dev/null; then
+        ifconfig | awk '/inet /{ print $2 }'
+    elif command -v ip &>/dev/null; then
+        ip addr | grep -oP 'inet \K[\d.]+'
+    else
+        echo "You don't have ifconfig or ip command installed!"
+    fi
+}
+
+function down4me ()
+{
+    # checks whether a website is down for you, or everybody
+    # $ down4me http://www.google.com
+    curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
+}
+
+function myip ()
+{
+    # displays your ip address, as seen by the Internet
+    res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
+    echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
+}
+
+function del()
+{
+    # move files to hidden folder in tmp, that gets cleared on each reboot
+    mkdir -p /tmp/.trash && mv "$@" /tmp/.trash;
+}
+
+######## This way sudo commands get the alias of the account
 alias sudo='sudo '
+
+################################################################################
+#                          Set the default text editor                         #
+################################################################################
 
 if hash nvim 2>/dev/null; then
     export EDITOR='nvim'
@@ -67,23 +127,65 @@ if hash systemctl 2>/dev/null; then
 fi
 
 #####################    GIT     #######################
+function git_stats
+{
+    # Awesome work from https://github.com/esc/git-stats
+    # including some modifications
+
+    if [ -n "$(git symbolic-ref HEAD 2> /dev/null)" ]; then
+        echo "Number of commits per author:"
+        git --no-pager shortlog -sn --all
+        AUTHORS=$( git shortlog -sn --all | cut -f2 | cut -f1 -d' ')
+        LOGOPTS=""
+        if [[  "$1" == '-w' ]]; then
+            LOGOPTS="$LOGOPTS -w"
+            shift
+        fi
+        if [[  "$1" == '-M' ]]; then
+            LOGOPTS="$LOGOPTS -M"
+            shift
+        fi
+        if [[  "$1" == '-C' ]]; then
+            LOGOPTS="$LOGOPTS -C --find-copies-harder"
+            shift
+        fi
+        for a in $AUTHORS
+        do
+            echo '-------------------'
+            echo "Statistics for: $a"
+            echo -n "Number of files changed: "
+            git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f3 | sort -iu | wc -l
+            echo -n "Number of lines added: "
+            git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f1 | awk '{s+=$1} END {print s}'
+            echo -n "Number of lines deleted: "
+            git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f2 | awk '{s+=$1} END {print s}'
+            echo -n "Number of merges: "
+            git log $LOGOPTS --all --merges --author=$a | grep -c '^commit'
+        done
+    else
+        echo "you're currently not in a git repository"
+    fi
+}
+
 if hash git 2>/dev/null; then
     alias clone="git clone"
     alias ga="git add"
     alias gs="git status"
-    alias gc="git commit -m "
-    alias gp="git push"
-    alias gpu="git pull"
-    alias gco="git checkout "
+    alias gc="git commit"
+    alias gps="git push"
+    alias gpl="git pull"
+    alias go="git checkout "
     alias gr="git reset"
     alias gss="git stash save"
     alias gsp="git stash pop"
     alias gsd="git stash drop"
     alias gsa="git stash apply"
+    alias gsl="git stash list"
+    alias gsw="git stash show"
 fi
 
 #####################     VB      #######################
-alias vbkernel="sudo modprobe vboxdrv"
+alias vbk="sudo modprobe vboxdrv"
 
 ################  package management ##################
 if hash docker 2>/dev/null; then
