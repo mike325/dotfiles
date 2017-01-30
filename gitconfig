@@ -8,6 +8,14 @@
     #############
     cl = clean -xdf .
     #############
+    sb = submodule
+    sbf = submodule foreach
+    sbfp = submodule foreach git pull
+    sbu = submodule update
+    sbur = submodule update --recursive
+    sbui = submodule update --init
+    sbuir = submodule update --init --recursive
+    #############
     a  = add
     aa = add --all
     ai = add -i
@@ -107,7 +115,6 @@
     rpu = remote prune upstream
     #############
     s = status
-    sb = status -s -b
     #############
     sa = stash apply
     sc = stash clear
