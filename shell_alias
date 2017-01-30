@@ -64,6 +64,14 @@ function del()
 ######## This way sudo commands get the alias of the account
 alias sudo='sudo '
 
+######## Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
+if hash thefuck 2>/dev/null; then
+    eval "$(thefuck --alias)"
+    alias fuck='eval $(thefuck $(fc -ln -1))'
+    alias please='fuck'
+fi
+
+
 ################################################################################
 #                          Set the default text editor                         #
 ################################################################################
