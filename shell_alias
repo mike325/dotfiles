@@ -61,17 +61,6 @@ function del()
     mkdir -p /tmp/.trash && mv "$@" /tmp/.trash;
 }
 
-######## This way sudo commands get the alias of the account
-alias sudo='sudo '
-
-######## Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
-if hash thefuck 2>/dev/null; then
-    eval "$(thefuck --alias)"
-    alias fuck='eval $(thefuck $(fc -ln -1))'
-    alias please='fuck'
-fi
-
-
 ################################################################################
 #                          Set the default text editor                         #
 ################################################################################
@@ -120,6 +109,20 @@ alias turnoff="sudo poweroff"
 
 alias salias="source ~/.shell_alias"
 alias sset="source ~/.shell_settings"
+
+######## This way sudo commands get the alias of the account
+alias sudo='sudo '
+
+######## Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
+if hash thefuck 2>/dev/null; then
+    eval "$(thefuck --alias)"
+    alias fuck='eval $(thefuck $(fc -ln -1))'
+    alias please='fuck'
+fi
+
+if hash realpath 2>/dev/null; then
+    alias grp="realpath ."
+fi
 
 if hash ctags 2>/dev/null; then
     alias gtf="ctags -R ."

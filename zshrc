@@ -107,6 +107,14 @@ if [[ -d $HOME/bin ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
+if [[ -d $HOME/.local/bin/ ]]; then
+    export PATH="$HOME/.local/bin/:$PATH"
+fi
+
+if [[ -d $HOME/bin/neovim/bin/ ]]; then
+    export PATH="$HOME/bin/neovim/bin:$PATH"
+fi
+
 if [[ -f ~/.shell_settings ]]; then
     source ~/.shell_settings
 fi
