@@ -88,7 +88,7 @@ if [[ -f $HOME/.local/lib/pythonstartup.py ]]; then
 fi
 
 if [[ -d $HOME/.local/neovim/bin ]]; then
-    export PATH="$HOME/bin/neovim/bin:$PATH"
+    export PATH="$HOME/.local/neovim/bin:$PATH"
 fi
 
 ################################################################################
