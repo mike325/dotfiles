@@ -47,24 +47,34 @@ export SCM_CHECK=true
 # (Advanced): Uncomment this to make Bash-it reload itself automatically
 # after enabling or disabling aliases, plugins, and completions.
 
-
 ################################################################################
 #                               Vim c-s compatibility                          #
 stty -ixon                                                                     #
 ################################################################################
 
-if [[ -d $HOME/bin ]]; then
-    export PATH="$HOME/bin:$PATH"
-fi
+################################################################################
+#                         Make some dir that I normally use                    #
+################################################################################
+if [[ ! -d $HOME/.local/ ]]; then
+    mkdir -p $HOME/.local/bin
+    mkdir -p $HOME/.local/lib
+    mkdir -p $HOME/.local/share
 
-if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
 fi
 
-if [[ -d $HOME/bin/neovim/bin/ ]]; then
+if [[ -f $HOME/.local/lib/pythonstartup.py ]]; then
+    export PYTHONSTARTUP="$HOME/.local/lib/pythonstartup.py"
+fi
+
+if [[ -d $HOME/.local/neovim/bin ]]; then
     export PATH="$HOME/bin/neovim/bin:$PATH"
 fi
 
+################################################################################
+#                       Load the settings, alias and framework                 #
+################################################################################
+# Load host settings
 if [[ -f ~/.shell_settings ]]; then
     source ~/.shell_settings
 fi

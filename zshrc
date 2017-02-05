@@ -94,27 +94,39 @@ export SHORT_HOSTNAME=$(hostname -s)
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 # You can change default plugins in shell_settings file
-if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    plugins=(pip battery git docker archlinux python colored-man-pages)
-fi
 
 ################################################################################
 #                               Vim c-s compatibility                          #
 stty -ixon                                                                     #
 ################################################################################
 
-if [[ -d $HOME/bin ]]; then
-    export PATH="$HOME/bin:$PATH"
-fi
+################################################################################
+#                         Make some dir that I normally use                    #
+################################################################################
+if [[ ! -d $HOME/.local/ ]]; then
+    mkdir -p $HOME/.local/bin
+    mkdir -p $HOME/.local/lib
+    mkdir -p $HOME/.local/share
 
-if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
 fi
 
-if [[ -d $HOME/bin/neovim/bin/ ]]; then
+if [[ -f $HOME/.local/lib/pythonstartup.py ]]; then
+    export PYTHONSTARTUP="$HOME/.local/lib/pythonstartup.py"
+fi
+
+if [[ -d $HOME/.local/neovim/bin ]]; then
     export PATH="$HOME/bin/neovim/bin:$PATH"
 fi
 
+################################################################################
+#                       Load the settings, alias and framework                 #
+################################################################################
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    plugins=(pip battery git docker archlinux python colored-man-pages)
+fi
+
+# Load host settings
 if [[ -f ~/.shell_settings ]]; then
     source ~/.shell_settings
 fi
