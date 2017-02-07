@@ -79,7 +79,9 @@ if [[ ! -d $HOME/.local/ ]]; then
     mkdir -p $HOME/.local/bin
     mkdir -p $HOME/.local/lib
     mkdir -p $HOME/.local/share
+fi
 
+if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
 fi
 
