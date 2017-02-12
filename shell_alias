@@ -87,8 +87,9 @@ function del()
 
 if hash nvim 2>/dev/null; then
     export EDITOR='nvim'
-    alias vim=nvim
-    alias vi=/bin/vim
+    VIM_PATH="$(command -v vim)"
+    alias vim="nvim"
+    alias vi="$VIM_PATH"
     alias cdvim="cd ~/.config/nvim"
     alias cdvi="cd ~/.vim"
 else

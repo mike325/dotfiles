@@ -128,7 +128,9 @@ if [[ ! -d $HOME/.local/ ]]; then
     mkdir -p $HOME/.local/bin
     mkdir -p $HOME/.local/lib
     mkdir -p $HOME/.local/share
+fi
 
+if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
 fi
 
@@ -144,7 +146,7 @@ fi
 #                       Load the settings, alias and framework                 #
 ################################################################################
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    plugins=(pip battery git docker archlinux python colored-man-pages)
+    plugins=(docker git python colored-man-pages)
 fi
 
 # Load host settings
