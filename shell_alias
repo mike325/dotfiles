@@ -165,7 +165,14 @@ if hash thefuck 2>/dev/null; then
 fi
 
 if hash realpath 2>/dev/null; then
-    alias grp="realpath ."
+    function grp()
+    {
+        if [[ ! -z $1 ]]; then
+            realpath "$1"
+        else
+            realpath "."
+        fi
+    }
 fi
 
 if hash ctags 2>/dev/null; then
@@ -250,7 +257,8 @@ if hash docker 2>/dev/null; then
 fi
 
 if hash yaourt 2>/dev/null; then
-    alias update="yaourt -Syyu"
+    alias update="yaourt -Syyu --aur"
+    alias updaten="yaourt -Syyu --aur --noconfirm"
 elif hash apt-get 2>/dev/null; then
     alias update="sudo apt-get update && sudo apt-get upgrade"
 elif hash dnf 2>/dev/null; then
