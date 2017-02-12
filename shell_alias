@@ -98,6 +98,29 @@ else
 fi
 
 ################################################################################
+#                         Small script to install neovim                       #
+################################################################################
+
+function install_neovim()
+{
+    git checkout . 2>/dev/null
+    git clean -xdf . 2>/dev/null
+
+    git checkout v0.1.7 2>/dev/null
+
+    rm -r build/
+    make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
+    if [[ $? -eq 0 ]]; then
+        make install
+        if [[ $? -eq 0 ]]; then
+            export PATH="$(pwd)/bin:$PATH"
+
+            echo You may want to add export PATH="$(pwd)/bin:\$PATH" in the shell_alias
+        fi
+    fi
+}
+
+################################################################################
 #                          Fix my common typos                                 #
 ################################################################################
 
