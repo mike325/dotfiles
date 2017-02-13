@@ -25,9 +25,22 @@
 [core]
     editor = vim
 [user]
-#    name  = USER
-#    email = MAIL
+    name  = Mike
+    email = mike@prodeveloper.me
+[github]
+    user = mike325
+[color]
+	ui = auto
+	diff = auto
+	status = auto
+	branch = auto
+	interactive = auto
+	grep = auto
+[init]
+    templatedir = ~/.git_template
 [alias]
+    ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
+    #############
     cn = clone --recursive
     #############
     cl = clean -xdf .
