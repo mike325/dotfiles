@@ -39,7 +39,7 @@
 [init]
     templatedir = ~/.git_template
 [alias]
-    ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
+    ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags'"
     #############
     cn = clone --recursive
     #############
@@ -107,6 +107,8 @@
     psfo = push -f origin
     psuo = push -u origin
     psom = push origin master
+    pshm =  push origin HEAD:master
+    psrhm = "!f() { git push $1 HEAD:master }; f"
     psfom = push -f origin master
     psuom = push -u origin master
     #############
