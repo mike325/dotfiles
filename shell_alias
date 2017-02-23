@@ -101,6 +101,16 @@ else
     alias cdvim="cd ~/.vim"
 fi
 
+if hash emacs 2>/dev/null; then
+    function cmacs() {
+        emacsclient -nw "$@"
+    }
+
+    function gmacs() {
+        emacsclient -c "$@" &
+    }
+fi
+
 ################################################################################
 #                         Small script to install neovim                       #
 ################################################################################
