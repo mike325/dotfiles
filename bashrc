@@ -77,11 +77,9 @@ stty -ixon                                                                     #
 ################################################################################
 #                         Make some dir that I normally use                    #
 ################################################################################
-if [[ ! -d $HOME/.local/ ]]; then
-    mkdir -p $HOME/.local/bin
-    mkdir -p $HOME/.local/lib
-    mkdir -p $HOME/.local/share
-fi
+[[ $HOME/.local/bin ]] && mkdir -p $HOME/.local/bin
+[[ $HOME/.local/lib ]] && mkdir -p $HOME/.local/lib
+[[ $HOME/.local/share ]] && mkdir -p $HOME/.local/share
 
 if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
