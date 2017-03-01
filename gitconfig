@@ -41,6 +41,10 @@
 [alias]
     ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags'"
     #############
+    updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
+    #############
+    rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
+    #############
     cn = clone --recursive
     #############
     cl = clean -xdf .

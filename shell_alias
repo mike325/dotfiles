@@ -109,6 +109,14 @@ if hash emacs 2>/dev/null; then
     function gmacs() {
         emacsclient -c "$@" &
     }
+
+    function dmacs() {
+        emacs --daemon &
+    }
+
+    function kmacs() {
+        emacsclient -c "(kill-emacs)"
+    }
 fi
 
 ################################################################################
