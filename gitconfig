@@ -46,6 +46,8 @@
     #############
     rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
     #############
+    dt  = describe --tag
+    #############
     cn = clone --recursive
     #############
     cl = clean -xdf .
