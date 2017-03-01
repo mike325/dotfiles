@@ -24,6 +24,7 @@
 
 [core]
     editor = vim
+	excludesfile = ~/.git_global_ignore
 [user]
     name  = Mike
     email = mike@prodeveloper.me

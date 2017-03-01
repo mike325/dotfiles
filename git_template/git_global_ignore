@@ -1,0 +1,8 @@
+.ropeproject/
+tags
+etags
+TAGS
+GTAGS
+PTAGS
+
+*.pyc
