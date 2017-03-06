@@ -116,7 +116,7 @@ if hash emacs 2>/dev/null; then
     }
 
     function kmacs() {
-        emacsclient -c "(kill-emacs)"
+        emacsclient -e "(kill-emacs)"
     }
 fi
 
