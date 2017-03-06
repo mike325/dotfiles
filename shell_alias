@@ -30,18 +30,19 @@
 ################################################################################
 #   Some usefull functions taken from https://github.com/Bash-it/bash-it/      #
 ################################################################################
+
+# create a dir an move to it
 function mkcd()
 {
-    # create a dir an move to it
     if [[ ! -z $1 ]]; then
         mkdir "$1"
         cd "$1"
     fi
 }
 
+# disk usage per directory in Linux
 function usage ()
 {
-    # disk usage per directory in Linux
     if [ -n "$1" ]; then
         du -h --max-depth=1 "$1"
     else
@@ -49,9 +50,9 @@ function usage ()
     fi
 }
 
+# display all ip addresses for this host
 function ips ()
 {
-    # display all ip addresses for this host
     if command -v ifconfig &>/dev/null; then
         ifconfig | awk '/inet /{ print $2 }'
     elif command -v ip &>/dev/null; then
@@ -61,23 +62,23 @@ function ips ()
     fi
 }
 
+# checks whether a website is down for you, or everybody
+# $ down4me http://www.google.com
 function down4me ()
 {
-    # checks whether a website is down for you, or everybody
-    # $ down4me http://www.google.com
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
+# displays your ip address, as seen by the Internet
 function myip ()
 {
-    # displays your ip address, as seen by the Internet
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
+# move files to hidden folder in tmp, that gets cleared on each reboot
 function del()
 {
-    # move files to hidden folder in tmp, that gets cleared on each reboot
     mkdir -p /tmp/.trash && mv "$@" /tmp/.trash;
 }
 
@@ -123,20 +124,27 @@ fi
 #                         Small script to install neovim                       #
 ################################################################################
 
+# Small script to install neovim
+# Warning ! this script delete evething in the workdirectory before install
 function install_neovim()
 {
+    # Remove all unstaged changes
     git checkout . 2>/dev/null
+    # Remove all untracked files
     git clean -xdf . 2>/dev/null
+    rm -r build/
 
+    # Checkout to the stable branch
     git checkout v0.1.7 2>/dev/null
 
-    rm -r build/
+    # Prefix the current dir
     make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
+
+    # Continue only if there isn't erros
     if [[ $? -eq 0 ]]; then
         make install
         if [[ $? -eq 0 ]]; then
             export PATH="$(pwd)/bin:$PATH"
-
             echo You may want to add export PATH="$(pwd)/bin:\$PATH" in the shell_alias
         fi
     fi
@@ -152,12 +160,15 @@ alias cim="vim"
 alias im="vim"
 
 ################################################################################
-#                               Alias                                          #
+#                        Alias and Functions                                   #
 ################################################################################
 
 alias q="exit"
 
-alias rl="rm *.log"
+function rl()
+{
+    rm "$@" *.log
+}
 
 alias ports="netstat -tulpn"
 
@@ -169,9 +180,26 @@ alias ls='ls --color'
 alias la="ls -A"
 alias ll="ls -lh"
 alias lla="ls -lhA"
-alias bk="cd .."
 alias cl="clear"
 alias turnoff="sudo poweroff"
+
+# Function to go back any number of dirs
+function bk()
+{
+    if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]]; then
+        PARENT="./"
+
+        for (( i = 0; i < "$1"; i++ )); do
+            PARENT="${PARENT}../"
+        done
+        cd "$PARENT"
+    elif [[ -z "$1" ]]; then
+        cd ..
+    else
+        echo "Unexpected arg $1"
+        return 1
+    fi
+}
 
 alias salias="source ~/.shell_alias"
 alias sset="source ~/.shell_settings"
@@ -190,9 +218,23 @@ if hash realpath 2>/dev/null; then
     function grp()
     {
         if [[ ! -z $1 ]]; then
-            realpath "$1"
+            realpath "$@"
         else
             realpath "."
+        fi
+    }
+else
+    function grp()
+    {
+        if [[ ! -z "$1" ]]; then
+            cd "$1" 1> /dev/null
+
+            if [[ $? -eq 0 ]]; then
+                pwd -P
+                cd - 1> /dev/null
+            fi
+        else
+            pwd -P
         fi
     }
 fi
@@ -204,6 +246,8 @@ fi
 #####################    systemctl     #######################
 if hash systemctl 2>/dev/null; then
     alias sysctl="sudo systemctl"
+    alias usysctl="systemctl --user"
+
     alias ctls="sudo systemctl start"
     alias ctlk="sudo systemctl stop"
     alias ctlr="sudo systemctl restart"

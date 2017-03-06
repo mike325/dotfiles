@@ -77,9 +77,10 @@ stty -ixon                                                                     #
 ################################################################################
 #                         Make some dir that I normally use                    #
 ################################################################################
-[[ $HOME/.local/bin ]] && mkdir -p $HOME/.local/bin
-[[ $HOME/.local/lib ]] && mkdir -p $HOME/.local/lib
-[[ $HOME/.local/share ]] && mkdir -p $HOME/.local/share
+[[ $HOME/.local/bin ]] && mkdir -p "$HOME/.local/bin"
+[[ $HOME/.local/lib ]] && mkdir -p "$HOME/.local/lib"
+[[ $HOME/.local/share ]] && mkdir -p "$HOME/.local/share"
+[[ $HOME/.local/golang/src ]] && mkdir -p "$HOME/.local/golang/src"
 
 if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
@@ -91,6 +92,14 @@ fi
 
 if [[ -d $HOME/.local/neovim/bin ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
+fi
+
+if [[ -d $HOME/.local/golang/bin ]]; then
+    export PATH="$HOME/.local/golang/bin:$PATH"
+fi
+
+if [[ -d $HOME/.local/golang/src ]]; then
+    export GOPATH="$HOME/.local/golang/src"
 fi
 
 ################################################################################
