@@ -189,7 +189,7 @@ function bk()
     if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]]; then
         PARENT="./"
 
-        for (( i = 0; i < "$1"; i++ )); do
+        for (( i = 0; i < $1; i++ )); do
             PARENT="${PARENT}../"
         done
         cd "$PARENT"
