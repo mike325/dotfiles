@@ -24,19 +24,20 @@
 
 [core]
     editor = vim
-	excludesfile = ~/.git_global_ignore
+    excludesfile = ~/.git_global_ignore
 [user]
     name  = Mike
     email = mike@prodeveloper.me
 [github]
     user = mike325
 [color]
-	ui = auto
-	diff = auto
-	status = auto
-	branch = auto
-	interactive = auto
-	grep = auto
+    ui = auto
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+    grep = auto
+    log = auto
 [init]
     templatedir = ~/.git_template
 [alias]
