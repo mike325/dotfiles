@@ -155,6 +155,10 @@ function install_neovim()
 ################################################################################
 
 alias gti="git"
+alias got="git"
+alias gut="git"
+alias gi="git"
+
 alias bim="vim"
 alias cim="vim"
 alias im="vim"
