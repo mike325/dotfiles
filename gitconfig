@@ -25,145 +25,210 @@
 [core]
     editor = vim
     excludesfile = ~/.git_global_ignore
+
 [user]
     name  = Mike
     email = mike@prodeveloper.me
+
 [github]
     user = mike325
+
 [color]
-    ui = auto
-    diff = auto
-    status = auto
-    branch = auto
+    ui          = auto
+    diff        = auto
+    status      = auto
+    branch      = auto
     interactive = auto
-    grep = auto
-    log = auto
+    grep        = auto
+    log         = auto
+
 [init]
     templatedir = ~/.git_template
+
+[color "branch"]
+    current = green
+    local   = yellow
+    remote  = red
+
+[color "diff"]
+    frag = magenta
+    meta = yellow
+    new  = green
+    old  = red
+
+[color "status"]
+    added     = green
+    changed   = yellow
+    untracked = red
+
+[push]
+    # Make `git push` automatically push relevant annotated tags when pushing
+    followTags = true
+
 [alias]
-    ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags'"
-    #############
-    updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
-    #############
-    rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
-    #############
+################################################################################
+#                 Just a status                                                #
+################################################################################
+
+    s = status
+
+################################################################################
+#                 Get the tag of the current commit                            #
+################################################################################
+
     dt  = describe --tag
-    #############
+
+################################################################################
+#                 clone recursive                                              #
+################################################################################
+
     cn = clone --recursive
-    #############
+
+################################################################################
+#                 Clean the repo of all untracke files                         #
+################################################################################
+
     cl = clean -xdf .
-    #############
-    sb = submodule
-    sbf = submodule foreach
-    sbfp = submodule foreach git pull
-    sbu = submodule update
-    sbur = submodule update --recursive
-    sbui = submodule update --init
+
+################################################################################
+#                 Submodule management                                         #
+################################################################################
+
+    sb    = submodule
+    sbf   = submodule foreach
+    sbfp  = submodule foreach git pull
+    sbu   = submodule update
+    sbur  = submodule update --recursive
+    sbui  = submodule update --init
     sbuir = submodule update --init --recursive
-    #############
+
+################################################################################
+#                 Quick add files                                              #
+################################################################################
+
     a  = add
     aa = add --all
     ai = add -i
-    #############
+
+################################################################################
+#                 Branch management                                            #
+################################################################################
+
     b   = branch
-    ba  = branch -a
+    ba  = branch --all
     bd  = branch -d
     bdd = branch -D
     br  = branch -r
-    #############
+
+################################################################################
+#                 Commit shortcuts                                             #
+################################################################################
+
     c   = commit
-    ca  = commit -a
     cm  = commit -m
-    cam = commit -am
-    cd  = commit --amend
-    cad = commit -a --amend
-    #############
+    ca  = commit --amend
+
+################################################################################
+#                 Diff stuff                                                   #
+################################################################################
+
     d   = diff
-    dn  = "!f() { git diff --name-status $1 HEAD; }; f"
     dc  = diff --cached
-    dl  = difftool
-    dlc = difftool --cached
     dk  = diff --check
     dp  = diff --patience
-    dck = diff --cached --check
-    #############
-    g = grep -nI --color
-    #############
-    l  = log
-    ll = log --oneline
-    lg = log --graph
+
+################################################################################
+#                 Grep something in the current repo                           #
+################################################################################
+
+    g  = grep -nI --color
+    gi = grep -nIi --color
+
+################################################################################
+#                 Git log stuff                                                #
+################################################################################
+
+    l   = log
+    ll  = log --oneline
+    lg  = log --graph
     llg = log --oneline --graph --decorate
-    #############
+
+################################################################################
+#                 Git ls a bit simpler and with grep search                    #
+################################################################################
+
     ls = ls-files
-    lsf = "!git ls-files | grep -i"
-    #############
+
+################################################################################
+#                 Merge shortcuts                                              #
+################################################################################
+
     m  = merge
     ma = merge --abort
     mc = merge --continue
     ms = merge --skip
-    #############
-    o = checkout
+
+################################################################################
+#                 Checkout ** TODO add some more shortcuts                     #
+################################################################################
+
+    o  = checkout
     ob = checkout -b
     od = checkout --
     or = checkout .
-    #############
-    ps = push
-    psf = push -f
-    psu = push -u
-    pso = push origin
-    psao = push --all origin
-    psfo = push -f origin
-    psuo = push -u origin
-    psom = push origin master
-    pshm =  push origin HEAD:master
-    psrhm = "!f() { git push $1 HEAD:master }; f"
-    psfom = push -f origin master
-    psuom = push -u origin master
-    #############
-    pl = pull
-    plu = pull -u
-    plo = pull origin
-    plp = pull upstream
-    plom = pull origin master
-    plpm = pull upstream master
-    #############
-    pb = pull --rebase
-    pbo = pull --rebase origin
-    pbp = pull --rebase upstream
-    pbom = pull --rebase origin master
-    pbpm = pull --rebase upstream master
-    #############
+
+################################################################################
+#                 Shortcuts to push and pull changes                           #
+################################################################################
+
+    ps    = push
+    psom  = push origin master
+    pshm  = push origin HEAD:master
+
+    pl    = pull
+    plom  = pull origin master
+
+    pb    = pull --rebase
+    pbo   = pull --rebase origin
+    pbom  = pull --rebase origin master
+
+################################################################################
+#                 Simple rebase settings                                       #
+################################################################################
+
     rb = rebase
     rba = rebase --abort
     rbc = rebase --continue
     rbi = rebase --interactive
     rbs = rebase --skip
-    #############
-    re = reset
-    rh = reset HEAD
-    reh = reset --hard
-    rem = reset --mixed
-    res = reset --soft
+
+################################################################################
+#                 Reset the HEAD of the repo                                   #
+################################################################################
+
+    re   = reset
+    rh   = reset HEAD
+    reh  = reset --hard
+    res  = reset --soft
     rehh = reset --hard HEAD
-    remh = reset --mixed HEAD
     resh = reset --soft HEAD
-    #############
-    r = remote
-    ra = remote add
-    rr = remote rm
-    rv = remote -v
-    rm = remote rename
-    rp = remote prune
-    rs = remote show
+
+################################################################################
+#                 Remotes management                                           #
+################################################################################
+
+    r   = remote
+    ra  = remote add
+    rr  = remote rm
+    rm  = remote rename
+    rs  = remote show
     rao = remote add origin
-    rau = remote add upstream
     rso = remote show origin
-    rsu = remote show upstream
-    rpo = remote prune origin
-    rpu = remote prune upstream
-    #############
-    s = status
-    #############
+
+################################################################################
+#                 Stash stuff                                                  #
+################################################################################
+
     sa = stash apply
     sc = stash clear
     sd = stash drop
@@ -171,25 +236,54 @@
     sp = stash pop
     ss = stash save
     sw = stash show
-    #############
-    w = show
-    wp = show -p
-    wr = show -p --no-color
-    #############
+
+################################################################################
+#      SVN compatibility (I have to use this crap, hope no one else need it)   #
+################################################################################
+
     svnr = svn rebase
     svnd = svn dcommit
     svnl = svn log --oneline --show-commit
-    #############
-    assume = update-index --assume-unchanged
-    unassume = update-index --no-assume-unchanged
-    assumed = "!git ls-files -v | grep ^h | cut -c 3-"
-    unassumeall = !git assumed | xargs git update-index --no-assume-unchanged
-    #############
-    ours = "!f() { git checkout --ours $@ && git add $@; }; f"
-    theirs = "!f() { git checkout --theirs $@ && git add $@; }; f"
-    #############
-    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
-    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
-    #############
-    human = name-rev --name-only --refs=refs/heads/*
+
+################################################################################
+#                 Custom functions                                             #
+################################################################################
+
+#   Create a stash of the current changes and then reapply them
     snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+
+#   Auto create tags files and place it in .git dir
+    ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags'"
+
+#   Update just one file form specific remote
+    updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
+
+#   Reset a staged file to its original state (index)
+    rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
+
+#   Push the current branch to the master of a remote
+    psrhm = "!f() { git push $1 HEAD:master }; f"
+
+#   Seach some text in the tracked files
+    lsf = "!git ls-files | grep -i"
+
+#   Get the filesnames of all changes a given commit and the HEAD
+    dn  = "!f() { git diff --name-status $1 HEAD; }; f"
+
+#   Remove the tag with the specified tag name if exists and tag the latest
+#   commit with that name.
+    retag = "!f() { \
+        git tag -d $1 &> /dev/null; \
+        git tag $1; \
+    }; f"
+
+#   Find commits by commit message.
+    cm = "!f() { \
+        git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
+    }; f"
+
+#   Remove any given number of commits
+    rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
+
+#   Undo any given number of commits
+    ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
