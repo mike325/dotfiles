@@ -85,10 +85,10 @@
     cn = clone --recursive
 
 ################################################################################
-#                 Clean the repo of all untracke files                         #
+#                 Clean the repo of all untracked files                        #
 ################################################################################
 
-    cl = clean -xdf .
+    cl = clean -xdf . # Use with a lot of caution !!!!
 
 ################################################################################
 #                 Submodule management                                         #
@@ -100,33 +100,33 @@
     sbu   = submodule update
     sbur  = submodule update --recursive
     sbui  = submodule update --init
-    sbuir = submodule update --init --recursive
+    sbuir = submodule update --init --recursive # init and update all submodules
 
 ################################################################################
 #                 Quick add files                                              #
 ################################################################################
 
-    a  = add
-    aa = add --all
-    ai = add -i
+    a  = add        # Add stuff
+    aa = add --all  # Add all stuff
+    ai = add -i     # Add interactive stuff
 
 ################################################################################
 #                 Branch management                                            #
 ################################################################################
 
-    b   = branch
-    ba  = branch --all
-    bd  = branch -d
-    bdd = branch -D
-    br  = branch -r
+    b   = branch        # Show local branches
+    ba  = branch --all  # Show all local and remote branches
+    bd  = branch -d     # Delete a merged branch
+    bdd = branch -D     # Force branch deletion
+    br  = branch -m     # Rename a branch
 
 ################################################################################
 #                 Commit shortcuts                                             #
 ################################################################################
 
-    c   = commit
-    cm  = commit -m
-    ca  = commit --amend
+    c   = commit            # Normal commit
+    cm  = commit -m         # Short commit
+    ca  = commit --amend    # Commit over the last commit
 
 ################################################################################
 #                 Diff stuff                                                   #
@@ -141,23 +141,23 @@
 #                 Grep something in the current repo                           #
 ################################################################################
 
-    g  = grep -nI --color
-    gi = grep -nIi --color
+    g  = grep -nI --color   # Grep showing the line number and ignore binaries
+    gi = grep -nIi --color  # Same as above but ignore case
 
 ################################################################################
 #                 Git log stuff                                                #
 ################################################################################
 
-    l   = log
-    ll  = log --oneline
-    lg  = log --graph
-    llg = log --oneline --graph --decorate
+    l   = log                         # Normal log
+    lg  = log --graph                 # Normal log with graph
+    ll  = log --pretty=custom         # Short log with pretty format
+    llg = log --graph --pretty=custom # Short pretty log with graph
 
 ################################################################################
 #                 Git ls a bit simpler and with grep search                    #
 ################################################################################
 
-    ls = ls-files
+    ls = ls-files # Display tracked files
 
 ################################################################################
 #                 Merge shortcuts                                              #
@@ -172,25 +172,25 @@
 #                 Checkout ** TODO add some more shortcuts                     #
 ################################################################################
 
-    o  = checkout
-    ob = checkout -b
-    od = checkout --
-    or = checkout .
+    o  = checkout       # checkout shortcut
+    ob = checkout -b    # checkout to a given branch
+    od = checkout --    # Reset the changes in a given file
+    or = checkout .     # Reset the changes of the working space
 
 ################################################################################
 #                 Shortcuts to push and pull changes                           #
 ################################################################################
 
-    ps    = push
-    psom  = push origin master
-    pshm  = push origin HEAD:master
+    ps    = push                    # Normal push shortcut
+    psom  = push origin master      # Push master to origin remote
+    pshm  = push origin HEAD:master # push HEAD to master's origin
 
-    pl    = pull
-    plom  = pull origin master
+    pl    = pull               # Pull shortcut
+    plom  = pull origin master # pull from master origin
 
-    pb    = pull --rebase
-    pbo   = pull --rebase origin
-    pbom  = pull --rebase origin master
+    pb    = pull --rebase               # Pull with rebase
+    pbo   = pull --rebase origin        # Pull and rebase from origin
+    pbom  = pull --rebase origin master # Pull and rebase master from origin
 
 ################################################################################
 #                 Simple rebase settings                                       #
@@ -217,13 +217,13 @@
 #                 Remotes management                                           #
 ################################################################################
 
-    r   = remote
-    ra  = remote add
-    rr  = remote rm
-    rm  = remote rename
-    rs  = remote show
-    rao = remote add origin
-    rso = remote show origin
+    r   = remote             # remote shortcut
+    ra  = remote add         # Add remote
+    rr  = remote rm          # remove remote
+    rm  = remote rename      # rename remote
+    rs  = remote show        # show info if remote
+    rao = remote add origin  # add origin remote
+    rso = remote show origin # Show origin remote info
 
 ################################################################################
 #                 Stash stuff                                                  #
@@ -252,7 +252,7 @@
 #   Create a stash of the current changes and then reapply them
     snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
 
-#   Auto create tags files and place it in .git dir
+#   Auto create tags files and place it in .git dir Credits to Tpope
     ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags'"
 
 #   Update just one file form specific remote
@@ -264,26 +264,36 @@
 #   Push the current branch to the master of a remote
     psrhm = "!f() { git push $1 HEAD:master }; f"
 
-#   Seach some text in the tracked files
+#   Search some text in the tracked files
     lsf = "!git ls-files | grep -i"
 
-#   Get the filesnames of all changes a given commit and the HEAD
+#   Get the filenames of all changes a given commit and the HEAD
     dn  = "!f() { git diff --name-status $1 HEAD; }; f"
+
+#   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 
 #   Remove the tag with the specified tag name if exists and tag the latest
 #   commit with that name.
     retag = "!f() { \
         git tag -d $1 &> /dev/null; \
         git tag $1; \
-    }; f"
+        }; f"
 
 #   Find commits by commit message.
     cm = "!f() { \
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
-    }; f"
+        }; f"
 
 #   Remove any given number of commits
     rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
 
 #   Undo any given number of commits
     ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
+
+[pretty]
+    custom = "%C(magenta)%h%C(red)%d %C(yellow)%ar %C(green)%s %C(yellow)(%an)"
+    #                     │        │            │            │             └─ author name
+    #                     │        │            │            └─ message
+    #                     │        │            └─ date (relative)
+    #                     │        └─ decorations (branch, heads or tags)
+    #                     └─ hash (abbreviated)

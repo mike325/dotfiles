@@ -32,7 +32,7 @@
 ################################################################################
 
 # create a dir an move to it
-function mkcd()
+function mkcd ()
 {
     if [[ ! -z $1 ]]; then
         mkdir "$1"
