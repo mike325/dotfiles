@@ -70,8 +70,11 @@ export SCM_CHECK=true
 # after enabling or disabling aliases, plugins, and completions.
 
 ################################################################################
-#                               Vim c-s compatibility                          #
+#                               Some vim stuff                                 #
+# Use <C-s> in terminal vim                                                    #
 stty -ixon                                                                     #
+# Set vi keys in the shell                                                     #
+set -o vi                                                                      #
 ################################################################################
 
 ################################################################################
