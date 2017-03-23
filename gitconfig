@@ -88,7 +88,8 @@
 #                 Clean the repo of all untracked files                        #
 ################################################################################
 
-    cl = clean -xdf . # Use with a lot of caution !!!!
+    cl  = clean -df .  # Remove all untracked files (excluding ignore ones)
+    cla = clean -xdf . # Remove everything, including ignored files
 
 ################################################################################
 #                 Submodule management                                         #
