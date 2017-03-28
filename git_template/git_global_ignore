@@ -1,8 +1,9 @@
-.ropeproject/
+*.ropeproject*/*
 tags
 etags
 TAGS
 GTAGS
 PTAGS
-
 *.pyc
+tmp/*
+tmp_*/*
