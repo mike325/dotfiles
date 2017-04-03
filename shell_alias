@@ -167,6 +167,16 @@ alias im="vim"
 #                        Alias and Functions                                   #
 ################################################################################
 
+# Small Function that compress a file or directory with the same name as
+# output
+function tcmp()
+{
+    if [[ ! -z "$1" ]]; then
+        NAME="$1"
+        tar czf "$NAME.tar.bz" "$NAME"
+    fi
+}
+
 alias q="exit"
 
 function rl()
