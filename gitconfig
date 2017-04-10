@@ -149,10 +149,12 @@
 #                 Git log stuff                                                #
 ################################################################################
 
-    l   = log                         # Normal log
-    lg  = log --graph                 # Normal log with graph
-    ll  = log --pretty=custom         # Short log with pretty format
-    llg = log --graph --pretty=custom # Short pretty log with graph
+    l   = log                               # Normal log
+    ln  = log --name-status                 # get files that changed
+    lg  = log --graph                       # Normal log with graph
+    ll  = log --pretty=custom               # Short log with pretty format
+    llg = log --graph --pretty=custom       # Short pretty log with graph
+    lln = log --name-status --pretty=custom # get files that changed
 
 ################################################################################
 #                 Git ls a bit simpler and with grep search                    #
@@ -170,7 +172,7 @@
     ms = merge --skip
 
 ################################################################################
-#                 Checkout ** TODO add some more shortcuts                     #
+#                 Checkout ** TODO add more shortcuts                          #
 ################################################################################
 
     o  = checkout       # checkout shortcut

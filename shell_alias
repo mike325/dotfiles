@@ -27,8 +27,10 @@
 #                                                                              #
 ################################################################################
 
+# TODO split the file into smaller packages
+
 ################################################################################
-#   Some usefull functions taken from https://github.com/Bash-it/bash-it/      #
+#   Some useful functions taken from https://github.com/Bash-it/bash-it/       #
 ################################################################################
 
 # create a dir an move to it
@@ -69,7 +71,7 @@ function down4me ()
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
-# displays your ip address, as seen by the Internet
+# displays your IP address, as seen by the Internet
 function myip ()
 {
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
@@ -103,33 +105,58 @@ else
 fi
 
 if hash emacs 2>/dev/null; then
-    function cmacs() {
+    function cmacs()
+    {
         emacsclient -nw "$@"
     }
 
-    function gmacs() {
+    function gmacs()
+    {
         emacsclient -c "$@" &
     }
 
-    function dmacs() {
+    function dmacs()
+    {
         emacs --daemon &
     }
 
-    function kmacs() {
+    function kmacs()
+    {
         emacsclient -e "(kill-emacs)"
     }
 fi
 
 ################################################################################
-#                         Small script to install neovim                       #
+#                         Small script to install Neovim                       #
 ################################################################################
 
-# Small script to install neovim
-# Warning ! this script delete evething in the workdirectory before install
-function install_neovim()
+# Small script to install Neovim
+# Warning ! This script delete everything in the work directory before install
+function install_nvim()
 {
+    LOCATION="$HOME/.local/"
+    URL="https://github.com/neovim/neovim"
+
+    if [[ ! -z "$1" ]] && [[ $1 =~ "^-d$" ]]; then
+
+        if [[ ! -z "$2" ]]; then
+            LOCATION="$2"
+        else
+            mkdir -p "$LOCATION"
+        fi
+
+        git clone --recursive "$URL" "$LOCATION"
+
+        if [[ $? -ne 0 ]]; then
+            return 1
+        fi
+    fi
+
+    cd "$LOCATION"
+
     # Remove all unstaged changes
     git checkout . 2>/dev/null
+
     # Remove all untracked files
     git clean -xdf . 2>/dev/null
     rm -r build/
@@ -140,13 +167,37 @@ function install_neovim()
     # Prefix the current dir
     make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
 
-    # Continue only if there isn't erros
+    # Continue only if there isn't errors
     if [[ $? -eq 0 ]]; then
         make install
         if [[ $? -eq 0 ]]; then
             export PATH="$(pwd)/bin:$PATH"
             echo You may want to add export PATH="$(pwd)/bin:\$PATH" in the shell_alias
         fi
+    fi
+
+    cd -
+}
+
+################################################################################
+#                 Small script to install some shell frameworks                #
+################################################################################
+
+# Small script to install bash-it or oh-my-zsh shell frameworks
+function install_shell()
+{
+    if [[ "$SHELL" =~ "bash" ]] && [[ ! -d "$HOME/.bash_it" ]]; then
+        git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it" 2>/dev/null
+    elif [[ "$SHELL" =~ "zsh" ]] && [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+        if hash curl 2>/dev/null; then
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+        elif hash wget 2>/dev/null; then
+            sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+        else
+            git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh" 2>/dev/null
+        fi
+    else
+        echo "Sorry the current shell is not supported"
     fi
 }
 
@@ -231,13 +282,14 @@ fi
 if hash realpath 2>/dev/null; then
     function grp()
     {
-        if [[ ! -z $1 ]]; then
+        if [[ ! -z "$1" ]]; then
             realpath "$@"
         else
             realpath "."
         fi
     }
 else
+    # TODO write a wrapper to  manage file without realpath
     function grp()
     {
         if [[ ! -z "$1" ]]; then
@@ -262,10 +314,10 @@ if hash systemctl 2>/dev/null; then
     alias sysctl="sudo systemctl"
     alias usysctl="systemctl --user"
 
-    alias ctls="sudo systemctl start"
-    alias ctlk="sudo systemctl stop"
-    alias ctlr="sudo systemctl restart"
-    alias ctlw="sudo systemctl status"
+    alias ctls="sudo systemctl start"   # Start
+    alias ctlh="sudo systemctl stop"    # Halt
+    alias ctlr="sudo systemctl restart" # Restart
+    alias ctlw="sudo systemctl status"  # shoW
 fi
 
 #####################    GIT     #######################
@@ -330,6 +382,9 @@ fi
 alias vbk="sudo modprobe vboxdrv"
 
 ################  package management ##################
+
+# TODO Make a small function to install system basics
+
 if hash docker 2>/dev/null; then
     alias docker="sudo docker"
     alias docker-compose="sudo docker-compose"
@@ -339,8 +394,20 @@ fi
 if hash yaourt 2>/dev/null; then
     alias update="yaourt -Syyu --aur"
     alias updaten="yaourt -Syyu --aur --noconfirm"
+
+    alias omni="yaourt -S"
+
+elif hash pacman 2>/dev/null; then
+    alias update="sudo pacman -Syyu"
+    alias updaten="sudo pacman -Syyu --noconfirm"
+
+    alias omni="sudo pacman -S"
 elif hash apt-get 2>/dev/null; then
     alias update="sudo apt-get update && sudo apt-get upgrade"
+
+    alias omni="sudo apt-get install"
 elif hash dnf 2>/dev/null; then
     alias update="sudo dnf update"
+
+    alias omni="sudo dnf install"
 fi
