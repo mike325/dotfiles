@@ -18,9 +18,12 @@
 ;        `++:.                           `-/+/
 ;        .`   github.com/mike325/dotfiles   `/
 
+[init]
+    templatedir = ~/.git_template
+
 [core]
     editor = vim
-    excludesfile = ~/.git_global_ignore
+    excludesfile = ~/.git_template/gitignore
 
 [user]
     name  = Mike
@@ -37,9 +40,6 @@
     interactive = auto
     grep        = auto
     log         = auto
-
-[init]
-    templatedir = ~/.git_template
 
 [color "branch"]
     current = green
