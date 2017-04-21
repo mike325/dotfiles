@@ -279,6 +279,7 @@
     sa = "!f(){ if [ -z $1 ]; then git stash apply; else git stash apply stash@{$1}; fi; }; f"
     sp = "!f(){ if [ -z $1 ]; then git stash pop; else git stash pop stash@{$1}; fi; }; f"
     sd = "!f(){ if [ -z $1 ]; then git stash drop; else git stash drop stash@{$1}; fi; }; f"
+    sw = "!f(){ if [ -z $1 ]; then git stash show; else git stash show stash@{$1}; fi; }; f"
 
 ;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 
