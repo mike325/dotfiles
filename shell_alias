@@ -104,6 +104,8 @@ else
     alias cdvim="cd ~/.vim"
 fi
 
+alias vimu="vim -u NONE"
+
 if hash emacs 2>/dev/null; then
     function cmacs()
     {
