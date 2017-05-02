@@ -33,7 +33,7 @@
 #   Some useful functions taken from https://github.com/Bash-it/bash-it/       #
 ################################################################################
 
-# create a dir an move to it
+# Create a dir an move to it
 function mkcd ()
 {
     if [[ ! -z $1 ]]; then
@@ -42,7 +42,7 @@ function mkcd ()
     fi
 }
 
-# disk usage per directory in Linux
+# Disk usage per directory in Linux
 function usage ()
 {
     if [ -n "$1" ]; then
@@ -52,7 +52,7 @@ function usage ()
     fi
 }
 
-# display all ip addresses for this host
+# Display all ip addresses for this host
 function ips ()
 {
     if command -v ifconfig &>/dev/null; then
@@ -64,29 +64,41 @@ function ips ()
     fi
 }
 
-# checks whether a website is down for you, or everybody
+# Checks whether a website is down for you, or everybody
 # $ down4me http://www.google.com
 function down4me ()
 {
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
-# displays your IP address, as seen by the Internet
+# Displays your IP address, as seen by the Internet
 function myip ()
 {
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
-# move files to hidden folder in tmp, that gets cleared on each reboot
+# Move files to hidden folder in tmp, that gets cleared on each reboot
 function del()
 {
-    mkdir -p /tmp/.trash && mv "$@" /tmp/.trash;
+    mkdir -p /tmp/.trash && mv --backup=numbered "$@" /tmp/.trash;
 }
+
 
 ################################################################################
 #                          Set the default text editor                         #
 ################################################################################
+
+# Move the current folder to the "trash" and rename the second folder
+# Do not accept parameters apart from the dirs
+function override()
+{
+    if [[ ! -z "$1" ]] && [[ ! -z "2" ]]; then
+        mkdir -p /tmp/.trash
+        mv --backup=numbered "$2" /tmp/.trash
+        mv "$1" "$2" /tmp/.trash
+    fi
+}
 
 if hash nvim 2>/dev/null; then
     export EDITOR='nvim'

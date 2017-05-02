@@ -4,6 +4,8 @@ etags
 TAGS
 GTAGS
 PTAGS
+cscope.*
+cscope
 *.pyc
 tmp/*
 tmp_*/*
