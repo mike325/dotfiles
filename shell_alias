@@ -146,12 +146,41 @@ fi
 
 # Small script to install Neovim
 # Warning ! This script delete everything in the work directory before install
+function show_nvim_libs()
+{
+    echo "Please also consider to install the python libs"
+    echo "  $ pip3 install --user neovim && pip2 install --user neovim"
+    echo "and Ruby libs"
+    echo "  $ gem install --user-install neovim"
+    echo ""
+}
+
+function show_nvim_help()
+{
+    echo "Please make sure you have all the depencies in your system"
+    echo ""
+    echo "Ubuntu/Debian/Linux mint"
+    echo "  # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip"
+    echo ""
+    echo "CentOS/RetHat/Fedora"
+    echo "  # dnf install libtool autoconf automake cmake gcc gcc-c++ make pkgconfig unzip"
+    echo ""
+    echo "ArchLinux/Antergos/Manjaro"
+    echo "  # pacman -S base-devel cmake unzip"
+    echo ""
+
+    show_nvim_libs
+
+    echo "For other Unix systems (BSD, Linux and MacOS) and Windows please check"
+    echo "  https://github.com/neovim/neovim/wiki/Building-Neovim"
+}
+
 function install_nvim()
 {
-    LOCATION="$HOME/.local/"
+    LOCATION="$HOME/.local/neovim"
     URL="https://github.com/neovim/neovim"
 
-    if [[ ! -z "$1" ]] && [[ $1 =~ "^-d$" ]]; then
+    if [[ ! -z "$1" ]] && [[ "$1" =~ ^-d$ ]]; then
 
         if [[ ! -z "$2" ]]; then
             LOCATION="$2"
@@ -171,26 +200,49 @@ function install_nvim()
     # Remove all unstaged changes
     git checkout . 2>/dev/null
 
+    if [[ $? -ne 0 ]]; then
+        return 1
+    fi
+
     # Remove all untracked files
     git clean -xdf . 2>/dev/null
-    rm -r build/
+    rm -fr build/
 
     # Checkout to the stable branch
     git checkout v0.1.7 2>/dev/null
 
+    # Always clean the build dir
+    make clean
+
     # Prefix the current dir
     make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
+
+    # Set the type release to avoid debug messages
+    make CMAKE_BUILD_TYPE=Release
 
     # Continue only if there isn't errors
     if [[ $? -eq 0 ]]; then
         make install
         if [[ $? -eq 0 ]]; then
             export PATH="$(pwd)/bin:$PATH"
-            echo You may want to add export PATH="$(pwd)/bin:\$PATH" in the shell_alias
+
+            echo ""
+            echo "You may want to add 'export PATH=\"$(pwd)/bin:\$PATH\"' in the shell_alias"
+            echo ""
+
+            show_nvim_libs
+        else
+            show_nvim_help
+            return 1
         fi
+    else
+        show_nvim_help
+        return 1
     fi
 
-    cd -
+    cd - &> /dev/null
+
+    return 0
 }
 
 ################################################################################
