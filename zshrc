@@ -23,7 +23,7 @@
 #                     `/ossssso+/:-        -:/+ossss'.-                        #
 #                    `+sso+:-`                 `.-/+oso:                       #
 #                   `++:.                           `-/+/                      #
-#                   .`                                 `/                      #
+#                   .`   github.com/mike325/dotfiles   `/                      #
 #                                                                              #
 ################################################################################
 
@@ -119,7 +119,10 @@ export SHORT_HOSTNAME=$(hostname -s)
 # You can change default plugins in shell_settings file
 
 ################################################################################
-#                               Vim c-s compatibility                          #
+#                               Some vim stuff                                 #
+# Use <C-s> in terminal vim                                                    #
+# ** I haven't test this in ZSH                                                #
+# [[ $- == *i* ]] && stty -ixon                                                #
 stty -ixon                                                                     #
 ################################################################################
 
@@ -154,6 +157,11 @@ fi
 ################################################################################
 #                       Load the settings, alias and framework                 #
 ################################################################################
+
+# We don't need this stuff if we are in a non interactive session
+# ** I haven't test this in ZSH
+# if [[ $- == *i* ]]; then
+
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     plugins=(docker git python colored-man-pages)
 fi
@@ -172,3 +180,5 @@ fi
 if [[ -f ~/.shell_alias ]]; then
     source ~/.shell_alias
 fi
+
+# fi

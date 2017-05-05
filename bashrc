@@ -23,7 +23,7 @@
 #                     `/ossssso+/:-        -:/+ossss'.-                        #
 #                    `+sso+:-`                 `.-/+oso:                       #
 #                   `++:.                           `-/+/                      #
-#                   .`                                 `/                      #
+#                   .`   github.com/mike325/dotfiles   `/                      #
 #                                                                              #
 ################################################################################
 
@@ -84,7 +84,7 @@ shopt -s checkwinsize
 ################################################################################
 #                               Some vim stuff                                 #
 # Use <C-s> in terminal vim                                                    #
-stty -ixon                                                                     #
+[[ $- == *i* ]] && stty -ixon                                                  #
 # Set vi keys in the shell                                                     #
 set -o vi
 ################################################################################
@@ -120,17 +120,23 @@ fi
 ################################################################################
 #                       Load the settings, alias and framework                 #
 ################################################################################
-# Load host settings
-if [[ -f ~/.shell_settings ]]; then
-    source ~/.shell_settings
-fi
 
-# Load Bash It after set host settings
-if [[ -f "$BASH_IT/bash_it.sh" ]]; then
-    source $BASH_IT/bash_it.sh
-fi
+# We don't need this stuff if we are in a non interactive session
+if [[ $- == *i* ]]; then
 
-# Load alias after bash-it to give them higher priority
-if [[ -f ~/.shell_alias ]]; then
-    source ~/.shell_alias
+    # Load host settings
+    if [[ -f ~/.shell_settings ]]; then
+        source ~/.shell_settings
+    fi
+
+    # Load Bash It after set host settings
+    if [[ -f "$BASH_IT/bash_it.sh" ]]; then
+        source $BASH_IT/bash_it.sh
+    fi
+
+    # Load alias after bash-it to give them higher priority
+    if [[ -f ~/.shell_alias ]]; then
+        source ~/.shell_alias
+    fi
+
 fi
