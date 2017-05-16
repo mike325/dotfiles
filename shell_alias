@@ -33,6 +33,10 @@
 #   Some useful functions taken from https://github.com/Bash-it/bash-it/       #
 ################################################################################
 
+# if [[ ! -z $ALIAS_LOAD ]]; then
+#     unalias --all
+# fi
+
 # Create a dir an move to it
 function mkcd ()
 {
@@ -227,7 +231,7 @@ function install_nvim()
             export PATH="$(pwd)/bin:$PATH"
 
             echo ""
-            echo "You may want to add 'export PATH=\"$(pwd)/bin:\$PATH\"' in the shell_alias"
+            echo "You may want to add export PATH=\"$(pwd)/bin:\$PATH\" in the shell_alias"
             echo ""
 
             show_nvim_libs
@@ -355,21 +359,57 @@ if hash realpath 2>/dev/null; then
         fi
     }
 else
-    # TODO write a wrapper to  manage file without realpath
+    # TODO Optimize code for file management
     function grp()
     {
         if [[ ! -z "$1" ]]; then
-            cd "$1" 1> /dev/null
+            FULL_PATH="$1"
+            ROOT_PATH="${FULL_PATH%/*}"
+            FILE_PATH="${FULL_PATH##*/}"
 
-            if [[ $? -eq 0 ]]; then
-                pwd -P
-                cd - 1> /dev/null
+            if [[ -f "$FULL_PATH" ]]; then
+                cd "$ROOT_PATH" 2> /dev/null
+
+                if [[ $? -eq 0 ]]; then
+                    echo "$(pwd -P)/$FILE_PATH"
+                    cd - 1> /dev/null
+                else
+                    echo "$(pwd -P)/$FILE_PATH"
+                fi
+
+            else
+                ROOT_PATH="$1"
+
+                cd "$ROOT_PATH" 1> /dev/null
+
+                if [[ $? -eq 0 ]]; then
+                    echo "$(pwd -P)"
+                    cd - 1> /dev/null
+                fi
             fi
+
         else
             pwd -P
         fi
     }
 fi
+
+# Init original path with HOME dir
+ORIGINAL_PATH="$(pwd)"
+
+# Move to the realpath version of the curren working dir
+function crp()
+{
+    # Save the current path
+    ORIGINAL_PATH="$(pwd)"
+    cd "$(grp)"
+}
+
+# Go back to the last sym path or $HOME
+function gobk()
+{
+    cd "$ORIGINAL_PATH"
+}
 
 if hash ctags 2>/dev/null; then
     alias gtf="ctags -R ."
@@ -477,3 +517,6 @@ elif hash dnf 2>/dev/null; then
 
     alias omni="sudo dnf install"
 fi
+
+# To know whether or not alias have been already loaded
+# ALIAS_LOAD=1

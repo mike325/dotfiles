@@ -132,6 +132,9 @@ if [[ $- == *i* ]]; then
     # Load Bash It after set host settings
     if [[ -f "$BASH_IT/bash_it.sh" ]]; then
         source $BASH_IT/bash_it.sh
+
+        # A like my normal sl
+        unalias sl
     fi
 
     # Load alias after bash-it to give them higher priority
