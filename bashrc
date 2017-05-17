@@ -134,7 +134,9 @@ if [[ $- == *i* ]]; then
         source $BASH_IT/bash_it.sh
 
         # A like my normal sl
-        unalias sl
+        if [[ "$(command -v sl)" =~ "alias" ]]; then
+            unalias sl
+        fi
     fi
 
     # Load alias after bash-it to give them higher priority
