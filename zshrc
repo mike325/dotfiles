@@ -110,7 +110,6 @@ export SHORT_HOSTNAME=$(hostname -s)
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-# bindkey -v
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -121,9 +120,10 @@ export SHORT_HOSTNAME=$(hostname -s)
 ################################################################################
 #                               Some vim stuff                                 #
 # Use <C-s> in terminal vim                                                    #
-# ** I haven't test this in ZSH                                                #
-# [[ $- == *i* ]] && stty -ixon                                                #
-stty -ixon                                                                     #
+[[ $- == *i* ]] && stty -ixon                                                  #
+# Set vi keys in the shell                                                     #
+bindkey -v
+export KEYTIMEOUT=1
 ################################################################################
 
 ################################################################################
