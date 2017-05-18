@@ -497,25 +497,46 @@ if hash docker 2>/dev/null; then
     alias dkpa="docker ps -a"
 fi
 
+# Yeah I'm too lazy to remember each command in every distro soooooo
+# I added this alias
+# TODO add other distros commands I've used, like Solus
 if hash yaourt 2>/dev/null; then
+    # 'Install' package maybe in the PATH
+    alias get="yaourt -S"
+    alias getn="yaourt -S --noconfirm"
+
+    alias update="yaourt -Syyu --aur"
+
     alias update="yaourt -Syyu --aur"
     alias updaten="yaourt -Syyu --aur --noconfirm"
 
-    alias omni="yaourt -S"
+    alias remove="yaourt -Rns"
 
+# Yeah Arch from scratch may not have yaourt
 elif hash pacman 2>/dev/null; then
+    alias get="sudo pacman -S"
+    alias getn="sudo pacman -S --noconfirm"
+
     alias update="sudo pacman -Syyu"
     alias updaten="sudo pacman -Syyu --noconfirm"
 
-    alias omni="sudo pacman -S"
+    alias remove="sudo pacman -Rns"
+
 elif hash apt-get 2>/dev/null; then
+    alias get="sudo apt-get install"
+    alias getn="sudo apt-get install -y"
+
     alias update="sudo apt-get update && sudo apt-get upgrade"
 
-    alias omni="sudo apt-get install"
+    alias remove="sudo apt-get remove"
+
 elif hash dnf 2>/dev/null; then
+    alias get="sudo dnf install"
+    alias getn="sudo dnf -y install"
+
     alias update="sudo dnf update"
 
-    alias omni="sudo dnf install"
+    alias remove="sudo dnf remove"
 fi
 
 # To know whether or not alias have been already loaded
