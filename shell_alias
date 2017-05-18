@@ -367,26 +367,36 @@ else
             ROOT_PATH="${FULL_PATH%/*}"
             FILE_PATH="${FULL_PATH##*/}"
 
-            if [[ -f "$FULL_PATH" ]]; then
-                cd "$ROOT_PATH" 2> /dev/null
+            pushd . > /dev/null
 
+            if [[ -f "$FULL_PATH" ]]; then
+                pushd "$ROOT_PATH" &> /dev/null
+
+                # I haven't think a better way to check if the given path was
+                # push into the stack, that's why I can't print the path a
+                # then pop it
                 if [[ $? -eq 0 ]]; then
                     echo "$(pwd -P)/$FILE_PATH"
-                    cd - 1> /dev/null
+                    popd > /dev/null
                 else
                     echo "$(pwd -P)/$FILE_PATH"
                 fi
 
-            else
+
+            elif [[ -d "$FULL_PATH" ]]; then
                 ROOT_PATH="$1"
 
-                cd "$ROOT_PATH" 1> /dev/null
+                pushd "$ROOT_PATH" > /dev/null
 
-                if [[ $? -eq 0 ]]; then
-                    echo "$(pwd -P)"
-                    cd - 1> /dev/null
-                fi
+                echo "$(pwd -P)"
+
+                popd > /dev/null
+            else
+                echo "    ---- [X] Error 404 the given path doesn't exist"
             fi
+
+            # Retrun to the original dir
+            popd > /dev/null
 
         else
             pwd -P
