@@ -38,8 +38,7 @@
 # fi
 
 # Create a dir an move to it
-function mkcd ()
-{
+function mkcd () {
     if [[ ! -z $1 ]]; then
         mkdir "$1"
         cd "$1"
@@ -47,8 +46,7 @@ function mkcd ()
 }
 
 # Disk usage per directory in Linux
-function usage ()
-{
+function usage () {
     if [ -n "$1" ]; then
         du -h --max-depth=1 "$1"
     else
@@ -57,34 +55,30 @@ function usage ()
 }
 
 # Display all ip addresses for this host
-function ips ()
-{
+function ips () {
     if command -v ifconfig &>/dev/null; then
         ifconfig | awk '/inet /{ print $2 }'
     elif command -v ip &>/dev/null; then
         ip addr | grep -oP 'inet \K[\d.]+'
     else
-        echo "You don't have ifconfig or ip command installed!"
+        echo "    ---- [X] Error You don't have ifconfig or ip command installed!"
     fi
 }
 
 # Checks whether a website is down for you, or everybody
 # $ down4me http://www.google.com
-function down4me ()
-{
+function down4me () {
     curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
 }
 
 # Displays your IP address, as seen by the Internet
-function myip ()
-{
+function myip () {
     res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
     echo -e "Your public IP is: ${echo_bold_green} $res ${echo_normal}"
 }
 
 # Move files to hidden folder in tmp, that gets cleared on each reboot
-function del()
-{
+function del() {
     mkdir -p /tmp/.trash && mv --backup=numbered "$@" /tmp/.trash;
 }
 
@@ -95,8 +89,7 @@ function del()
 
 # Move the current folder to the "trash" and rename the second folder
 # Do not accept parameters apart from the dirs
-function override()
-{
+function override() {
     if [[ ! -z "$1" ]] && [[ ! -z "2" ]]; then
         mkdir -p /tmp/.trash
         mv --backup=numbered "$2" /tmp/.trash
@@ -123,23 +116,19 @@ fi
 alias vimu="vim -u NONE"
 
 if hash emacs 2>/dev/null; then
-    function cmacs()
-    {
+    function cmacs() {
         emacsclient -nw "$@"
     }
 
-    function gmacs()
-    {
+    function gmacs() {
         emacsclient -c "$@" &
     }
 
-    function dmacs()
-    {
+    function dmacs() {
         emacs --daemon &
     }
 
-    function kmacs()
-    {
+    function kmacs() {
         emacsclient -e "(kill-emacs)"
     }
 fi
@@ -150,8 +139,7 @@ fi
 
 # Small script to install Neovim
 # Warning ! This script delete everything in the work directory before install
-function show_nvim_libs()
-{
+function show_nvim_libs() {
     echo "Please also consider to install the python libs"
     echo "  $ pip3 install --user neovim && pip2 install --user neovim"
     echo "and Ruby libs"
@@ -159,9 +147,8 @@ function show_nvim_libs()
     echo ""
 }
 
-function show_nvim_help()
-{
-    echo "Please make sure you have all the depencies in your system"
+function show_nvim_help() {
+    echo "    ---- [X] Error Please make sure you have all the depencies in your system"
     echo ""
     echo "Ubuntu/Debian/Linux mint"
     echo "  # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip"
@@ -179,8 +166,7 @@ function show_nvim_help()
     echo "  https://github.com/neovim/neovim/wiki/Building-Neovim"
 }
 
-function install_nvim()
-{
+function install_nvim() {
     LOCATION="$HOME/.local/neovim"
     URL="https://github.com/neovim/neovim"
 
@@ -254,8 +240,7 @@ function install_nvim()
 ################################################################################
 
 # Small script to install bash-it or oh-my-zsh shell frameworks
-function install_shell()
-{
+function install_shell() {
     if [[ "$SHELL" =~ "bash" ]] && [[ ! -d "$HOME/.bash_it" ]]; then
         git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it" 2>/dev/null
     elif [[ "$SHELL" =~ "zsh" ]] && [[ ! -d "$HOME/.oh-my-zsh" ]]; then
@@ -267,7 +252,7 @@ function install_shell()
             git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh" 2>/dev/null
         fi
     else
-        echo "Sorry the current shell is not supported"
+        echo "    ---- [X] Error the current shell is not supported"
     fi
 }
 
@@ -290,8 +275,7 @@ alias im="vim"
 
 # Small Function that compress a file or directory with the same name as
 # output
-function tcmp()
-{
+function tcmp() {
     if [[ ! -z "$1" ]]; then
         NAME="$1"
         tar czf "$NAME.tar.bz" "$NAME"
@@ -300,8 +284,7 @@ function tcmp()
 
 alias q="exit"
 
-function rl()
-{
+function rl() {
     rm "$@" *.log
 }
 
@@ -319,8 +302,7 @@ alias cl="clear"
 alias turnoff="sudo poweroff"
 
 # Function to go back any number of dirs
-function bk()
-{
+function bk() {
     if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]]; then
         PARENT="./"
 
@@ -350,8 +332,7 @@ if hash thefuck 2>/dev/null; then
 fi
 
 if hash realpath 2>/dev/null; then
-    function grp()
-    {
+    function grp() {
         if [[ ! -z "$1" ]]; then
             realpath "$@"
         else
@@ -360,8 +341,7 @@ if hash realpath 2>/dev/null; then
     }
 else
     # TODO Optimize code for file management
-    function grp()
-    {
+    function grp() {
         if [[ ! -z "$1" ]]; then
             FULL_PATH="$1"
             ROOT_PATH="${FULL_PATH%/*}"
@@ -404,20 +384,44 @@ else
     }
 fi
 
+# Credit: http://nparikh.org/notes/zshrc.txt
+function extract() {
+    while [[ $# -gt 0 ]]; do
+        if [[ -f "$1" ]]; then
+            case "$1" in
+                *.tar.bz2|*.tbz2) echo "[*] Extracting $1"; tar -jxvf "$1" 1> /dev/null;;
+                *.tar.gz|*.tgz)   echo "[*] Extracting $1"; tar -zxvf "$1" 1> /dev/null;;
+                *.zip|*.ZIP)      echo "[*] Extracting $1"; unzip "$1" 1> /dev/null;;
+                *.pax.Z)          echo "[*] Extracting $1"; uncompress "$1" 1> /dev/null;;
+                *.bz2)            echo "[*] Extracting $1"; bunzip2 "$1" 1> /dev/null;;
+                *.dmg)            echo "[*] Extracting $1"; hdiutil mount "$1" 1> /dev/null;;
+                *.tar)            echo "[*] Extracting $1"; tar -xvf "$1" 1> /dev/null;;
+                *.pax)            echo "[*] Extracting $1"; cat "$1" 1> /dev/null;;
+                *.rar)            echo "[*] Extracting $1"; unrar x "$1" 1> /dev/null;;
+                *.7z)             echo "[*] Extracting $1"; 7z x "$1" 1> /dev/null;;
+                *.gz)             echo "[*] Extracting $1"; gunzip "$1" 1> /dev/null;;
+                *.Z)              echo "[*] Extracting $1"; uncompress "$1" 1> /dev/null;;
+                *)                echo "    ---- [X] Error '$1' cannot be extracted/mounted via extract()" ;;
+            esac
+        else
+            echo "    ---- [X] Error '$1' is not a valid file"
+        fi
+        shift
+    done
+}
+
 # Init original path with HOME dir
 ORIGINAL_PATH="$(pwd)"
 
 # Move to the realpath version of the curren working dir
-function crp()
-{
+function crp() {
     # Save the current path
     ORIGINAL_PATH="$(pwd)"
     cd "$(grp)"
 }
 
 # Go back to the last sym path or $HOME
-function gobk()
-{
+function gobk() {
     cd "$ORIGINAL_PATH"
 }
 
@@ -437,8 +441,7 @@ if hash systemctl 2>/dev/null; then
 fi
 
 #####################    GIT     #######################
-function git_stats
-{
+function git_stats {
     # Awesome work from https://github.com/esc/git-stats
     # including some modifications
 
@@ -473,7 +476,7 @@ function git_stats
             git log $LOGOPTS --all --merges --author=$a | grep -c '^commit'
         done
     else
-        echo "you're currently not in a git repository"
+        echo "    ---- [X] Error You're currently not in a git repository"
     fi
 }
 

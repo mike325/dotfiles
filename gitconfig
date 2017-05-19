@@ -263,9 +263,6 @@
 ;   Push the current branch to the master of a remote
     psrhm = "!f() { git push $1 HEAD:master }; f"
 
-;   Search some text in the tracked files
-    lsf = "!git ls-files | grep -i"
-
 ;   Get the filenames of all changes a given commit and the HEAD
     dn  = "!f() { git diff --name-status $1 HEAD; }; f"
 
@@ -288,12 +285,12 @@
     retag = "!f() { \
         git tag -d $1 &> /dev/null; \
         git tag $1; \
-        }; f"
+    }; f"
 
 ;   Find commits by commit message.
     cm = "!f() { \
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
-        }; f"
+    }; f"
 
 [pretty]
     custom = "%C(magenta)%h%C(red)%d %C(yellow)%ar %C(green)%s %C(yellow)(%an)"
