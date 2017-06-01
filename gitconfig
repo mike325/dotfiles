@@ -126,6 +126,14 @@
     ca  = commit --amend    ; Commit over the last commit
 
 ;###############################################################################
+;                 Cherry pick commits                                          #
+;###############################################################################
+
+    chp  = cherry-pick
+    chpc = cherry-pick --continue
+    chpa = cherry-pick --abort
+
+;###############################################################################
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
@@ -177,19 +185,22 @@
     or = checkout .     ; Reset the changes of the working space
 
 ;###############################################################################
-;                 Shortcuts to push and pull changes                           #
+;                 Shortcuts to push changes                                    #
 ;###############################################################################
 
     ps    = push                    ; Normal push shortcut
     psom  = push origin master      ; Push master to origin remote
     pshm  = push origin HEAD:master ; push HEAD to master's origin
 
-    pl    = pull               ; Pull shortcut
-    plom  = pull origin master ; pull from master origin
+;###############################################################################
+;                 Shortcuts for pull cmd's                                     #
+;###############################################################################
 
-    pb    = pull --rebase               ; Pull with rebase
-    pbo   = pull --rebase origin        ; Pull and rebase from origin
-    pbom  = pull --rebase origin master ; Pull and rebase master from origin
+    pl    = pull
+    plom  = pull origin master
+    pb    = pull --rebase
+    pbo   = pull --rebase origin
+    pbom  = pull --rebase origin master
 
 ;###############################################################################
 ;                 Simple rebase settings                                       #
@@ -209,8 +220,6 @@
     rh   = reset HEAD
     reh  = reset --hard
     res  = reset --soft
-    rehh = reset --hard HEAD
-    resh = reset --soft HEAD
 
 ;###############################################################################
 ;                 Remotes management                                           #
@@ -228,13 +237,9 @@
 ;                 Stash stuff                                                  #
 ;###############################################################################
 
-    ; sa = stash apply
     sc = stash clear
-    ; sd = stash drop
     sl = stash list
-    ; sp = stash pop
     ss = stash save
-    ; sw = stash show
 
 ;###############################################################################
 ;      SVN compatibility (I have to use this crap, hope no one else need it)   #
