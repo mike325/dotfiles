@@ -392,6 +392,7 @@ function extract() {
                 *.tar.bz2|*.tbz2) echo "[*] Extracting $1"; tar -jxvf "$1" 1> /dev/null;;
                 *.tar.gz|*.tgz)   echo "[*] Extracting $1"; tar -zxvf "$1" 1> /dev/null;;
                 *.zip|*.ZIP)      echo "[*] Extracting $1"; unzip "$1" 1> /dev/null;;
+                *.tar.bz)         echo "[*] Extracting $1"; tar -xf "$1" 1> /dev/null;;
                 *.pax.Z)          echo "[*] Extracting $1"; uncompress "$1" 1> /dev/null;;
                 *.bz2)            echo "[*] Extracting $1"; bunzip2 "$1" 1> /dev/null;;
                 *.dmg)            echo "[*] Extracting $1"; hdiutil mount "$1" 1> /dev/null;;
