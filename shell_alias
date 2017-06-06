@@ -294,6 +294,12 @@ alias grep="grep --color -n"
 alias grepo="grep -o"
 alias grepe="grep -E"
 
+function llg() {
+    if [[ ! -z "$1" ]]; then
+        ls -lhA | grep "$@"
+    fi
+}
+
 alias ls='ls --color'
 alias la="ls -A"
 alias ll="ls -lh"
