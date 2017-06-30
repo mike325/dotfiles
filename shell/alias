@@ -216,7 +216,7 @@ function bk() {
                 echo "              that means that you already know it (nice)"
                 echo ""
 
-                exit 0
+                return 0
                 ;;
         esac
     done
