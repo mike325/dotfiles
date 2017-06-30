@@ -1,0 +1,280 @@
+#!/usr/bin/env bash
+
+################################################################################
+#                                                                              #
+#   Author: Mike 8a                                                            #
+#   Description: Some useful alias                                             #
+#                                                                              #
+#                                     -`                                       #
+#                     ...            .o+`                                      #
+#                  .+++s+   .h`.    `ooo/                                      #
+#                 `+++%++  .h+++   `+oooo:                                     #
+#                 +++o+++ .hhs++. `+oooooo:                                    #
+#                 +s%%so%.hohhoo'  'oooooo+:                                   #
+#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
+#                  hh+o+hoso+h+`/++++.+++++++:                                 #
+#                   `+h+++h.+ `/++++++++++++++:                                #
+#                            `/+++ooooooooooooo/`                              #
+#                           ./ooosssso++osssssso+`                             #
+#                          .oossssso-````/osssss::`                            #
+#                         -osssssso.      :ssss``to.                           #
+#                        :osssssss/  Mike  osssl   +                           #
+#                       /ossssssss/   8a   +sssslb                             #
+#                     `/ossssso+/:-        -:/+ossss'.-                        #
+#                    `+sso+:-`                 `.-/+oso:                       #
+#                   `++:.                           `-/+/                      #
+#                   .`   github.com/mike325/dotfiles   `/                      #
+#                                                                              #
+################################################################################
+
+################################################################################
+#                          Set the default text editor                         #
+################################################################################
+
+if hash nvim 2>/dev/null; then
+    export EDITOR='nvim'
+    VIM_PATH="$(command -v vim)"
+
+    # Prevent to screw the path alias
+    if [[ ! $VIM_PATH =~ "alias" ]]; then
+        alias vim="nvim"
+        alias vi="$VIM_PATH"
+        alias cdvim="cd ~/.config/nvim"
+        alias cdvi="cd ~/.vim"
+    fi
+else
+    export EDITOR='vim'
+    alias cdvim="cd ~/.vim"
+fi
+
+alias vimu="vim -u NONE"
+
+################################################################################
+#                          Fix my common typos                                 #
+################################################################################
+
+alias gti="git"
+alias got="git"
+alias gut="git"
+alias gi="git"
+
+alias bim="vim"
+alias cim="vim"
+alias im="vim"
+
+################################################################################
+#                        Some useful shortcuts                                 #
+################################################################################
+
+alias q="exit"
+alias cl="clear"
+alias turnoff="sudo poweroff"
+
+# Show used ports
+alias ports="netstat -tulpn"
+
+alias grep="grep --color -n"
+alias grepo="grep -o"
+alias grepe="grep -E"
+
+alias ls='ls --color'
+alias la="ls -A"
+alias ll="ls -lh"
+alias lla="ls -lhA"
+
+alias salias="source ~/.alias"
+alias sset="source ~/.host_settings"
+
+# This way sudo commands get the alias of the account
+alias sudo='sudo '
+
+# Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
+if hash thefuck 2>/dev/null; then
+    eval "$(thefuck --alias)"
+    alias fuck='eval $(thefuck $(fc -ln -1))'
+    alias please='fuck'
+fi
+
+# laod kernel module for virtualbox
+alias vbk="sudo modprobe vboxdrv"
+
+# Generate tags file
+if hash ctags 2>/dev/null; then
+    alias gtf="ctags -R ."
+fi
+
+################################################################################
+#                               Systemctl                                      #
+################################################################################
+
+if hash systemctl 2>/dev/null; then
+    alias sysctl="sudo systemctl"
+    alias usysctl="systemctl --user"
+
+    alias ctls="sudo systemctl start"   # Start
+    alias ctlh="sudo systemctl stop"    # Halt
+    alias ctlr="sudo systemctl restart" # Restart
+    alias ctlw="sudo systemctl status"  # shoW
+fi
+
+################################################################################
+#                               Git shortcut                                   #
+################################################################################
+
+
+if hash git 2>/dev/null; then
+    alias clone="git clone"
+    alias ga="git add"
+    alias gs="git status"
+    alias gc="git commit"
+    alias gps="git push"
+    alias gpl="git pull"
+    alias gco="git checkout "
+    alias gr="git reset"
+    alias gss="git stash save"
+    alias gsp="git stash pop"
+    alias gsd="git stash drop"
+    alias gsa="git stash apply"
+    alias gsl="git stash list"
+    alias gsw="git stash show"
+fi
+
+################################################################################
+#                         Package management shortcuts                         #
+################################################################################
+# TODO Make a small function to install system basics
+
+if hash docker 2>/dev/null; then
+    alias docker="sudo docker"
+    alias docker-compose="sudo docker-compose"
+    alias dkpa="docker ps -a"
+fi
+
+# Yeah I'm too lazy to remember each command in every distro soooooo
+# I added this alias
+# TODO add other distros commands I've used, like Solus
+if hash yaourt 2>/dev/null; then
+    # 'Install' package maybe in the PATH
+    alias get="yaourt -S"
+    alias getn="yaourt -S --noconfirm"
+
+    alias update="yaourt -Syyu --aur"
+
+    alias update="yaourt -Syyu --aur"
+    alias updaten="yaourt -Syyu --aur --noconfirm"
+
+    alias remove="yaourt -Rns"
+
+# Yeah Arch from scratch may not have yaourt
+elif hash pacman 2>/dev/null; then
+    alias get="sudo pacman -S"
+    alias getn="sudo pacman -S --noconfirm"
+
+    alias update="sudo pacman -Syyu"
+    alias updaten="sudo pacman -Syyu --noconfirm"
+
+    alias remove="sudo pacman -Rns"
+
+elif hash apt-get 2>/dev/null; then
+    alias get="sudo apt-get install"
+    alias getn="sudo apt-get install -y"
+
+    alias update="sudo apt-get update && sudo apt-get upgrade"
+
+    alias remove="sudo apt-get remove"
+
+elif hash dnf 2>/dev/null; then
+    alias get="sudo dnf install"
+    alias getn="sudo dnf -y install"
+
+    alias update="sudo dnf update"
+
+    alias remove="sudo dnf remove"
+fi
+
+
+################################################################################
+#             Functions to move around dirs and other simple stuff             #
+################################################################################
+
+function bk() {
+    for key in "$@"; do
+        case "$key" in
+            -h|--help)
+
+                echo ""
+                echo "  Function to go back any number of dirs"
+                echo ""
+                echo "  Usage:"
+                echo "      $NAME [Number of nodes to move back] [OPTIONAL]"
+                echo "          Ex."
+                echo "          $ bk 2 # = cd ../../"
+                echo ""
+                echo "      Optional Flags"
+                echo "          -h, --help"
+                echo "              Display help and exit. If you are seeing this,"
+                echo "              that means that you already know it (nice)"
+                echo ""
+
+                exit 0
+                ;;
+        esac
+    done
+
+    if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]]; then
+        local parent="./"
+        for (( i = 0; i < $1; i++ )); do
+            local parent="${parent}../"
+        done
+        cd "$parent"
+    elif [[ -z "$1" ]]; then
+        cd ..
+    else
+        echo "Unexpected arg $1"
+        exit 1
+    fi
+}
+
+function llg() {
+    if [[ ! -z "$1" ]]; then
+        ls -lhA | grep "$@"
+    fi
+}
+
+function rl() {
+    rm "$@" *.log
+}
+
+# Init original path with HOME dir
+ORIGINAL_PATH="$(pwd)"
+
+# Move to the realpath version of the curren working dir
+function crp() {
+    # Save the current path
+    ORIGINAL_PATH="$(pwd)"
+    cd "$(grp)"
+}
+
+# Go back to the last sym path or $HOME
+function gobk() {
+    cd "$ORIGINAL_PATH"
+}
+
+
+if hash emacs 2>/dev/null; then
+    function cmacs() {
+        emacsclient -nw "$@"
+    }
+
+    function gmacs() {
+        emacsclient -c "$@" &
+    }
+
+    function dmacs() {
+        emacs --daemon &
+    }
+
+    function kmacs() {
+        emacsclient -e "(kill-emacs)"
+    }
+fi

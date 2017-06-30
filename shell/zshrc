@@ -129,10 +129,10 @@ export KEYTIMEOUT=1
 ################################################################################
 #                         Make some dir that I normally use                    #
 ################################################################################
-[[ $HOME/.local/bin ]] && mkdir -p "$HOME/.local/bin"
-[[ $HOME/.local/lib ]] && mkdir -p "$HOME/.local/lib"
-[[ $HOME/.local/share ]] && mkdir -p "$HOME/.local/share"
-[[ $HOME/.local/golang/src ]] && mkdir -p "$HOME/.local/golang/src"
+[[ -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
+[[ -d "$HOME/.local/lib" ]] && mkdir -p "$HOME/.local/lib"
+[[ -d "$HOME/.local/share" ]] && mkdir -p "$HOME/.local/share"
+[[ -d "$HOME/.local/golang/src" ]] && mkdir -p "$HOME/.local/golang/src"
 
 if [[ -d $HOME/.local/bin/ ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
@@ -160,25 +160,23 @@ fi
 
 # We don't need this stuff if we are in a non interactive session
 # ** I haven't test this in ZSH
-# if [[ $- == *i* ]]; then
+if [[ $- == *i* ]]; then
+    if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+        plugins=(docker git python colored-man-pages)
+    fi
 
-if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    plugins=(docker git python colored-man-pages)
+    # Load host settings
+    if [[ -f ~/.host_settings ]]; then
+        source ~/.host_settings
+    fi
+
+    # Load oh-my-zsh after set host settings
+    if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+        source $ZSH/oh-my-zsh.sh
+    fi
+
+    # Load alias after bash-it to give them higher priority
+    if [[ -f ~/.alias ]]; then
+        source ~/.alias
+    fi
 fi
-
-# Load host settings
-if [[ -f ~/.shell_settings ]]; then
-    source ~/.shell_settings
-fi
-
-# Load oh-my-zsh after set host settings
-if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    source $ZSH/oh-my-zsh.sh
-fi
-
-# Load alias after bash-it to give them higher priority
-if [[ -f ~/.shell_alias ]]; then
-    source ~/.shell_alias
-fi
-
-# fi
