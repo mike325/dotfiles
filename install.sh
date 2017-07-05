@@ -93,7 +93,24 @@ function help_user() {
     echo ""
 }
 
+function warn_msg() {
+    WARN_MESSAGE="$1"
+    printf "[!] Warning!!! $WARN_MESSAGE \n"
+}
+
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X] Error!!!   $ERROR_MESSAGE \n"
+}
+
+function status_msg() {
+    STATUS_MESSAGGE="$1"
+    printf "[*]     $STATUS_MESSAGGE \n"
+}
+
 function setup_scripts() {
+    status_msg "Getting shell functions and scripts"
+
     for script in ${_SCRIPT_PATH}/bin/*; do
         local file_basename="${script%.*}"
         local file_extention="${script#*.}"
@@ -101,46 +118,63 @@ function setup_scripts() {
         sh -c "$_CMD $script $HOME/.local/bin/$file_basename"
     done
 
+    status_msg "Getting python startup script"
     sh -c "$_CMD ${_SCRIPT_PATH}/scripts/pythonstartup.py $HOME/.local/lib/pythonstartup.py"
 
+    status_msg "Getting ctags defaults"
     sh -c "$_CMD ${_SCRIPT_PATH}/ctags $HOME/.ctags"
 }
 
 function setup_alias() {
+    status_msg "Getting shell alias"
     sh -c "$_CMD ${_SCRIPT_PATH}/alias $HOME/.alias"
 
     # Currently just ZSH and BASH are the available shells
+    status_msg "Getting Shell configs"
     if [[ -f "${_SCRIPT_PATH}/shell/${SHELL}rc" ]]; then
         sh -c "$_CMD ${_SCRIPT_PATH}/shell/${SHELL}rc $HOME/.${SHELL}rc"
+    else
+        warn_msg "Current shell ( $SHELL ) is unsupported"
     fi
 }
 
 function setup_git() {
+    status_msg "Installing Global Git settings"
     sh -c "$_CMD ${_SCRIPT_PATH}/gitconfig $HOME/.gitconfig"
+
+    status_msg "Installing Global Git templates and hooks"
     sh -c "$_CMD ${_SCRIPT_PATH}/git_template $HOME/.git_template"
 }
 
 function get_vim_dotfiles() {
+    status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
+
     git clone --recursive https://github.com/mike325/.vim "$HOME/.vim"
     sh -c "$_CMD $HOME/.vim/init.vim $HOME/.vimrc"
 }
 
 function get_nvim_dotfiles() {
+    status_msg "Running Neovim install script"
+
     # Since no all systems have sudo/root access lets assume all dependencies are
     # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
     ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
 
     # if the current command creates a symbolic link and we already have some vim
     # settings, lets use them
+    status_msg "Checking existing vim dotfiles"
     if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
+        status_msg "Linking current vim dotfiles"
         sh -c "$_CMD $HOME/.vim $HOME/.config/nvim"
     else
-        # else lets clone my vim dotfiles
+        status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
         git clone --recursive https://github.com/mike325/.vim "$HOME/.config/nvim"
     fi
 }
 
 function get_emacs_dotfiles() {
+    status_msg "Installing Evil Emacs"
+
     git clone --recursive https://github.com/mike325/.emacs.d "$HOME/.emacs.d"
 
     mkdir -p "$HOME/.config/systemd/user"
@@ -148,12 +182,17 @@ function get_emacs_dotfiles() {
 }
 
 function setup_shell_framework() {
+    status_msg "Getting shell framework"
+
     ${_SCRIPT_PATH}/bin/get_shell.sh
 }
 
 function get_dotfiles() {
-    mkdir -p "$HOME/.local/"
     _SCRIPT_PATH="$HOME/.local/dotfiles"
+
+    status_msg "Installing dotfiles in $_SCRIPT_PATH"
+
+    mkdir -p "$HOME/.local/"
     git clone --recursive https://github.com/mike325/dotfiles "$_SCRIPT_PATH"
 }
 
