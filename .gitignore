@@ -1,1 +1,4 @@
 .ropeproject/
+
+# Each host can have custom commands
+git/host/

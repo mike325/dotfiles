@@ -32,6 +32,7 @@ _SHELL_FRAMEWORK=0
 _EMACS=0
 _DOTFILES=0
 _GIT=0
+_FORCE_INSTALL=0
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -39,21 +40,27 @@ _NAME="${_NAME##*/}"
 _SCRIPT_PATH="$0"
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
+_CURRENT_SHELL="${SHELL##*/}"
+
 _CMD="ln -s"
 
 function help_user() {
     echo ""
     echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
     echo "  if any flag ins given, the script will install just want is being told to do."
-    echo "      By default command (if none flag is given): $_NAME -f -a -e -v -n -b -g"
+    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g"
     echo ""
     echo "  Usage:"
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
-    echo "          -f, --frameworks"
+    echo "          -f, --force"
+    echo "              Force installation, remove all previous conflict files before installing"
+    echo "              This flag is always disable by default"
+    echo ""
+    echo "          -s, --shell_frameworks"
     echo "              Install shell frameworks, bash-it or oh-my-zsh according to the current shell"
-    echo "              Current shell in \$SHELL:   $SHELL"
+    echo "              Current shell in \$SHELL:   $_CURRENT_SHELL"
     echo ""
     echo "          -c, --copy"
     echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
@@ -108,49 +115,64 @@ function status_msg() {
     printf "[*]     $STATUS_MESSAGGE \n"
 }
 
+function execute_cmd() {
+    local pre_cmd="$1"
+    local post_cmd="$2"
+
+    if [[ $_FORCE_INSTALL -eq 1 ]]; then
+        rm -rf "$post_cmd"
+    fi
+
+    sh -c "$_CMD $pre_cmd $post_cmd"
+}
+
 function setup_scripts() {
     status_msg "Getting shell functions and scripts"
 
     for script in ${_SCRIPT_PATH}/bin/*; do
-        local file_basename="${script%.*}"
-        local file_extention="${script#*.}"
+        local file_basename="${script%%.*}"
+        local file_extention="${script##*.}"
 
-        sh -c "$_CMD $script $HOME/.local/bin/$file_basename"
+        execute_cmd "$script" "$HOME/.local/bin/$file_basename"
     done
 
     status_msg "Getting python startup script"
-    sh -c "$_CMD ${_SCRIPT_PATH}/scripts/pythonstartup.py $HOME/.local/lib/pythonstartup.py"
+    execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
 
     status_msg "Getting ctags defaults"
-    sh -c "$_CMD ${_SCRIPT_PATH}/ctags $HOME/.ctags"
+    execute_cmd "${_SCRIPT_PATH}/ctags" "$HOME/.ctags"
 }
 
 function setup_alias() {
     status_msg "Getting shell alias"
-    sh -c "$_CMD ${_SCRIPT_PATH}/alias $HOME/.alias"
+    execute_cmd "${_SCRIPT_PATH}/alias" "$HOME/.alias"
 
     # Currently just ZSH and BASH are the available shells
     status_msg "Getting Shell configs"
-    if [[ -f "${_SCRIPT_PATH}/shell/${SHELL}rc" ]]; then
-        sh -c "$_CMD ${_SCRIPT_PATH}/shell/${SHELL}rc $HOME/.${SHELL}rc"
+    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
+        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc"
+        execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.local/lib/shell_specific"
     else
-        warn_msg "Current shell ( $SHELL ) is unsupported"
+        warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
 }
 
 function setup_git() {
     status_msg "Installing Global Git settings"
-    sh -c "$_CMD ${_SCRIPT_PATH}/gitconfig $HOME/.gitconfig"
+    execute_cmd "${_SCRIPT_PATH}/git/gitconfig" "$HOME/.gitconfig"
 
     status_msg "Installing Global Git templates and hooks"
-    sh -c "$_CMD ${_SCRIPT_PATH}/git_template $HOME/.git_template"
+    [[ ! -d "$HOME/.local/git/" ]] && execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.local/git"
+
+    status_msg "Setting up local git commands"
+    [[ ! -d "$HOME/.local/git/host" ]] && mkdir -p "$HOME/.local/git/host"
 }
 
 function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
 
     git clone --recursive https://github.com/mike325/.vim "$HOME/.vim"
-    sh -c "$_CMD $HOME/.vim/init.vim $HOME/.vimrc"
+    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
 }
 
 function get_nvim_dotfiles() {
@@ -165,7 +187,7 @@ function get_nvim_dotfiles() {
     status_msg "Checking existing vim dotfiles"
     if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
         status_msg "Linking current vim dotfiles"
-        sh -c "$_CMD $HOME/.vim $HOME/.config/nvim"
+        execute_cmd "$HOME/.vim" "$HOME/.config/nvim"
     else
         status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
         git clone --recursive https://github.com/mike325/.vim "$HOME/.config/nvim"
@@ -178,7 +200,7 @@ function get_emacs_dotfiles() {
     git clone --recursive https://github.com/mike325/.emacs.d "$HOME/.emacs.d"
 
     mkdir -p "$HOME/.config/systemd/user"
-    sh -c "$_CMD ${_SCRIPT_PATH}/services/emacs.service $HOME/.config/systemd/user/emacs.service"
+    execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
 }
 
 function setup_shell_framework() {
@@ -206,9 +228,12 @@ while [[ $# -gt 0 ]]; do
             _ALIAS=1
             _ALL=0
             ;;
-        -f|--frameworks)
+        -s|--shell_frameworks)
             _SHELL_FRAMEWORK=1
             _ALL=0
+            ;;
+        -f|--force)
+            _FORCE_INSTALL=1
             ;;
         -d|--dotfiles)
             _DOTFILES=1

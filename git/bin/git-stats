@@ -43,7 +43,7 @@ function help_user() {
     echo "              Add '-w' to 'git log', check 'git log --help' for more info"
     echo ""
     echo "          -M"
-    echo "              Add '-M' to 'git log', check 'git log --help' for more info"
+    echo "              Add '-w' to 'git log', check 'git log --help' for more info"
     echo ""
     echo "          -C"
     echo "              Add '-C' and '--find-copies-harder' to 'git log', check 'git log --help' for more info"
