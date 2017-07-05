@@ -43,12 +43,51 @@ _CMD="ln -s"
 
 function help_user() {
     echo ""
-    echo "  Simple installer of this dotfiles"
+    echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
+    echo "  if any flag ins given, the script will install just want is being told to do."
+    echo "      By default command (if none flag is given): $_NAME -f -a -e -v -n -b -g"
     echo ""
     echo "  Usage:"
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
+    echo "          -f, --frameworks"
+    echo "              Install shell frameworks, bash-it or oh-my-zsh according to the current shell"
+    echo "              Current shell in \$SHELL:   $SHELL"
+    echo ""
+    echo "          -c, --copy"
+    echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
+    echo "              the command to 'cp -rf' this way you can remove the folder after installation"
+    echo "              but you need to re-download the files each time you want to update the files"
+    echo ""
+    echo "          -a, --alias"
+    echo "              Install shell alias and shell basic configurations \${SHELL}rc for bash and zsh"
+    echo ""
+    echo "          -d, --dotfiles"
+    echo "              Download my dotfiles repo in case, this options is meant to be used in case this"
+    echo "              script is standalone executed"
+    echo "              URL: https://github.com/mike325/dotfiles"
+    echo ""
+    echo "          -e, --emacs"
+    echo "              Download and install my evil Emacs dotfiles and install systemd's emacs.service"
+    echo "              URL: https://github.com/mike325/.emacs.d"
+    echo ""
+    echo "          -v, --vim"
+    echo "              Download and install my Vim dotfiles"
+    echo "              URL: https://github.com/mike325/.vim"
+    echo ""
+    echo "          -n, --neovim"
+    echo "              Download and install my Vim dotfiles in Neovim's dir."
+    echo "              Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)"
+    echo "              them, otherwise download them from my vim's dotfiles repo"
+    echo "              URL: https://github.com/mike325/.vim"
+    echo ""
+    echo "          -b, --bin"
+    echo "              Install shell functions and scripts in $HOME/.local/bin"
+    echo ""
+    echo "          -g, --git"
+    echo "              Install my gitconfigs, hooks and templates"
+    echo ""
     echo "          -h, --help"
     echo "              Display help, if you are seeing this, that means that you already know it (nice)"
     echo ""
@@ -163,12 +202,12 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-[[ -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
-[[ -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
+[[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
+[[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
-if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/bin/get_nvim.sh" ]]; then
+if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/alias" ]]; then
     get_dotfiles
 fi
 
