@@ -28,6 +28,9 @@
 NAME="$0"
 NAME="${NAME##*/}"
 
+_DEFAULT_SHELL="${SHELL##*/}"
+_CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+
 function help_user() {
     echo ""
     echo "  Small script to install bash-it or oh-my-zsh shell frameworks"
@@ -43,6 +46,21 @@ function help_user() {
     echo ""
 }
 
+function warn_msg() {
+    WARN_MESSAGE="$1"
+    printf "[!] Warning!!! $WARN_MESSAGE \n"
+}
+
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X] Error!!!   $ERROR_MESSAGE \n"
+}
+
+function status_msg() {
+    STATUS_MESSAGGE="$1"
+    printf "[*]     $STATUS_MESSAGGE \n"
+}
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -52,16 +70,23 @@ for key in "$@"; do
     esac
 done
 
-if [[ "$SHELL" =~ "bash" ]] && [[ ! -d "$HOME/.bash_it" ]]; then
+if [[ "$_CURRENT_SHELL" =~ "bash" ]] && [[ ! -d "$HOME/.bash_it" ]]; then
+    status_msg "Cloning bash-it"
     git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it" 2>/dev/null
-elif [[ "$SHELL" =~ "zsh" ]] && [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+elif [[ "$_CURRENT_SHELL" =~ "zsh" ]] && [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     if hash curl 2>/dev/null; then
+        status_msg "Getting oh-my-zsh with curl"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     elif hash wget 2>/dev/null; then
+        status_msg "Getting oh-my-zsh with wget"
         sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
     else
+        status_msg "Cloning oh-my-zsh"
         git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh" 2>/dev/null
     fi
 else
-    echo "    ---- [X] Error the current shell is not supported"
+    error_msg "The current shell is not supported"
+    exit 1
 fi
+
+exit 0

@@ -38,9 +38,19 @@ _NAME="$0"
 _NAME="${_NAME##*/}"
 
 _SCRIPT_PATH="$0"
+
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
-_CURRENT_SHELL="${SHELL##*/}"
+if hash realpath 2>/dev/null; then
+    _SCRIPT_PATH="$(realpath $_SCRIPT_PATH)"
+else
+    pushd "$_SCRIPT_PATH" > /dev/null
+    _SCRIPT_PATH="$(pwd -P)"
+    popd > /dev/null
+fi
+
+_DEFAULT_SHELL="${SHELL##*/}"
+_CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 
 _CMD="ln -s"
 
@@ -60,7 +70,7 @@ function help_user() {
     echo ""
     echo "          -s, --shell_frameworks"
     echo "              Install shell frameworks, bash-it or oh-my-zsh according to the current shell"
-    echo "              Current shell in \$SHELL:   $_CURRENT_SHELL"
+    echo "              Current shell in:   $_CURRENT_SHELL"
     echo ""
     echo "          -c, --copy"
     echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
@@ -130,8 +140,10 @@ function setup_scripts() {
     status_msg "Getting shell functions and scripts"
 
     for script in ${_SCRIPT_PATH}/bin/*; do
-        local file_basename="${script%%.*}"
-        local file_extention="${script##*.}"
+        local scriptname="${script##*/}"
+
+        local file_basename="${scriptname%%.*}"
+        local file_extention="${scriptname##*.}"
 
         execute_cmd "$script" "$HOME/.local/bin/$file_basename"
     done
@@ -145,7 +157,7 @@ function setup_scripts() {
 
 function setup_alias() {
     status_msg "Getting shell alias"
-    execute_cmd "${_SCRIPT_PATH}/alias" "$HOME/.alias"
+    execute_cmd "${_SCRIPT_PATH}/shell/alias" "$HOME/.alias"
 
     # Currently just ZSH and BASH are the available shells
     status_msg "Getting Shell configs"
@@ -271,7 +283,7 @@ done
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
-if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/alias" ]]; then
+if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
     get_dotfiles
 fi
 
