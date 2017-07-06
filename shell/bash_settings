@@ -54,3 +54,6 @@ export SCM_CHECK=true
 # https://github.com/djl/vcprompt
 #export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
 
+if [[ -f "$BASH_IT/bash_it.sh" ]]; then
+    source "$BASH_IT/bash_it.sh"
+fi

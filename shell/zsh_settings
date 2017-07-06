@@ -92,3 +92,7 @@ export SHORT_HOSTNAME=$(hostname -s)
 
 bindkey -v
 export KEYTIMEOUT=1
+
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
