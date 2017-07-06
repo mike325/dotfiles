@@ -54,6 +54,8 @@ _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 
 _CMD="ln -s"
 
+_BASE_URL="https://github.com/mike325"
+
 function help_user() {
     echo ""
     echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
@@ -112,17 +114,17 @@ function help_user() {
 
 function warn_msg() {
     WARN_MESSAGE="$1"
-    printf "[!] Warning!!! $WARN_MESSAGE \n"
+    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
 }
 
 function error_msg() {
     ERROR_MESSAGE="$1"
-    printf "[X] Error!!!   $ERROR_MESSAGE \n"
+    printf "[X]     ---- Error!!!   $ERROR_MESSAGE \n"
 }
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
-    printf "[*]     $STATUS_MESSAGGE \n"
+    printf "[*]     ---- $STATUS_MESSAGGE \n"
 }
 
 function execute_cmd() {
@@ -131,10 +133,37 @@ function execute_cmd() {
 
     if [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
+    elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+        warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
+        return 1
     fi
 
     sh -c "$_CMD $pre_cmd $post_cmd"
 }
+
+function clone_repo() {
+    local repo="$1"
+    local dest="$2"
+
+    if hash git 2>/dev/null; then
+        if [[ $_FORCE_INSTALL -eq 1 ]]; then
+            rm -rf "$post_cmd"
+        else
+            warn_msg "Skipping ${repo##*/}, already exists in $dest"
+            return 1
+        fi
+
+        if [[ ! -d "$dest" ]]; then
+            git clone --recursive "$repo" "$dest"
+        fi
+    else
+        error_msg "Git command is not available"
+        return 2
+    fi
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
+}
+
 
 function setup_scripts() {
     status_msg "Getting shell functions and scripts"
@@ -183,8 +212,10 @@ function setup_git() {
 function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
 
-    git clone --recursive https://github.com/mike325/.vim "$HOME/.vim"
+    clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
     execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
 }
 
 function get_nvim_dotfiles() {
@@ -202,23 +233,29 @@ function get_nvim_dotfiles() {
         execute_cmd "$HOME/.vim" "$HOME/.config/nvim"
     else
         status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
-        git clone --recursive https://github.com/mike325/.vim "$HOME/.config/nvim"
+        clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
     fi
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
 }
 
 function get_emacs_dotfiles() {
     status_msg "Installing Evil Emacs"
 
-    git clone --recursive https://github.com/mike325/.emacs.d "$HOME/.emacs.d"
+    clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d"
 
     mkdir -p "$HOME/.config/systemd/user"
     execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
 }
 
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
     ${_SCRIPT_PATH}/bin/get_shell.sh
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
 }
 
 function get_dotfiles() {
@@ -227,7 +264,9 @@ function get_dotfiles() {
     status_msg "Installing dotfiles in $_SCRIPT_PATH"
 
     mkdir -p "$HOME/.local/"
-    git clone --recursive https://github.com/mike325/dotfiles "$_SCRIPT_PATH"
+    clone_repo "$_BASE_URL/dotfiles" "$HOME/dotfiles"
+
+    [[ $? -eq 0 ]] && return 0 || return "$?"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -285,6 +324,10 @@ done
 # (the command may be executed using `curl`)
 if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
     get_dotfiles
+    if (( $? != 0 )); then
+       error_msg "Could not install dotfiles"
+       exit 1
+    fi
 fi
 
 if [[ $_ALL -eq 1 ]]; then

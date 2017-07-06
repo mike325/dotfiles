@@ -73,7 +73,14 @@ alias turnoff="sudo poweroff"
 # Show used ports
 alias ports="netstat -tulpn"
 
-alias grep="grep --color -n"
+# Termux's grep doesn't have color support
+if [[ $(uname --all) =~ Android ]]; then
+    unalias grep
+    alias grep="grep -n"
+else
+    alias grep="grep --color -n"
+fi
+
 alias grepo="grep -o"
 alias grepe="grep -E"
 
