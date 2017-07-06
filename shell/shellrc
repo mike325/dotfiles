@@ -82,9 +82,11 @@ fi
 
 # We don't need this stuff if we are in a non interactive session
 if [[ $- == *i* ]]; then
+    _DEFAULT_SHELL="${SHELL##*/}"
+    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 
     # Configure shell framework
-    if [[ $SHELL =~ bash ]] || [[ $SHELL =~ zsh ]]; then
+    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
         [[ -f  "$HOME/.local/lib/shell_specific" ]] && source "$HOME/.local/lib/shell_specific"
     fi
 
