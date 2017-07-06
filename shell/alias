@@ -206,7 +206,7 @@ function bk() {
                 echo "  Function to go back any number of dirs"
                 echo ""
                 echo "  Usage:"
-                echo "      $NAME [Number of nodes to move back] [OPTIONAL]"
+                echo "      $ bk [Number of nodes to move back] [OPTIONAL]"
                 echo "          Ex."
                 echo "          $ bk 2 # = cd ../../"
                 echo ""
@@ -232,6 +232,34 @@ function bk() {
     else
         echo "Unexpected arg $1"
         exit 1
+    fi
+}
+
+function mkcd() {
+    for key in "$@"; do
+        case "$key" in
+            -h|--help)
+
+                echo ""
+                echo "  Create a dir an move to it"
+                echo ""
+                echo "  Usage:"
+                echo "      mkcd NEW_DIR [OPTIONAL]"
+                echo "          Ex."
+                echo "          $ mkcd new_foo"
+                echo ""
+                echo "      Optional Flags"
+                echo "          -h, --help"
+                echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
+                echo ""
+
+                return 0
+                ;;
+        esac
+    done
+
+    if [[ ! -z "$1" ]]; then
+        mkdir -p "$1" && cd "$1"
     fi
 }
 
