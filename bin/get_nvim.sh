@@ -49,7 +49,7 @@ function __show_nvim_libs() {
 }
 
 function __show_nvim_help() {
-    echo "    ---- [X] Error Please make sure you have all the dependencies in your system"
+    # echo "    ---- [X] Error Please make sure you have all the dependencies in your system"
     echo ""
     echo "Ubuntu/Debian/Linux mint"
     echo "  # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip"
@@ -137,7 +137,7 @@ git clean -xdf . 2>/dev/null
 rm -fr build/
 
 # Checkout to the stable branch
-git checkout v0.1.7 2>/dev/null
+git checkout v0.2.0 2>/dev/null
 
 if [[ "$__BUILD_LIBS" -eq 1 ]]; then
     if hash apt-get 2> /dev/null; then
@@ -202,6 +202,7 @@ make clean
 # Prefix the current dir
 make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
 
+# make CMAKE_BUILD_TYPE=RelWithDebInfo
 # Set the type release to avoid debug messages
 make CMAKE_BUILD_TYPE=Release
 
