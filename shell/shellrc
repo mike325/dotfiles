@@ -85,24 +85,27 @@ if [[ $- == *i* ]]; then
     _DEFAULT_SHELL="${SHELL##*/}"
     _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 
-    # Configure shell framework
-    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
-        [[ -f  "$HOME/.local/lib/shell_specific" ]] && source "$HOME/.local/lib/shell_specific"
+    # Make less colorful
+    export LESS=' -R '
+
+    # Configure shell framework and specific shell settings (Just bash and zsh)
+    # are supported
+    if [[ -f  "$HOME/.config/shell/${_CURRENT_SHELL}_settings" ]]; then
+        source "$HOME/.config/shell/${_CURRENT_SHELL}_settings"
     fi
 
-    # A like my normal sl
+    # I prefer the cool sl
     if [[ "$(command -v sl)" =~ "alias" ]]; then
         unalias sl
     fi
 
     # Load alias after bash-it to give them higher priority
-    if [[ -f ~/.alias ]]; then
-        source ~/.alias
+    if [[ -f "$HOME/.config/shell/alias"  ]]; then
+        source "$HOME/.config/shell/alias"
     fi
 
     # Load host settings
-    if [[ -f ~/.host_settings ]]; then
-        source ~/.host_settings
+    if [[ -f  "$HOME/.config/shell/host/settings" ]]; then
+        source "$HOME/.config/shell/host/settings"
     fi
-
 fi

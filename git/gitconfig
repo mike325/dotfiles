@@ -19,11 +19,11 @@
 ;        .`   github.com/mike325/dotfiles   `/
 
 [init]
-    templatedir = ~/.local/git/templates/
+    templatedir = ~/.config/git/templates/
 
 [core]
     editor = vim
-    excludesfile = ~/.local/git/templates/gitignore
+    excludesfile = ~/.config/git/templates/gitignore
 
 [user]
     name  = Mike

@@ -75,7 +75,7 @@ alias ports="netstat -tulpn"
 
 # Termux's grep doesn't have color support
 if [[ $(uname --all) =~ Android ]]; then
-    unalias grep
+    unalias grep > /dev/null
     alias grep="grep -n"
 else
     alias grep="grep --color -n"
@@ -88,9 +88,6 @@ alias ls='ls --color'
 alias la="ls -A"
 alias ll="ls -lh"
 alias lla="ls -lhA"
-
-alias salias="source ~/.alias"
-alias sset="source ~/.host_settings"
 
 # This way sudo commands get the alias of the account
 alias sudo='sudo '

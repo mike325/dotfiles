@@ -139,6 +139,8 @@ function execute_cmd() {
     fi
 
     sh -c "$_CMD $pre_cmd $post_cmd"
+
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 function clone_repo() {
@@ -161,7 +163,7 @@ function clone_repo() {
         return 2
     fi
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 
@@ -185,14 +187,16 @@ function setup_scripts() {
 }
 
 function setup_alias() {
-    status_msg "Getting shell alias"
-    execute_cmd "${_SCRIPT_PATH}/shell/alias" "$HOME/.alias"
-
     # Currently just ZSH and BASH are the available shells
-    status_msg "Getting Shell configs"
+    status_msg "Getting Shell init file"
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
         execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc"
-        execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.local/lib/shell_specific"
+        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+
+        (( $? != 0 )) && return $?
+
+        status_msg "Getting shell configs"
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell"
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
@@ -203,19 +207,22 @@ function setup_git() {
     execute_cmd "${_SCRIPT_PATH}/git/gitconfig" "$HOME/.gitconfig"
 
     status_msg "Installing Global Git templates and hooks"
-    [[ ! -d "$HOME/.local/git/" ]] && execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.local/git"
+    [[ ! -d "$HOME/.config/git/" ]] && execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.config/git"
 
     status_msg "Setting up local git commands"
-    [[ ! -d "$HOME/.local/git/host" ]] && mkdir -p "$HOME/.local/git/host"
+    [[ ! -d "$HOME/.config/git/host" ]] && mkdir -p "$HOME/.config/git/host"
 }
 
 function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
 
     clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
-    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    # If we couldn't clone our repo, return
+    (( $? != 0 )) && return $?
+
+    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 function get_nvim_dotfiles() {
@@ -224,6 +231,9 @@ function get_nvim_dotfiles() {
     # Since no all systems have sudo/root access lets assume all dependencies are
     # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
     ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
+
+    # If we couldn't clone our repo, return
+    (( $? != 0 )) && return $?
 
     # if the current command creates a symbolic link and we already have some vim
     # settings, lets use them
@@ -236,7 +246,7 @@ function get_nvim_dotfiles() {
         clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
     fi
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 function get_emacs_dotfiles() {
@@ -244,10 +254,13 @@ function get_emacs_dotfiles() {
 
     clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d"
 
+    # If we couldn't clone our repo, return
+    (( $? != 0 )) && return $?
+
     mkdir -p "$HOME/.config/systemd/user"
     execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 function setup_shell_framework() {
@@ -255,7 +268,7 @@ function setup_shell_framework() {
 
     ${_SCRIPT_PATH}/bin/get_shell.sh
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 function get_dotfiles() {
@@ -266,7 +279,7 @@ function get_dotfiles() {
     mkdir -p "$HOME/.local/"
     clone_repo "$_BASE_URL/dotfiles" "$HOME/dotfiles"
 
-    [[ $? -eq 0 ]] && return 0 || return "$?"
+    (( $? == 0 )) && return 0 || return "$?"
 }
 
 while [[ $# -gt 0 ]]; do
