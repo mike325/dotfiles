@@ -197,6 +197,10 @@ function setup_alias() {
 
         status_msg "Getting shell configs"
         execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell"
+
+        # Since we could fail linking/copying the dir, lets check it first
+        (( $? != 0 )) && return $?
+        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
