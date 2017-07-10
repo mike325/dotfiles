@@ -232,14 +232,26 @@ function setup_git() {
 
 function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
-
     clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
-
     # If we couldn't clone our repo, return
     (( $? != 0 )) && return $?
 
     execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
-    (( $? == 0 )) && return 0 || return "$?"
+    (( $? != 0 )) && return $?
+
+    # Windows stuff
+    if [[ $_IS_WINDOWS -eq 1 ]]; then
+        status_msg "Cloning vim dotfiles in $HOME/vimfiles"
+        clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
+        # If we couldn't clone our repo, return
+        (( $? != 0 )) && return $?
+
+        execute_cmd "$HOME/.vim/init.vim" "$HOME/_vimrc"
+        (( $? != 0 )) && return $?
+    fi
+
+    # No errors so far
+    return 0
 }
 
 function get_nvim_dotfiles() {
@@ -263,7 +275,18 @@ function get_nvim_dotfiles() {
         clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
     fi
 
-    (( $? == 0 )) && return 0 || return "$?"
+    (( $? != 0 )) && return $?
+
+    # Windows stuff
+    if [[ $_IS_WINDOWS -eq 1 ]]; then
+        status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
+        clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim"
+        # If we couldn't clone our repo, return
+        (( $? != 0 )) && return $?
+    fi
+
+    # No errors so far
+    return 0
 }
 
 function get_emacs_dotfiles() {
