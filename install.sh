@@ -255,33 +255,33 @@ function get_vim_dotfiles() {
 }
 
 function get_nvim_dotfiles() {
-    status_msg "Running Neovim install script"
-
-    # Since no all systems have sudo/root access lets assume all dependencies are
-    # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
-    ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
-
-    # If we couldn't clone our repo, return
-    (( $? != 0 )) && return $?
-
-    # if the current command creates a symbolic link and we already have some vim
-    # settings, lets use them
-    status_msg "Checking existing vim dotfiles"
-    if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
-        status_msg "Linking current vim dotfiles"
-        execute_cmd "$HOME/.vim" "$HOME/.config/nvim"
-    else
-        status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
-        clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
-    fi
-
-    (( $? != 0 )) && return $?
-
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
         clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim"
         # If we couldn't clone our repo, return
+        (( $? != 0 )) && return $?
+    else
+        status_msg "Running Neovim install script"
+
+        # Since no all systems have sudo/root access lets assume all dependencies are
+        # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
+        ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
+
+        # If we couldn't clone our repo, return
+        (( $? != 0 )) && return $?
+
+        # if the current command creates a symbolic link and we already have some vim
+        # settings, lets use them
+        status_msg "Checking existing vim dotfiles"
+        if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
+            status_msg "Linking current vim dotfiles"
+            execute_cmd "$HOME/.vim" "$HOME/.config/nvim"
+        else
+            status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
+            clone_repo "$_BASE_URL/.vim" "$HOME/.config/nvim"
+        fi
+
         (( $? != 0 )) && return $?
     fi
 
