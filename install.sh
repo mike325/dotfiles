@@ -49,12 +49,23 @@ else
     popd > /dev/null
 fi
 
-_DEFAULT_SHELL="${SHELL##*/}"
-_CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
-
 _CMD="ln -s"
-
 _BASE_URL="https://github.com/mike325"
+
+_DEFAULT_SHELL="${SHELL##*/}"
+_CURRENT_SHELL="bash"
+_IS_WINDOWS=0
+
+# Windows stuff
+if [[ $(uname --all) =~ MINGW ]]; then
+    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
+    _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+    # Windows does not support links we will use cp instead
+    _IS_WINDOWS=1
+    _CMD="cp -rf"
+else
+    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+fi
 
 function help_user() {
     echo ""
@@ -78,6 +89,7 @@ function help_user() {
     echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
     echo "              the command to 'cp -rf' this way you can remove the folder after installation"
     echo "              but you need to re-download the files each time you want to update the files"
+    echo "              Option not valid in windows platforms"
     echo ""
     echo "          -a, --alias"
     echo "              Install shell alias and shell basic configurations \${SHELL}rc for bash and zsh"
@@ -211,7 +223,7 @@ function setup_git() {
     execute_cmd "${_SCRIPT_PATH}/git/gitconfig" "$HOME/.gitconfig"
 
     status_msg "Installing Global Git templates and hooks"
-    [[ ! -d "$HOME/.config/git/" ]] && execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.config/git"
+    execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.config/git"
 
     status_msg "Setting up local git commands"
     [[ ! -d "$HOME/.config/git/host" ]] && mkdir -p "$HOME/.config/git/host"

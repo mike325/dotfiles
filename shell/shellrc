@@ -83,7 +83,16 @@ fi
 # We don't need this stuff if we are in a non interactive session
 if [[ $- == *i* ]]; then
     _DEFAULT_SHELL="${SHELL##*/}"
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+
+    # Windows stuff
+    if [[ $(uname --all) =~ MINGW ]]; then
+        _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
+        _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+        _IS_WINDOWS=1
+    else
+        _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+    fi
+
 
     # Make less colorful
     export LESS=' -R '
