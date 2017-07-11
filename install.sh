@@ -239,6 +239,9 @@ function get_vim_dotfiles() {
     execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
     (( $? != 0 )) && return $?
 
+    execute_cmd "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"
+    (( $? != 0 )) && return $?
+
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/vimfiles"
@@ -247,6 +250,9 @@ function get_vim_dotfiles() {
         (( $? != 0 )) && return $?
 
         execute_cmd "$HOME/.vim/init.vim" "$HOME/_vimrc"
+        (( $? != 0 )) && return $?
+
+        execute_cmd "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"
         (( $? != 0 )) && return $?
     fi
 
