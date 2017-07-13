@@ -162,7 +162,7 @@ function clone_repo() {
 
     if hash git 2>/dev/null; then
         if [[ $_FORCE_INSTALL -eq 1 ]]; then
-            rm -rf "$post_cmd"
+            rm -rf "$dest"
         else
             warn_msg "Skipping ${repo##*/}, already exists in $dest"
             return 1
@@ -231,7 +231,7 @@ function setup_git() {
 }
 
 function get_vim_dotfiles() {
-    status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
+    status_msg "Cloning vim dotfiles in $HOME/.vim"
     clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
     # If we couldn't clone our repo, return
     (( $? != 0 )) && return $?
@@ -242,11 +242,11 @@ function get_vim_dotfiles() {
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/vimfiles"
-        clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
+        clone_repo "$_BASE_URL/.vim" "$HOME/vimfiles"
         # If we couldn't clone our repo, return
         (( $? != 0 )) && return $?
 
-        execute_cmd "$HOME/.vim/init.vim" "$HOME/_vimrc"
+        execute_cmd "$HOME/vimfiles/init.vim" "$HOME/_vimrc"
         (( $? != 0 )) && return $?
     fi
 
