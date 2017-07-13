@@ -189,6 +189,7 @@
 ;###############################################################################
 
     ps    = push                    ; Normal push shortcut
+    pso   = push origin             ; Push to origin remote
     psom  = push origin master      ; Push master to origin remote
     pshm  = push origin HEAD:master ; push HEAD to master's origin
 
