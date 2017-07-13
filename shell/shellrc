@@ -101,11 +101,17 @@ if [[ $- == *i* ]]; then
     # are supported
     if [[ -f  "$HOME/.config/shell/${_CURRENT_SHELL}_settings" ]]; then
         source "$HOME/.config/shell/${_CURRENT_SHELL}_settings"
-    fi
 
-    # I prefer the cool sl
-    if [[ "$(command -v sl)" =~ "alias" ]]; then
-        unalias sl
+        # I prefer the cool sl and the bins in my path
+        _kill_alias=(ips usage myip del down4me sl)
+
+        for i in ${_kill_alias[@]}; do
+            if [[ "$(type -t $i)" =~ "function" ]]; then
+                unset -f "$i"
+            elif [[ "$(type -t $i)" =~ "alias" ]]; then
+                unalias "$i"
+            fi
+        done
     fi
 
     # Load alias after bash-it to give them higher priority
