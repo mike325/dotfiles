@@ -234,8 +234,8 @@ function bk() {
     elif [[ -z "$1" ]]; then
         cd ..
     else
-        echo "Unexpected arg $1"
-        exit 1
+        echo "  ---- [X] Error Unexpected arg $1, please provide a number"
+        return 1
     fi
 }
 
