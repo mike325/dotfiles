@@ -136,9 +136,6 @@ fi
 git clean -xdf . 2>/dev/null
 rm -fr build/
 
-# Checkout to the stable branch
-git checkout v0.2.0 2>/dev/null
-
 if [[ "$__BUILD_LIBS" -eq 1 ]]; then
     if hash apt-get 2> /dev/null; then
         sudo apt-get install -y \
@@ -191,10 +188,18 @@ if [[ "$__BUILD_LIBS" -eq 1 ]]; then
         echo "             dependencies in Neovim's page:"
         echo "             https://github.com/neovim/neovim/wiki/Building-Neovim"
         echo ""
+        exit 1
     fi
 fi
 
-
+# BUG: Since the latest stable version (v0.2.0 up to Jul/2017) have "old" deps
+# GCC7 just works for the master branch
+GCC_VERSION="$(gcc --version | head -1 | awk '{print $3}')"
+GCC_VERSION="${GCC_VERSION%%.*}"
+# Checkout to the latest stable version
+if (( $GCC_VERSION < 7 )); then
+    git checkout $( git tag | tail -n 1 ) 2>/dev/null
+fi
 
 # Always clean the build dir
 make clean
@@ -219,12 +224,12 @@ if [[ $? -eq 0 ]]; then
         echo ""
 
         if [[ $__PYTHON_LIBS -eq 1 ]]; then
-            hash pip2 2> /dev/null && pip2 install --user neovim -y
-            hash pip3 2> /dev/null && pip3 install --user neovim -y
+            hash pip2 2> /dev/null && /usr/bin/yes | pip2 install --user neovim
+            hash pip3 2> /dev/null && /usr/bin/yes | pip3 install --user neovim
         fi
 
         if [[ $__RUBY_LIBS -eq 1 ]]; then
-            hash gem 2> /dev/null && gem install --user-install -y neovim
+            hash gem 2> /dev/null && gem install --user-install neovim
         fi
 
         if [[ $__PYTHON_LIBS -eq 0 ]] || [[ $__RUBY_LIBS -eq 0 ]]; then

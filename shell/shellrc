@@ -63,6 +63,13 @@ elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
     export PYTHONSTARTUP="$PYTHONSTARTUP_SCRIPT"
 fi
 
+if hash gem 2> /dev/null; then
+    _GEM_USER_PATH=$(gem environment | grep -i 'user install' | awk '{print $5}')
+    if [[ -d "${_GEM_USER_PATH}/bin" ]]; then
+        export PATH="${_GEM_USER_PATH}/bin:$PATH"
+    fi
+fi
+
 # If Neovim is installed in a different path, you could set it in "host_settings" file
 if [[ -d $HOME/.local/neovim/bin ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
