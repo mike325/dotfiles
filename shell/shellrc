@@ -106,9 +106,9 @@ if [[ $- == *i* ]]; then
         _kill_alias=(ips usage myip del down4me sl)
 
         for i in ${_kill_alias[@]}; do
-            if [[ "$(type -t $i)" =~ "function" ]]; then
+            if [[ "$(command -V $i)" =~ "function" ]]; then
                 unset -f "$i"
-            elif [[ "$(type -t $i)" =~ "alias" ]]; then
+            elif [[ "$(command -V $i)" =~ "alias" ]]; then
                 unalias "$i"
             fi
         done
