@@ -64,7 +64,7 @@ if [[ $(uname --all) =~ MINGW ]]; then
     _IS_WINDOWS=1
     _CMD="cp -rf"
 else
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+    _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
 fi
 
 function help_user() {
@@ -312,7 +312,11 @@ function get_emacs_dotfiles() {
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
-    ${_SCRIPT_PATH}/bin/get_shell.sh
+    if [[ $_FORCE_INSTALL -eq 1 ]]; then
+        ${_SCRIPT_PATH}/bin/get_shell.sh -s "$_CURRENT_SHELL" -f
+    else
+        ${_SCRIPT_PATH}/bin/get_shell.sh -s "$_CURRENT_SHELL"
+    fi
 
     (( $? == 0 )) && return 0 || return "$?"
 }
@@ -322,8 +326,9 @@ function get_dotfiles() {
 
     status_msg "Installing dotfiles in $_SCRIPT_PATH"
 
-    mkdir -p "$HOME/.local/"
-    clone_repo "$_BASE_URL/dotfiles" "$HOME/dotfiles"
+    [[ ! -d "$HOME/.local/" ]] && mkdir -p "$HOME/.local/"
+
+    clone_repo "$_BASE_URL/dotfiles" "$_SCRIPT_PATH"
 
     (( $? == 0 )) && return 0 || return "$?"
 }
