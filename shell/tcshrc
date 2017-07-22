@@ -1,0 +1,78 @@
+#!/usr/bin/env tcsh
+
+################################################################################
+#                                                                              #
+#  NOT TESTED!!!! Draft of a simple/basic port of my shellrc                   #
+#                                                                              #
+#   Author: Mike 8a                                                            #
+#   Description: Small shell configs                                           #
+#                                                                              #
+#                                     -`                                       #
+#                     ...            .o+`                                      #
+#                  .+++s+   .h`.    `ooo/                                      #
+#                 `+++%++  .h+++   `+oooo:                                     #
+#                 +++o+++ .hhs++. `+oooooo:                                    #
+#                 +s%%so%.hohhoo'  'oooooo+:                                   #
+#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
+#                  hh+o+hoso+h+`/++++.+++++++:                                 #
+#                   `+h+++h.+ `/++++++++++++++:                                #
+#                            `/+++ooooooooooooo/`                              #
+#                           ./ooosssso++osssssso+`                             #
+#                          .oossssso-````/osssss::`                            #
+#                         -osssssso.      :ssss``to.                           #
+#                        :osssssss/  Mike  osssl   +                           #
+#                       /ossssssss/   8a   +sssslb                             #
+#                     `/ossssso+/:-        -:/+ossss'.-                        #
+#                    `+sso+:-`                 `.-/+oso:                       #
+#                   `++:.                           `-/+/                      #
+#                   .`   github.com/mike325/dotfiles   `/                      #
+#                                                                              #
+################################################################################
+
+# Magic tcsh stuff
+set addsuffix
+set autolist
+alias cmdcwd 'set prompt="$user@`hostname`[$cwd] " '
+# set correct=cmd
+
+# Create some dirs
+if ( -d "$HOME/.local/bin" ) then
+    mkdir -p "$HOME/.local/bin"
+endif
+
+if ( -d "$HOME/.local/lib" ) then
+    mkdir -p "$HOME/.local/lib"
+endif
+
+if ( -d "$HOME/.local/share" ) then
+    mkdir -p "$HOME/.local/share"
+endif
+
+if ( -d "$HOME/.local/golang/src" ) then
+    mkdir -p "$HOME/.local/golang/src"
+endif
+
+### Setting the PATH var
+if ( -d "$HOME/.local/git/bin" ) then
+    setenv PATH "$HOME/.local/git/bin:$PATH"
+endif
+
+if ( -d $HOME/.local/bin/ ) then
+    setenv PATH "$HOME/.local/bin/:$PATH"
+endif
+
+if ( -f $HOME/.local/lib/pythonstartup.py ) then
+    setenv PYTHONSTARTUP "$HOME/.local/lib/pythonstartup.py"
+endif
+
+if ( -d $HOME/.local/neovim/bin ) then
+    setenv PATH "$HOME/.local/neovim/bin:$PATH"
+endif
+
+if ( -d $HOME/.local/golang/bin ) then
+    setenv PATH "$HOME/.local/golang/bin:$PATH"
+endif
+
+if ( -d $HOME/.local/golang/src ) then
+    setenv GOPATH "$HOME/.local/golang/src"
+endif
