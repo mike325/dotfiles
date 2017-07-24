@@ -195,8 +195,16 @@ function setup_scripts() {
     status_msg "Getting python startup script"
     execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
 
-    status_msg "Getting ctags defaults"
-    execute_cmd "${_SCRIPT_PATH}/ctags" "$HOME/.ctags"
+    status_msg "Getting dotconfigs defaults"
+
+    for script in ${_SCRIPT_PATH}/dotconfigs/*; do
+        local scriptname="${script##*/}"
+
+        local file_basename="${scriptname%%.*}"
+        local file_extention="${scriptname##*.}"
+
+        execute_cmd "$script" "$HOME/.${file_basename}"
+    done
 }
 
 function setup_alias() {
