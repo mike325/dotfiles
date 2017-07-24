@@ -106,6 +106,11 @@ if (( $__INTERACTIVE == 1 )); then
     # Make less colorful
     export LESS=' -R '
 
+    # Load custom shell framework settings (override default shell framework settings)
+    if [[ -f  "$HOME/.config/shell/host/framework_settings" ]]; then
+        source "$HOME/.config/shell/host/framework_settings"
+    fi
+
     # Configure shell framework and specific shell settings (Just bash and zsh)
     # are supported
     if [[ -f  "$HOME/.config/shell/${_CURRENT_SHELL}_settings" ]]; then
@@ -128,7 +133,7 @@ if (( $__INTERACTIVE == 1 )); then
         source "$HOME/.config/shell/alias"
     fi
 
-    # Load host settings
+    # Load host settings (override general alias and funtions)
     if [[ -f  "$HOME/.config/shell/host/settings" ]]; then
         source "$HOME/.config/shell/host/settings"
     fi
