@@ -36,8 +36,15 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-NAME="$0"
-NAME="${NAME##*/}"
+__NAME="$0"
+__NAME="${__NAME##*/}"
+__LOCATION="$(pwd)"
+__URL="https://github.com/neovim/neovim"
+__PYTHON_LIBS=0
+__RUBY_LIBS=0
+__BUILD_LIBS=0
+__CLONE=0
+
 
 # Warning ! This script delete everything in the work directory before install
 function __show_nvim_libs() {
@@ -69,17 +76,55 @@ function __show_nvim_help() {
 
 function show_help() {
     echo ""
+    echo "  Simple script to build and install Neovim directly from the source"
+    echo "  with some pretty basic options."
+    echo ""
+    echo "  Usage:"
+    echo "      $_NAME [OPTIONS]"
+    echo ""
+    echo "      Optional Flags"
+    echo "          -c, --clone"
+    echo "              By default this script expect to run under a git directory with"
+    echo "              the Neovim's source code, this options clone Neovim's repo and move"
+    echo "              to the repo's root before starts the compile process"
+    echo ""
+    echo "          -d <DIR> , --dir <DIR>"
+    echo "              Choose the base root of the repo and move to it before compile"
+    echo "              the source code, if this options is used with -c/--clone flag"
+    echo "              it will clone the repo in the desire <DIR>"
+    echo ""
+    echo "          -p, --python"
+    echo "              Install Neovim's python package for python2 and python3"
+    echo ""
+    echo "          -r, --ruby"
+    echo "              Install Neovim's ruby package"
+    echo ""
+    echo "          -b, --build"
+    echo "              Install all dependencies of the before build neovim's source code"
+    echo "              Just few systems are supported, Debian's family, Fedora's family and"
+    echo "              ArchLinux's family"
+    echo ""
+    echo "          -h, --help"
+    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
     echo ""
 
-    __show_nvim_help
+    # __show_nvim_help
 }
 
-__LOCATION="$(pwd)"
-__URL="https://github.com/neovim/neovim"
-__PYTHON_LIBS=0
-__RUBY_LIBS=0
-__BUILD_LIBS=0
-__CLONE=0
+function warn_msg() {
+    WARN_MESSAGE="$1"
+    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+}
+
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   $ERROR_MESSAGE \n"
+}
+
+function status_msg() {
+    STATUS_MESSAGGE="$1"
+    printf "[*]     ---- $STATUS_MESSAGGE \n"
+}
 
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -232,7 +277,7 @@ if [[ $? -eq 0 ]]; then
             hash gem 2> /dev/null && gem install --user-install neovim
         fi
 
-        if [[ $__PYTHON_LIBS -eq 0 ]] || [[ $__RUBY_LIBS -eq 0 ]]; then
+        if [[ $__PYTHON_LIBS -eq 1 ]] || [[ $__RUBY_LIBS -eq 1 ]]; then
             __show_nvim_libs
         fi
 
