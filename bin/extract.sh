@@ -59,7 +59,7 @@ for key in "$@"; do
 done
 
 while [[ $# -gt 0 ]]; do
-    local filename="$1"
+    filename="$1"
 
     if [[ -f "$filename" ]]; then
         case "$filename" in
@@ -68,6 +68,7 @@ while [[ $# -gt 0 ]]; do
             *.zip|*.ZIP)      extraction "$filename" "unzip";;
             *.tar.bz)         extraction "$filename" "tar -xf";;
             *.pax.Z)          extraction "$filename" "uncompress";;
+            *.tar)            extraction "$filename" "tar -xf";;
             *.bz2)            extraction "$filename" "bunzip2";;
             *.dmg)            extraction "$filename" "hdiutil mount";;
             *.tar)            extraction "$filename" "tar -xvf";;
