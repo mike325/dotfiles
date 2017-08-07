@@ -22,7 +22,7 @@
     templatedir = ~/.config/git/templates/
 
 [core]
-    editor = vim
+    editor = $EDITOR
     excludesfile = ~/.config/git/templates/gitignore
 
 [user]
