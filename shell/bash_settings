@@ -23,9 +23,9 @@ elif [[ -d "$HOME/.bash_it" ]]; then
 fi
 
 # location ~/.bash_it/themes/
-# export BASH_IT_THEME='bakke'
 # Load it just in case it's not defined yet
-[[ -z $BASH_IT_THEME ]] &&  export BASH_IT_THEME='demula'
+# [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
+[[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
 
 # (Advanced): Change this to the name of your remote repo if you
 # cloned bash-it with a remote other than origin such as `bash-it`.
