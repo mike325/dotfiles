@@ -280,7 +280,10 @@ function get_nvim_dotfiles() {
 
         # Since no all systems have sudo/root access lets assume all dependencies are
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
-        ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
+        if ! hash nvim 2> /dev/null; then
+            # Make Neovim only if it's not already installed
+            ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
+        fi
 
         # If we couldn't clone our repo, return
         (( $? != 0 )) && return $?
