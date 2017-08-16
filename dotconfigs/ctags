@@ -11,16 +11,20 @@
 --exclude=.svn
 --exclude=.hg
 --exclude=.git
---exclude=.ropeproject
---exclude=libs
---exclude=build
 --exclude=dist
 --exclude=user-data
 --exclude=venv
 --exclude=virtualenv
 --exclude=static-cache
 --exclude=closure-library
---exclude=cache
+--exclude=.ropeproject/*
+--exclude=_build/*
+--exclude=build/*
+--exclude=cache/*
+--exclude=node_modules/*
+--exclude=lib/*
+--exclude=log/*
+--exclude=tmp/*
 
 --exclude=*.xml
 
