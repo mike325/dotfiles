@@ -37,6 +37,7 @@ if hash nvim 2>/dev/null; then
 
     # Prevent to screw the path alias
     if [[ ! $VIM_PATH =~ "alias" ]]; then
+        export MANPAGER="nvim -c 'set ft=man' -"
         alias vim="nvim"
         alias vi="$VIM_PATH"
         alias cdvim="cd ~/.config/nvim"
@@ -44,6 +45,7 @@ if hash nvim 2>/dev/null; then
     fi
 else
     export EDITOR='vim'
+    export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
     alias cdvim="cd ~/.vim"
 fi
 
