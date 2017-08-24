@@ -30,6 +30,7 @@ NAME="${NAME##*/}"
 
 _DEFAULT_SHELL="${SHELL##*/}"
 _FORCE_INSTALL=0
+_BACKUP=0
 
 # Windows stuff
 if [[ $(uname --all) =~ MINGW ]]; then
@@ -56,6 +57,11 @@ function help_user() {
     echo "          $ get_shell -s bash-it"
     echo ""
     echo "      Optional Flags"
+    echo "          --backup"
+    echo "              Enable backup of existing files, this flag enables --force but"
+    echo "              makes a backup before deletion"
+    echo "                  BACKUP_DIR: $HOME/.local/backup"
+    echo ""
     echo "          -f, --force"
     echo "              Force installation, remove all previous conflict files before installing"
     echo "              This flag is always disable by default"
@@ -85,7 +91,11 @@ function status_msg() {
 
 function rm_framework() {
     local framework_dir="$1"
-    [[ $_FORCE_INSTALL -eq 1 ]] && rm -rf "$framework_dir"
+    if [[ $_BACKUP -eq 1 ]]; then
+        mv --backup=numbered "$framework_dir" "$HOME/.local/backup"
+    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+        rm -rf "$framework_dir"
+    fi
 }
 
 while [[ $# -gt 0 ]]; do
@@ -107,6 +117,9 @@ while [[ $# -gt 0 ]]; do
                 esac
                 shift
             fi
+            ;;
+        --backup)
+            _BACKUP=1
             ;;
         -f|--force)
             _FORCE_INSTALL=1
@@ -130,7 +143,7 @@ if [[ "$_CURRENT_SHELL" =~ "bash" ]]; then
 
     if [[ ! -d "$HOME/.bash_it" ]]; then
         status_msg "Cloning bash-it"
-        git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it" 
+        git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"
     else
         warn_msg "Bash-it is already install"
     fi
@@ -147,7 +160,7 @@ elif [[ "$_CURRENT_SHELL" =~ "zsh" ]]; then
         #     sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
         # else
         status_msg "Cloning oh-my-zsh"
-        git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh" 
+        git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
         # fi
     else
         warn_msg "oh-my-zsh is already install"

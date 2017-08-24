@@ -33,6 +33,7 @@ _EMACS=0
 _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
+_BACKUP=0
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -77,6 +78,11 @@ function help_user() {
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
+    echo "          --backup"
+    echo "              Enable backup of existing files, this flag enables --force but"
+    echo "              makes a backup before deletion"
+    echo "                  BACKUP_DIR: $HOME/.local/backup"
+    echo ""
     echo "          -f, --force"
     echo "              Force installation, remove all previous conflict files before installing"
     echo "              This flag is always disable by default"
@@ -144,7 +150,9 @@ function execute_cmd() {
     local pre_cmd="$1"
     local post_cmd="$2"
 
-    if [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if [[ $_BACKUP -eq 1 ]]; then
+        mv --backup=numbered "$post_cmd" "$HOME/.local/backup"
+    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
     elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
@@ -161,7 +169,9 @@ function clone_repo() {
     local dest="$2"
 
     if hash git 2>/dev/null; then
-        if [[ $_FORCE_INSTALL -eq 1 ]]; then
+        if [[ $_BACKUP -eq 1 ]]; then
+            mv --backup=numbered "$post_cmd" "$HOME/.local/backup"
+        elif [[ $_FORCE_INSTALL -eq 1 ]]; then
             rm -rf "$dest"
         else
             warn_msg "Skipping ${repo##*/}, already exists in $dest"
@@ -323,8 +333,10 @@ function get_emacs_dotfiles() {
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
-    if [[ $_FORCE_INSTALL -eq 1 ]]; then
-        ${_SCRIPT_PATH}/bin/get_shell.sh -s "$_CURRENT_SHELL" -f
+    if [[ $_BACKUP -eq 1 ]]; then
+        ${_SCRIPT_PATH}/bin/ get_shell.sh -s "$_CURRENT_SHELL" --backup
+    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+        ${_SCRIPT_PATH}/bin/ get_shell.sh -s "$_CURRENT_SHELL" -f
     else
         ${_SCRIPT_PATH}/bin/get_shell.sh -s "$_CURRENT_SHELL"
     fi
@@ -347,6 +359,10 @@ function get_dotfiles() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --backup)
+            _BACKUP=1
+            [[ ! -d "$HOME/.local/backup" ]] && mkdir -p "$HOME/.local/backup"
+            ;;
         -c|--copy)
             _CMD="cp -rf"
             ;;
@@ -400,8 +416,8 @@ done
 if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
     get_dotfiles
     if (( $? != 0 )); then
-       error_msg "Could not install dotfiles"
-       exit 1
+        error_msg "Could not install dotfiles"
+        exit 1
     fi
 fi
 
