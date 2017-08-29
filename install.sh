@@ -65,6 +65,12 @@ if [[ $(uname --all) =~ MINGW ]]; then
     _CMD="cp -rf"
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
+
+    # Hack when using sudo
+    # TODO: Must fix this
+    if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
+        _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
+    fi
 fi
 
 function help_user() {
