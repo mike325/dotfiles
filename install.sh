@@ -52,7 +52,7 @@ fi
 _CMD="ln -s"
 _BASE_URL="https://github.com/mike325"
 
-_DEFAULT_SHELL="${SHELL##*/}"
+# _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
 _IS_WINDOWS=0
 
@@ -133,17 +133,17 @@ function help_user() {
 
 function warn_msg() {
     WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
 }
 
 function error_msg() {
     ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   $ERROR_MESSAGE \n"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE"
 }
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
-    printf "[*]     ---- $STATUS_MESSAGGE \n"
+    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
 }
 
 function execute_cmd() {
@@ -400,6 +400,7 @@ done
 
 [[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
 [[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
+[[ ! -d "$HOME/.config/" ]] && mkdir -p  "$HOME/.config/"
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
