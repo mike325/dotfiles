@@ -49,7 +49,13 @@ else
     alias cdvim="cd ~/.vim"
 fi
 
+# Starts (n)vim with no settings at all
 alias vimu="vim -u NONE"
+
+# Starts (n)vim with minimal settings
+# - Disable all plugins
+# - Set my default settings, autocmds, and my key maps
+alias vimm="vim --cmd \"let g:minimal=0\""
 
 ################################################################################
 #                          Fix my common typos                                 #
@@ -98,7 +104,8 @@ alias lla="ls -lhA"
 # This way sudo commands get the alias of the account
 [[ $EUID -ne 0 ]] && alias sudo='sudo '
 
-# Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
+# Magnificent app which corrects your previous console command
+# https://github.com/nvbn/thefuck
 if hash thefuck 2>/dev/null; then
     eval "$(thefuck --alias)"
     alias fuck='eval $(thefuck $(fc -ln -1))'
@@ -277,7 +284,7 @@ function bk() {
         for (( i = 0; i < $1; i++ )); do
             local parent="${parent}../"
         done
-        cd "$parent"
+        cd "$parent" || return 1
     elif [[ -z "$1" ]]; then
         cd ..
     else
@@ -310,7 +317,8 @@ function mkcd() {
     done
 
     if [[ ! -z "$1" ]]; then
-        mkdir -p "$1" && cd "$1"
+        mkdir -p "$1"
+        cd "$1" || return 1
     fi
 }
 
@@ -321,7 +329,7 @@ function llg() {
 }
 
 function rl() {
-    rm "$@" *.log
+    rm "$@" ./*.log
 }
 
 # Init original path with HOME dir
@@ -331,12 +339,12 @@ ORIGINAL_PATH="$(pwd)"
 function crp() {
     # Save the current path
     ORIGINAL_PATH="$(pwd)"
-    cd "$(grp)"
+    cd "$(grp)" || return 1
 }
 
 # Go back to the last sym path or $HOME
 function gobk() {
-    cd "$ORIGINAL_PATH"
+    cd "$ORIGINAL_PATH" || return 1
 }
 
 

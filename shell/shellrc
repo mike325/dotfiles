@@ -32,7 +32,7 @@
 ################################################################################
 #                               Some vim stuff                                 #
 # Use <C-s> in terminal vim                                                    #
-(( $__INTERACTIVE == 1 )) && stty -ixon                                                  #
+(( __INTERACTIVE == 1 )) && stty -ixon                                         #
 # Set vi keys in the shell                                                     #
 set -o vi
 ################################################################################
@@ -90,16 +90,16 @@ fi
 ################################################################################
 
 # We don't need this stuff if we are in a non __INTERACTIVE session
-if (( $__INTERACTIVE == 1 )); then
-    _DEFAULT_SHELL="${SHELL##*/}"
+if (( __INTERACTIVE == 1 )); then
+    export _DEFAULT_SHELL="${SHELL##*/}"
 
     # Windows stuff
     if [[ $(uname --all) =~ MINGW ]]; then
-        _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
-        _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-        _IS_WINDOWS=1
+        export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
+        export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+        export _IS_WINDOWS=1
     else
-        _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+        export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
     fi
 
 
@@ -119,7 +119,7 @@ if (( $__INTERACTIVE == 1 )); then
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage myip del down4me sl)
 
-        for i in ${_kill_alias[@]}; do
+        for i in "${_kill_alias[@]}"; do
             if [[ "$(command -V $i)" =~ "function" ]]; then
                 unset -f "$i"
             elif [[ "$(command -V $i)" =~ "alias" ]]; then
