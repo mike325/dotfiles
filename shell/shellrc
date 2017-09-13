@@ -48,6 +48,18 @@ set -o vi
 # [[ ! -d "$HOME/.local/git/hooks" ]] && mkdir -p "$HOME/.local/git/hooks"
 # [[ ! -d "$HOME/.local/git/bin" ]] && mkdir -p "$HOME/.local/git/bin"
 
+
+# Load all proxy settings
+if [[ -f "$HOME/.config/shell/proxy"  ]]; then
+    source "$HOME/.config/shell/proxy"
+fi
+
+# Load all ENV variables
+if [[ -f "$HOME/.config/shell/env"  ]]; then
+    source "$HOME/.config/shell/env"
+fi
+
+
 if [[ -d "$HOME/.local/git/bin" ]]; then
     export PATH="$HOME/.local/git/bin:$PATH"
 fi
