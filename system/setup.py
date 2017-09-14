@@ -88,6 +88,8 @@ _PKGS = {
                 "vim-nox",
                 "python-dev",
                 "python3-dev",
+                "python-setuptools",
+                "python3-setuptools",
                 "pkg-config",
                 "aptitude",
                 "g++",
@@ -114,6 +116,8 @@ _PKGS = {
                 "automake",
                 "build-essential",
                 "shellcheck",
+                "python-setuptools",
+                "python3-setuptools",
             ],
         },
     },
@@ -272,13 +276,14 @@ class PkgManager(object):
 
         call(install_cmd)
 
-        status_message("Installings secondary tool packages")
-        status_message("Using: {0}  ".format(self._secondary_tool["name"]))
-        install_cmd = self.__create_cmd(self._secondary_tool)
+        if self._secondary_tool is not None:
+            status_message("Installings secondary tool packages")
+            status_message("Using: {0}  ".format(self._secondary_tool["name"]))
+            install_cmd = self.__create_cmd(self._secondary_tool)
 
-        status_message("Command:\n{0}  ".format(" ".join(install_cmd)))
+            status_message("Command:\n{0}  ".format(" ".join(install_cmd)))
 
-        call(install_cmd)
+            call(install_cmd)
         pass
 
 

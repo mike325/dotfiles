@@ -1,5 +1,5 @@
 # pydoc
-vim-vint
+# vim-vint
 neovim-remote
 jedi
 flake8
