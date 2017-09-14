@@ -1,0 +1,15 @@
+# pydoc
+jedi
+flake8
+neovim
+pylint
+pyflakes
+pep8
+autopep8
+rope
+ropevim
+yapf
+jsbeautifier
+vim-vint
+neovim-remote
+virtualenv
