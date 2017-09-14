@@ -28,9 +28,13 @@ NAME="${NAME##*/}"
 
 function help_user() {
     echo ""
-    echo "  Get the realpath of the given dir"
-    echo "  This script tries to use 'realpath', if it's available, you could use"
-    echo "  any possible flag; otherwise , if realpath is not available, 'pwd' will be use"
+    echo "  Tries to get the real path of the given dir/file"
+    echo "  The following tools are used in the given order:"
+    echo "      1) realpath"
+    echo "      2) readlink -f"
+    echo "      3) pwd"
+    echo ""
+    echo "  If realpath is available, you can give any argument directly to it."
     echo ""
     echo "  Usage:"
     echo "      $NAME [PATH] [OPTIONAL]"
@@ -59,6 +63,12 @@ if hash realpath 2>/dev/null; then
     else
         realpath "."
     fi
+elif hash readlink 2>/dev/null; then
+    if [[ ! -z "$1" ]]; then
+        readlink -f "$@"
+    else
+        readlink -f "."
+    fi
 else
     # TODO Optimize code for file management
     if [[ ! -z "$1" ]]; then
@@ -69,12 +79,11 @@ else
         pushd . > /dev/null
 
         if [[ -f "$FULL_PATH" ]]; then
-            pushd "$ROOT_PATH" &> /dev/null
 
             # I haven't think a better way to check if the given path was
             # push into the stack, that's why I can't print the path a
             # then pop it
-            if [[ $? -eq 0 ]]; then
+            if pushd "$ROOT_PATH" 2> /dev/null; then
                 echo "$(pwd -P)/$FILE_PATH"
                 popd > /dev/null
             else
@@ -86,7 +95,7 @@ else
 
             pushd "$ROOT_PATH" > /dev/null
 
-            echo "$(pwd -P)"
+            pwd -P
 
             popd > /dev/null
         else

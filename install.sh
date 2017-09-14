@@ -34,6 +34,7 @@ _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
 _BACKUP=0
+_BACKUP_DIR="$HOME/.local/backup"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -43,7 +44,7 @@ _SCRIPT_PATH="$0"
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
 if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH="$(realpath $_SCRIPT_PATH)"
+    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
 else
     pushd "$_SCRIPT_PATH" > /dev/null
     _SCRIPT_PATH="$(pwd -P)"
@@ -53,7 +54,7 @@ fi
 _CMD="ln -s"
 _BASE_URL="https://github.com/mike325"
 
-_DEFAULT_SHELL="${SHELL##*/}"
+# _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
 _IS_WINDOWS=0
 
@@ -66,6 +67,11 @@ if [[ $(uname --all) =~ MINGW ]]; then
     _CMD="cp -rf"
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
+    # Hack when using sudo
+    # TODO: Must fix this
+    if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
+        _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
+    fi
 fi
 
 function help_user() {
@@ -78,10 +84,8 @@ function help_user() {
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
-    echo "          --backup"
-    echo "              Enable backup of existing files, this flag enables --force but"
-    echo "              makes a backup before deletion"
-    echo "                  BACKUP_DIR: $HOME/.local/backup"
+    echo "          --backup, --backup=FOLDER"
+    echo "              Backup all existing files into $HOME/.local/backup"
     echo ""
     echo "          -f, --force"
     echo "              Force installation, remove all previous conflict files before installing"
@@ -99,22 +103,26 @@ function help_user() {
     echo "              ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!"
     echo ""
     echo "          -a, --alias"
-    echo "              Install shell alias and shell basic configurations \${SHELL}rc for bash and zsh"
+    echo "              Install:"
+    echo "                  - Shell alias in $HOME/.config/shell"
+    echo "                  - Shell basic configurations \${SHELL}rc for bash and zsh,"
+    echo "                  - Evething inside ./dotconfigs into $HOME"
+    echo "                  - Python startup script in $HOME/.local/lib/"
     echo ""
     echo "          -d, --dotfiles"
     echo "              Download my dotfiles repo in case, this options is meant to be used in case this"
     echo "              script is standalone executed"
     echo "                  URL: https://github.com/mike325/dotfiles"
     echo ""
-    echo "          -e, --emacs"
+    echo "          -e, --emacs, --emacs=URL"
     echo "              Download and install my evil Emacs dotfiles and install systemd's emacs.service"
     echo "                  URL: https://github.com/mike325/.emacs.d"
     echo ""
-    echo "          -v, --vim"
+    echo "          -v, --vim, --vim=URL"
     echo "              Download and install my Vim dotfiles"
     echo "                  URL: https://github.com/mike325/.vim"
     echo ""
-    echo "          -n, --neovim"
+    echo "          -n, --neovim, --neovim=URL"
     echo "              Download and install my Vim dotfiles in Neovim's dir."
     echo "              Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)"
     echo "              them, otherwise download them from my vim's dotfiles repo"
@@ -124,7 +132,10 @@ function help_user() {
     echo "              Install shell functions and scripts in $HOME/.local/bin"
     echo ""
     echo "          -g, --git"
-    echo "              Install my gitconfigs, hooks and templates"
+    echo "              Install:"
+    echo "                  - Gitconfigs"
+    echo "                  - Hooks"
+    echo "                  - Templates"
     echo ""
     echo "          -h, --help"
     echo "              Display help, if you are seeing this, that means that you already know it (nice)"
@@ -133,17 +144,17 @@ function help_user() {
 
 function warn_msg() {
     WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
 }
 
 function error_msg() {
     ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   $ERROR_MESSAGE \n"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE"
 }
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
-    printf "[*]     ---- $STATUS_MESSAGGE \n"
+    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
 }
 
 function execute_cmd() {
@@ -151,7 +162,7 @@ function execute_cmd() {
     local post_cmd="$2"
 
     if [[ $_BACKUP -eq 1 ]]; then
-        mv --backup=numbered "$post_cmd" "$HOME/.local/backup"
+        mv --backup=numbered "$post_cmd" "$_BACKUP_DIR"
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
     elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
@@ -159,9 +170,7 @@ function execute_cmd() {
         return 1
     fi
 
-    sh -c "$_CMD $pre_cmd $post_cmd"
-
-    (( $? == 0 )) && return 0 || return "$?"
+    sh -c "$_CMD $pre_cmd $post_cmd" && return 0 || return "$?"
 }
 
 function clone_repo() {
@@ -170,7 +179,7 @@ function clone_repo() {
 
     if hash git 2>/dev/null; then
         if [[ $_BACKUP -eq 1 ]]; then
-            mv --backup=numbered "$post_cmd" "$HOME/.local/backup"
+            mv --backup=numbered "$dest" "$_BACKUP_DIR"
         elif [[ $_FORCE_INSTALL -eq 1 ]]; then
             rm -rf "$dest"
         else
@@ -190,48 +199,48 @@ function clone_repo() {
 }
 
 
-function setup_scripts() {
+function setup_bin() {
     status_msg "Getting shell functions and scripts"
 
     for script in ${_SCRIPT_PATH}/bin/*; do
         local scriptname="${script##*/}"
 
         local file_basename="${scriptname%%.*}"
-        local file_extention="${scriptname##*.}"
+        # local file_extention="${scriptname##*.}"
 
         execute_cmd "$script" "$HOME/.local/bin/$file_basename"
     done
 
-    status_msg "Getting python startup script"
-    execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
-
-    status_msg "Getting dotconfigs defaults"
-
-    for script in ${_SCRIPT_PATH}/dotconfigs/*; do
-        local scriptname="${script##*/}"
-
-        local file_basename="${scriptname%%.*}"
-        local file_extention="${scriptname##*.}"
-
-        execute_cmd "$script" "$HOME/.${file_basename}"
-    done
 }
 
 function setup_alias() {
     # Currently just ZSH and BASH are the available shells
     status_msg "Getting Shell init file"
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
-        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc"
+
+        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return $?
         # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
-        (( $? != 0 )) && return $?
-
         status_msg "Getting shell configs"
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell"
 
         # Since we could fail linking/copying the dir, lets check it first
-        (( $? != 0 )) && return $?
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return $?
+
         [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
+
+        status_msg "Getting python startup script"
+        execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
+
+        status_msg "Getting dotconfigs defaults"
+
+        for script in ${_SCRIPT_PATH}/dotconfigs/*; do
+            local scriptname="${script##*/}"
+
+            local file_basename="${scriptname%%.*}"
+            # local file_extention="${scriptname##*.}"
+
+            execute_cmd "$script" "$HOME/.${file_basename}"
+        done
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
@@ -250,28 +259,24 @@ function setup_git() {
 
 function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.vim"
-    clone_repo "$_BASE_URL/.vim" "$HOME/.vim"
+
     # If we couldn't clone our repo, return
-    (( $? != 0 )) && return $?
+    clone_repo "$_BASE_URL/.vim" "$HOME/.vim" || return $?
 
-    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc"
-    (( $? != 0 )) && return $?
+    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc" || return $?
 
-    execute_cmd "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"
-    (( $? != 0 )) && return $?
+    execute_cmd "$HOME/.vim/ginit.vim" "$HOME/.gvimrc" || return $?
 
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/vimfiles"
-        clone_repo "$_BASE_URL/.vim" "$HOME/vimfiles"
+
         # If we couldn't clone our repo, return
-        (( $? != 0 )) && return $?
+        clone_repo "$_BASE_URL/.vim" "$HOME/vimfiles" || return $?
 
-        execute_cmd "$HOME/vimfiles/init.vim" "$HOME/_vimrc"
-        (( $? != 0 )) && return $?
+        execute_cmd "$HOME/vimfiles/init.vim" "$HOME/_vimrc" || return $?
 
-        execute_cmd "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"
-        (( $? != 0 )) && return $?
+        execute_cmd "$HOME/.vim/ginit.vim" "$HOME/_gvimrc" || return $?
     fi
 
     # No errors so far
@@ -282,9 +287,9 @@ function get_nvim_dotfiles() {
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
-        clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim"
+
         # If we couldn't clone our repo, return
-        (( $? != 0 )) && return $?
+        clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
     else
         status_msg "Running Neovim install script"
 
@@ -292,11 +297,10 @@ function get_nvim_dotfiles() {
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
         if ! hash nvim 2> /dev/null; then
             # Make Neovim only if it's not already installed
-            ${_SCRIPT_PATH}/bin/get_nvim.sh -c -d "$HOME/.local/" -p
+            "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p || return $?
+            # If we couldn't clone our repo, return
         fi
 
-        # If we couldn't clone our repo, return
-        (( $? != 0 )) && return $?
 
         # if the current command creates a symbolic link and we already have some vim
         # settings, lets use them
@@ -319,10 +323,8 @@ function get_nvim_dotfiles() {
 function get_emacs_dotfiles() {
     status_msg "Installing Evil Emacs"
 
-    clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d"
-
     # If we couldn't clone our repo, return
-    (( $? != 0 )) && return $?
+    clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d" && return $?
 
     mkdir -p "$HOME/.config/systemd/user"
     execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
@@ -333,12 +335,10 @@ function get_emacs_dotfiles() {
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
-    if [[ $_BACKUP -eq 1 ]]; then
-        ${_SCRIPT_PATH}/bin/ get_shell.sh -s "$_CURRENT_SHELL" --backup
-    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
-        ${_SCRIPT_PATH}/bin/ get_shell.sh -s "$_CURRENT_SHELL" -f
+    if [[ $_FORCE_INSTALL -eq 1 ]]; then
+        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" -f
     else
-        ${_SCRIPT_PATH}/bin/get_shell.sh -s "$_CURRENT_SHELL"
+        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL"
     fi
 
     (( $? == 0 )) && return 0 || return "$?"
@@ -351,17 +351,15 @@ function get_dotfiles() {
 
     [[ ! -d "$HOME/.local/" ]] && mkdir -p "$HOME/.local/"
 
-    clone_repo "$_BASE_URL/dotfiles" "$_SCRIPT_PATH"
-
-    (( $? == 0 )) && return 0 || return "$?"
+    clone_repo "$_BASE_URL/dotfiles" "$_SCRIPT_PATH" && return 0 || return "$?"
 }
 
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+<<<<<<< HEAD
         --backup)
             _BACKUP=1
-            [[ ! -d "$HOME/.local/backup" ]] && mkdir -p "$HOME/.local/backup"
             ;;
         -c|--copy)
             _CMD="cp -rf"
@@ -410,19 +408,19 @@ done
 
 [[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
 [[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
+[[ ! -d "$HOME/.config/" ]] && mkdir -p  "$HOME/.config/"
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
 if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
-    get_dotfiles
-    if (( $? != 0 )); then
-        error_msg "Could not install dotfiles"
-        exit 1
+    if get_dotfiles; then
+       error_msg "Could not install dotfiles"
+       exit 1
     fi
 fi
 
 if [[ $_ALL -eq 1 ]]; then
-    setup_scripts
+    setup_bin
     setup_alias
     setup_shell_framework
     setup_git
@@ -430,7 +428,7 @@ if [[ $_ALL -eq 1 ]]; then
     get_nvim_dotfiles
     get_emacs_dotfiles
 else
-    [[ $_BIN -eq 1 ]] && setup_scripts
+    [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_ALIAS -eq 1 ]] && setup_alias
     [[ $_SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $_GIT -eq 1 ]] && setup_git

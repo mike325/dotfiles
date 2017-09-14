@@ -80,7 +80,7 @@ function show_help() {
     echo "  with some pretty basic options."
     echo ""
     echo "  Usage:"
-    echo "      $_NAME [OPTIONS]"
+    echo "      $__NAME [OPTIONS]"
     echo ""
     echo "      Optional Flags"
     echo "          -c, --clone"
@@ -113,17 +113,17 @@ function show_help() {
 
 function warn_msg() {
     WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
 }
 
 function error_msg() {
     ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   $ERROR_MESSAGE \n"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE"
 }
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
-    printf "[*]     ---- $STATUS_MESSAGGE \n"
+    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -156,24 +156,20 @@ done
 if [[ "$__CLONE" -eq 1 ]]; then
     __LOCATION="$__LOCATION/neovim"
 
-    git clone --recursive "$__URL" "$__LOCATION"
-
-    if [[ $? -ne 0 ]]; then
-        exit 1
-    fi
+    git clone --recursive "$__URL" "$__LOCATION" || exit 1
 fi
 
 if [[ -d "$__LOCATION" ]]; then
     pushd "$__LOCATION" > /dev/null
 else
+    error_msg "$__LOCATION doesn't exist"
     exit 1
 fi
 
 # Remove all unstaged changes
-git checkout . 2>/dev/null
-
-# No a Git repo
-if [[ $? -ne 0 ]]; then
+if ! git checkout . 2>/dev/null; then
+    # No a Git repo
+    error_msg "The current dir $(pwd -P) is not a Neovim git repo"
     popd > /dev/null && exit 1
 fi
 
@@ -181,7 +177,13 @@ fi
 git clean -xdf . 2>/dev/null
 rm -fr build/
 
+# Get latest version
+git checkout master
+git pull origin master
+
 if [[ "$__BUILD_LIBS" -eq 1 ]]; then
+    status_msg "Looking for system dependencies"
+
     if hash apt-get 2> /dev/null; then
         sudo apt-get install -y \
             libtool \
@@ -228,9 +230,13 @@ if [[ "$__BUILD_LIBS" -eq 1 ]]; then
             # ruby-dev
     else
         echo ""
-        echo "    ---- [X] Error your system is neither a Debian derivate nor a"
-        echo "             Fedora or Arch derivate, please check your system's"
-        echo "             dependencies in Neovim's page:"
+        echo "    ---- [X] Error your system is not supported to preinstall deps"
+        echo "             Supported systems are:"
+        echo "                  - Debian family"
+        echo "                  - Ubuntu family"
+        echo "                  - Archlinux, Antergos and Manjaro"
+        echo "                  - Fedora"
+        echo "             Please check the ependencies in Neovim's page:"
         echo "             https://github.com/neovim/neovim/wiki/Building-Neovim"
         echo ""
         exit 1
@@ -238,12 +244,15 @@ if [[ "$__BUILD_LIBS" -eq 1 ]]; then
 fi
 
 # BUG: Since the latest stable version (v0.2.0 up to Jul/2017) have "old" deps
-# GCC7 just works for the master branch
+# GCC7 works just for the master branch
 GCC_VERSION="$(gcc --version | head -1 | awk '{print $3}')"
 GCC_VERSION="${GCC_VERSION%%.*}"
 # Checkout to the latest stable version
-if (( $GCC_VERSION < 7 )); then
-    git checkout $( git tag | tail -n 1 ) 2>/dev/null
+if (( GCC_VERSION < 7 )); then
+    status_msg "Using latest stable version $( git tag | tail -n 1 )"
+    git checkout "$( git tag | tail -n 1 )" 2>/dev/null
+else
+    warn_msg "GCC version is > 7, using master to compile source code"
 fi
 
 # Always clean the build dir
@@ -254,26 +263,25 @@ make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
 
 # make CMAKE_BUILD_TYPE=RelWithDebInfo
 # Set the type release to avoid debug messages
-make CMAKE_BUILD_TYPE=Release
-
 # Continue only if there isn't errors
-if [[ $? -eq 0 ]]; then
+if make CMAKE_BUILD_TYPE=Release; then
 
-    make install
-
-    if [[ $? -eq 0 ]]; then
-        export PATH="$(pwd)/bin:$PATH"
+    if make install; then
+        # export PATH="$(pwd)/bin:$PATH"
 
         echo ""
         # echo "You may want to add 'export PATH=\"$(pwd)/bin:\$PATH\"' in your ~/.${SHELL##*/}rc"
         echo ""
 
         if [[ $__PYTHON_LIBS -eq 1 ]]; then
+            status_msg "Installing python2 libs"
             hash pip2 2> /dev/null && /usr/bin/yes | pip2 install --user neovim
+            status_msg "Installing python3 libs"
             hash pip3 2> /dev/null && /usr/bin/yes | pip3 install --user neovim
         fi
 
         if [[ $__RUBY_LIBS -eq 1 ]]; then
+            status_msg "Installing ruby libs"
             hash gem 2> /dev/null && gem install --user-install neovim
         fi
 

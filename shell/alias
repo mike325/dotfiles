@@ -49,7 +49,13 @@ else
     alias cdvim="cd ~/.vim"
 fi
 
+# Starts (n)vim with no settings at all
 alias vimu="vim -u NONE"
+
+# Starts (n)vim with minimal settings
+# - Disable all plugins
+# - Set my default settings, autocmds, and my key maps
+alias vimm="vim --cmd \"let g:minimal=0\""
 
 ################################################################################
 #                          Fix my common typos                                 #
@@ -70,7 +76,11 @@ alias im="vim"
 
 alias q="exit"
 alias cl="clear"
-alias turnoff="sudo poweroff"
+if [[ $EUID -ne 0 ]]; then
+    alias turnoff="sudo poweroff"
+else
+    alias turnoff="poweroff"
+fi
 
 # Show used ports
 alias ports="netstat -tulpn"
@@ -92,9 +102,10 @@ alias ll="ls -lh"
 alias lla="ls -lhA"
 
 # This way sudo commands get the alias of the account
-alias sudo='sudo '
+[[ $EUID -ne 0 ]] && alias sudo='sudo '
 
-# Magnificent app which corrects your previous console command https://github.com/nvbn/thefuck
+# Magnificent app which corrects your previous console command
+# https://github.com/nvbn/thefuck
 if hash thefuck 2>/dev/null; then
     eval "$(thefuck --alias)"
     alias fuck='eval $(thefuck $(fc -ln -1))'
@@ -102,7 +113,7 @@ if hash thefuck 2>/dev/null; then
 fi
 
 # laod kernel module for virtualbox
-alias vbk="sudo modprobe vboxdrv"
+[[ $EUID -ne 0 ]] && alias vbk="sudo modprobe vboxdrv"
 
 # Generate tags file
 if hash ctags 2>/dev/null; then
@@ -114,13 +125,23 @@ fi
 ################################################################################
 
 if hash systemctl 2>/dev/null; then
-    alias sysctl="sudo systemctl"
-    alias usysctl="systemctl --user"
+    if [[ $EUID -ne 0 ]]; then
+        alias sysctl="sudo systemctl"
+        alias usysctl="systemctl --user"
 
-    alias ctls="sudo systemctl start"   # Start
-    alias ctlh="sudo systemctl stop"    # Halt
-    alias ctlr="sudo systemctl restart" # Restart
-    alias ctlw="sudo systemctl status"  # shoW
+        alias ctls="sudo systemctl start"   # Start
+        alias ctlh="sudo systemctl stop"    # Halt
+        alias ctlr="sudo systemctl restart" # Restart
+        alias ctlw="sudo systemctl status"  # shoW
+    else
+        alias sysctl="systemctl"
+        alias usysctl="systemctl --user"
+
+        alias ctls="systemctl start"   # Start
+        alias ctlh="systemctl stop"    # Halt
+        alias ctlr="systemctl restart" # Restart
+        alias ctlw="systemctl status"  # shoW
+    fi
 fi
 
 ################################################################################
@@ -151,8 +172,11 @@ fi
 # TODO Make a small function to install system basics
 
 if hash docker 2>/dev/null; then
-    alias docker="sudo docker"
-    alias docker-compose="sudo docker-compose"
+    if [[ $EUID -ne 0 ]]; then
+        alias docker="sudo docker"
+        alias docker-compose="sudo docker-compose"
+    fi
+
     alias dkpa="docker ps -a"
 fi
 
@@ -171,31 +195,59 @@ if hash yaourt 2>/dev/null; then
 
     alias remove="yaourt -Rns"
 
-# Yeah Arch from scratch may not have yaourt
+    # Yeah Arch from scratch may not have yaourt
 elif hash pacman 2>/dev/null; then
-    alias get="sudo pacman -S"
-    alias getn="sudo pacman -S --noconfirm"
+    if [[ $EUID -ne 0 ]]; then
+        alias get="sudo pacman -S"
+        alias getn="sudo pacman -S --noconfirm"
 
-    alias update="sudo pacman -Syyu"
-    alias updaten="sudo pacman -Syyu --noconfirm"
+        alias update="sudo pacman -Syyu"
+        alias updaten="sudo pacman -Syyu --noconfirm"
 
-    alias remove="sudo pacman -Rns"
+        alias remove="sudo pacman -Rns"
+    else
+        alias get="pacman -S"
+        alias getn="pacman -S --noconfirm"
+
+        alias update="pacman -Syyu"
+        alias updaten="pacman -Syyu --noconfirm"
+
+        alias remove="pacman -Rns"
+    fi
 
 elif hash apt-get 2>/dev/null; then
-    alias get="sudo apt-get install"
-    alias getn="sudo apt-get install -y"
+    if [[ $EUID -ne 0 ]]; then
+        alias get="sudo apt-get install"
+        alias getn="sudo apt-get install -y"
 
-    alias update="sudo apt-get update && sudo apt-get upgrade"
+        alias update="sudo apt-get update && sudo apt-get upgrade"
 
-    alias remove="sudo apt-get remove"
+        alias remove="sudo apt-get remove"
+    else
+        alias get="apt-get install"
+        alias getn="apt-get install -y"
+
+        alias update="apt-get update && apt-get upgrade"
+
+        alias remove="apt-get remove"
+    fi
 
 elif hash dnf 2>/dev/null; then
-    alias get="sudo dnf install"
-    alias getn="sudo dnf -y install"
+    if [[ $EUID -ne 0 ]]; then
+        alias get="sudo dnf install"
+        alias getn="sudo dnf -y install"
 
-    alias update="sudo dnf update"
+        alias update="sudo dnf update"
 
-    alias remove="sudo dnf remove"
+        alias remove="sudo dnf remove"
+    else
+        alias get="dnf install"
+        alias getn="dnf -y install"
+
+        alias update="dnf update"
+
+        alias remove="dnf remove"
+    fi
 fi
 
 
@@ -232,7 +284,7 @@ function bk() {
         for (( i = 0; i < $1; i++ )); do
             local parent="${parent}../"
         done
-        cd "$parent"
+        cd "$parent" || return 1
     elif [[ -z "$1" ]]; then
         cd ..
     else
@@ -265,7 +317,8 @@ function mkcd() {
     done
 
     if [[ ! -z "$1" ]]; then
-        mkdir -p "$1" && cd "$1"
+        mkdir -p "$1"
+        cd "$1" || return 1
     fi
 }
 
@@ -276,7 +329,7 @@ function llg() {
 }
 
 function rl() {
-    rm "$@" *.log
+    rm "$@" ./*.log
 }
 
 # Init original path with HOME dir
@@ -286,12 +339,12 @@ ORIGINAL_PATH="$(pwd)"
 function crp() {
     # Save the current path
     ORIGINAL_PATH="$(pwd)"
-    cd "$(grp)"
+    cd "$(grp)" || return 1
 }
 
 # Go back to the last sym path or $HOME
 function gobk() {
-    cd "$ORIGINAL_PATH"
+    cd "$ORIGINAL_PATH" || return 1
 }
 
 
