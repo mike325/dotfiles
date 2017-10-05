@@ -369,7 +369,6 @@ function get_dotfiles() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
-<<<<<<< HEAD
         --backup)
             _BACKUP=1
             ;;
