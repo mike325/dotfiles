@@ -29,12 +29,16 @@
 
 [[ $- == *i* ]] && __INTERACTIVE=1 || __INTERACTIVE=0
 
+
 ################################################################################
 #                               Some vim stuff                                 #
 # Use <C-s> in terminal vim                                                    #
 (( __INTERACTIVE == 1 )) && stty -ixon                                         #
 # Set vi keys in the shell                                                     #
 set -o vi
+
+# Make backspace delete in a sane way
+stty erase '^?'
 ################################################################################
 
 ################################################################################
@@ -50,9 +54,9 @@ set -o vi
 # [[ ! -d "$HOME/.local/git/bin" ]] && mkdir -p "$HOME/.local/git/bin"
 
 # Load profile settings
-if [[ -f $HOME/.profile ]]; then
-    source $HOME/.profile
-fi
+# if [[ -f $HOME/.profile ]]; then
+#     source $HOME/.profile
+# fi
 
 # Load all proxy settings
 if [[ -f "$HOME/.config/shell/host/proxy"  ]]; then
@@ -63,7 +67,6 @@ fi
 if [[ -f "$HOME/.config/shell/host/env"  ]]; then
     source "$HOME/.config/shell/host/env"
 fi
-
 
 if [[ -d "$HOME/.local/git/bin" ]]; then
     export PATH="$HOME/.local/git/bin:$PATH"
@@ -80,12 +83,12 @@ elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
     export PYTHONSTARTUP="$PYTHONSTARTUP_SCRIPT"
 fi
 
-if hash gem 2> /dev/null; then
-    _GEM_USER_PATH=$(gem environment | grep -i 'user install' | awk '{print $5}')
-    if [[ -d "${_GEM_USER_PATH}/bin" ]]; then
-        export PATH="${_GEM_USER_PATH}/bin:$PATH"
-    fi
-fi
+# if hash gem 2> /dev/null; then
+#     _GEM_USER_PATH=$(gem environment | grep -i 'user install' | awk '{print $5}')
+#     if [[ -d "${_GEM_USER_PATH}/bin" ]]; then
+#         export PATH="${_GEM_USER_PATH}/bin:$PATH"
+#     fi
+# fi
 
 # If Neovim is installed in a different path, you could set it in "env" file
 if [[ -d "$HOME/.local/neovim/bin" ]]; then
@@ -135,7 +138,7 @@ if (( __INTERACTIVE == 1 )); then
         source "$HOME/.config/shell/${_CURRENT_SHELL}_settings"
 
         # I prefer the cool sl and the bins in my path
-        _kill_alias=(ips usage myip del down4me sl)
+        _kill_alias=(ips usage myip del down4me)
 
         for i in "${_kill_alias[@]}"; do
             if [[ "$(command -V $i)" =~ "function" ]]; then
@@ -177,10 +180,4 @@ if (( __INTERACTIVE == 1 )); then
     echo    "             '++:.                           '-/+/"
     echo    "             .'   github.com/mike325/dotfiles   '/"
     echo    ""
-else
-    # If you have bash-specific customizations for non-login
-    # shells, locate them in .${SHELLL}rc.$USER
-    if [[ -f "$HOME/.${_CURRENT_SHELL}rc.$USER" ]]; then
-        source "$HOME/.${_CURRENT_SHELL}rc.$USER"
-    fi
 fi
