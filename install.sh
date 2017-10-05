@@ -369,16 +369,8 @@ function get_dotfiles() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
-        --backup|--backup=*)
-            if [[ "$key" =~ "=" ]]; then
-                _BACKUP_DIR="${key##=}"
-                if [[ "$_BACKUP_DIR" == "" ]]; then
-                    error_msg "Empty backup dir"
-                    exit 1
-                fi
-
-                [[ ! -d "$_BACKUP_DIR" ]] && mkdir -p "$_BACKUP_DIR"
-            fi
+<<<<<<< HEAD
+        --backup)
             _BACKUP=1
             ;;
         -c|--copy)
