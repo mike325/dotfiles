@@ -108,6 +108,7 @@ function help_user() {
     echo "                  - Shell basic configurations \${SHELL}rc for bash and zsh,"
     echo "                  - Evething inside ./dotconfigs into $HOME"
     echo "                  - Python startup script in $HOME/.local/lib/"
+    echo "                  - EXPERIMENTAL support for csh and tcsh"
     echo ""
     echo "          -d, --dotfiles"
     echo "              Download my dotfiles repo in case, this options is meant to be used in case this"

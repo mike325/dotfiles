@@ -30,3 +30,4 @@
 export http_proxy='http://URL:PORT'
 export https_proxy='http://URL:PORT'
 export no_proxy='localhost,127.0.0.1,LOCALDOMAIN.com'
+export ftp_proxy='http://URL:PORT'
