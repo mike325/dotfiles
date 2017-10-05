@@ -64,12 +64,12 @@ if [[ -d "$HOME/.local/git/bin" ]]; then
     export PATH="$HOME/.local/git/bin:$PATH"
 fi
 
-if [[ -d $HOME/.local/bin/ ]]; then
+if [[ -d "$HOME/.local/bin/" ]]; then
     export PATH="$HOME/.local/bin/:$PATH"
 fi
 
-# If you have a custom pythonstartup script, you could set it in "host_settings" file
-if [[ -f $HOME/.local/lib/pythonstartup.py ]]; then
+# If you have a custom pythonstartup script, you could set it in "env" file
+if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
     export PYTHONSTARTUP="$HOME/.local/lib/pythonstartup.py"
 elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
     export PYTHONSTARTUP="$PYTHONSTARTUP_SCRIPT"
@@ -82,18 +82,18 @@ if hash gem 2> /dev/null; then
     fi
 fi
 
-# If Neovim is installed in a different path, you could set it in "host_settings" file
-if [[ -d $HOME/.local/neovim/bin ]]; then
+# If Neovim is installed in a different path, you could set it in "env" file
+if [[ -d "$HOME/.local/neovim/bin" ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
 elif [[ -d "$NEOVIM_PATH" ]]; then
     export PATH="$NEOVIM_PATH:$PATH"
 fi
 
-if [[ -d $HOME/.local/golang/bin ]]; then
+if [[ -d "$HOME/.local/golang/bin" ]]; then
     export PATH="$HOME/.local/golang/bin:$PATH"
 fi
 
-if [[ -d $HOME/.local/golang/src ]]; then
+if [[ -d "$HOME/.local/golang/src" ]]; then
     export GOPATH="$HOME/.local/golang/src"
 fi
 

@@ -214,36 +214,48 @@ function setup_bin() {
 }
 
 function setup_alias() {
+    # TODO: Refactor to remove break stratements
+    #
     # Currently just ZSH and BASH are the available shells
     status_msg "Getting Shell init file"
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
 
-        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return $?
+        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || break
         # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
         status_msg "Getting shell configs"
 
         # Since we could fail linking/copying the dir, lets check it first
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return $?
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || break
 
         [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
 
-        status_msg "Getting python startup script"
-        execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
+    elif [[ $_CURRENT_SHELL =~ csh ]]; then
+        # WARNING !! experimental
+        execute_cmd "${_SCRIPT_PATH}/shell/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || break
 
-        status_msg "Getting dotconfigs defaults"
+        status_msg "Getting shell configs"
 
-        for script in ${_SCRIPT_PATH}/dotconfigs/*; do
-            local scriptname="${script##*/}"
+        # Since we could fail linking/copying the dir, lets check it first
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || break
 
-            local file_basename="${scriptname%%.*}"
-            # local file_extention="${scriptname##*.}"
-
-            execute_cmd "$script" "$HOME/.${file_basename}"
-        done
+        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
+
+    status_msg "Getting python startup script"
+    execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
+
+    status_msg "Getting dotconfigs defaults"
+    for script in ${_SCRIPT_PATH}/dotconfigs/*; do
+        local scriptname="${script##*/}"
+
+        local file_basename="${scriptname%%.*}"
+        # local file_extention="${scriptname##*.}"
+
+        execute_cmd "$script" "$HOME/.${file_basename}"
+    done
 }
 
 function setup_git() {
