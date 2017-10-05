@@ -29,12 +29,6 @@
 #                                                                              #
 ################################################################################
 
-# Magic tcsh stuff
-set addsuffix
-set autolist
-alias cmdcwd 'set prompt=$user@`hostname` at [$cwd]  '
-# set correct=cmd
-
 # Set erase character
 stty erase '^?'
 
@@ -88,7 +82,7 @@ endif
 ################################################################################
 
 if ($?prompt) then
-    # setenv _DEFAULT_SHELL ${SHELL##*/}
+    setenv _CURRENT_SHELL `echo $shell | sed 's/.*\///g'`
 
     # Make less colorful
     setenv LESS ' -R '
@@ -100,23 +94,23 @@ if ($?prompt) then
 #
 #     # NOTE: can't make this crap works yet
 #     #
-#     # Configure shell framework and specific shell settings (Just bash and zsh)
-#     # are supported
-#     # if ( -f  $HOME/.config/shell/${_CURRENT_SHELL}_settings ) then
-#     #     source $HOME/.config/shell/${_CURRENT_SHELL}_settings
-#     #
-#     #     # I prefer the cool sl and the bins in my path
-#     #     set _kill_alias = ( ips usage myip del down4me sl )
-#     #
-#     #     foreach i ($_kill_alias)
-#     #         if ( `command -V $i` =~ function ) then
-#     #             unset -f $i
-#     #         else if ( `command -V $i` =~ alias ) then
-#     #             unalias $i
-#     #         endif
-#     #     end
-#     # endif
-#
+    # Configure shell framework and specific shell settings (Just bash and zsh)
+    # are supported
+    if ( -f  $HOME/.config/shell/${_CURRENT_SHELL}_settings ) then
+        source $HOME/.config/shell/${_CURRENT_SHELL}_settings
+
+        # # I prefer the cool sl and the bins in my path
+        # set _kill_alias = ( ips usage myip del down4me sl )
+
+        # foreach i ($_kill_alias)
+        #     if ( `command -V $i` =~ function ) then
+        #         unset -f $i
+        #     else if ( `command -V $i` =~ alias ) then
+        #         unalias $i
+        #     endif
+        # end
+    endif
+
     # Load alias after bash-it to give them higher priority
     if ( -f $HOME/.config/shell/alias.csh  ) then
         source $HOME/.config/shell/alias.csh
