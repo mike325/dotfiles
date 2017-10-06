@@ -34,7 +34,7 @@ _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
 _BACKUP=0
-_BACKUP_DIR="$HOME/.local/backup"
+_BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y.%X')"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -163,7 +163,8 @@ function execute_cmd() {
     local post_cmd="$2"
 
     if [[ $_BACKUP -eq 1 ]]; then
-        mv --backup=numbered "$post_cmd" "$_BACKUP_DIR"
+        local name="${post_cmd##*/}"
+        mv --backup=numbered "$post_cmd" "${_BACKUP_DIR}/${name}"
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
     elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
@@ -421,6 +422,10 @@ done
 [[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
 [[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
 [[ ! -d "$HOME/.config/" ]] && mkdir -p  "$HOME/.config/"
+
+if [[ $_BACKUP -eq 1 ]]; then
+    mkdir -p "${_BACKUP_DIR}"
+fi
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
