@@ -216,9 +216,6 @@ function setup_bin() {
 }
 
 function setup_alias() {
-    # TODO: Refactor to remove return 1 stratements
-    #
-    # Currently just ZSH and BASH are the available shells
 
     status_msg "Getting python startup script"
     execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
@@ -236,7 +233,7 @@ function setup_alias() {
     status_msg "Getting Shell init file"
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
 
-        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
+        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
             execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return 1
         else
             warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
