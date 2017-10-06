@@ -121,26 +121,7 @@ if ($?prompt) then
         source $HOME/.config/shell/host/settings.csh
     endif
 
-    echo    ""
-    echo    "                               -'"
-    echo    "               ...            .o+'"
-    echo    "            .+++s+   .h'.    'ooo/"
-    echo    "           '+++%++  .h+++   '+oooo:"
-    echo    "           +++o+++ .hhs++. '+oooooo:"
-    echo    "           +s%%so%.hohhoo'  'oooooo+:"
-    echo    "           '+ooohs+h+sh++'/:  ++oooo+:"
-    echo    "            hh+o+hoso+h+'/++++.+++++++:"
-    echo    "             '+h+++h.+ '/++++++++++++++:"
-    echo    "                      '/+++ooooooooooooo/'"
-    echo    "                     ./ooosssso++osssssso+'"
-    echo    "                    .oossssso-''''/osssss::'"
-    echo    "                   -osssssso.      :ssss''to."
-    echo    "                  :osssssss/  Mike  osssl   +"
-    echo    "                 /ossssssss/   8a   +sssslb"
-    echo    "               '/ossssso+/:-        -:/+ossss'.-"
-    echo    "              '+sso+:-'                 '.-/+oso:"
-    echo    "             '++:.                           '-/+/"
-    echo    "             .'   github.com/mike325/dotfiles   '/"
-    echo    ""
+    if ( -f "$HOME/.config/shell/banner" ) then
+        cat "$HOME/.config/shell/banner"
+    endif
 endif
-
