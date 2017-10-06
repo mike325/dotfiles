@@ -276,7 +276,7 @@ function __create_alias() {
                 echo "          Ex."
                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER"
                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER -p /sbin/"
-                echo "          $ __create_alias fuck 'echo \"y u mad?\"'" -c
+                echo "          $ __create_alias fuck 'echo \"y u mad?\"'-c"
                 echo ""
                 echo "      Optional Flags"
                 echo "          -c, --command"
