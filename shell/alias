@@ -276,7 +276,7 @@ function __create_alias() {
                 echo "          Ex."
                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER"
                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER -p /sbin/"
-                echo "          $ __create_alias fuck 'echo \"y u mad?\"'-c"
+                echo "          $ __create_alias fuck ' echo \"y u mad?\" ' -c"
                 echo ""
                 echo "      Optional Flags"
                 echo "          -c, --command"
@@ -297,7 +297,7 @@ function __create_alias() {
     done
 
     if [[ $# -le 1 ]]; then
-        echo "  ---- [X] Error This function receives at least 2 args, NAME and ALIAS"
+        echo "  ---- [X] Error This function receives at least 2 args, NAME and ALIAS" 1>&2
         return 1
     fi
 
@@ -315,7 +315,7 @@ function __create_alias() {
                 shift # Shift path
 
                 if [[ ! -d "$test_path" ]]; then
-                    echo "  ---- [X] Error The given path ( $test_path ) doesn't exist"
+                    echo "  ---- [X] Error The given path ( $test_path ) doesn't exist" 1>&2
                     return 2
                 fi
                 ;;
@@ -328,7 +328,7 @@ function __create_alias() {
 
     if [[ $test_cmd -eq 1 ]]; then
         if hash $name 2>/dev/null; then
-            echo "  ---- [X] Error The given command already exists ( $name )"
+            echo "  ---- [X] Error The given command already exists ( $name )" 1>&2
             return 2
         fi
     fi
@@ -371,7 +371,7 @@ function bk() {
     elif [[ -z "$1" ]]; then
         cd ..
     else
-        echo "  ---- [X] Error Unexpected arg $1, please provide a number"
+        echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
         return 1
     fi
 }

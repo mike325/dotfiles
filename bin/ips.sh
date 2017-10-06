@@ -46,6 +46,12 @@ function help_user() {
     echo ""
 }
 
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+}
+
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -60,5 +66,5 @@ if command -v ifconfig &>/dev/null; then
 elif command -v ip &>/dev/null; then
     ip addr | grep -oP 'inet \K[\d.]+'
 else
-    echo "    ---- [X] Error You don't have ifconfig or ip command installed!"
+    error_msg "You don't have ifconfig or ip command installed!"
 fi

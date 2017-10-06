@@ -49,6 +49,12 @@ function extraction() {
     sh -c "$cmd $filename 1> /dev/null"
 }
 
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+}
+
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -80,7 +86,7 @@ while [[ $# -gt 0 ]]; do
             *)                echo "    ---- [X] Error '$filename' cannot be extracted/mounted via extract()" ;;
         esac
     else
-        echo "    ---- [X] Error '$filename' is not a valid file"
+        error_msg "'$filename' is not a valid file"
     fi
     shift
 done

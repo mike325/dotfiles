@@ -48,6 +48,12 @@ function help_user() {
     echo ""
 }
 
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+}
+
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -99,7 +105,7 @@ else
 
             popd > /dev/null
         else
-            echo "    ---- [X] Error 404 the given path doesn't exist"
+            error_msg "The given path doesn't exist"
         fi
 
         # Retrun to the original dir

@@ -149,7 +149,7 @@ function warn_msg() {
 
 function error_msg() {
     ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
 }
 
 function status_msg() {

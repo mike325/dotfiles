@@ -50,6 +50,13 @@ function help_user() {
     echo ""
 }
 
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+}
+
+
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -90,6 +97,6 @@ if [[ -n "$(git symbolic-ref HEAD 2> /dev/null)" ]]; then
         git log $LOGOPTS --all --merges --author=$a | grep -c '^commit'
     done
 else
-    echo "    ---- [X] Error You're currently not in a git repository"
+    error_msg "You're currently not in a git repository"
     exit 1
 fi
