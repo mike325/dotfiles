@@ -84,7 +84,7 @@ function help_user() {
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
-    echo "          --backup, --backup=FOLDER"
+    echo "          --backup"
     echo "              Backup all existing files into $HOME/.local/backup"
     echo ""
     echo "          -f, --force"
@@ -216,35 +216,9 @@ function setup_bin() {
 }
 
 function setup_alias() {
-    # TODO: Refactor to remove break stratements
+    # TODO: Refactor to remove return 1 stratements
     #
     # Currently just ZSH and BASH are the available shells
-    status_msg "Getting Shell init file"
-    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
-
-        execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || break
-        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
-
-        status_msg "Getting shell configs"
-
-        # Since we could fail linking/copying the dir, lets check it first
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || break
-
-        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
-
-    elif [[ $_CURRENT_SHELL =~ csh ]]; then
-        # WARNING !! experimental
-        execute_cmd "${_SCRIPT_PATH}/shell/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || break
-
-        status_msg "Getting shell configs"
-
-        # Since we could fail linking/copying the dir, lets check it first
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || break
-
-        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
-    else
-        warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
-    fi
 
     status_msg "Getting python startup script"
     execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
@@ -258,6 +232,46 @@ function setup_alias() {
 
         execute_cmd "$script" "$HOME/.${file_basename}"
     done
+
+    status_msg "Getting Shell init file"
+    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
+
+        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
+            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+        else
+            warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
+            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+        fi
+        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+
+        status_msg "Getting shell configs"
+
+        # Since we could fail linking/copying the dir, lets check it first
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
+
+        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
+
+    elif [[ $_CURRENT_SHELL =~ csh ]]; then
+        # WARNING !! experimental
+
+        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
+            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+        else
+            warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
+            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+        fi
+        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+
+        status_msg "Getting shell configs"
+
+        # Since we could fail linking/copying the dir, lets check it first
+        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
+
+        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
+    else
+        warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
+    fi
+
 }
 
 function setup_git() {
