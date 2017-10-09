@@ -68,8 +68,8 @@ if [[ -f "$HOME/.config/shell/host/env"  ]]; then
     source "$HOME/.config/shell/host/env"
 fi
 
-if [[ -d "$HOME/.local/git/bin" ]]; then
-    export PATH="$HOME/.local/git/bin:$PATH"
+if [[ -d "$HOME/.config/git/bin" ]]; then
+    export PATH="$HOME/.config/git/bin:$PATH"
 fi
 
 if [[ -d "$HOME/.local/bin/" ]]; then

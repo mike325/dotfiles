@@ -74,7 +74,7 @@ alias im="vim"
 #                        Some useful shortcuts                                 #
 ################################################################################
 
-alias q="exit"
+# alias q="exit"
 alias cl="clear"
 if [[ $EUID -ne 0 ]]; then
     alias turnoff="sudo poweroff"
@@ -97,11 +97,12 @@ alias grepo="grep -o"
 alias grepe="grep -E"
 
 alias ls='ls --color'
-alias la="ls -A"
+alias la="ls -hA"
+alias l="ls -h"
 alias ll="ls -lh"
 alias lla="ls -lhA"
 
-# This way sudo commands get the alias of the account
+# We only want sudo alias when user =! root
 [[ $EUID -ne 0 ]] && alias sudo='sudo '
 
 # Magnificent app which corrects your previous console command
@@ -113,7 +114,11 @@ if hash thefuck 2>/dev/null; then
 fi
 
 # laod kernel module for virtualbox
-[[ $EUID -ne 0 ]] && alias vbk="sudo modprobe vboxdrv"
+if [[ $EUID -ne 0 ]]; then
+    alias vbk="sudo modprobe vboxdrv"
+else
+    alias vbk="modprobe vboxdrv"
+fi
 
 # Generate tags file
 if hash ctags 2>/dev/null; then
@@ -130,9 +135,9 @@ if hash systemctl 2>/dev/null; then
         alias usysctl="systemctl --user"
 
         alias ctls="sudo systemctl start"   # Start
-        alias ctlh="sudo systemctl stop"    # Halt
         alias ctlr="sudo systemctl restart" # Restart
         alias ctlw="sudo systemctl status"  # shoW
+        alias ctlh="sudo systemctl stop"    # Halt
     else
         alias sysctl="systemctl"
         alias usysctl="systemctl --user"
@@ -252,7 +257,7 @@ fi
 
 
 ################################################################################
-#             Functions to move around dirs and other simple stuff             #
+#               Functions to move around dirs and other simple stuff           #
 ################################################################################
 
 function __create_alias() {
@@ -289,9 +294,6 @@ function __create_alias() {
                 echo "          -h, --help"
                 echo "              Display help and exit. If you are seeing this,"
                 echo "              that means that you already know it (nice)"
-                echo ""
-
-                return 0
                 ;;
         esac
     done
@@ -335,7 +337,72 @@ function __create_alias() {
 
     alias $name="$new_alias"
     return 0
+}
 
+# Simple map of "q" to deactivate virtualenv or exit terminal session
+function q() {
+    if hash deactivate 2> /dev/null; then
+        deactivate
+    else
+        exit
+    fi
+}
+
+function venv() {
+    local _git=0
+    local _name="env"
+    local _top="."
+
+
+    while [[ $# -gt 0 ]]; do
+        local key="$1"
+        case "$key" in
+            -h|--help)
+                echo ""
+                echo "  Source given virtualevn"
+                echo ""
+                echo "  Usage:"
+                echo "      venv [OPTIONAL]"
+                echo "          Ex."
+                echo "          $ venv -g"
+                echo "          $ venv -g django"
+                echo "          $ venv ~/django"
+                echo ""
+                echo "      Optional Flags"
+                echo "          -h, --help"
+                echo "              Display help and exit."
+                echo ""
+                return 0
+                ;;
+            -g|--git)
+                local _git=1
+                ;;
+            *)
+                local _name="$2"
+                shift
+                ;;
+        esac
+        shift
+    done
+
+    if [[ $_git -eq 1 ]]; then
+        if ! git rev-parse --show-toplevel 1> /dev/null; then
+            echo "[X]     ---- Error!!!   Git repo error"
+            return 1
+        fi
+
+        local _top="$(git rev-parse --show-toplevel)"
+        local _top="$_top/.git"
+
+        local _name="$_top/$_name"
+    fi
+
+    if [[ ! -f "$_name/bin/activate" ]]; then
+        echo "[X]     ---- Error!!!  Missing activate file, $_name/bin/activate"
+        return 1
+    fi
+
+    source "$_name/bin/activate"
 }
 
 function bk() {
@@ -362,7 +429,7 @@ function bk() {
         esac
     done
 
-    if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]]; then
+    if [[ ! -z "$1" ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
         local parent="./"
         for (( i = 0; i < $1; i++ )); do
             local parent="${parent}../"
@@ -391,7 +458,7 @@ function mkcd() {
                 echo ""
                 echo "      Optional Flags"
                 echo "          -h, --help"
-                echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
+                echo "              Display help and exit."
                 echo ""
 
                 return 0
@@ -402,7 +469,9 @@ function mkcd() {
     if [[ ! -z "$1" ]]; then
         mkdir -p "$1"
         cd "$1" || return 1
+        return 0
     fi
+    return 1
 }
 
 function llg() {
@@ -412,7 +481,8 @@ function llg() {
 }
 
 function rl() {
-    rm "$@" ./*.log
+    rm -f "$@" ./*.log
+    return 0
 }
 
 # Init original path with HOME dir

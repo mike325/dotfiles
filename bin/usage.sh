@@ -28,17 +28,17 @@
 #            `++:.                           `-/+/
 #            .`    github.com/mike325/dotfiles   /
 
-NAME="$0"
-NAME="${NAME##*/}"
+__NAME="$0"
+__NAME="${__NAME##*/}"
 
 function help_user() {
     echo ""
     echo "  Disk usage per directory/file in Linux"
     echo ""
     echo "  Usage:"
-    echo "      $NAME [PATH/FILE] [OPTIONAL]"
+    echo "      $__NAME [PATH/FILE] [OPTIONAL]"
     echo "          Ex."
-    echo "          $ $NAME ./folder"
+    echo "          $ $__NAME ./folder"
     echo ""
     echo "      Optional Flags"
     echo "          -h, --help"

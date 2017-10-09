@@ -142,6 +142,23 @@ function help_user() {
     echo ""
 }
 
+function __parse_args() {
+    local arg="$1"
+    local name="$2"
+
+    local pattern="^--$name[=][a-zA-Z0-9./]+$"
+    if [[ ! -z "$3" ]]; then
+        local pattern="^--$name[=]$3$"
+    fi
+
+    if [[ $arg =~ $pattern ]]; then
+        local left_side="${arg#*=}"
+        echo "$left_side"
+    else
+        echo "$arg"
+    fi
+}
+
 function warn_msg() {
     WARN_MESSAGE="$1"
     printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
@@ -381,8 +398,21 @@ function get_dotfiles() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --proxy)
+            ;;
         --backup)
             _BACKUP=1
+            mkdir -p "$_BACKUP_DIR"
+            ;;
+        --backup=*)
+            if [[ $(__parse_args "$key" "backup") == "$key" ]]; then
+                __ERROR_DATA=$(__parse_args "$key" "new")
+                error_msg "Not a valid backupdir $__ERROR_DATA"
+                exit 1
+            fi
+            _BACKUP=1
+            _BACKUP_DIR=$(__parse_args "$key" "new")
+            mkdir -p "$_BACKUP_DIR"
             ;;
         -c|--copy)
             _CMD="cp -rf"
