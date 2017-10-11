@@ -153,6 +153,14 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+# Windows stuff
+if [[ $(uname --all) =~ MINGW ]]; then
+    __IS_WINDOWS=1
+    warn_msg "Mingw platform is currently unsupported"
+    error_msg "Please follow the official instructions to get Neovim in windows https://github.com/neovim/neovim/wiki/Installing-Neovim#windows"
+    exit 1
+fi
+
 if [[ "$__CLONE" -eq 1 ]]; then
     __LOCATION="$__LOCATION/neovim"
 
