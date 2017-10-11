@@ -32,16 +32,29 @@
 ################################################################################
 
 if hash nvim 2>/dev/null; then
-    export EDITOR='nvim'
-    VIM_PATH="$(command -v vim)"
+    if [[ $(uname --all) =~ MINGW ]]; then
+        # Since windows have GUI neovim
+        # We keep the terminal env.
+        export EDITOR="vim"
 
-    # Prevent to screw the path alias
-    if [[ ! $VIM_PATH =~ "alias" ]]; then
-        export MANPAGER="nvim -c 'set ft=man' -"
-        alias vim="nvim"
-        alias vi="$VIM_PATH"
-        alias cdvim="cd ~/.config/nvim"
+        # We can't use TUI neovim
+        alias nvim="nvim-qt"
+        # We are on windows so we use neovim's windows path
+        alias cdvim="cd ~/AppData/Local/nvim/"
+        # Vim reads unix dotpath, ~/vimfiles/ is for gVim
         alias cdvi="cd ~/.vim"
+    else
+        export EDITOR='nvim'
+        VIM_PATH="$(command -v vim)"
+
+        # Prevent to screw the path alias
+        if [[ ! $VIM_PATH =~ "alias" ]]; then
+            export MANPAGER="nvim -c 'set ft=man' -"
+            alias vim="nvim"
+            alias vi="$VIM_PATH"
+            alias cdvim="cd ~/.config/nvim"
+            alias cdvi="cd ~/.vim"
+        fi
     fi
 else
     export EDITOR='vim'
