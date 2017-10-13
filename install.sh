@@ -24,6 +24,7 @@
 #            .`   github.com/mike325/dotfiles   `/
 
 _ALL=1
+_COOL_FONTS=0
 _ALIAS=0
 _VIM=0
 _NVIM=0
@@ -78,7 +79,7 @@ function help_user() {
     echo ""
     echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
     echo "  if any flag ins given, the script will install just want is being told to do."
-    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g"
+    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -p"
     echo ""
     echo "  Usage:"
     echo "      $_NAME [OPTIONAL]"
@@ -136,6 +137,12 @@ function help_user() {
     echo "                  - Gitconfigs"
     echo "                  - Hooks"
     echo "                  - Templates"
+    echo ""
+    echo "          -p, --fonts, --powerline"
+    echo "              Install the powerline patched fonts"
+    echo "                  * Since the patched fonts have different install method for Windows"
+    echo "                    they are just download"
+    echo "                  * This options is ignored if the install script is executed in a SSH session"
     echo ""
     echo "          -h, --help"
     echo "              Display help, if you are seeing this, that means that you already know it (nice)"
@@ -296,6 +303,18 @@ function setup_git() {
 
     status_msg "Setting up local git commands"
     [[ ! -d "$HOME/.config/git/host" ]] && mkdir -p "$HOME/.config/git/host"
+
+    # Since The current dotfiles may be the first thing to run
+    # We want to have the git hooks in here
+    status_msg "Settings git hooks for the current dotfiles"
+    for hooks in ${_SCRIPT_PATH}/git/templates/hooks/*; do
+        local scriptname="${script##*/}"
+
+        local file_basename="${scriptname%%.*}"
+        # local file_extention="${scriptname##*.}"
+
+        execute_cmd "$hooks" "${_SCRIPT_PATH}/.git/hooks"
+    done
 }
 
 function get_vim_dotfiles() {
@@ -395,11 +414,27 @@ function get_dotfiles() {
     clone_repo "$_BASE_URL/dotfiles" "$_SCRIPT_PATH" && return 0 || return "$?"
 }
 
+function get_cool_fonts() {
+    if [[ -z $SSH_CONNECTION ]]; then
+        status_msg "Gettings powerline fonts"
+        clone_repo "https://github.com/powerline/fonts" "$HOME/.local/"
+
+        if [[ $_IS_WINDOWS -eq 1 ]]; then
+            # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
+            # BUT administrator promp will pop up for EVERY font (too fucking much)
+            status_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
+        else
+            status_msg "Installing cool fonts"
+            $HOME/.local/fonts/install.sh
+        fi
+    else
+        warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
+    fi
+}
+
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
-        --proxy)
-            ;;
         --backup)
             _BACKUP=1
             mkdir -p "$_BACKUP_DIR"
@@ -413,6 +448,9 @@ while [[ $# -gt 0 ]]; do
             _BACKUP=1
             _BACKUP_DIR=$(__parse_args "$key" "new")
             mkdir -p "$_BACKUP_DIR"
+            ;;
+        -p|--fonts|--powerline)
+            _COOL_FONTS=1
             ;;
         -c|--copy)
             _CMD="cp -rf"
@@ -484,6 +522,7 @@ if [[ $_ALL -eq 1 ]]; then
     get_vim_dotfiles
     get_nvim_dotfiles
     get_emacs_dotfiles
+    get_cool_fonts
 else
     [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_ALIAS -eq 1 ]] && setup_alias
@@ -492,4 +531,5 @@ else
     [[ $_VIM -eq 1 ]] && get_vim_dotfiles
     [[ $_NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $_EMACS -eq 1 ]] && get_emacs_dotfiles
+    [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
 fi
