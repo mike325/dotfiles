@@ -197,7 +197,7 @@
 ;                 Shortcuts for pull cmd's                                     #
 ;###############################################################################
 
-    pl    = pull
+    ; pl    = pull
     plom  = pull origin master
     pb    = pull --rebase
     pbo   = pull --rebase origin
