@@ -533,3 +533,5 @@ else
     [[ $_EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
 fi
+
+exit 0
