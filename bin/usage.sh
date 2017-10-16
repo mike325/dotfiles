@@ -56,7 +56,7 @@ for key in "$@"; do
 done
 
 if [[ -n "$1" ]]; then
-    du -h --max-depth=1 "$1"
+    du -h --max-depth=1 $@
 else
     du -h --max-depth=1
 fi
