@@ -1,5 +1,32 @@
 #!/usr/bin/env bash
 
+################################################################################
+#                                                                              #
+#   Author: Mike 8a                                                            #
+#   Description: Extra bash settings                                           #
+#                                                                              #
+#                                     -`                                       #
+#                     ...            .o+`                                      #
+#                  .+++s+   .h`.    `ooo/                                      #
+#                 `+++%++  .h+++   `+oooo:                                     #
+#                 +++o+++ .hhs++. `+oooooo:                                    #
+#                 +s%%so%.hohhoo'  'oooooo+:                                   #
+#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
+#                  hh+o+hoso+h+`/++++.+++++++:                                 #
+#                   `+h+++h.+ `/++++++++++++++:                                #
+#                            `/+++ooooooooooooo/`                              #
+#                           ./ooosssso++osssssso+`                             #
+#                          .oossssso-````/osssss::`                            #
+#                         -osssssso.      :ssss``to.                           #
+#                        :osssssss/  Mike  osssl   +                           #
+#                       /ossssssss/   8a   +sssslb                             #
+#                     `/ossssso+/:-        -:/+ossss'.-                        #
+#                    `+sso+:-`                 `.-/+oso:                       #
+#                   `++:.                           `-/+/                      #
+#                   .`   github.com/mike325/dotfiles   `/                      #
+#                                                                              #
+################################################################################
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth

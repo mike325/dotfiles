@@ -3,7 +3,7 @@
 ################################################################################
 #                                                                              #
 #   Author: Mike 8a                                                            #
-#   Description: Some useful alias                                             #
+#   Description: Some useful alias and functions                               #
 #                                                                              #
 #                                     -`                                       #
 #                     ...            .o+`                                      #
@@ -31,44 +31,28 @@
 #                          Set the default text editor                         #
 ################################################################################
 
+# Set vi to start as a minimal setup with just settings, mappings and autocmd; 0 plugins
+alias vi="vim --cmd \"let g:minimal=0\""
+
+alias viu="vim -u NONE"
+
 if hash nvim 2>/dev/null; then
     if [[ $(uname --all) =~ MINGW ]]; then
-        # Since windows have GUI neovim
-        # We keep the terminal env.
-        export EDITOR="vim"
-
-        # We can't use TUI neovim
-        alias nvim="nvim-qt"
-        # We are on windows so we use neovim's windows path
+        alias nvim="powershell nvim-qt"
         alias cdvim="cd ~/AppData/Local/nvim/"
-        # Vim reads unix dotpath, ~/vimfiles/ is for gVim
-        alias cdvi="cd ~/.vim"
+        export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
+        export EDITOR="vim"
     else
-        export EDITOR='nvim'
-        VIM_PATH="$(command -v vim)"
-
-        # Prevent to screw the path alias
-        if [[ ! $VIM_PATH =~ "alias" ]]; then
-            export MANPAGER="nvim -c 'set ft=man' -"
-            alias vim="nvim"
-            alias vi="$VIM_PATH"
-            alias cdvim="cd ~/.config/nvim"
-            alias cdvi="cd ~/.vim"
-        fi
+        alias cdvi="cd ~/.vim"
+        alias cdvim="cd ~/.config/nvim"
+        export EDITOR="nvim"
+        export MANPAGER="nvim -c 'set ft=man' -"
     fi
 else
-    export EDITOR='vim'
-    export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
     alias cdvim="cd ~/.vim"
+    export EDITOR="vim"
+    export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
 fi
-
-# Starts (n)vim with no settings at all
-alias vimu="vim -u NONE"
-
-# Starts (n)vim with minimal settings
-# - Disable all plugins
-# - Set my default settings, autocmds, and my key maps
-alias vimm="vim --cmd \"let g:minimal=0\""
 
 ################################################################################
 #                          Fix my common typos                                 #
@@ -203,68 +187,68 @@ fi
 # TODO add other distros commands I've used, like Solus
 if hash yaourt 2>/dev/null; then
     # 'Install' package maybe in the PATH
-    alias get="yaourt -S"
-    alias getn="yaourt -S --noconfirm"
+    alias getpkg="yaourt -S"
+    alias getpkgn="yaourt -S --noconfirm"
 
     alias update="yaourt -Syyu --aur"
 
     alias update="yaourt -Syyu --aur"
     alias updaten="yaourt -Syyu --aur --noconfirm"
 
-    alias remove="yaourt -Rns"
+    alias rmpkg="yaourt -Rns"
 
     # Yeah Arch from scratch may not have yaourt
 elif hash pacman 2>/dev/null; then
     if [[ $EUID -ne 0 ]]; then
-        alias get="sudo pacman -S"
-        alias getn="sudo pacman -S --noconfirm"
+        alias getpkg="sudo pacman -S"
+        alias getpkgn="sudo pacman -S --noconfirm"
 
         alias update="sudo pacman -Syyu"
         alias updaten="sudo pacman -Syyu --noconfirm"
 
-        alias remove="sudo pacman -Rns"
+        alias rmpkg="sudo pacman -Rns"
     else
-        alias get="pacman -S"
-        alias getn="pacman -S --noconfirm"
+        alias getpkg="pacman -S"
+        alias getpkgn="pacman -S --noconfirm"
 
         alias update="pacman -Syyu"
         alias updaten="pacman -Syyu --noconfirm"
 
-        alias remove="pacman -Rns"
+        alias rmpkg="pacman -Rns"
     fi
 
 elif hash apt-get 2>/dev/null; then
     if [[ $EUID -ne 0 ]]; then
-        alias get="sudo apt-get install"
-        alias getn="sudo apt-get install -y"
+        alias getpkg="sudo apt-getpkg install"
+        alias getpkgn="sudo apt-getpkg install -y"
 
-        alias update="sudo apt-get update && sudo apt-get upgrade"
+        alias update="sudo apt-getpkg update && sudo apt-getpkg upgrade"
 
-        alias remove="sudo apt-get remove"
+        alias rmpkg="sudo apt-getpkg remove"
     else
-        alias get="apt-get install"
-        alias getn="apt-get install -y"
+        alias getpkg="apt-getpkg install"
+        alias getpkgn="apt-getpkg install -y"
 
-        alias update="apt-get update && apt-get upgrade"
+        alias update="apt-getpkg update && apt-getpkg upgrade"
 
-        alias remove="apt-get remove"
+        alias rmpkg="apt-getpkg remove"
     fi
 
 elif hash dnf 2>/dev/null; then
     if [[ $EUID -ne 0 ]]; then
-        alias get="sudo dnf install"
-        alias getn="sudo dnf -y install"
+        alias getpkg="sudo dnf install"
+        alias getpkgn="sudo dnf -y install"
 
         alias update="sudo dnf update"
 
-        alias remove="sudo dnf remove"
+        alias rmpkg="sudo dnf remove"
     else
-        alias get="dnf install"
-        alias getn="dnf -y install"
+        alias getpkg="dnf install"
+        alias getpkgn="dnf -y install"
 
         alias update="dnf update"
 
-        alias remove="dnf remove"
+        alias rmpkg="dnf remove"
     fi
 fi
 
@@ -273,6 +257,7 @@ fi
 #               Functions to move around dirs and other simple stuff           #
 ################################################################################
 
+# FIXME
 function __create_alias() {
     local test_path=""
     local test_cmd=0
@@ -411,11 +396,13 @@ function venv() {
     fi
 
     if [[ ! -f "$_name/bin/activate" ]]; then
-        echo "[X]     ---- Error!!!  Missing activate file, $_name/bin/activate"
+        echo "[X]     ---- Error!!!  Missing activate file, $_name/bin/activate" 1>&2
         return 1
     fi
 
     source "$_name/bin/activate"
+
+    return 0
 }
 
 function bk() {
