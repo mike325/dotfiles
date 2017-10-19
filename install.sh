@@ -34,8 +34,8 @@ _EMACS=0
 _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
-_BACKUP=0
-_BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y.%X')"
+_BACKUP=1
+_BACKUP_DIR="$HOME/.local/backup_$(date '+%H-%M-%S_%d.%b.%Y')"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -87,6 +87,7 @@ function help_user() {
     echo "      Optional Flags"
     echo "          --backup"
     echo "              Backup all existing files into $HOME/.local/backup"
+    echo "              ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used"
     echo ""
     echo "          -f, --force"
     echo "              Force installation, remove all previous conflict files before installing"
@@ -437,7 +438,6 @@ while [[ $# -gt 0 ]]; do
     case "$key" in
         --backup)
             _BACKUP=1
-            mkdir -p "$_BACKUP_DIR"
             ;;
         --backup=*)
             if [[ $(__parse_args "$key" "backup") == "$key" ]]; then
@@ -447,7 +447,6 @@ while [[ $# -gt 0 ]]; do
             fi
             _BACKUP=1
             _BACKUP_DIR=$(__parse_args "$key" "new")
-            mkdir -p "$_BACKUP_DIR"
             ;;
         -p|--fonts|--powerline)
             _COOL_FONTS=1
@@ -501,7 +500,14 @@ done
 [[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
 [[ ! -d "$HOME/.config/" ]] && mkdir -p  "$HOME/.config/"
 
+# Because the "cp -rf" means there are no symbolic links
+# we must be sure we wont screw the shell host settings
+if [[ $_IS_WINDOWS -eq 1 ]] || [[ $_CMD == "cp -rf" ]]; then
+    _BACKUP=1
+fi
+
 if [[ $_BACKUP -eq 1 ]]; then
+    status_msg "Preparing backup dir"
     mkdir -p "${_BACKUP_DIR}"
 fi
 
