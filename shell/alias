@@ -38,7 +38,9 @@ alias viu="vim -u NONE"
 
 if hash nvim 2>/dev/null; then
     if [[ $(uname --all) =~ MINGW ]]; then
-        alias nvim="powershell nvim-qt"
+        # This crap keep failing,maybe because the shell stuff
+        # alias nvim="powershell nvim-qt"
+        alias cdvi="cd ~/.vim"
         alias cdvim="cd ~/AppData/Local/nvim/"
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
         export EDITOR="vim"
@@ -498,6 +500,14 @@ function crp() {
 # Go back to the last sym path or $HOME
 function gobk() {
     cd "$ORIGINAL_PATH" || return 1
+}
+
+# Check what's in the trash can
+function cdt() {
+    if [[ -d /tmp/.trash ]]; then
+        cd /tmp/.trash
+    fi
+    return 0
 }
 
 

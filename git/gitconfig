@@ -32,6 +32,12 @@
 [github]
     user = mike325
 
+[url "git://github.com/"]
+    insteadOf = gh:
+
+[url "git@github.com:"]
+    insteadOf = sgh:
+
 [color]
     ui          = auto
     diff        = auto
@@ -60,6 +66,10 @@
 [push]
     ; Make `git push` automatically push relevant annotated tags when pushing
     followTags = true
+    default = tracking
+
+[help]
+    autocorrect = 1
 
 [alias]
 ;###############################################################################

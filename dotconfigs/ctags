@@ -1,3 +1,4 @@
+--c++-kinds=+p
 --python-kinds=cfm
 --javascript-kinds=cm
 
@@ -5,6 +6,7 @@
 
 --tag-relative=yes
 
+--fields=+iaS
 --fields=+l
 --fields=+n
 

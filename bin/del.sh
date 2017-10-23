@@ -39,11 +39,17 @@ function help_user() {
     echo "      $NAME PATH/FILE [OPTIONAL]"
     echo "          Ex."
     echo "          $ $NAME ./folder"
+    echo "          $ $NAME ./foo ./bar ~/tmp"
     echo ""
     echo "      Optional Flags"
     echo "          -h, --help"
     echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
     echo ""
+}
+
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
 }
 
 for key in "$@"; do
@@ -55,6 +61,12 @@ for key in "$@"; do
     esac
 done
 
-if [[ ! -z "$1" ]]; then
-    mkdir -p /tmp/.trash && mv --backup=numbered "$@" /tmp/.trash;
-fi
+mkdir -p /tmp/.trash
+
+for i in $@; do
+    if [[ -d "$i" ]]; then
+        mv --backup=numbered "$i" /tmp/.trash;
+    else
+        error_msg "$i doesn't exists"
+    fi
+done
