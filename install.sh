@@ -35,7 +35,7 @@ _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
 _BACKUP=1
-_BACKUP_DIR="$HOME/.local/backup_$(date '+%H-%M-%S_%d.%b.%Y')"
+_BACKUP_DIR="$HOME/.local/backup_$(date '%d.%b.%Y_+%H-%M-%S')"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"

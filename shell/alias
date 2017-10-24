@@ -32,9 +32,6 @@
 ################################################################################
 
 # Set vi to start as a minimal setup with just settings, mappings and autocmd; 0 plugins
-alias vi="vim --cmd \"let g:minimal=0\""
-
-alias viu="vim -u NONE"
 
 if hash nvim 2>/dev/null; then
     if [[ $(uname --all) =~ MINGW ]]; then
@@ -44,16 +41,29 @@ if hash nvim 2>/dev/null; then
         alias cdvim="cd ~/AppData/Local/nvim/"
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
         export EDITOR="vim"
+
+
+        alias vi="vim --cmd \"let g:minimal=0\""
+        alias viu="vim -u NONE"
+
     else
         alias cdvi="cd ~/.vim"
         alias cdvim="cd ~/.config/nvim"
         export EDITOR="nvim"
         export MANPAGER="nvim -c 'set ft=man' -"
+
+        alias vi="nvim --cmd \"let g:minimal=0\""
+        alias viu="nvim -u NONE"
+
     fi
 else
     alias cdvim="cd ~/.vim"
     export EDITOR="vim"
     export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
+
+    alias vi="vim --cmd \"let g:minimal=0\""
+    alias viu="vim -u NONE"
+
 fi
 
 ################################################################################
