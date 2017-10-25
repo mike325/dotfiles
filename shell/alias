@@ -42,10 +42,8 @@ if hash nvim 2>/dev/null; then
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
         export EDITOR="vim"
 
-
         alias vi="vim --cmd \"let g:minimal=0\""
         alias viu="vim -u NONE"
-
     else
         alias cdvi="cd ~/.vim"
         alias cdvim="cd ~/.config/nvim"
@@ -54,7 +52,6 @@ if hash nvim 2>/dev/null; then
 
         alias vi="nvim --cmd \"let g:minimal=0\""
         alias viu="nvim -u NONE"
-
     fi
 else
     alias cdvim="cd ~/.vim"
@@ -63,7 +60,6 @@ else
 
     alias vi="vim --cmd \"let g:minimal=0\""
     alias viu="vim -u NONE"
-
 fi
 
 ################################################################################
