@@ -208,6 +208,7 @@
 ;###############################################################################
 
     ; pl    = pull
+    plo   = pull origin
     plom  = pull origin master
     pb    = pull --rebase
     pbo   = pull --rebase origin

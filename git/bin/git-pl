@@ -30,8 +30,12 @@ NAME="${NAME##*-}"
 function help_user() {
     echo ""
     echo "  Script to pull changes from a repository"
-    echo "      The scrip use git svn rebase and ift it fails tries with git pull."
-    echo "      It passes all the args to the git commands"
+    echo ""
+    echo "  The script use git svn rebase and if it fails tries with git pull."
+    echo "  It passes all the args to the git commands"
+    echo ""
+    echo " NOTE: Since I don't use git svn too much, if any argument is given to the script"
+    echo "       it will automatically switch to git pull"
     echo ""
     echo "  Usage:"
     echo "      $NAME [OPTIONAL]"
@@ -85,8 +89,12 @@ for key in "$@"; do
     esac
 done
 
-if git svn fetch >/dev/null 2>&1; then
-    git svn rebase "$@"
+if [[ -z "$1" ]]; then
+    if git svn fetch >/dev/null 2>&1; then
+        git svn rebase "$@"
+    else
+        git pull "$@"
+    fi
 else
     git pull "$@"
 fi
