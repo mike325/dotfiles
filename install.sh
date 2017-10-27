@@ -187,8 +187,12 @@ function execute_cmd() {
     local post_cmd="$2"
 
     if [[ $_BACKUP -eq 1 ]]; then
-        local name="${post_cmd##*/}"
-        mv --backup=numbered "$post_cmd" "${_BACKUP_DIR}/${name}"
+        # We check if the target exist since we could be adding new
+        # scripts that may no be installed
+        if [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+            local name="${post_cmd##*/}"
+            mv --backup=numbered "$post_cmd" "${_BACKUP_DIR}/${name}"
+        fi
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
     elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then

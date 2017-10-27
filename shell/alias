@@ -35,8 +35,7 @@
 
 if hash nvim 2>/dev/null; then
     if [[ $(uname --all) =~ MINGW ]]; then
-        # This crap keep failing,maybe because the shell stuff
-        # alias nvim="powershell nvim-qt"
+        alias nvim="nvim-qt &"
         alias cdvi="cd ~/.vim"
         alias cdvim="cd ~/AppData/Local/nvim/"
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
