@@ -507,6 +507,9 @@ function gobk() {
     cd "$ORIGINAL_PATH" || return 1
 }
 
+# Go relative path
+alias grp="gobk"
+
 # Check what's in the trash can
 function cdt() {
     if [[ -d /tmp/.trash ]]; then
@@ -514,6 +517,59 @@ function cdt() {
     fi
     return 0
 }
+
+function change_base() {
+    for key in "$@"; do
+        case "$key" in
+            -h|--help)
+
+                echo ""
+                echo "  Function to look for the nearest ancestor of given dir"
+                echo ""
+                echo "  Usage:"
+                echo "      $ change_base DIR [OPTIONAL]"
+                echo "          Ex."
+                echo "          /home/$USER/foo $ change_base bar"
+                echo "          /home/$USER/bar $"
+                echo ""
+                echo "      Optional Flags"
+                echo "          -h, --help"
+                echo "              Display help and exit. If you are seeing this,"
+                echo "              that means that you already know it (nice)"
+                echo ""
+
+                return 0
+                ;;
+        esac
+    done
+
+    if [[ -z "$1" ]]; then
+        echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
+        return 1
+    fi
+
+    local cwd="$(pwd)"
+    local new_cwd="$1"
+
+    local new_path=""
+
+    while [[ $cwd != "" ]]; do
+        local cwd="${cwd%/*}"
+        local new_path="$cwd/$new_cwd"
+
+        if [[ -d  "$new_path" ]] && [[ "$new_path" != "$(pwd)" ]]; then
+            if ! pushd "$new_path" 1> /dev/null; then
+                return 1
+            fi
+            return 0
+        fi
+    done
+
+    echo "  ---- [X] Error $1 is not a parent relative dir" 1>&2
+    return 1
+}
+
+alias cb="change_base"
 
 
 if hash emacs 2>/dev/null; then
