@@ -448,6 +448,8 @@ function bk() {
         echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
         return 1
     fi
+
+    return 0
 }
 
 function mkcd() {
@@ -508,7 +510,7 @@ function gobk() {
 }
 
 # Go relative path
-alias grp="gobk"
+# alias grp="gobk"
 
 # Check what's in the trash can
 function cdt() {

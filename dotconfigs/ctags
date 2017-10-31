@@ -6,9 +6,13 @@
 
 --tag-relative=yes
 
---fields=+iaS
+--fields=+i
+--fields=+a
+--fields=+S
 --fields=+l
 --fields=+n
+--fields=+t
+--fields=+m
 
 --exclude=.svn
 --exclude=.hg
