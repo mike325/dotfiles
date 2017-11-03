@@ -41,7 +41,7 @@ function help_user() {
     echo "  Usage:"
     echo "      $NAME URL"
     echo "          Ex."
-    echo "          $ $NAME https://google.com"
+    echo "          $ $NAME google.com"
     echo ""
     echo "      Optional Flags"
     echo "          -h, --help"
@@ -59,5 +59,5 @@ for key in "$@"; do
 done
 
 if [[ ! -z "$1" ]]; then
-    curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
+    curl -s -L --max-redirs 1 "http://www.downforeveryoneorjustme.com/$1" | grep -oE "It's just you.|It's not just you!"
 fi
