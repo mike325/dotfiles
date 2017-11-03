@@ -36,6 +36,7 @@ _GIT=0
 _FORCE_INSTALL=0
 _BACKUP=1
 _BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y_%H-%M-%S')"
+_VERBOSE=0
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -61,7 +62,7 @@ _IS_WINDOWS=0
 
 # Windows stuff
 if [[ $(uname --all) =~ MINGW ]]; then
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
+    _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     # Windows does not support links we will use cp instead
     _IS_WINDOWS=1
@@ -85,8 +86,11 @@ function help_user() {
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
-    echo "          --backup"
-    echo "              Backup all existing files into $HOME/.local/backup"
+    echo "          --verbose"
+    echo "              Output debug messages"
+    echo ""
+    echo "          --backup, --backup=DIR"
+    echo "              Backup all existing files into $HOME/.local/backup or the provided dir"
     echo "              ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used"
     echo ""
     echo "          -f, --force"
@@ -101,14 +105,14 @@ function help_user() {
     echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
     echo "              the command to 'cp -rf' this way you can remove the folder after installation"
     echo "              but you need to re-download the files each time you want to update the files"
-    echo "              ----    Option not valid in windows platforms"
+    echo "              ----    Ignored option in Windows platform"
     echo "              ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!"
     echo ""
     echo "          -a, --alias"
     echo "              Install:"
     echo "                  - Shell alias in $HOME/.config/shell"
     echo "                  - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh"
-    echo "                  - Evething inside ./dotconfigs into $HOME"
+    echo "                  - Everything inside ./dotconfigs into $HOME"
     echo "                  - Python startup script in $HOME/.local/lib/"
     echo ""
     echo "          -d, --dotfiles"
@@ -151,35 +155,51 @@ function help_user() {
 }
 
 function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        echo ""
+    fi
+
     local arg="$1"
     local name="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9./]+$"
+    local pattern="^--$name[=][a-zA-Z0-9._-/~]+$"
+
     if [[ ! -z "$3" ]]; then
         local pattern="^--$name[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then
         local left_side="${arg#*=}"
-        echo "$left_side"
+        echo "${left_side/#\~/$HOME}"
     else
         echo "$arg"
     fi
 }
 
 function warn_msg() {
-    WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
+    local warn_message="$1"
+    printf "[!]     ---- Warning!!! %s \n" "$warn_message"
+    return 0
 }
 
 function error_msg() {
-    ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+    local error_message="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$error_message" 1>&2
+    return 0
 }
 
 function status_msg() {
-    STATUS_MESSAGGE="$1"
-    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
+    local status_message="$1"
+    printf "[*]     ---- %s \n" "$status_message"
+    return 0
+}
+
+function verbose_msg() {
+    if [[ $_VERBOSE -eq 1 ]]; then
+        local debug_message="$1"
+        printf "[+]     ---- Debug!!!   %s \n" "$debug_message"
+    fi
+    return 0
 }
 
 function execute_cmd() {
@@ -191,7 +211,19 @@ function execute_cmd() {
         # scripts that may no be installed
         if [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
             local name="${post_cmd##*/}"
-            mv --backup=numbered "$post_cmd" "${_BACKUP_DIR}/${name}"
+            # We want to copy all non symbolic links
+            if [[ ! -L "$post_cmd" ]]; then
+                verbose_msg "Backing up $post_cmd to ${_BACKUP_DIR}/${name}"
+                cp -rf --backup=numbered "$post_cmd" "${_BACKUP_DIR}/${name}"
+            elif [[ -d "$post_cmd/host" ]] && [[ $(ls -A "$post_cmd/host") ]]; then
+                # Check for host specific settings only if it's not empty
+                verbose_msg "Backing up $post_cmd/host to ${_BACKUP_DIR}/${name}/host"
+                cp -rf --backup=numbered "$post_cmd/host" "${_BACKUP_DIR}/${name}"
+            else
+                verbose_msg "Nothing to backup in $post_cmd"
+            fi
+
+            rm -rf "$post_cmd"
         fi
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
@@ -199,6 +231,8 @@ function execute_cmd() {
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
         return 1
     fi
+
+    verbose_msg "$_CMD $pre_cmd $post_cmd"
 
     sh -c "$_CMD $pre_cmd $post_cmd" && return 0 || return "$?"
 }
@@ -218,14 +252,16 @@ function clone_repo() {
         fi
 
         if [[ ! -d "$dest" ]]; then
-            git clone --recursive "$repo" "$dest"
+            verbose_msg "Cloning $repo"
+            if git clone --recursive "$repo" "$dest"; then
+                return 0
+            fi
+            return 1
         fi
     else
         error_msg "Git command is not available"
         return 2
     fi
-
-    (( $? == 0 )) && return 0 || return "$?"
 }
 
 
@@ -240,7 +276,7 @@ function setup_bin() {
 
         execute_cmd "$script" "$HOME/.local/bin/$file_basename"
     done
-
+    return 0
 }
 
 function setup_alias() {
@@ -296,7 +332,7 @@ function setup_alias() {
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
     fi
-
+    return 0
 }
 
 function setup_git() {
@@ -320,6 +356,7 @@ function setup_git() {
 
         execute_cmd "$hooks" "${_SCRIPT_PATH}/.git/hooks"
     done
+    return 0
 }
 
 function get_vim_dotfiles() {
@@ -391,10 +428,13 @@ function get_emacs_dotfiles() {
     # If we couldn't clone our repo, return
     clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d" && return $?
 
-    mkdir -p "$HOME/.config/systemd/user"
-    execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
+    verbose_msg "Creating dir $HOME/.config/systemd/user" && mkdir -p "$HOME/.config/systemd/user"
+    if execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
+    then
+        return 0
+    fi
 
-    (( $? == 0 )) && return 0 || return "$?"
+    return 1
 }
 
 function setup_shell_framework() {
@@ -430,11 +470,12 @@ function get_cool_fonts() {
             status_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
         else
             status_msg "Installing cool fonts"
-            $HOME/.local/fonts/install.sh
+            "$HOME"/.local/fonts/install.sh
         fi
     else
         warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
     fi
+    return 0
 }
 
 while [[ $# -gt 0 ]]; do
@@ -445,12 +486,12 @@ while [[ $# -gt 0 ]]; do
             ;;
         --backup=*)
             if [[ $(__parse_args "$key" "backup") == "$key" ]]; then
-                __ERROR_DATA=$(__parse_args "$key" "new")
+                __ERROR_DATA=$(__parse_args "$key" "backup")
                 error_msg "Not a valid backupdir $__ERROR_DATA"
                 exit 1
             fi
             _BACKUP=1
-            _BACKUP_DIR=$(__parse_args "$key" "new")
+            _BACKUP_DIR=$(__parse_args "$key" "backup")
             ;;
         -p|--fonts|--powerline)
             _COOL_FONTS=1
@@ -492,6 +533,9 @@ while [[ $# -gt 0 ]]; do
             _GIT=1
             _ALL=0
             ;;
+        --verbose)
+            _VERBOSE=1
+            ;;
         -h|--help)
             help_user
             exit 0
@@ -500,18 +544,19 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-[[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
-[[ ! -d "$HOME/.local/lib" ]] && mkdir -p  "$HOME/.local/lib/"
-[[ ! -d "$HOME/.config/" ]] && mkdir -p  "$HOME/.config/"
+[[ ! -d "$HOME/.local/bin" ]] && verbose_msg "Creating dir $HOME/.local/bin" && mkdir -p "$HOME/.local/bin"
+[[ ! -d "$HOME/.local/lib" ]] && verbose_msg "Creating dir $HOME/.local/lib" && mkdir -p "$HOME/.local/lib"
+[[ ! -d "$HOME/.config/" ]]   && verbose_msg "Creating dir $HOME/.config/" && mkdir -p "$HOME/.config/"
 
 # Because the "cp -rf" means there are no symbolic links
 # we must be sure we wont screw the shell host settings
 if [[ $_IS_WINDOWS -eq 1 ]] || [[ $_CMD == "cp -rf" ]]; then
+    verbose_msg "Activating backup"
     _BACKUP=1
 fi
 
 if [[ $_BACKUP -eq 1 ]]; then
-    status_msg "Preparing backup dir"
+    status_msg "Preparing backup dir ${_BACKUP_DIR}"
     mkdir -p "${_BACKUP_DIR}"
 fi
 
