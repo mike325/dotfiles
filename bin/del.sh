@@ -64,7 +64,7 @@ done
 mkdir -p /tmp/.trash
 
 for i in $@; do
-    if [[ -d "$i" ]]; then
+    if [[ -d "$i" ]] || [[ -f "$i" ]]; then
         mv --backup=numbered "$i" /tmp/.trash;
     else
         error_msg "$i doesn't exists"
