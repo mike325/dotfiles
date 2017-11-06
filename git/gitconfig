@@ -24,6 +24,7 @@
 [core]
     editor = $EDITOR
     excludesfile = ~/.config/git/templates/gitignore
+    autocrlf = input
 
 [user]
     name  = Mike
