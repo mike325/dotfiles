@@ -88,13 +88,13 @@ if [[ -n "$(git symbolic-ref HEAD 2> /dev/null)" ]]; then
         echo '-------------------'
         echo "Statistics for: $a"
         echo -n "Number of files changed: "
-        git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f3 | sort -iu | wc -l
+        git log "$LOGOPTS" --all --numstat --format="%n" --author="$a" | cut -f3 | sort -iu | wc -l
         echo -n "Number of lines added: "
-        git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f1 | awk '{s+=$1} END {print s}'
+        git log "$LOGOPTS" --all --numstat --format="%n" --author="$a" | cut -f1 | awk '{s+=$1} END {print s}'
         echo -n "Number of lines deleted: "
-        git log $LOGOPTS --all --numstat --format="%n" --author=$a | cut -f2 | awk '{s+=$1} END {print s}'
+        git log "$LOGOPTS" --all --numstat --format="%n" --author="$a" | cut -f2 | awk '{s+=$1} END {print s}'
         echo -n "Number of merges: "
-        git log $LOGOPTS --all --merges --author=$a | grep -c '^commit'
+        git log "$LOGOPTS" --all --merges --author="$a" | grep -c '^commit'
     done
 else
     error_msg "You're currently not in a git repository"

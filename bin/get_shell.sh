@@ -28,9 +28,10 @@
 NAME="$0"
 NAME="${NAME##*/}"
 
-_DEFAULT_SHELL="${SHELL##*/}"
+# _DEFAULT_SHELL="${SHELL##*/}"
 _FORCE_INSTALL=0
 _BACKUP=0
+_VERBOSE=0
 
 # Windows stuff
 if [[ $(uname --all) =~ MINGW ]]; then
@@ -38,7 +39,6 @@ if [[ $(uname --all) =~ MINGW ]]; then
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     # Windows does not support links we will use cp instead
     _IS_WINDOWS=1
-    _CMD="cp -rf"
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
 fi
@@ -57,6 +57,9 @@ function help_user() {
     echo "          $ get_shell -s bash-it"
     echo ""
     echo "      Optional Flags"
+    echo "          --verbose"
+    echo "              Output debug messages"
+    echo ""
     echo "          --backup"
     echo "              Enable backup of existing files, this flag enables --force but"
     echo "              makes a backup before deletion"
@@ -75,18 +78,29 @@ function help_user() {
 }
 
 function warn_msg() {
-    WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+    local warn_message="$1"
+    printf "[!]     ---- Warning!!! %s \n" "$warn_message"
+    return 0
 }
 
 function error_msg() {
-    ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+    local error_message="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$error_message" 1>&2
+    return 0
 }
 
 function status_msg() {
-    STATUS_MESSAGGE="$1"
-    printf "[*]     ---- $STATUS_MESSAGGE \n"
+    local status_message="$1"
+    printf "[*]     ---- %s \n" "$status_message"
+    return 0
+}
+
+function verbose_msg() {
+    if [[ $_VERBOSE -eq 1 ]]; then
+        local debug_message="$1"
+        printf "[+]     ---- Debug!!!   %s \n" "$debug_message"
+    fi
+    return 0
 }
 
 function rm_framework() {
@@ -101,6 +115,9 @@ function rm_framework() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --verbose)
+            _VERBOSE=1
+            ;;
         -s|--shell)
             if [[ ! -z "$2" ]]; then
                 case $2 in

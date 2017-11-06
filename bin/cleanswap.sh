@@ -32,9 +32,9 @@ _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 if hash realpath 2>/dev/null; then
     _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" > /dev/null
+    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
     _SCRIPT_PATH="$(pwd -P)"
-    popd > /dev/null
+    popd 1> /dev/null || exit 1
 fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"

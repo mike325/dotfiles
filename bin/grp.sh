@@ -82,7 +82,7 @@ else
         ROOT_PATH="${FULL_PATH%/*}"
         FILE_PATH="${FULL_PATH##*/}"
 
-        pushd . > /dev/null
+        pushd . 1> /dev/null || exit 1
 
         if [[ -f "$FULL_PATH" ]]; then
 
@@ -91,7 +91,7 @@ else
             # then pop it
             if pushd "$ROOT_PATH" 2> /dev/null; then
                 echo "$(pwd -P)/$FILE_PATH"
-                popd > /dev/null
+                popd 1> /dev/null || exit 1
             else
                 echo "$(pwd -P)/$FILE_PATH"
             fi
@@ -99,17 +99,17 @@ else
         elif [[ -d "$FULL_PATH" ]]; then
             ROOT_PATH="$1"
 
-            pushd "$ROOT_PATH" > /dev/null
+            pushd "$ROOT_PATH" 1> /dev/null || exit 1
 
             pwd -P
 
-            popd > /dev/null
+            popd 1> /dev/null || exit 1
         else
             error_msg "The given path doesn't exist"
         fi
 
         # Retrun to the original dir
-        popd > /dev/null
+        popd 1> /dev/null || exit 1
 
     else
         pwd -P

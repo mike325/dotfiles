@@ -515,7 +515,7 @@ function gobk() {
 # Check what's in the trash can
 function cdt() {
     if [[ -d /tmp/.trash ]]; then
-        cd /tmp/.trash
+        pushd /tmp/.trash 1> /dev/null || exit 1
     fi
     return 0
 }
