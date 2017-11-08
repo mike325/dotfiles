@@ -120,6 +120,21 @@ else
     export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 fi
 
+if  [[ $_IS_WINDOWS -eq 1 ]]; then
+    # Windows user paths where pip install python packages
+    if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then
+        export PATH="$HOME/AppData/Roaming/Python/Scripts:$PATH"
+    fi
+
+    if [[ -d "$HOME/AppData/Roaming/Python/Python27/Scripts" ]]; then
+        export PATH="$HOME/AppData/Roaming/Python/Python27/Scripts:$PATH"
+    fi
+
+    if [[ -d "$HOME/AppData/Roaming/Python/Python36/Scripts/" ]]; then
+        export PATH="$HOME/AppData/Roaming/Python/Python36/Scripts/:$PATH"
+    fi
+fi
+
 export _DEFAULT_SHELL="${SHELL##*/}"
 
 if (( __INTERACTIVE == 1 )); then
