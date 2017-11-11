@@ -78,6 +78,9 @@ alias im="vim"
 #                        Some useful shortcuts                                 #
 ################################################################################
 
+# Check all user process
+alias psu="ps -u $USER"
+
 # alias q="exit"
 alias cl="clear"
 if [[ $EUID -ne 0 ]]; then
@@ -344,11 +347,25 @@ function __create_alias() {
     return 0
 }
 
+function killssh() {
+    if [[ ! -z $(pgrep -u $USER ssh-agent) ]]; then
+        kill -7 $(pgrep -u $USER ssh-agent)
+    fi
+    return 0
+}
+
+function ssha() {
+    eval $(ssh-agent)
+    ssh-add ~/.ssh/id_rsa
+    return 0
+}
+
 # Simple map of "q" to deactivate virtualenv or exit terminal session
 function q() {
     if hash deactivate 2> /dev/null; then
         deactivate
     else
+        killssh
         exit
     fi
 }

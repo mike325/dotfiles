@@ -23,9 +23,9 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-NAME="$0"
-NAME="${NAME##*/}"
-NAME="${NAME##*-}"
+_NAME="$0"
+_NAME="${_NAME##*/}"
+_NAME="${_NAME##*-}"
 
 function help_user() {
     echo ""
@@ -38,9 +38,9 @@ function help_user() {
     echo "       it will automatically switch to git pull"
     echo ""
     echo "  Usage:"
-    echo "      $NAME [OPTIONAL]"
+    echo "      $_NAME [OPTIONAL]"
     echo "          Ex."
-    echo "          $ git $NAME"
+    echo "          $ git $_NAME"
     echo ""
     echo "      Optional Flags"
     echo "          -h, --help"
@@ -50,11 +50,11 @@ function help_user() {
 
 function __parse_args() {
     local arg="$1"
-    local name="$2"
+    local _NAME="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9./]+$"
+    local pattern="^--$_NAME[=][a-zA-Z0-9./]+$"
     if [[ ! -z "$3" ]]; then
-        local pattern="^--$name[=]$3$"
+        local pattern="^--$_NAME[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then

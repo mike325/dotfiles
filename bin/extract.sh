@@ -69,21 +69,18 @@ while [[ $# -gt 0 ]]; do
 
     if [[ -f "$filename" ]]; then
         case "$filename" in
-            *.tar.bz2|*.tbz2) extraction "$filename" "tar -jxvf";;
-            *.tar.gz|*.tgz)   extraction "$filename" "tar -zxvf";;
-            *.zip|*.ZIP)      extraction "$filename" "unzip";;
-            *.tar.bz)         extraction "$filename" "tar -xf";;
-            *.pax.Z)          extraction "$filename" "uncompress";;
-            *.tar)            extraction "$filename" "tar -xf";;
-            *.bz2)            extraction "$filename" "bunzip2";;
-            *.dmg)            extraction "$filename" "hdiutil mount";;
-            *.tar)            extraction "$filename" "tar -xvf";;
-            *.pax)            extraction "$filename" "cat";;
-            *.rar)            extraction "$filename" "unrar x";;
-            *.7z)             extraction "$filename" "7z x";;
-            *.gz)             extraction "$filename" "gunzip";;
-            *.Z)              extraction "$filename" "uncompress";;
-            *)                echo "    ---- [X] Error '$filename' cannot be extracted/mounted via extract()" ;;
+            *.tar|*.tar.*) extraction "$filename" "tar -xf";;
+            *.zip|*.ZIP)   extraction "$filename" "unzip";;
+            *.tar.bz)      extraction "$filename" "tar -xf";;
+            *.pax.Z)       extraction "$filename" "uncompress";;
+            *.bz2)         extraction "$filename" "bunzip2";;
+            *.dmg)         extraction "$filename" "hdiutil mount";;
+            *.pax)         extraction "$filename" "cat";;
+            *.rar)         extraction "$filename" "unrar x";;
+            *.7z)          extraction "$filename" "7z x";;
+            *.gz)          extraction "$filename" "gunzip";;
+            *.Z)           extraction "$filename" "uncompress";;
+            *) echo " ---- [X] Error '$filename' cannot be extracted/mounted via extract()" ;;
         esac
     else
         error_msg "'$filename' is not a valid file"
