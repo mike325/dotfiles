@@ -23,17 +23,17 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-NAME="$0"
-NAME="${NAME##*/}"
+_NAME="$0"
+_NAME="${_NAME##*/}"
 
 function help_user() {
     echo ""
     echo "  Extract any given number of compressed files"
     echo ""
     echo "  Usage:"
-    echo "      $NAME FILE(S) [OPTIONAL]"
+    echo "      $_NAME FILE(S) [OPTIONAL]"
     echo "          Ex."
-    echo "          $ $NAME file.zip stuff.tar foo.rar"
+    echo "          $ $_NAME file.zip stuff.tar foo.rar"
     echo ""
     echo "      Optional Flags"
     echo "          -h, --help"
@@ -71,7 +71,6 @@ while [[ $# -gt 0 ]]; do
         case "$filename" in
             *.tar|*.tar.*) extraction "$filename" "tar -xf";;
             *.zip|*.ZIP)   extraction "$filename" "unzip";;
-            *.tar.bz)      extraction "$filename" "tar -xf";;
             *.pax.Z)       extraction "$filename" "uncompress";;
             *.bz2)         extraction "$filename" "bunzip2";;
             *.dmg)         extraction "$filename" "hdiutil mount";;

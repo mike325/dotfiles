@@ -44,6 +44,7 @@ __PYTHON_LIBS=0
 __RUBY_LIBS=0
 __BUILD_LIBS=0
 __CLONE=0
+__FORCE_INSTALL=0
 
 
 # Warning ! This script delete everything in the work directory before install
@@ -99,6 +100,9 @@ function show_help() {
     echo "          -r, --ruby"
     echo "              Install Neovim's ruby package"
     echo ""
+    echo "          -f, --force"
+    echo "              Ignore errors and warnings and force compilation"
+    echo ""
     echo "          -b, --build"
     echo "              Install all dependencies of the before build neovim's source code"
     echo "              Just few systems are supported, Debian's family, Fedora's family and"
@@ -129,6 +133,9 @@ function status_msg() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        -f|--force)
+            __FORCE_INSTALL=1
+            ;;
         -c|--clone)
             __CLONE=1
             ;;
@@ -161,11 +168,22 @@ if [[ $(uname --all) =~ MINGW ]]; then
     exit 1
 fi
 
-if [[ "$__CLONE" -eq 1 ]]; then
+if [[ "$__CLONE" -eq 1 ]] && [[ ! -d "$__LOCATION/neovim" ]]; then
     __LOCATION="$__LOCATION/neovim"
-
     git clone --recursive "$__URL" "$__LOCATION" || exit 1
+
+elif [[ -d "$__LOCATION/neovim" ]]; then
+    warn_msg "$__LOCATION/neovim already exists, skipping cloning"
+    __LOCATION="$__LOCATION/neovim"
 fi
+
+if [[ -f "$__LOCATION/bin/nvim" ]] && [[ $__FORCE_INSTALL -eq 0 ]]; then
+    status_msg "Neovim is already compiled, aborting"
+    exit 0
+elif [[ $__FORCE_INSTALL -eq 1 ]]; then
+    warn_msg "Neovim is already compiled, but fuck it, you want to recompile"
+fi
+
 
 if [[ -d "$__LOCATION" ]]; then
     pushd "$__LOCATION" > /dev/null

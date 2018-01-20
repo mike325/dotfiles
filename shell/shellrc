@@ -36,8 +36,8 @@
 (( __INTERACTIVE == 1 )) && stty -ixon                                         #
 # Set vi keys in the shell                                                     #
 set -o vi
-
-# Make backspace delete in a sane way
+#                                                                              #
+# Make backspace delete in a sane way                                          #
 stty erase '^?'
 ################################################################################
 

@@ -37,6 +37,7 @@ _FORCE_INSTALL=0
 _BACKUP=1
 _BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y_%H-%M-%S')"
 _VERBOSE=0
+_PORTABLES=0
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -52,6 +53,8 @@ else
     _SCRIPT_PATH="$(pwd -P)"
     popd > /dev/null
 fi
+
+_TMP="/tmp/"
 
 _CMD="ln -s"
 _BASE_URL="https://github.com/mike325"
@@ -138,10 +141,17 @@ function help_user() {
     echo "              Install shell functions and scripts in $HOME/.local/bin"
     echo ""
     echo "          -g, --git"
+    echo "              Install git configurations into $HOME/.config/git and $HOME/.gitconfig"
     echo "              Install:"
     echo "                  - Gitconfigs"
     echo "                  - Hooks"
     echo "                  - Templates"
+    echo ""
+    echo "          -t, --portables"
+    echo "              Install isolated/portable programs into $HOME/.local/bin"
+    echo "              Install:"
+    echo "                  - pip2 and pip3"
+    echo "                  - shellcheck"
     echo ""
     echo "          -p, --fonts, --powerline"
     echo "              Install the powerline patched fonts"
@@ -390,6 +400,16 @@ function get_nvim_dotfiles() {
     if [[ $_IS_WINDOWS -eq 1 ]]; then
         status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
 
+        # TODO: auto detect Windows arch and latest nvim version
+        if ! hash nvim 2> /dev/null; then
+            if hash curl 2>/dev/null; then
+                curl -s https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip -o "$HOME/.local/nvim.zip"
+                unzip "$HOME/.local/nvim.zip"
+                mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
+                # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
+            fi
+        fi
+
         # If we couldn't clone our repo, return
         clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
     else
@@ -399,8 +419,19 @@ function get_nvim_dotfiles() {
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
         if ! hash nvim 2> /dev/null; then
             # Make Neovim only if it's not already installed
-            "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p || return $?
-            # If we couldn't clone our repo, return
+
+            local force_flag=""
+            if [[ $__FORCE_INSTALL -eq 1 ]]; then
+                local force_flag="-f"
+            fi
+
+            # If the repo was already cloned, lets just build it
+            if [[ -d "$HOME/.local/neovim" ]]; then
+                "${_SCRIPT_PATH}"/bin/get_nvim.sh -d "$HOME/.local/" -p $force_flag || return $?
+            else
+                "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p $force_flag || return $?
+            fi
+            # If we couldn't clone the repo, return
         fi
 
 
@@ -421,6 +452,50 @@ function get_nvim_dotfiles() {
     # No errors so far
     return 0
 }
+
+function get_portables() {
+    if hash curl 2>/dev/null; then
+        status_msg "Checking portable programs"
+        if [[ $_IS_WINDOWS -eq 1 ]]; then
+
+            if ! hash shellcheck 2>/dev/null; then
+                status_msg "Getting shellcheck"
+                curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"
+                unzip "$_TMP/shellcheck-latest.zip" -o "$_TMP"
+                chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
+                mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
+            else
+                warn_msg "Skipping shellcheck"
+            fi
+
+        else
+            if ! hash pip3 2>/dev/null || hash pip2 2>/dev/null ; then
+                status_msg "Getting python pip"
+                curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"
+                chmod +x "$_TMP/get-pip.py"
+                hash pip2 2>/dev/null || python2 $_TMP/get-pip.py --user
+                hash pip3 2>/dev/null || python3 $_TMP/get-pip.py --user
+            else
+                warn_msg "Skipping pip"
+            fi
+
+            if ! hash shellcheck 2>/dev/null; then
+                status_msg "Getting shellcheck"
+                curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"
+                pushd "$_TMP" > /dev/null
+                tar xf "$_TMP/shellcheck.tar.xz"
+                chmod +x "$_TMP/shellcheck-latest/shellcheck"
+                mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
+                popd > /dev/null
+            else
+                warn_msg "Skipping shellcheck"
+            fi
+        fi
+        return 0
+    fi
+    return 1
+}
+
 
 function get_emacs_dotfiles() {
     status_msg "Installing Evil Emacs"
@@ -493,8 +568,13 @@ while [[ $# -gt 0 ]]; do
             _BACKUP=1
             _BACKUP_DIR=$(__parse_args "$key" "backup")
             ;;
+        -t|--portable|--portables)
+            _PORTABLES=1
+            _ALL=0
+            ;;
         -p|--fonts|--powerline)
             _COOL_FONTS=1
+            _ALL=0
             ;;
         -c|--copy)
             _CMD="cp -rf"
@@ -578,6 +658,7 @@ if [[ $_ALL -eq 1 ]]; then
     get_nvim_dotfiles
     get_emacs_dotfiles
     get_cool_fonts
+    get_portables
 else
     [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_ALIAS -eq 1 ]] && setup_alias
@@ -587,6 +668,7 @@ else
     [[ $_NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $_EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
+    [[ $_PORTABLES -eq 1 ]] && get_portables
 fi
 
 exit 0
