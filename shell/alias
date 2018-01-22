@@ -348,8 +348,10 @@ function __create_alias() {
 }
 
 function killssh() {
-    if [[ ! -z $(pgrep -u $USER ssh-agent) ]]; then
-        kill -7 $(pgrep -u $USER ssh-agent)
+    if hash pgrep 2>/dev/null; then
+        if [[ ! -z $(pgrep -u $USER ssh-agent) ]]; then
+            kill -7 $(pgrep -u $USER ssh-agent)
+        fi
     fi
     return 0
 }
