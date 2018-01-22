@@ -67,9 +67,17 @@ _IS_WINDOWS=0
 if [[ $(uname --all) =~ MINGW ]]; then
     _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+
+    # Horrible hack
+    if [[ $_CURRENT_SHELL =~ "ps" ]]; then
+        _CURRENT_SHELL="$(ps | tail -n 1 | awk '{ print $8 }')"
+        _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+    fi
+
     # Windows does not support links we will use cp instead
     _IS_WINDOWS=1
     _CMD="cp -rf"
+    USER="$USERNAME"
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
     # Hack when using sudo
@@ -253,7 +261,9 @@ function clone_repo() {
 
     if hash git 2>/dev/null; then
         if [[ $_BACKUP -eq 1 ]]; then
-            mv --backup=numbered "$dest" "$_BACKUP_DIR"
+            if [[ -f "$dest" ]] || [[ -d "$dest" ]]; then
+                mv --backup=numbered "$dest" "$_BACKUP_DIR"
+            fi
         elif [[ $_FORCE_INSTALL -eq 1 ]]; then
             rm -rf "$dest"
         else
@@ -397,24 +407,28 @@ function get_vim_dotfiles() {
 
 function get_nvim_dotfiles() {
     # Windows stuff
+    status_msg "Setting up neovim"
     if [[ $_IS_WINDOWS -eq 1 ]]; then
-        status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
 
         # TODO: auto detect Windows arch and latest nvim version
         if ! hash nvim 2> /dev/null; then
             if hash curl 2>/dev/null; then
-                curl -s https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip -o "$HOME/.local/nvim.zip"
-                unzip "$HOME/.local/nvim.zip"
+                status_msg "Getting neovim executable"
+                curl -Ls https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip -o "$HOME/.local/nvim.zip"
+
+                [[ -d "$HOME/.local/Neovim" ]] && rm -rf "$HOME/.local/Neovim"
+                [[ -d "$HOME/.local/neovim" ]] && rm -rf "$HOME/.local/neovim"
+
+                unzip "$HOME/.local/nvim.zip" -d "$HOME/.local/"
                 mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
                 # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
             fi
         fi
 
         # If we couldn't clone our repo, return
+        status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
         clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
     else
-        status_msg "Running Neovim install script"
-
         # Since no all systems have sudo/root access lets assume all dependencies are
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
         if ! hash nvim 2> /dev/null; then
@@ -426,6 +440,8 @@ function get_nvim_dotfiles() {
             fi
 
             # If the repo was already cloned, lets just build it
+            # TODO: Considering to use appimage binary instead of compiling it from the source code
+            status_msg "Compiling neovim from source"
             if [[ -d "$HOME/.local/neovim" ]]; then
                 "${_SCRIPT_PATH}"/bin/get_nvim.sh -d "$HOME/.local/" -p $force_flag || return $?
             else
@@ -461,7 +477,8 @@ function get_portables() {
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
                 curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"
-                unzip "$_TMP/shellcheck-latest.zip" -o "$_TMP"
+                [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
+                unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
                 chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
                 mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
             else
@@ -537,7 +554,7 @@ function get_dotfiles() {
 function get_cool_fonts() {
     if [[ -z $SSH_CONNECTION ]]; then
         status_msg "Gettings powerline fonts"
-        clone_repo "https://github.com/powerline/fonts" "$HOME/.local/"
+        clone_repo "https://github.com/powerline/fonts" "$HOME/.local/fonts"
 
         if [[ $_IS_WINDOWS -eq 1 ]]; then
             # We could indeed run $ powershell $HOME/.local/fonts/install.ps1

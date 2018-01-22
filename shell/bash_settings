@@ -51,8 +51,12 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-# [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
-[[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
+if [[ $_IS_WINDOWS -eq 0 ]]; then
+    [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
+else
+    [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
+fi
+
 
 # (Advanced): Change this to the name of your remote repo if you
 # cloned bash-it with a remote other than origin such as `bash-it`.

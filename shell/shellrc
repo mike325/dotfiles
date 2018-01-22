@@ -116,6 +116,7 @@ if [[ $(uname --all) =~ MINGW ]]; then
     export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     export _IS_WINDOWS=1
+    export USER="$USERNAME"
 else
     export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
 fi
