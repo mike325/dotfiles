@@ -200,6 +200,8 @@ if hash yaourt 2>/dev/null; then
     alias getpkg="yaourt -S"
     alias getpkgn="yaourt -S --noconfirm"
 
+    alias searchpkg="yaourt -Ss"
+
     alias update="yaourt -Syyu --aur"
 
     alias update="yaourt -Syyu --aur"
@@ -209,6 +211,8 @@ if hash yaourt 2>/dev/null; then
 
     # Yeah Arch from scratch may not have yaourt
 elif hash pacman 2>/dev/null; then
+    alias searchpkg="pacman -Ss"
+
     if [[ $EUID -ne 0 ]]; then
         alias getpkg="sudo pacman -S"
         alias getpkgn="sudo pacman -S --noconfirm"
@@ -227,24 +231,28 @@ elif hash pacman 2>/dev/null; then
         alias rmpkg="pacman -Rns"
     fi
 
-elif hash apt-get 2>/dev/null; then
+elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
+    alias searchpkg="apt search"
+
     if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo apt-getpkg install"
-        alias getpkgn="sudo apt-getpkg install -y"
+        alias getpkg="sudo apt install"
+        alias getpkgn="sudo apt install -y"
 
-        alias update="sudo apt-getpkg update && sudo apt-getpkg upgrade"
+        alias update="sudo apt update && sudo apt upgrade"
 
-        alias rmpkg="sudo apt-getpkg remove"
+        alias rmpkg="sudo apt remove"
     else
-        alias getpkg="apt-getpkg install"
-        alias getpkgn="apt-getpkg install -y"
+        alias getpkg="apt install"
+        alias getpkgn="apt install -y"
 
-        alias update="apt-getpkg update && apt-getpkg upgrade"
+        alias update="apt update && apt upgrade"
 
-        alias rmpkg="apt-getpkg remove"
+        alias rmpkg="apt remove"
     fi
 
 elif hash dnf 2>/dev/null; then
+    alias searchpkg="dnf search"
+
     if [[ $EUID -ne 0 ]]; then
         alias getpkg="sudo dnf install"
         alias getpkgn="sudo dnf -y install"
