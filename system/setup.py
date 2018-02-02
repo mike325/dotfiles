@@ -31,6 +31,13 @@ __header__ = """
             .`                                 `/
 """
 
+# TODO: Enable portable installs in both linux and Windows
+#   1) Considering we don't have any compiler available, just standalone executables will be download in Windows
+#   2) Need to decide which portable type will be use in linux
+#       - Appimage
+#       - Snap
+#       - Compile source code (considering is quiet provable to have a compiler)
+
 _PKGS = {
     # Global packages (any Unix system, may support windows Cywing later)
     # All global packages will be install using main method
@@ -47,6 +54,19 @@ _PKGS = {
         "sl",
         "unzip",
     ],
+    "portables": {
+        "linux": [
+            "ctags",
+            "shellcheck",
+            "neovim",
+            "pip",
+        ],
+        "windows": [
+            "ctags",
+            "shellcheck",
+            "neovim",
+        ],
+    },
     "arch": {
         "main": {
             "name": "pacman",
@@ -260,6 +280,13 @@ class PkgManager(object):
         install_cmd += pkgs_data["pkgs"]
 
         return install_cmd
+
+    def get_portable(self):
+        """TODO: Docstring for get_portable.
+        :returns: TODO
+
+        """
+        pass
 
     def install_pkgs(self):
         """Install the available packages for the current OS

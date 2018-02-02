@@ -49,9 +49,9 @@ _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 if hash realpath 2>/dev/null; then
     _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" > /dev/null
+    pushd "$_SCRIPT_PATH" > /dev/null || exit 1
     _SCRIPT_PATH="$(pwd -P)"
-    popd > /dev/null
+    popd > /dev/null || exit 1
 fi
 
 _TMP="/tmp/"
@@ -435,7 +435,7 @@ function get_nvim_dotfiles() {
             # Make Neovim only if it's not already installed
 
             local force_flag=""
-            if [[ $__FORCE_INSTALL -eq 1 ]]; then
+            if [[ $_FORCE_INSTALL -eq 1 ]]; then
                 local force_flag="-f"
             fi
 
@@ -478,12 +478,35 @@ function get_portables() {
                 status_msg "Getting shellcheck"
                 curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"
                 [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
-                unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
+                if ! unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"; then
+                    error_msg "An error occurred extracting zip file"
+                    return 1
+                fi
                 chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
                 mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
             else
-                warn_msg "Skipping shellcheck"
+                warn_msg "Skipping shellcheck, already installed"
             fi
+
+
+            if ! hash ctags 2>/dev/null; then
+                # TODO: auto detect latest version
+                local major="5"
+                local minor="8"
+                status_msg "Getting ctags"
+                curl -Ls "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" -o "$_TMP/ctags${major}${minor}.zip"
+                [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
+                if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
+                    error_msg "An error occurred extracting zip file"
+                    return 1
+                fi
+                chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
+                mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
+            else
+                warn_msg "Skipping ctags, already installed"
+            fi
+
+
 
         else
             if ! hash pip3 2>/dev/null || hash pip2 2>/dev/null ; then
@@ -493,19 +516,19 @@ function get_portables() {
                 hash pip2 2>/dev/null || python2 $_TMP/get-pip.py --user
                 hash pip3 2>/dev/null || python3 $_TMP/get-pip.py --user
             else
-                warn_msg "Skipping pip"
+                warn_msg "Skipping pip, already installed"
             fi
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
                 curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"
-                pushd "$_TMP" > /dev/null
-                tar xf "$_TMP/shellcheck.tar.xz"
+                pushd "$_TMP" > /dev/null || return 1
+                tar xf "$_TMP/shellcheck.tar.xz" || return 1
                 chmod +x "$_TMP/shellcheck-latest/shellcheck"
                 mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-                popd > /dev/null
+                popd > /dev/null || return 1
             else
-                warn_msg "Skipping shellcheck"
+                warn_msg "Skipping shellcheck, already installed"
             fi
         fi
         return 0
