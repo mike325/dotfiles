@@ -660,6 +660,10 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        *)
+            error_msg "Unknown flag $1"
+            exit 1
+            ;;
     esac
     shift
 done
