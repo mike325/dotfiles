@@ -27,7 +27,7 @@ _NAME="$0"
 _NAME="${_NAME##*/}"
 _NAME="${_NAME##*-}"
 
-_EDITOR="${EDITOR:-vi}"
+_EDITOR="${EDITOR:-vim}"
 _CACHED=""
 
 _SCRIPT_PATH="$0"

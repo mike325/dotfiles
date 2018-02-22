@@ -476,14 +476,14 @@ function get_portables() {
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
-                curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"
-                [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
-                if ! unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"; then
-                    error_msg "An error occurred extracting zip file"
-                    return 1
+                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
+                    [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
+                    unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
+                    chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
+                    mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
+                else
+                    error_msg "Curl couldn't get shellcheck"
                 fi
-                chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
-                mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
             else
                 warn_msg "Skipping shellcheck, already installed"
             fi
@@ -509,24 +509,30 @@ function get_portables() {
 
 
         else
-            if ! hash pip3 2>/dev/null || hash pip2 2>/dev/null ; then
+            if ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
                 status_msg "Getting python pip"
-                curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"
-                chmod +x "$_TMP/get-pip.py"
-                hash pip2 2>/dev/null || python2 $_TMP/get-pip.py --user
-                hash pip3 2>/dev/null || python3 $_TMP/get-pip.py --user
+                if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
+                    chmod +x "$_TMP/get-pip.py"
+                    ! hash pip2 2>/dev/null || python2 $_TMP/get-pip.py --user
+                    ! hash pip3 2>/dev/null || python3 $_TMP/get-pip.py --user
+                else
+                    error_msg "Curl couldn't get pip"
+                fi
             else
                 warn_msg "Skipping pip, already installed"
             fi
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
-                curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"
-                pushd "$_TMP" > /dev/null || return 1
-                tar xf "$_TMP/shellcheck.tar.xz" || return 1
-                chmod +x "$_TMP/shellcheck-latest/shellcheck"
-                mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-                popd > /dev/null || return 1
+                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"; then
+                    pushd "$_TMP" 1> /dev/null || return 1
+                    tar xf "$_TMP/shellcheck.tar.xz"
+                    chmod +x "$_TMP/shellcheck-latest/shellcheck"
+                    mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
+                    popd 1> /dev/null || return 1
+                else
+                    error_msg "Curl couldn't get shellcheck"
+                fi
             else
                 warn_msg "Skipping shellcheck, already installed"
             fi
