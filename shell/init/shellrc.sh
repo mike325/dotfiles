@@ -138,6 +138,10 @@ fi
 
 export _DEFAULT_SHELL="${SHELL##*/}"
 
+if hash gtags 2>/dev/null; then
+    export GTAGSLABEL=pygments
+fi
+
 if (( __INTERACTIVE == 1 )); then
 
     # Make less colorful
@@ -148,10 +152,9 @@ if (( __INTERACTIVE == 1 )); then
         source "$HOME/.config/shell/host/framework_settings"
     fi
 
-    # Configure shell framework and specific shell settings (Just bash and zsh)
-    # are supported
-    if [[ -f  "$HOME/.config/shell/${_CURRENT_SHELL}_settings" ]]; then
-        source "$HOME/.config/shell/${_CURRENT_SHELL}_settings"
+    # Configure shell framework and specific shell settings
+    if [[ -f  "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh" ]]; then
+        source "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh"
 
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage del down4me)
@@ -166,13 +169,13 @@ if (( __INTERACTIVE == 1 )); then
     fi
 
     # Load alias after bash-it to give them higher priority
-    if [[ -f "$HOME/.config/shell/alias"  ]]; then
-        source "$HOME/.config/shell/alias"
+    if [[ -f "$HOME/.config/shell/alias/alias.sh"  ]]; then
+        source "$HOME/.config/shell/alias/alias.sh"
     fi
 
     # Load host settings (override general alias and funtions)
-    if [[ -f  "$HOME/.config/shell/host/settings" ]]; then
-        source "$HOME/.config/shell/host/settings"
+    if [[ -f  "$HOME/.config/shell/host/settings.sh" ]]; then
+        source "$HOME/.config/shell/host/settings.sh"
     fi
 
     if [[ -f "$HOME/.config/shell/banner" ]]; then

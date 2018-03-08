@@ -54,13 +54,9 @@ setenv EDITOR vim
 setenv MANPAGER "env MAN_PN=1 vim -M +MANPAGER -"
 alias cdvim "cd ~/.vim"
 
-# Starts (n)vim with no settings at all
-alias vimu "vim -u NONE"
+alias vi "vim --cmd \"let g:minimal=0\""
+alias viu "vim -u NONE"
 
-# Starts (n)vim with minimal settings
-# - Disable all plugins
-# - Set my default settings, autocmds, and my key maps
-alias vimm 'vim --cmd "let g:minimal=0"'
 
 ################################################################################
 #                          Fix my common typos                                 #

@@ -61,6 +61,11 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        *)
+            error_msg "Unknown argument $key"
+            help_user
+            exit 1
+            ;;
     esac
     shift
 done
@@ -72,3 +77,5 @@ elif hash wget; then
 else
     :
 fi
+
+exit 0

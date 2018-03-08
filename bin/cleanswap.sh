@@ -109,6 +109,11 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        *)
+            error_msg "Unknown argument $key"
+            help_user
+            exit 1
+            ;;
     esac
     shift
 done
@@ -123,3 +128,5 @@ else
 fi
 
 [[ -d "$HOME/.vim/.resources/swap/" ]] && rm -rf ~/.vim/.resources/swap/*
+
+exit 0

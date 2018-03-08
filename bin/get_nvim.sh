@@ -156,6 +156,11 @@ while [[ $# -gt 0 ]]; do
             show_help
             exit 0
             ;;
+        *)
+            error_msg "Unknown argument $key"
+            help_user
+            exit 1
+            ;;
     esac
     shift
 done

@@ -60,3 +60,5 @@ if [[ -n "$1" ]]; then
 else
     du -h --max-depth=1
 fi
+
+exit 0

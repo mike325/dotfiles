@@ -1,0 +1,56 @@
+{
+    ".projections.json": {
+        "type": "Projections"
+    },
+    ".gitignore": {
+        "type": "GitIgnore"
+    },
+    "README.md": {
+        "type": "Readme"
+    },
+    "LICENSE": {
+        "type": "License"
+    },
+    "install.sh": {
+        "type": "Install"
+    },
+    "bin/*": {
+        "type": "Bins"
+    },
+    "dotconfigs/*": {
+        "type": "Dotconfigs"
+    },
+    "services/*": {
+        "type": "Services"
+    },
+    "system/*": {
+        "type": "System"
+    },
+    "git/bin/*": {
+        "type": "GitBins"
+    },
+    "git/templates/*": {
+        "type": "GitTemplates"
+    },
+    "git/templates/hooks/*": {
+        "type": "GitHooks"
+    },
+    "shell/alias/*": {
+        "type": "ShellAlias"
+    },
+    "shell/init/*": {
+        "type": "ShellInit"
+    },
+    "shell/host/*": {
+        "type": "ShellHost"
+    },
+    "shell/samples/*": {
+        "type": "ShellSamples"
+    },
+    "shell/settings/*": {
+        "type": "ShellSettings"
+    },
+    "shell/banner": {
+        "type": "ShellBanner"
+    }
+}

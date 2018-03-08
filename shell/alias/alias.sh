@@ -115,9 +115,15 @@ alias lla="ls -lhA"
 # Magnificent app which corrects your previous console command
 # https://github.com/nvbn/thefuck
 if hash thefuck 2>/dev/null; then
+    # eval "$(thefuck --alias fuck --enable-experimental-instant-mode)"
     eval "$(thefuck --alias)"
-    alias fuck='eval $(thefuck $(fc -ln -1))'
     alias please='fuck'
+
+    # Yep tons of fuck, kind of a long command
+    alias guck='fuck'
+    alias fukc='fuck'
+    alias gukc='fuck'
+    alias fuvk='fuck'
 fi
 
 # laod kernel module for virtualbox
@@ -127,9 +133,9 @@ else
     alias vbk="modprobe vboxdrv"
 fi
 
-# Generate tags file
 if hash ctags 2>/dev/null; then
-    alias gtf="ctags -R ."
+    # Get Fucking Tags
+    alias gft="ctags -R ."
 fi
 
 ################################################################################

@@ -61,3 +61,5 @@ done
 if [[ ! -z "$1" ]]; then
     curl -s -L --max-redirs 1 "http://www.downforeveryoneorjustme.com/$1" | grep -oE "It's just you.|It's not just you!"
 fi
+
+exit 0

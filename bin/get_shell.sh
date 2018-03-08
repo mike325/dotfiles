@@ -146,7 +146,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            error_msg "Unknown Option $key"
+            error_msg "Unknown argument $key"
             help_user
             exit 1
             ;;

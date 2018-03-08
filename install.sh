@@ -49,9 +49,9 @@ _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 if hash realpath 2>/dev/null; then
     _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" > /dev/null || exit 1
+    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
     _SCRIPT_PATH="$(pwd -P)"
-    popd > /dev/null || exit 1
+    popd 1> /dev/null || exit 1
 fi
 
 _TMP="/tmp/"
@@ -86,6 +86,10 @@ else
         _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
     fi
 fi
+
+# TODO:
+# 1) Add colors to the script
+# 2) Improve Neovim and portables install
 
 function help_user() {
     echo ""
@@ -158,8 +162,9 @@ function help_user() {
     echo "          -t, --portables"
     echo "              Install isolated/portable programs into $HOME/.local/bin"
     echo "              Install:"
-    echo "                  - pip2 and pip3"
+    echo "                  - pip2 and pip3 (GNU/Linux only)"
     echo "                  - shellcheck"
+    echo "                  - Neovim (if --neovim is not used and Neovim is not in the PATH)"
     echo ""
     echo "          -p, --fonts, --powerline"
     echo "              Install the powerline patched fonts"
@@ -318,10 +323,10 @@ function setup_alias() {
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
 
         if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
         else
             warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
         fi
         # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
@@ -336,10 +341,10 @@ function setup_alias() {
         # WARNING !! experimental
 
         if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
-            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
         else
             warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            execute_cmd "${_SCRIPT_PATH}/shell/shellrc" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
         fi
         # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
@@ -351,6 +356,7 @@ function setup_alias() {
         [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
     else
         warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
+        return 1
     fi
     return 0
 }
@@ -405,6 +411,7 @@ function get_vim_dotfiles() {
     return 0
 }
 
+# TODO: As portable note says, create flag `compile` to force compilation or jut get the pre compiled binaries
 function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
@@ -456,19 +463,26 @@ function get_nvim_dotfiles() {
         status_msg "Checking existing vim dotfiles"
         if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
             status_msg "Linking current vim dotfiles"
-            execute_cmd "$HOME/.vim" "$HOME/.config/nvim"
+            if ! execute_cmd "$HOME/.vim" "$HOME/.config/nvim"; then
+                error_msg "Fail to link dotvim files"
+                return 1
+            fi
         else
             status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
-            clone_repo "$_BASE_URL/.vim" "$HOME/.config/nvim"
+            if ! clone_repo "$_BASE_URL/.vim" "$HOME/.config/nvim"; then
+                error_msg "Fail to clone dotvim files"
+                return 1
+            fi
         fi
 
-        (( $? != 0 )) && return $?
     fi
 
     # No errors so far
     return 0
 }
 
+# TODO: Add GNU global as a windows portable
+# TODO: Add compile option to auto compile some programs
 function get_portables() {
     if hash curl 2>/dev/null; then
         status_msg "Checking portable programs"
@@ -562,12 +576,12 @@ function setup_shell_framework() {
     status_msg "Getting shell framework"
 
     if [[ $_FORCE_INSTALL -eq 1 ]]; then
-        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" -f
+        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" -f || return 1
     else
-        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL"
+        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" || return 1
     fi
 
-    (( $? == 0 )) && return 0 || return "$?"
+    return 0
 }
 
 function get_dotfiles() {
@@ -667,7 +681,8 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
-            error_msg "Unknown flag $1"
+            error_msg "Unknown argument $key"
+            help_user
             exit 1
             ;;
     esac
@@ -694,8 +709,8 @@ fi
 # (the command may be executed using `curl`)
 if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
     if get_dotfiles; then
-       error_msg "Could not install dotfiles"
-       exit 1
+        error_msg "Could not install dotfiles"
+        exit 1
     fi
 fi
 
