@@ -47,6 +47,33 @@ if [[ -d "$HOME/.bash-it" ]]; then
     export BASH_IT="$HOME/.bash-it"
 elif [[ -d "$HOME/.bash_it" ]]; then
     export BASH_IT="$HOME/.bash_it"
+else
+    export black="\[\e[0;30m\]"
+    export red="\[\e[0;31m\]"
+    export green="\[\e[0;32m\]"
+    export yellow="\[\e[0;33m\]"
+    export blue="\[\e[0;34m\]"
+    export purple="\[\e[0;35m\]"
+    export cyan="\[\e[0;36m\]"
+    export white="\[\e[0;37m\]"
+    export orange="\[\e[0;91m\]"
+
+    export normal="\[\e[0m\]"
+    export reset_color="\[\e[39m\]"
+
+    # These colors are meant to be used with `echo -e`
+    export echo_black="\033[0;30m"
+    export echo_red="\033[0;31m"
+    export echo_green="\033[0;32m"
+    export echo_yellow="\033[0;33m"
+    export echo_blue="\033[0;34m"
+    export echo_purple="\033[0;35m"
+    export echo_cyan="\033[0;36m"
+    export echo_white="\033[0;37;1m"
+    export echo_orange="\033[0;91m"
+
+    export echo_normal="\033[0m"
+    export echo_reset_color="\033[39m"
 fi
 
 # location ~/.bash_it/themes/
@@ -85,5 +112,8 @@ export TODO="t"
 # Set vcprompt executable path for scm advance info in prompt (demula theme)
 # https://github.com/djl/vcprompt
 #export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
+
+# Case insesitive globes
+shopt -s nocaseglob
 
 [[ -f "$BASH_IT/bash_it.sh" ]] && source "$BASH_IT/bash_it.sh"

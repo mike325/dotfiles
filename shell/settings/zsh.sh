@@ -115,7 +115,14 @@ unsetopt beep
 # Add wisely, as too many plugins slow down shell startup.
 # You can change default plugins in shell_settings file
 
-bindkey -v
-export KEYTIMEOUT=1
+# bindkey -v
+# export KEYTIMEOUT=1
 
-[ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
+# Case insesitive tab completion
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+else
+    PROMPT="%F{red}%n%f@%F{cyan}%m%f %F{yellow}%~%f %#"$'\n'"→ "
+fi

@@ -60,11 +60,15 @@ stty erase '^?'
 
 # Load all proxy settings
 if [[ -f "$HOME/.config/shell/host/proxy"  ]]; then
+    # We already checked the file exists so its "safe"
+    # shellcheck disable=SC1090
     source "$HOME/.config/shell/host/proxy"
 fi
 
 # Load all ENV variables
 if [[ -f "$HOME/.config/shell/host/env"  ]]; then
+    # We already checked the file exists so its "safe"
+    # shellcheck disable=SC1090
     source "$HOME/.config/shell/host/env"
 fi
 
@@ -112,13 +116,14 @@ fi
 # We don't need this stuff if we are in a non __INTERACTIVE session
 
 # Windows stuff
+_CURRENT_SHELL=""
 if [[ $(uname --all) =~ MINGW ]]; then
-    export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
+    export _CURRENT_SHELL="$(ps | grep $( echo $$ ) | awk '{ print $8 }')"
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     export _IS_WINDOWS=1
     export USER="$USERNAME"
 else
-    export _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $4 }')"
+    export _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $4 }')"
 fi
 
 if  [[ $_IS_WINDOWS -eq 1 ]]; then
@@ -149,20 +154,24 @@ if (( __INTERACTIVE == 1 )); then
 
     # Load custom shell framework settings (override default shell framework settings)
     if [[ -f  "$HOME/.config/shell/host/framework_settings" ]]; then
+        # We already checked the file exists so its "safe"
+        # shellcheck disable=SC1090
         source "$HOME/.config/shell/host/framework_settings"
     fi
 
     # Configure shell framework and specific shell settings
     if [[ -f  "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh" ]]; then
+        # We already checked the file exists so its "safe"
+        # shellcheck disable=SC1090
         source "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh"
 
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage del down4me)
 
         for i in "${_kill_alias[@]}"; do
-            if [[ "$(command -V $i)" =~ "function" ]]; then
+            if [[ "$(command -V "$i")" =~ "function" ]]; then
                 unset -f "$i"
-            elif [[ "$(command -V $i)" =~ "alias" ]]; then
+            elif [[ $(command -V "$i") =~ "alias" ]]; then
                 unalias "$i"
             fi
         done
@@ -170,11 +179,15 @@ if (( __INTERACTIVE == 1 )); then
 
     # Load alias after bash-it to give them higher priority
     if [[ -f "$HOME/.config/shell/alias/alias.sh"  ]]; then
+        # We already checked the file exists so its "safe"
+        # shellcheck disable=SC1090
         source "$HOME/.config/shell/alias/alias.sh"
     fi
 
     # Load host settings (override general alias and funtions)
     if [[ -f  "$HOME/.config/shell/host/settings.sh" ]]; then
+        # We already checked the file exists so its "safe"
+        # shellcheck disable=SC1090
         source "$HOME/.config/shell/host/settings.sh"
     fi
 
