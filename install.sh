@@ -707,7 +707,7 @@ fi
 
 # If the user request the dotfiles or the script path doesn't have the full files
 # (the command may be executed using `curl`)
-if [[ $_DOTFILES -eq 1 ]] || [[ ! -f "${_SCRIPT_PATH}/shell/alias" ]]; then
+if [[ $_DOTFILES -eq 1 ]] || [[ ! -d "${_SCRIPT_PATH}/shell" ]]; then
     if get_dotfiles; then
         error_msg "Could not install dotfiles"
         exit 1

@@ -35,7 +35,9 @@
 
 if hash nvim 2>/dev/null; then
     if [[ $(uname --all) =~ MINGW ]]; then
-        alias nvim="nvim-qt &"
+        function nvim() {
+            nvim-qt "$@" &
+        }
         alias cdvi="cd ~/.vim"
         alias cdvim="cd ~/AppData/Local/nvim/"
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
