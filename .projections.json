@@ -11,6 +11,9 @@
     "LICENSE": {
         "type": "License"
     },
+    ".travis.yml": {
+        "type": "Travis"
+    },
     "install.sh": {
         "type": "Install"
     },
@@ -36,13 +39,13 @@
         "type": "GitHooks"
     },
     "shell/alias/*": {
-        "type": "ShellAlias"
+        "type": "Alias"
     },
     "shell/init/*": {
         "type": "ShellInit"
     },
     "shell/host/*": {
-        "type": "ShellHost"
+        "type": "HostSettings"
     },
     "shell/samples/*": {
         "type": "ShellSamples"
@@ -51,6 +54,6 @@
         "type": "ShellSettings"
     },
     "shell/banner": {
-        "type": "ShellBanner"
+        "type": "Banner"
     }
 }
