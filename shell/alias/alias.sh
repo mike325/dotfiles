@@ -84,7 +84,7 @@ alias im="vim"
 ################################################################################
 
 # Check all user process
-alias psu="ps -u $USER"
+alias psu='ps -u $USER'
 
 # alias q="exit"
 alias cl="clear"
@@ -102,7 +102,7 @@ if [[ $(uname --all) =~ Android ]]; then
     unalias grep > /dev/null
     alias grep="grep -n"
 else
-    alias grep="grep --color -n"
+    alias grep="grep --color=auto -n"
 fi
 
 alias grepo="grep -o"
@@ -124,11 +124,14 @@ if hash thefuck 2>/dev/null; then
     eval "$(thefuck --alias)"
     alias please='fuck'
 
-    # Yep tons of fuck, kind of a long command
+    # Yep tons of fucks
     alias guck='fuck'
     alias fukc='fuck'
     alias gukc='fuck'
     alias fuvk='fuck'
+else
+    :
+    # alias fuck='sudo $(history -p \!\!)'
 fi
 
 # laod kernel module for virtualbox
@@ -378,7 +381,7 @@ function killssh() {
 }
 
 function ssha() {
-    eval $(ssh-agent)
+    eval "$(ssh-agent)"
     ssh-add ~/.ssh/id_rsa
     return 0
 }
@@ -397,7 +400,6 @@ function venv() {
     local _git=0
     local _name="env"
     local _top="."
-
 
     while [[ $# -gt 0 ]]; do
         local key="$1"
@@ -436,10 +438,10 @@ function venv() {
             return 1
         fi
 
-        local _top="$(git rev-parse --show-toplevel)"
-        local _top="$_top/.git"
+        _top="$(git rev-parse --show-toplevel)"
+        _top="$_top/.git"
 
-        local _name="$_top/$_name"
+        _name="$_top/$_name"
     fi
 
     if [[ ! -f "$_name/bin/activate" ]]; then
@@ -447,6 +449,7 @@ function venv() {
         return 1
     fi
 
+    # shellcheck disable=SC1090
     source "$_name/bin/activate"
 
     return 0
@@ -560,7 +563,68 @@ function cdt() {
     return 0
 }
 
+# TODO: Make full pattern substitution to change any node of the string
+function replace_base() {
+    local cwd
+    local new_cwd
+    for key in "$@"; do
+        case "$key" in
+            -h|--help)
+
+                echo ""
+                echo "  Function to look for the nearest ancestor with the full given path"
+                echo ""
+                echo "  Usage:"
+                echo "      $ replace_base DIR [OPTIONAL]"
+                echo "          Ex."
+                echo "          /home/$USER/foo/dummy $ replace_base bar"
+                echo "          /home/$USER/bar/dummy $"
+                echo ""
+                echo "      Optional Flags"
+                echo "          -h, --help"
+                echo "              Display help and exit. If you are seeing this,"
+                echo "              that means that you already know it (nice)"
+                echo ""
+
+                return 0
+                ;;
+        esac
+    done
+
+    if [[ -z "$1" ]]; then
+        echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
+        return 1
+    fi
+
+    new_cwd="$1"
+    cwd="$(pwd)"
+
+    local new_path=""
+
+    local array_list
+    # shellcheck disable=SC2207
+    array_list=($( pwd | tr '/' "\n"))
+
+    for i in "${array_list[@]}"; do
+        new_path="${cwd/$i/$new_cwd}"
+        if [[ -d "$new_path" ]] && [[ "$new_path" != "$(pwd)" ]]; then
+            if ! pushd "$new_path" 1> /dev/null; then
+                return 1
+            fi
+            return 0
+        fi
+        new_path=""
+    done
+
+    echo "  ---- [X] Error $new_cwd is not a parent relative dir" 1>&2
+    return 1
+}
+
+alias rb="replace_base"
+
 function change_base() {
+    local cwd
+    local new_cwd
     for key in "$@"; do
         case "$key" in
             -h|--help)
@@ -590,8 +654,8 @@ function change_base() {
         return 1
     fi
 
-    local cwd="$(pwd)"
-    local new_cwd="$1"
+    cwd="$(pwd)"
+    new_cwd="$1"
 
     local new_path=""
 
