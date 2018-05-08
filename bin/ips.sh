@@ -84,7 +84,7 @@ function local_ips() {
 function real_ip() {
     echo ""
     local res
-    res=$(curl -s checkip.dyndns.org | grep -Eo '[0-9\.]+')
+    res="$(curl -s ifconfig.me)"
     echo -e "Public IP"
     echo -e "$res"
 }
