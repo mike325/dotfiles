@@ -59,17 +59,17 @@ stty erase '^?'
 # fi
 
 # Load all proxy settings
-if [[ -f "$HOME/.config/shell/host/proxy"  ]]; then
+if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     # We already checked the file exists so its "safe"
     # shellcheck disable=SC1090
-    source "$HOME/.config/shell/host/proxy"
+    source "$HOME/.config/shell/host/proxy.sh"
 fi
 
 # Load all ENV variables
-if [[ -f "$HOME/.config/shell/host/env"  ]]; then
+if [[ -f "$HOME/.config/shell/host/env.sh"  ]]; then
     # We already checked the file exists so its "safe"
     # shellcheck disable=SC1090
-    source "$HOME/.config/shell/host/env"
+    source "$HOME/.config/shell/host/env.sh"
 fi
 
 if [[ -d "$HOME/.config/git/bin" ]]; then
@@ -153,10 +153,10 @@ if (( __INTERACTIVE == 1 )); then
     export LESS=' -R '
 
     # Load custom shell framework settings (override default shell framework settings)
-    if [[ -f  "$HOME/.config/shell/host/framework_settings" ]]; then
+    if [[ -f  "$HOME/.config/shell/host/framework.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090
-        source "$HOME/.config/shell/host/framework_settings"
+        source "$HOME/.config/shell/host/framework.sh"
     fi
 
     # Configure shell framework and specific shell settings
@@ -171,7 +171,7 @@ if (( __INTERACTIVE == 1 )); then
         for i in "${_kill_alias[@]}"; do
             if [[ "$(command -V "$i")" =~ "function" ]]; then
                 unset -f "$i"
-            elif [[ $(command -V "$i") =~ "alias" ]]; then
+            elif[[ $(command -V "$i") =~ "alias" ]]; then
                 unalias "$i"
             fi
         done

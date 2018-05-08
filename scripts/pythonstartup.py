@@ -8,8 +8,15 @@
 
 import atexit
 import os
-import readline
+import sys
 import rlcompleter
+try:
+    import readline
+except ImportError:
+    try:
+        import pyreadline as readline
+    except ImportError:
+        print("Error importing readline and pyreadline modules")
 
 __header__ = """
                                      -`
@@ -33,20 +40,25 @@ __header__ = """
                    .`                                 `/
 """
 
+sys.ps1 = "Mike >>>"
+sys.ps2 = "Mike ..."
+
 print(__header__)
 
-readline.parse_and_bind("tab: complete")
 historyPath = os.path.expanduser("~/.pyhistory")
+try:
 
-def q():
-    exit()
+    def save_history(history_file):
+        readline.write_history_file(history_file)
 
-def save_history(historyPath=historyPath):
-    import readline
-    readline.write_history_file(historyPath)
+    if os.path.exists(historyPath):
+        readline.read_history_file(historyPath)
 
-if os.path.exists(historyPath):
-    readline.read_history_file(historyPath)
+    readline.parse_and_bind("tab: complete")
 
-atexit.register(save_history)
-del os, atexit, readline, rlcompleter, save_history, historyPath
+    atexit.register(save_history)
+    del readline
+except NameError:
+    pass
+finally:
+    del os, atexit, rlcompleter, save_history, historyPath, sys

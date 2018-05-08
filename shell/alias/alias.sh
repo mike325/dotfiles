@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 ################################################################################
@@ -78,6 +79,10 @@ alias gi="git"
 alias bim="vim"
 alias cim="vim"
 alias im="vim"
+
+alias py="python"
+alias py2="python2"
+alias py3="python3"
 
 ################################################################################
 #                        Some useful shortcuts                                 #

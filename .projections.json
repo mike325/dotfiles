@@ -45,7 +45,7 @@
         "type": "ShellInit"
     },
     "shell/host/*": {
-        "type": "HostSettings"
+        "type": "Host"
     },
     "shell/samples/*": {
         "type": "ShellSamples"
