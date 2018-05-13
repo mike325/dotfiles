@@ -88,6 +88,8 @@ alias py3="python3"
 #                        Some useful shortcuts                                 #
 ################################################################################
 
+alias user="whoami"
+
 # Check all user process
 alias psu='ps -u $USER'
 

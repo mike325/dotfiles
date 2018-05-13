@@ -115,6 +115,7 @@
 ;###############################################################################
 
     a  = add        ; Add stuff
+    au = add -u     ; update the index with just the changed files
     aa = add --all  ; Add all stuff
     ai = add -i     ; Add interactive stuff
 
