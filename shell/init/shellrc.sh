@@ -109,6 +109,12 @@ if [[ -d "$HOME/.local/golang/src" ]]; then
     export GOPATH="$HOME/.local/golang/src"
 fi
 
+if hash npm 2>/dev/null; then
+    [[ ! -d "$HOME/.npm-global/" ]] && mkdir -p "$HOME/.npm-global"
+    export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+    export PATH="$HOME/.npm-global/bin:$PATH"
+fi
+
 ################################################################################
 #                       Load the settings, alias and framework                 #
 ################################################################################
@@ -171,10 +177,11 @@ if (( __INTERACTIVE == 1 )); then
         for i in "${_kill_alias[@]}"; do
             if [[ "$(command -V "$i")" =~ "function" ]]; then
                 unset -f "$i"
-            elif[[ $(command -V "$i") =~ "alias" ]]; then
+            elif [[ $(command -V "$i") =~ "alias" ]]; then
                 unalias "$i"
             fi
         done
+
     fi
 
     # Load alias after bash-it to give them higher priority
