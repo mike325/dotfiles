@@ -1,0 +1,14 @@
+[Unit]
+Description=Manually start KDE Plasma Workspace
+# Requires=ksmserver.service kuiserver.service kded.service kactivitymanagerd.service
+
+[Service]
+ExecStart=/usr/bin/plasmashell --no-respawn
+ExecStop=/usr/bin/kquitapp5 plasmashell
+Restart=on-failure
+KillMode=none
+BusName=org.kde.plasmashell
+
+[Install]
+WantedBy=default.target
+Alias=plasma-workspace.service

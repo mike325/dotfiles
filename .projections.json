@@ -23,8 +23,13 @@
     "dotconfigs/*": {
         "type": "Dotconfigs"
     },
-    "services/*": {
-        "type": "Services"
+    "systemd/*.service": {
+        "type": "Services",
+        "alternate": "systemd/{}.timer"
+    },
+    "systemd/*.timer": {
+        "type": "Timers",
+        "alternate": "systemd/{}.service"
     },
     "system/*": {
         "type": "System"
