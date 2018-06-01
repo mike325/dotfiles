@@ -45,7 +45,7 @@ if hash vim 2> /dev/null; then
             export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
             export EDITOR="vim"
 
-            alias vi="vim --cmd \"let g:minimal=0\""
+            alias vi="vim --cmd 'let g:minimal=0'"
             alias viu="vim -u NONE"
         else
             alias cdvi="cd ~/.vim"
@@ -53,7 +53,7 @@ if hash vim 2> /dev/null; then
             export EDITOR="nvim"
             export MANPAGER="nvim -c 'set ft=man' -"
 
-            alias vi="nvim --cmd \"let g:minimal=0\""
+            alias vi="nvim --cmd 'let g:minimal=0'"
             alias viu="nvim -u NONE"
         fi
         # Fucking typos
@@ -64,7 +64,7 @@ if hash vim 2> /dev/null; then
         export EDITOR="vim"
         export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
 
-        alias vi="vim --cmd \"let g:minimal=0\""
+        alias vi="vim --cmd 'let g:minimal=0'"
         alias viu="vim -u NONE"
     fi
 fi
@@ -78,9 +78,22 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
-alias bim="vim"
-alias cim="vim"
-alias im="vim"
+if [[ $(uname --all) =~ MINGW ]]; then
+    alias bim="vim"
+    alias cim="vim"
+    alias im="vim"
+elif hash nvim 2>/dev/null; then
+    alias bim="nvim"
+    alias cim="nvim"
+    alias im="nvim"
+else
+    alias bim="vim"
+    alias cim="vim"
+    alias im="vim"
+fi
+
+alias bi="vi"
+alias ci="vi"
 
 alias py="python"
 alias py2="python2"
@@ -101,6 +114,10 @@ if [[ $EUID -ne 0 ]]; then
     alias turnoff="sudo poweroff"
 else
     alias turnoff="poweroff"
+fi
+
+if hash clenaswap 2>/dev/null; then
+    alias cw="clenaswap"
 fi
 
 # Show used ports
@@ -130,8 +147,11 @@ alias lla="ls -lhA"
 # https://github.com/nvbn/thefuck
 if hash thefuck 2>/dev/null; then
     # eval "$(thefuck --alias fuck --enable-experimental-instant-mode)"
+
     eval "$(thefuck --alias)"
     alias please='fuck'
+
+    alias crap="eval \$(thefuck --alias); echo 'f*cks ready'"
 
     # Yep tons of fucks
     alias guck='fuck'

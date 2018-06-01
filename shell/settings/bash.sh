@@ -116,15 +116,19 @@ export TODO="t"
 # Case insesitive globes
 shopt -s nocaseglob
 
+
 # pip bash completion start
-function _pip_completion() {
-    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   PIP_AUTO_COMPLETE=1 $1 ) )
-}
-complete -o default -F _pip_completion pip
-complete -o default -F _pip_completion pip2
-complete -o default -F _pip_completion pip3
+if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
+    function _pip_completion()
+    {
+        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                    COMP_CWORD=$COMP_CWORD \
+                    PIP_AUTO_COMPLETE=1 $1 ) )
+    }
+    hash pip 2>/dev/null && complete -o default -F _pip_completion pip
+    hash pip2 2>/dev/null && complete -o default -F _pip_completion pip2
+    hash pip3 2>/dev/null && complete -o default -F _pip_completion pip3
+fi
 # pip bash completion end
 
 [[ -f "$BASH_IT/bash_it.sh" ]] && source "$BASH_IT/bash_it.sh"

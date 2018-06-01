@@ -54,7 +54,7 @@ setenv EDITOR vim
 setenv MANPAGER "env MAN_PN=1 vim -M +MANPAGER -"
 alias cdvim "cd ~/.vim"
 
-alias vi "vim --cmd \"let g:minimal=0\""
+alias vi "vim --cmd 'let g:minimal=0'"
 alias viu "vim -u NONE"
 
 
@@ -254,72 +254,7 @@ alias lla "ls -lhA"
 ################################################################################
 
 alias bk "cd .."
-# function bk() {
-#     for key in "$@" do
-#         case "$key" in
-#             -h|--help)
-#
-#                 echo ""
-#                 echo "  Function to go back any number of dirs"
-#                 echo ""
-#                 echo "  Usage:"
-#                 echo "      $ bk [Number of nodes to move back] [OPTIONAL]"
-#                 echo "          Ex."
-#                 echo "          $ bk 2 # = cd ../../"
-#                 echo ""
-#                 echo "      Optional Flags"
-#                 echo "          -h, --help"
-#                 echo "              Display help and exit. If you are seeing this,"
-#                 echo "              that means that you already know it (nice)"
-#                 echo ""
-#
-#                 return 0
-#
-#         esac
-#     done
-#
-#     if [[ ! -z "$1" ]] && [[ $1 =~ ^[0-9]+$ ]] then
-#         local parent="./"
-#         for (( i = 0 i < $1 i++ )) do
-#             local parent="${parent}../"
-#         done
-#         cd "$parent" || return 1
-#     elif [[ -z "$1" ]] then
-#         cd ..
-#     else
-#         echo "  ---- [X] Error Unexpected arg $1, please provide a number"
-#         return 1
-#     endif
-# }
 
-# function mkcd() {
-#     for key in "$@" do
-#         case "$key" in
-#             -h|--help)
-#
-#                 echo ""
-#                 echo "  Create a dir an move to it"
-#                 echo ""
-#                 echo "  Usage:"
-#                 echo "      mkcd NEW_DIR [OPTIONAL]"
-#                 echo "          Ex."
-#                 echo "          $ mkcd new_foo"
-#                 echo ""
-#                 echo "      Optional Flags"
-#                 echo "          -h, --help"
-#                 echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-#                 echo ""
-#
-#                 return 0
-#
-#         esac
-#     done
-#
-#     if [[ ! -z "$1" ]] then
-#         mkdir -p "$1"
-#         cd "$1" || return 1
-#     endif
-# }
 
 # function llg() {
 #     if [[ ! -z "$1" ]] then
@@ -346,23 +281,3 @@ alias rl "rm -rf ./*.log"
 # function gobk() {
 #     cd "$ORIGINAL_PATH" || return 1
 # }
-
-
-# if hash emacs 2>/dev/null then
-#     function cmacs() {
-#         emacsclient -nw "$@"
-#     }
-#
-#     function gmacs() {
-#         emacsclient -c "$@" &
-#     }
-#
-#     function dmacs() {
-#         emacs --daemon &
-#     }
-#
-#     function kmacs() {
-#         emacsclient -e "(kill-emacs)"
-#     }
-# endif
-
