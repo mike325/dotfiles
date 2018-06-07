@@ -155,6 +155,11 @@ fi
 
 if (( __INTERACTIVE == 1 )); then
 
+    # Set terminal colors
+    if [[  -n "$DISPLAY" ]] && [[ "$TERM" == "xterm" ]]; then
+        export TERM=xterm-256color
+    fi
+
     # Make less colorful
     export LESS=' -R '
 
