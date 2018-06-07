@@ -5,6 +5,12 @@
     ".gitignore": {
         "type": "GitIgnore"
     },
+    ".git/config": {
+        "type": "Git"
+    },
+    ".git/info/*": {
+        "type": "Git"
+    },
     "README.md": {
         "type": "Readme"
     },
@@ -42,6 +48,12 @@
     },
     "git/templates/hooks/*": {
         "type": "GitHooks"
+    },
+    "git/gitignore": {
+        "type": "GitIgnore"
+    },
+    "git/gitconfig": {
+        "type": "GitConfig"
     },
     "shell/alias/*": {
         "type": "Alias"

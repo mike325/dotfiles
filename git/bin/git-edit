@@ -31,6 +31,7 @@ _EDITOR="${EDITOR:-vim}"
 _CACHED=""
 
 _SCRIPT_PATH="$0"
+_WORKTREE=""
 
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
@@ -163,10 +164,24 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+_GITDIT="$(git rev-parse --git-dir)"
+worklist=($(git worktree list | awk '{print $1}'))
+for i in ${worklist[*]}; do
+    [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && _WORKTREE="$i"
+done
+
 if [[ ! -z "$_CACHED" ]]; then
-    _FILES=($( git diff-index --no-commit-id --name-only "$_CACHED" -r HEAD ))
+    if [[ ! -z "$_WORKTREE" ]]; then
+        _FILES=($(git --git-dir="$_GITDIT" --work-tree="$_WORKTREE" diff-index --no-commit-id --name-only "$_CACHED" -r HEAD ))
+    else
+        _FILES=($(git --git-dir="$_GITDIT" diff-index --no-commit-id --name-only "$_CACHED" -r HEAD ))
+    fi
 else
-    _FILES=($( git diff-index --no-commit-id --name-only -r HEAD ))
+    if [[ ! -z "$_WORKTREE" ]]; then
+        _FILES=($(git --git-dir="$_GITDIT" --work-tree="$_WORKTREE" diff-index --no-commit-id --name-only -r HEAD ))
+    else
+        _FILES=($(git --git-dir="$_GITDIT" diff-index --no-commit-id --name-only -r HEAD ))
+    fi
 fi
 
 

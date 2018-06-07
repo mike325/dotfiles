@@ -171,6 +171,8 @@
     ll  = log --pretty=custom               ; Short log with pretty format
     llg = log --graph --pretty=custom       ; Short pretty log with graph
     lln = log --name-status --pretty=custom ; get files that changed
+    w   = whatchanged                       ; Old whatchanged
+    wp  = whatchanged -p                    ; Old whatchanged with diff
 
 ;###############################################################################
 ;                 Git ls a bit simpler and with grep search                    #

@@ -80,6 +80,39 @@ function status_msg() {
     printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
 }
 
+function runGit() {
+    local gitdir worktree init
+    gitdir="$(git rev-parse --git-dir)"
+    if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
+        worklist=($(git worktree list | awk '{print $1}'))
+        for i in ${worklist[*]}; do
+            [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && worktree="$i"
+        done
+    fi
+    if [[ ! -z "$worktree" ]]; then
+        if [[ -z "$1" ]]; then
+            if git --git-dir="$gitdir" --work-tree="$worktree" svn fetch 2>/dev/null; then
+                git --git-dir="$gitdir" --work-tree="$worktree" svn rebase "$@"
+            else
+                git --git-dir="$gitdir" --work-tree="$worktree" pull "$@"
+            fi
+        else
+            git --git-dir="$gitdir" --work-tree="$worktree" pull "$@"
+        fi
+    else
+        if [[ -z "$1" ]]; then
+            if git --git-dir="$gitdir" svn fetch 2>/dev/null; then
+                git --git-dir="$gitdir" svn rebase "$@"
+            else
+                git --git-dir="$gitdir" pull "$@"
+            fi
+        else
+            git --git-dir="$gitdir" pull "$@"
+        fi
+    fi
+}
+
+
 for key in "$@"; do
     case "$key" in
         -h|--help)
@@ -89,12 +122,6 @@ for key in "$@"; do
     esac
 done
 
-if [[ -z "$1" ]]; then
-    if git svn fetch 2>/dev/null; then
-        git svn rebase "$@"
-    else
-        git pull "$@"
-    fi
-else
-    git pull "$@"
-fi
+runGit "$@"
+
+exit 0

@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 ################################################################################
@@ -106,6 +105,7 @@ alias py3="python3"
 alias sshkey='ssh-keygen -t rsa -b 4096 -C "${MAIL:-mickiller.25@gmail.com}"'
 
 alias user="whoami"
+alias j="jobs"
 
 # Check all user process
 alias psu='ps -u $USER'
@@ -163,6 +163,10 @@ if hash thefuck 2>/dev/null; then
 else
     :
     # alias fuck='sudo $(history -p \!\!)'
+fi
+
+if hash cleanswap 2>/dev/null; then
+    alias cw="cleanswap"
 fi
 
 # laod kernel module for virtualbox
