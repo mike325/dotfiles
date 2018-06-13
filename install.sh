@@ -34,10 +34,15 @@ _EMACS=0
 _DOTFILES=0
 _GIT=0
 _FORCE_INSTALL=0
-_BACKUP=1
+_BACKUP=0
 _BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y_%H-%M-%S')"
 _VERBOSE=0
 _PORTABLES=0
+_SYSTEMD=0
+_GIT_SSH=0
+
+_VERSION="0.1.0"
+_DATE="2018-06-12"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -57,7 +62,11 @@ fi
 _TMP="/tmp/"
 
 _CMD="ln -s"
-_BASE_URL="https://github.com/mike325"
+
+_PROTOCOL="https"
+_GIT_USER="mike325"
+_GIT_HOST="github.com"
+_URL=""
 
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
@@ -95,14 +104,36 @@ function help_user() {
     echo ""
     echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
     echo "  if any flag ins given, the script will install just want is being told to do."
-    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -p"
+    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts"
     echo ""
     echo "  Usage:"
     echo "      $_NAME [OPTIONAL]"
     echo ""
     echo "      Optional Flags"
-    echo "          --verbose"
-    echo "              Output debug messages"
+    echo "          --host"
+    echo "              Change default git host, the new host (ex. gitlab.com) must have the following repos"
+    echo "                  - .vim"
+    echo "                  - .emacs.d"
+    echo "                  - dotfiles"
+    echo ""
+    echo "          --user"
+    echo "              Change default git user, the new user (ex. mike325) must have the following repos"
+    echo "                  - .vim"
+    echo "                  - .emacs.d"
+    echo "                  - dotfiles"
+    echo ""
+    echo "          -p, --protocol"
+    echo "              Alternate between different git protocol"
+    echo "                  - https (default)"
+    echo "                  - ssh"
+    echo "                  - git (not tested)"
+    echo ""
+    echo "          --url"
+    echo "              Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have"
+    echo "              the following repos"
+    echo "                  - .vim"
+    echo "                  - .emacs.d"
+    echo "                  - dotfiles"
     echo ""
     echo "          --backup, --backup=DIR"
     echo "              Backup all existing files into $HOME/.local/backup or the provided dir"
@@ -133,21 +164,22 @@ function help_user() {
     echo "          -d, --dotfiles"
     echo "              Download my dotfiles repo in case, this options is meant to be used in case this"
     echo "              script is standalone executed"
-    echo "                  URL: https://github.com/mike325/dotfiles"
+    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles"
     echo ""
     echo "          -e, --emacs"
-    echo "              Download and install my evil Emacs dotfiles and install systemd's emacs.service"
-    echo "                  URL: https://github.com/mike325/.emacs.d"
+    echo "              Download and install my evil Emacs dotfiles"
+    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d"
     echo ""
     echo "          -v, --vim"
     echo "              Download and install my Vim dotfiles"
-    echo "                  URL: https://github.com/mike325/.vim"
+    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim"
     echo ""
     echo "          -n, --neovim"
+    echo "              Download Neovim executable (portable in windows and linux) if it hasn't been Installed"
     echo "              Download and install my Vim dotfiles in Neovim's dir."
     echo "              Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)"
     echo "              them, otherwise download them from my vim's dotfiles repo"
-    echo "                  URL: https://github.com/mike325/.vim"
+    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim"
     echo ""
     echo "          -b, --bin"
     echo "              Install shell functions and scripts in $HOME/.local/bin"
@@ -164,28 +196,38 @@ function help_user() {
     echo "              Install:"
     echo "                  - pip2 and pip3 (GNU/Linux only)"
     echo "                  - shellcheck"
-    echo "                  - Neovim (if --neovim is not used and Neovim is not in the PATH)"
     echo ""
-    echo "          -p, --fonts, --powerline"
+    echo "          --fonts, --powerline"
     echo "              Install the powerline patched fonts"
     echo "                  * Since the patched fonts have different install method for Windows"
     echo "                    they are just download"
     echo "                  * This options is ignored if the install script is executed in a SSH session"
     echo ""
+    echo "          -y, systemd"
+    echo "              Install user's systemd services (Just in Linux systems)"
+    echo "                  * Services are install in $HOME/.config/systemd/user"
+    echo ""
     echo "          -h, --help"
     echo "              Display help, if you are seeing this, that means that you already know it (nice)"
+    echo ""
+    echo "          --version"
+    echo "              Display the version and exit"
+    echo ""
+    echo "          --verbose"
+    echo "              Output debug messages"
     echo ""
 }
 
 function __parse_args() {
     if [[ $# -lt 2 ]]; then
-        echo ""
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
     fi
 
     local arg="$1"
     local name="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9._-/~]+$"
+    local pattern="^--$name[=][a-zA-Z0-9.:@_-/~]+$"
 
     if [[ ! -z "$3" ]]; then
         local pattern="^--$name[=]$3$"
@@ -225,7 +267,7 @@ function verbose_msg() {
     return 0
 }
 
-function execute_cmd() {
+function setup_config() {
     local pre_cmd="$1"
     local post_cmd="$2"
 
@@ -250,13 +292,12 @@ function execute_cmd() {
         fi
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
-    elif [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+    elif [[ -e "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
         return 1
     fi
 
     verbose_msg "$_CMD $pre_cmd $post_cmd"
-
     sh -c "$_CMD $pre_cmd $post_cmd" && return 0 || return "$?"
 }
 
@@ -266,27 +307,25 @@ function clone_repo() {
 
     if hash git 2>/dev/null; then
         if [[ $_BACKUP -eq 1 ]]; then
-            if [[ -f "$dest" ]] || [[ -d "$dest" ]]; then
+            if [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
                 mv --backup=numbered "$dest" "$_BACKUP_DIR"
             fi
         elif [[ $_FORCE_INSTALL -eq 1 ]]; then
             rm -rf "$dest"
-        else
+        elif [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
             warn_msg "Skipping ${repo##*/}, already exists in $dest"
             return 1
         fi
 
-        if [[ ! -d "$dest" ]]; then
-            verbose_msg "Cloning $repo"
-            if git clone --recursive "$repo" "$dest"; then
-                return 0
-            fi
-            return 1
+        verbose_msg "Cloning $repo"
+        if git clone --recursive "$repo" "$dest"; then
+            return 0
         fi
     else
         error_msg "Git command is not available"
         return 2
     fi
+    return 1
 }
 
 
@@ -299,7 +338,7 @@ function setup_bin() {
         local file_basename="${scriptname%%.*}"
         # local file_extention="${scriptname##*.}"
 
-        execute_cmd "$script" "$HOME/.local/bin/$file_basename"
+        setup_config "$script" "$HOME/.local/bin/$file_basename"
     done
     return 0
 }
@@ -307,7 +346,7 @@ function setup_bin() {
 function setup_alias() {
 
     status_msg "Getting python startup script"
-    execute_cmd "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
+    setup_config "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
 
     status_msg "Getting dotconfigs"
     for script in ${_SCRIPT_PATH}/dotconfigs/*; do
@@ -316,24 +355,24 @@ function setup_alias() {
         local file_basename="${scriptname%%.*}"
         # local file_extention="${scriptname##*.}"
 
-        execute_cmd "$script" "$HOME/.${file_basename}"
+        setup_config "$script" "$HOME/.${file_basename}"
     done
 
     status_msg "Getting Shell init file"
     if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
 
         if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
         else
             warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
         fi
-        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+        # setup_config "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
         status_msg "Getting shell configs"
 
         # Since we could fail linking/copying the dir, lets check it first
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
+        setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
 
         [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
 
@@ -341,17 +380,17 @@ function setup_alias() {
         # WARNING !! experimental
 
         if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
-            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
         else
             warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            execute_cmd "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
         fi
-        # execute_cmd "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+        # setup_config "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
 
         status_msg "Getting shell configs"
 
         # Since we could fail linking/copying the dir, lets check it first
-        execute_cmd "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
+        setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
 
         [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
     else
@@ -363,25 +402,31 @@ function setup_alias() {
 
 function setup_git() {
     status_msg "Installing Global Git settings"
-    execute_cmd "${_SCRIPT_PATH}/git/gitconfig" "$HOME/.gitconfig"
+    setup_config "${_SCRIPT_PATH}/git/gitconfig" "$HOME/.gitconfig"
 
     status_msg "Installing Global Git templates and hooks"
-    execute_cmd "${_SCRIPT_PATH}/git" "$HOME/.config/git"
+    setup_config "${_SCRIPT_PATH}/git" "$HOME/.config/git"
 
     status_msg "Setting up local git commands"
     [[ ! -d "$HOME/.config/git/host" ]] && mkdir -p "$HOME/.config/git/host"
 
-    # Since The current dotfiles may be the first thing to run
-    # We want to have the git hooks in here
+    # Since we are initializing the system, we want to copy our own hooks in this repo
     status_msg "Settings git hooks for the current dotfiles"
-    for hooks in ${_SCRIPT_PATH}/git/templates/hooks/*; do
-        local scriptname="${script##*/}"
+    if [[ ! -d "${_SCRIPT_PATH}/.git/hooks" ]]; then
+        setup_config "${_SCRIPT_PATH}/git/templates/hooks/" "${_SCRIPT_PATH}/.git/hooks"
+    else
+        [[ ! -d "${_SCRIPT_PATH}/.git/hooks" ]] && mkdir -p "${_SCRIPT_PATH}/.git/hooks"
+        for hooks in "${_SCRIPT_PATH}"/git/templates/hooks/*; do
+            local scriptname="${script##*/}"
 
-        local file_basename="${scriptname%%.*}"
-        # local file_extention="${scriptname##*.}"
+            local file_basename="${scriptname%%.*}"
+            # local file_extention="${scriptname##*.}"
 
-        execute_cmd "$hooks" "${_SCRIPT_PATH}/.git/hooks"
-    done
+            verbose_msg "$hooks"
+
+            setup_config "$hooks" "${_SCRIPT_PATH}/.git/hooks/${hooks##*/}"
+        done
+    fi
     return 0
 }
 
@@ -389,22 +434,48 @@ function get_vim_dotfiles() {
     status_msg "Cloning vim dotfiles in $HOME/.vim"
 
     # If we couldn't clone our repo, return
-    clone_repo "$_BASE_URL/.vim" "$HOME/.vim" || return $?
+    if ! clone_repo "$_URL/.vim" "$HOME/.vim"; then
+        error_msg "Failed to clone Vim's configs"
+        return 0
+    fi
 
-    execute_cmd "$HOME/.vim/init.vim" "$HOME/.vimrc" || return $?
+    if ! setup_config "$HOME/.vim/init.vim" "$HOME/.vimrc"; then
+        error_msg "Vimrc link failed"
+        return 1
+    fi
 
-    execute_cmd "$HOME/.vim/ginit.vim" "$HOME/.gvimrc" || return $?
+    if ! setup_config "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"; then
+        error_msg "gvimrc link failed"
+        return 1
+    fi
 
     # Windows stuff
     if [[ $_IS_WINDOWS -eq 1 ]]; then
-        status_msg "Cloning vim dotfiles in $HOME/vimfiles"
 
         # If we couldn't clone our repo, return
-        clone_repo "$_BASE_URL/.vim" "$HOME/vimfiles" || return $?
+        if [[ ! -d "$HOME/.vim" ]]; then
+            status_msg "Cloning vim dotfiles in $HOME/vimfiles"
+            if ! clone_repo "$_URL/.vim" "$HOME/vimfiles"; then
+                error_msg "Couldn't get vim repo"
+                return 1
+            fi
+        else
+            status_msg "Copying vim dir into in $HOME/vimfiles"
+            if ! setup_config "$HOME/.vim" "$HOME/vimfiles"; then
+                error_msg "We couldn't copy vim dir"
+                return 1
+            fi
+        fi
 
-        execute_cmd "$HOME/vimfiles/init.vim" "$HOME/_vimrc" || return $?
+        if ! setup_config "$HOME/vimfiles/init.vim" "$HOME/_vimrc"; then
+            error_msg "Vimrc link failed"
+            return 1
+        fi
 
-        execute_cmd "$HOME/.vim/ginit.vim" "$HOME/_gvimrc" || return $?
+        if ! setup_config "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"; then
+            error_msg "gvimrc link failed"
+            return 1
+        fi
     fi
 
     # No errors so far
@@ -421,7 +492,7 @@ function get_nvim_dotfiles() {
         if ! hash nvim 2> /dev/null; then
             if hash curl 2>/dev/null; then
                 status_msg "Getting neovim executable"
-                curl -Ls https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip -o "$HOME/.local/nvim.zip"
+                curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win64.zip -o "$HOME/.local/nvim.zip"
 
                 [[ -d "$HOME/.local/Neovim" ]] && rm -rf "$HOME/.local/Neovim"
                 [[ -d "$HOME/.local/neovim" ]] && rm -rf "$HOME/.local/neovim"
@@ -429,47 +500,61 @@ function get_nvim_dotfiles() {
                 unzip "$HOME/.local/nvim.zip" -d "$HOME/.local/"
                 mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
                 # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
+            else
+                error_msg "Curl is not available"
+                return 1
             fi
         fi
 
         # If we couldn't clone our repo, return
         status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
-        clone_repo "$_BASE_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
+        clone_repo "$_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
     else
         # Since no all systems have sudo/root access lets assume all dependencies are
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
         if ! hash nvim 2> /dev/null; then
             # Make Neovim only if it's not already installed
 
-            local force_flag=""
-            if [[ $_FORCE_INSTALL -eq 1 ]]; then
-                local force_flag="-f"
-            fi
+            # local force_flag=""
+            # if [[ $_FORCE_INSTALL -eq 1 ]]; then
+            #     local force_flag="-f"
+            # fi
 
-            # If the repo was already cloned, lets just build it
-            # TODO: Considering to use appimage binary instead of compiling it from the source code
-            status_msg "Compiling neovim from source"
-            if [[ -d "$HOME/.local/neovim" ]]; then
-                "${_SCRIPT_PATH}"/bin/get_nvim.sh -d "$HOME/.local/" -p $force_flag || return $?
+            if hash curl 2>/dev/null; then
+                # If the repo was already cloned, lets just build it
+                # TODO: Considering to use appimage binary instead of compiling it from the source code
+                if curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim.appimage -o "$HOME/.local/bin/nvim"; then
+                    chmod u+x "$HOME/.local/bin/nvim"
+                else
+                    error_msg "Curl failed to download Neovim"
+                    return 1
+                fi
             else
-                "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p $force_flag || return $?
+                error_msg "Curl is not available"
+                return 1
             fi
-            # If we couldn't clone the repo, return
-        fi
 
+            # status_msg "Compiling neovim from source"
+            # if [[ -d "$HOME/.local/neovim" ]]; then
+            #     "${_SCRIPT_PATH}"/bin/get_nvim.sh -d "$HOME/.local/" -p $force_flag || return $?
+            # else
+            #     "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p $force_flag || return $?
+            # fi
+
+        fi
 
         # if the current command creates a symbolic link and we already have some vim
         # settings, lets use them
         status_msg "Checking existing vim dotfiles"
         if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
             status_msg "Linking current vim dotfiles"
-            if ! execute_cmd "$HOME/.vim" "$HOME/.config/nvim"; then
+            if ! setup_config "$HOME/.vim" "$HOME/.config/nvim"; then
                 error_msg "Fail to link dotvim files"
                 return 1
             fi
         else
             status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
-            if ! clone_repo "$_BASE_URL/.vim" "$HOME/.config/nvim"; then
+            if ! clone_repo "$_URL/.vim" "$HOME/.config/nvim"; then
                 error_msg "Fail to clone dotvim files"
                 return 1
             fi
@@ -484,6 +569,7 @@ function get_nvim_dotfiles() {
 # TODO: Add GNU global as a windows portable
 # TODO: Add compile option to auto compile some programs
 function get_portables() {
+    local rst=0
     if hash curl 2>/dev/null; then
         status_msg "Checking portable programs"
         if [[ $_IS_WINDOWS -eq 1 ]]; then
@@ -497,9 +583,11 @@ function get_portables() {
                     mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
                 else
                     error_msg "Curl couldn't get shellcheck"
+                    rst=1
                 fi
             else
                 warn_msg "Skipping shellcheck, already installed"
+                rst=2
             fi
 
 
@@ -512,28 +600,41 @@ function get_portables() {
                 [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
                 if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
                     error_msg "An error occurred extracting zip file"
-                    return 1
+                    rst=1
                 fi
                 chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
                 mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
             else
                 warn_msg "Skipping ctags, already installed"
+                rst=2
             fi
-
-
-
         else
-            if ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
-                status_msg "Getting python pip"
-                if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
-                    chmod +x "$_TMP/get-pip.py"
-                    ! hash pip2 2>/dev/null || python2 $_TMP/get-pip.py --user
-                    ! hash pip3 2>/dev/null || python3 $_TMP/get-pip.py --user
+            if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
+                if ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
+                    status_msg "Getting python pip"
+                    if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
+                        chmod u+x "$_TMP/get-pip.py"
+
+                        if ! hash pip2 2>/dev/null; then
+                            status_msg "Installing pip2"
+                            python2 $_TMP/get-pip.py --user
+                        fi
+
+                        if ! hash pip3 2>/dev/null; then
+                            status_msg "Installing pip3"
+                            python3 $_TMP/get-pip.py --user
+                        fi
+                    else
+                        error_msg "Curl couldn't get pip"
+                        rst=1
+                    fi
                 else
-                    error_msg "Curl couldn't get pip"
+                    warn_msg "Skipping pip, already installed"
+                    rst=2
                 fi
             else
-                warn_msg "Skipping pip, already installed"
+                warn_msg "Skipping pip, the system doesn't have python"
+                rst=2
             fi
 
             if ! hash shellcheck 2>/dev/null; then
@@ -541,19 +642,32 @@ function get_portables() {
                 if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"; then
                     pushd "$_TMP" 1> /dev/null || return 1
                     tar xf "$_TMP/shellcheck.tar.xz"
-                    chmod +x "$_TMP/shellcheck-latest/shellcheck"
+                    chmod u+x "$_TMP/shellcheck-latest/shellcheck"
                     mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get shellcheck"
+                    rst=1
                 fi
             else
                 warn_msg "Skipping shellcheck, already installed"
+                rst=2
             fi
+
+            # if ! hash nvim 2>/dev/null; then
+            #     status_msg "Getting Neovim"
+            #     curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim.appimage -o "$HOME/.local/bin/nvim"
+            #     chmod u+x "$HOME/.local/bin/nvim"
+            # else
+            #     warn_msg "Neovim is already installed"
+            # fi
+
         fi
-        return 0
+    else
+        error_msg "Curl is not available"
+        return 1
     fi
-    return 1
+    return $rst
 }
 
 
@@ -561,15 +675,15 @@ function get_emacs_dotfiles() {
     status_msg "Installing Evil Emacs"
 
     # If we couldn't clone our repo, return
-    clone_repo "$_BASE_URL/.emacs.d" "$HOME/.emacs.d" && return $?
+    clone_repo "$_URL/.emacs.d" "$HOME/.emacs.d" && return $?
 
-    verbose_msg "Creating dir $HOME/.config/systemd/user" && mkdir -p "$HOME/.config/systemd/user"
-    if execute_cmd "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
-    then
-        return 0
-    fi
+    # verbose_msg "Creating dir $HOME/.config/systemd/user" && mkdir -p "$HOME/.config/systemd/user"
+    # if setup_config "${_SCRIPT_PATH}/services/emacs.service" "$HOME/.config/systemd/user/emacs.service"
+    # then
+    #     return 0
+    # fi
 
-    return 1
+    return 0
 }
 
 function setup_shell_framework() {
@@ -591,7 +705,7 @@ function get_dotfiles() {
 
     [[ ! -d "$HOME/.local/" ]] && mkdir -p "$HOME/.local/"
 
-    clone_repo "$_BASE_URL/dotfiles" "$_SCRIPT_PATH" && return 0 || return "$?"
+    clone_repo "$_URL/dotfiles" "$_SCRIPT_PATH" && return 0 || return "$?"
 }
 
 function get_cool_fonts() {
@@ -613,6 +727,56 @@ function get_cool_fonts() {
     return 0
 }
 
+function setup_systemd() {
+    if [[ $_IS_WINDOWS -eq 0 ]]; then
+        if hash systemctl 2> /dev/null; then
+            status_msg "Setting up User's systemd services"
+            if [[ -d "$HOME/.config/systemd/user/" ]]; then
+                warn_msg "Systemd folder already exist, copying files manually, files won't be auto updated"
+                for service in "${_SCRIPT_PATH}"/systemd/*.service; do
+                    local servicename="${service##*/}"
+
+                    local file_basename="${servicename%%.*}"
+                    # local file_extention="${scriptname##*.}"
+
+                    setup_config "${service}" "$HOME/.config/systemd/user/${servicename}"
+                done
+            else
+                [[ ! -d "$HOME/.config/systemd/" ]] && mkdir -p "$HOME/.config/systemd/"
+                setup_config "${_SCRIPT_PATH}/systemd/" "$HOME/.config/systemd/user"
+            fi
+            status_msg "Please reload user's units with 'systemctl --user daemon-reload'"
+            # status_msg "Reloding User's units"
+            # systemctl --user daemon-reload
+        else
+            error_msg "This system doesn't have systemd package"
+            return 1
+        fi
+    else
+        error_msg "Systemd's services work just in Linux environment"
+        return 1
+    fi
+    return 0
+}
+
+function version() {
+
+    if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
+        cat "${_SCRIPT_PATH}/shell/banner"
+    elif hash curl 2>/dev/null; then
+        curl -Ls https://raw.githubusercontent.com/Mike325/dotfiles/master/shell/banner 2>/dev/null
+    fi
+
+    echo ""
+    echo "  Mike's install script"
+    echo ""
+    echo "       Author   : Mike 8a"
+    echo "       Version  : ${_VERSION}"
+    echo "       Date     : ${_DATE}"
+    # echo "       Page     : https://github.com/mike325/dotfiles"
+    echo ""
+}
+
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
@@ -620,19 +784,79 @@ while [[ $# -gt 0 ]]; do
             _BACKUP=1
             ;;
         --backup=*)
-            if [[ $(__parse_args "$key" "backup") == "$key" ]]; then
-                __ERROR_DATA=$(__parse_args "$key" "backup")
-                error_msg "Not a valid backupdir $__ERROR_DATA"
+            _result=$(__parse_args "$key" "backup")
+            if [[ $_result == "$key" ]]; then
+                error_msg "Not a valid backupdir $_result"
                 exit 1
             fi
             _BACKUP=1
-            _BACKUP_DIR=$(__parse_args "$key" "backup")
+            _BACKUP_DIR="$_result"
+            ;;
+        -p|--protocol)
+            if [[ ! "$2" =~ ^(git|https|ssh)$ ]]; then
+                error_msg "Not a valid protocol $2"
+                exit 1
+            fi
+            _PROTOCOL="$2"
+            shift
+            ;;
+        --protocol=*)
+            _result=$(__parse_args "$key" "protocol" '(https|git|ssh)')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid protocol $_result"
+                exit 1
+            fi
+            _PROTOCOL="$_result"
+            ;;
+        --host)
+            _GIT_HOST="$2"
+            shift
+            ;;
+        --host=*)
+            _result=$(__parse_args "$key" "githost")
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid host $_result"
+                exit 1
+            fi
+            _GIT_HOST="$_result"
+            ;;
+        --user)
+            _GIT_USER="$2"
+            shift
+            ;;
+        --user=*)
+            _result=$(__parse_args "$key" "gituser")
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid gituser $_result"
+                exit 1
+            fi
+            _GIT_USER="$_result"
+            ;;
+        --url)
+            if [[ ! "$2" =~ ^(https://|git://|git@)[a-zA-Z0-9.:@_-/~]+$ ]]; then
+                error_msg "Not a valid url $2"
+                exit 1
+            fi
+            _URL="$2"
+            shift
+            ;;
+        --url=*)
+            _result=$(__parse_args "$key" "url" '(https://|git://|git@)[a-zA-Z0-9.:@_-/~]+')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid url $_result"
+                exit 1
+            fi
+            _URL="$_result"
+            ;;
+        -y|--systemd)
+            _SYSTEMD=1
+            _ALL=0
             ;;
         -t|--portable|--portables)
             _PORTABLES=1
             _ALL=0
             ;;
-        -p|--fonts|--powerline)
+        --fonts|--powerline)
             _COOL_FONTS=1
             _ALL=0
             ;;
@@ -680,6 +904,10 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        --version)
+            version
+            exit 0
+            ;;
         *)
             error_msg "Unknown argument $key"
             help_user
@@ -714,26 +942,51 @@ if [[ $_DOTFILES -eq 1 ]] || [[ ! -d "${_SCRIPT_PATH}/shell" ]]; then
     fi
 fi
 
+if [[ -z $_URL ]]; then
+    case $_PROTOCOL in
+        ssh)
+            _URL="git@$_GIT_HOST:$_GIT_USER"
+            ;;
+        https|http)
+            _URL="$_PROTOCOL://$_GIT_HOST/$_GIT_USER"
+            ;;
+        git)
+            warn_message "Git protocol has not been tested, yet"
+            _URL="git://$_GIT_HOST/$_GIT_USER"
+            ;;
+        *)
+            _URL="https://$_GIT_HOST/$_GIT_USER"
+            ;;
+    esac
+fi
+
+verbose_msg "Using ${_URL}"
+verbose_msg "Protocol: ${_PROTOCOL}"
+verbose_msg "User    : ${_GIT_USER}"
+verbose_msg "Host    : ${_GIT_HOST}"
+
 if [[ $_ALL -eq 1 ]]; then
     setup_bin
     setup_alias
     setup_shell_framework
     setup_git
+    get_portables
     get_vim_dotfiles
     get_nvim_dotfiles
     get_emacs_dotfiles
     get_cool_fonts
-    get_portables
+    setup_systemd
 else
     [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_ALIAS -eq 1 ]] && setup_alias
     [[ $_SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $_GIT -eq 1 ]] && setup_git
+    [[ $_PORTABLES -eq 1 ]] && get_portables
     [[ $_VIM -eq 1 ]] && get_vim_dotfiles
     [[ $_NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $_EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
-    [[ $_PORTABLES -eq 1 ]] && get_portables
+    [[ $_SYSTEMD -eq 1 ]] && setup_systemd
 fi
 
 exit 0
