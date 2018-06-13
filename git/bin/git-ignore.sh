@@ -41,7 +41,7 @@ function help_user() {
 
 function warn_msg() {
     WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! $WARN_MESSAGE \n"
+    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
 }
 
 function error_msg() {
@@ -51,7 +51,7 @@ function error_msg() {
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
-    printf "[*]     ---- $STATUS_MESSAGGE \n"
+    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
 }
 
 while [[ $# -gt 0 ]]; do
