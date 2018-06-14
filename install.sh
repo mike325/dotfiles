@@ -318,8 +318,15 @@ function clone_repo() {
         fi
 
         verbose_msg "Cloning $repo"
-        if git clone --recursive "$repo" "$dest"; then
-            return 0
+        # TODO: simplify this crap
+        if [[ $_VERBOSE -eq 1 ]]; then
+            if git clone --recursive "$repo" "$dest"; then
+                return 0
+            fi
+        else
+            if git clone --recursive "$repo" "$dest" 1>/dev/null; then
+                return 0
+            fi
         fi
     else
         error_msg "Git command is not available"
@@ -486,20 +493,26 @@ function get_vim_dotfiles() {
 function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
+    local nvim_version="v0.3.0"
     if [[ $_IS_WINDOWS -eq 1 ]]; then
 
         # TODO: auto detect Windows arch and latest nvim version
-        if ! hash nvim 2> /dev/null; then
+        if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
             if hash curl 2>/dev/null; then
-                status_msg "Getting neovim executable"
-                curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win64.zip -o "$HOME/.local/nvim.zip"
+                status_msg "Getting neovim ${nvim_version} executable"
+                if ! curl -Ls https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim-win64.zip -o "$_TMP/nvim.zip"; then
+                    error_msg "Failed neovim download"
+                    return 1
+                fi
 
                 [[ -d "$HOME/.local/Neovim" ]] && rm -rf "$HOME/.local/Neovim"
                 [[ -d "$HOME/.local/neovim" ]] && rm -rf "$HOME/.local/neovim"
 
-                unzip "$HOME/.local/nvim.zip" -d "$HOME/.local/"
-                mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
+                status_msg "Extracting files"
+                [[ $_VERBOSE -eq 1 ]] && unzip "$_TMP/nvim.zip" -d "$HOME/.local/"
+                [[ $_VERBOSE -eq 0 ]] && unzip "$_TMP/nvim.zip" -d "$HOME/.local/" &> /dev/null
                 # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
+                mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
             else
                 error_msg "Curl is not available"
                 return 1
@@ -507,12 +520,19 @@ function get_nvim_dotfiles() {
         fi
 
         # If we couldn't clone our repo, return
-        status_msg "Cloning vim dotfiles in $HOME/AppData/Local/nvim"
-        clone_repo "$_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
+        status_msg "Getting vim dotfiles in $HOME/AppData/Local/nvim"
+        if [[ -d "$HOME/.vim" ]]; then
+            setup_config "$HOME/.vim" "$HOME/AppData/Local/nvim"
+        elif [[ -d "$HOME/vimfiles" ]]; then
+            setup_config "$HOME/vimfiles" "$HOME/AppData/Local/nvim"
+        else
+            clone_repo "$_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
+        fi
+
     else
         # Since no all systems have sudo/root access lets assume all dependencies are
         # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
-        if ! hash nvim 2> /dev/null; then
+        if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
             # Make Neovim only if it's not already installed
 
             # local force_flag=""
@@ -523,7 +543,8 @@ function get_nvim_dotfiles() {
             if hash curl 2>/dev/null; then
                 # If the repo was already cloned, lets just build it
                 # TODO: Considering to use appimage binary instead of compiling it from the source code
-                if curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim.appimage -o "$HOME/.local/bin/nvim"; then
+                status_msg "Getting neovim ${nvim_version} executable"
+                if curl -Ls https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim.appimage -o "$HOME/.local/bin/nvim"; then
                     chmod u+x "$HOME/.local/bin/nvim"
                 else
                     error_msg "Curl failed to download Neovim"
@@ -546,10 +567,11 @@ function get_nvim_dotfiles() {
         # if the current command creates a symbolic link and we already have some vim
         # settings, lets use them
         status_msg "Checking existing vim dotfiles"
-        if [[ "$_CMD" == "ln -s" ]] && [[ -d "$HOME/.vim" ]]; then
-            status_msg "Linking current vim dotfiles"
+        if [[ -d "$HOME/.vim" ]]; then
+            [[ "$_CMD" == "ln -s" ]] && status_msg "Linking current vim dotfiles"
+            [[ "$_CMD" == "cp -rf" ]] && status_msg "Copying current vim dotfiles"
             if ! setup_config "$HOME/.vim" "$HOME/.config/nvim"; then
-                error_msg "Fail to link dotvim files"
+                error_msg "Failed gettings dotvim files"
                 return 1
             fi
         else
@@ -961,9 +983,14 @@ if [[ -z $_URL ]]; then
 fi
 
 verbose_msg "Using ${_URL}"
-verbose_msg "Protocol: ${_PROTOCOL}"
-verbose_msg "User    : ${_GIT_USER}"
-verbose_msg "Host    : ${_GIT_HOST}"
+verbose_msg "Protocol   : ${_PROTOCOL}"
+verbose_msg "User       : ${_GIT_USER}"
+verbose_msg "Host       : ${_GIT_HOST}"
+if [[ $_IS_WINDOWS -eq 0 ]]; then
+    verbose_msg "Platform   : Linux"
+else
+    verbose_msg "Platform   : Windows"
+fi
 
 if [[ $_ALL -eq 1 ]]; then
     setup_bin
