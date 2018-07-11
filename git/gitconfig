@@ -41,12 +41,12 @@
 
 [color]
     ui          = auto
-    diff        = off
+    diff        = auto
     status      = auto
     branch      = auto
-    interactive = off
-    grep        = off
-    log         = off
+    interactive = auto
+    grep        = auto
+    log         = auto
 
 [color "branch"]
     current = green
@@ -149,30 +149,30 @@
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
-    d   = diff
-    dc  = diff --cached
-    dk  = diff --check
-    dp  = diff --patience
+    d   = diff --color=never
+    dc  = diff --color=never --cached
+    dk  = diff --color=never --check
+    dp  = diff --color=never --patience
 
 ;###############################################################################
 ;                 Grep something in the current repo                           #
 ;###############################################################################
 
-    g  = grep -nI --color   ; Grep showing the line number and ignore binaries
-    gi = grep -nIi --color  ; Same as above but ignore case
+    g  = grep -nI --color=never   ; Grep showing the line number and ignore binaries
+    gi = grep -nIi --color=never  ; Same as above but ignore case
 
 ;###############################################################################
 ;                 Git log stuff                                                #
 ;###############################################################################
 
-    l   = log                               ; Normal log
-    ln  = log --name-status                 ; get files that changed
-    lg  = log --graph                       ; Normal log with graph
-    ll  = log --pretty=custom               ; Short log with pretty format
-    llg = log --graph --pretty=custom       ; Short pretty log with graph
-    lln = log --name-status --pretty=custom ; get files that changed
-    w   = whatchanged                       ; Old whatchanged
-    wp  = whatchanged -p                    ; Old whatchanged with diff
+    l   = log --color=never                               ; Normal log
+    ln  = log --color=never --name-status                 ; get files that changed
+    lg  = log --color=never --graph                       ; Normal log with graph
+    ll  = log --color=never --pretty=custom               ; Short log with pretty format
+    llg = log --color=never --graph --pretty=custom       ; Short pretty log with graph
+    lln = log --color=never --name-status --pretty=custom ; get files that changed
+    w   = whatchanged --color=never                       ; Old whatchanged
+    wp  = whatchanged --color=never -p                    ; Old whatchanged with diff
 
 ;###############################################################################
 ;                 Git ls a bit simpler and with grep search                    #

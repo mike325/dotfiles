@@ -38,8 +38,8 @@ if ( `where vim` != "" ) then
         # NOTE: This is set inside Neovim settings
         # shellcheck disable=SC2154
         if ( ! ($?nvr) ) then
-            setenv MANPAGER "nvim -R --cmd 'let g:minimal=0' -c 'setlocal readonly nomodifiable ft=man' -"
-            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' -c 'setlocal ft=git readonly nomodifiable' - "
+            setenv MANPAGER "nvim -R --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal readonly nomodifiable ft=man' -"
+            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' - "
             setenv EDITOR "nvim"
             alias vi "nvim --cmd 'let g:minimal=0'"
             alias viu "nvim -u NONE"
@@ -47,9 +47,9 @@ if ( `where vim` != "" ) then
             alias nvi "nvim"
             alias vnim "nvim"
         else
-            setenv MANPAGER "nvr -cc 'setlocal modiendifable' -c 'silent! setlocal ft=man' --remote-tab -"
-            setenv GIT_PAGER "nvr -cc 'setlocal modiendifable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
-            setenv EDITOR "nvr --remote-tab"
+            setenv MANPAGER "nvr -cc 'setlocal modifiable' -c 'silent! setlocal ft=man' --remote-tab -"
+            setenv GIT_PAGER "nvr -cc 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
+            setenv EDITOR "nvr --remote-tab-wait"
             alias vi "nvr --remote-silent"
             alias nvi "nvr --remote-silent"
             alias nvim "nvr --remote-silent"
@@ -57,8 +57,8 @@ if ( `where vim` != "" ) then
         endif
     else
         alias cdvim "cd ~/.vim"
-        setenv MANPAGER "env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -c 'silent! setlocal ft=man readonly nomodifiable' +MANPAGER -"
-        setenv GIT_PAGER "vim --cmd 'let g:minimal=0' --cmd 'setlocal modiendifable' -c 'setlocal ft=git readonly nomodifiable' -"
+        setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man readonly nomodifiable' +MANPAGER -"
+        setenv GIT_PAGER "vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' -"
         setenv EDITOR "vim"
 
         alias vi "vim --cmd 'let g:minimal=0'"
