@@ -50,9 +50,17 @@ if hash vim 2> /dev/null; then
         else
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
-            export MANPAGER="nvim -R --cmd 'let g:minimal=0' -c 'set ft=man' -"
-            export GIT_PAGER="nvim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
-            export EDITOR="nvim"
+            # NOTE: This is set inside Neovim settings
+            # shellcheck disable=SC2154
+            if [[ -z "$tnvr" ]]; then
+                export MANPAGER="nvim -R --cmd 'let g:minimal=0'  -c 'setlocal readonly' -c 'set ft=man' -"
+                export GIT_PAGER="nvim - --cmd 'let g:minimal=0'  -c 'setlocal readonly'  -c 'set filetype=git' -c 'set foldmethod=syntax'"
+                export EDITOR="nvim"
+            else
+                export MANPAGER="nvr -c 'setlocal bufhidden=delete' -c 'setlocal readonly' -c 'silent! set ft=man' --remote-tab -"
+                export GIT_PAGER="nvr -c 'setlocal bufhidden=delete' -c 'setlocal ft=git' -c 'setlocal readonly' -c 'setlocal foldmethod=syntax' --remote-tab -"
+                export EDITOR="nvr --remote-tab"
+            fi
 
             alias vi="nvim --cmd 'let g:minimal=0'"
             alias viu="nvim -u NONE"
