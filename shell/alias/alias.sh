@@ -47,6 +47,9 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
 
             alias vi="vim --cmd 'let g:minimal=0'"
             alias viu="vim -u NONE"
+            # Fucking typos
+            alias nvi="nvim"
+            alias vnim="nvim"
         else
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
@@ -73,6 +76,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
         fi
     else
         alias cdvim="cd ~/.vim"
+        alias cdvi="cd ~/.vim"
         export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -c 'silent! setlocal ft=man readonly nomodifiable' +MANPAGER -"
         export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' -"
         export EDITOR="vim"
