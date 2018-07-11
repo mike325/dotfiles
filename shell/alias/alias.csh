@@ -39,7 +39,7 @@ if ( `where vim` != "" ) then
         # shellcheck disable=SC2154
         if ( ! ($?nvr) ) then
             setenv MANPAGER "nvim -R --cmd 'let g:minimal=0' -c 'setlocal readonly nomodifiable ft=man' -"
-            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' -c 'setlocal ft=git readonly nomodiendifable' - "
+            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' -c 'setlocal ft=git readonly nomodifiable' - "
             setenv EDITOR "nvim"
             alias vi "nvim --cmd 'let g:minimal=0'"
             alias viu "nvim -u NONE"
