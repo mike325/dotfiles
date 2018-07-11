@@ -70,6 +70,12 @@
     "shell/settings/*": {
         "type": "ShellSettings"
     },
+    "libs/*.py": {
+        "type": "Libs"
+    },
+    "test/*.py": {
+        "type": "Tests"
+    },
     "shell/banner": {
         "type": "Banner"
     }

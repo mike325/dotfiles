@@ -63,6 +63,27 @@ if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
 fi
 # pip zsh completion end
 
+# Write to the history file immediately, not when the shell exits.
+setopt INC_APPEND_HISTORY
+# Share history between all sessions.
+setopt SHARE_HISTORY
+# Expire duplicate entries first when trimming history.
+setopt HIST_EXPIRE_DUPS_FIRST
+# Do not record an entry that was just recorded again.
+setopt HIST_IGNORE_DUPS
+# Delete old recorded entry if new entry is a duplicate.
+setopt HIST_IGNORE_ALL_DUPS
+# Do not display a line previously found.
+setopt HIST_FIND_NO_DUPS
+# Do not record an entry starting with a space.
+setopt HIST_IGNORE_SPACE
+# Do not write duplicate entries in the history file.
+setopt HIST_SAVE_NO_DUPS
+# Remove superfluous blanks before recording entry.
+setopt HIST_REDUCE_BLANKS
+# Do not execute immediately upon history expansion.
+setopt HIST_VERIFY
+
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     plugins=(go git python)
     # Set name of the theme to load. Optionally, if you set this to "random"

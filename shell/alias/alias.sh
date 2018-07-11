@@ -41,7 +41,8 @@ if hash vim 2> /dev/null; then
             }
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
-            export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
+            export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -M +MANPAGER -"
+            export GIT_PAGER="vim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
             export EDITOR="vim"
 
             alias vi="vim --cmd 'let g:minimal=0'"
@@ -49,8 +50,9 @@ if hash vim 2> /dev/null; then
         else
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
+            export MANPAGER="nvim -R --cmd 'let g:minimal=0' -c 'set ft=man' -"
+            export GIT_PAGER="nvim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
             export EDITOR="nvim"
-            export MANPAGER="nvim -c 'set ft=man' -"
 
             alias vi="nvim --cmd 'let g:minimal=0'"
             alias viu="nvim -u NONE"
@@ -60,8 +62,9 @@ if hash vim 2> /dev/null; then
         alias vnim="nvim"
     else
         alias cdvim="cd ~/.vim"
+        export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -M +MANPAGER -"
+        export GIT_PAGER="vim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
         export EDITOR="vim"
-        export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
 
         alias vi="vim --cmd 'let g:minimal=0'"
         alias viu="vim -u NONE"

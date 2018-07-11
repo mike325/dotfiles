@@ -51,7 +51,7 @@
 
 setenv EDITOR vim
 
-setenv MANPAGER "env MAN_PN=1 vim -M +MANPAGER -"
+setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=0' -M +MANPAGER -"
 alias cdvim "cd ~/.vim"
 
 alias vi "vim --cmd 'let g:minimal=0'"
