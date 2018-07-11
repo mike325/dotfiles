@@ -34,7 +34,7 @@
 if ( `where vim` != "" ) then
     if ( `where nvim` != "" ) then
         alias cdvi "cd ~/.vim"
-        alias cdvim "cd ~/.conendifg/nvim"
+        alias cdvim "cd ~/.config/nvim"
         # NOTE: This is set inside Neovim settings
         # shellcheck disable=SC2154
         if ( ! ($?nvr) ) then
