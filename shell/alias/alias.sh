@@ -33,7 +33,7 @@
 
 # Set vi to start as a minimal setup with just settings, mappings and autocmd; 0 plugins
 
-if hash vim 2> /dev/null; then
+if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
         if [[ $(uname --all) =~ MINGW ]]; then
             function nvim() {
@@ -42,7 +42,7 @@ if hash vim 2> /dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -M +MANPAGER -"
-            export GIT_PAGER="vim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
+            export GIT_PAGER="vim --cmd 'let g:minimal=0'  --cmd 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' -"
             export EDITOR="vim"
 
             alias vi="vim --cmd 'let g:minimal=0'"
@@ -52,26 +52,29 @@ if hash vim 2> /dev/null; then
             alias cdvim="cd ~/.config/nvim"
             # NOTE: This is set inside Neovim settings
             # shellcheck disable=SC2154
-            if [[ -z "$tnvr" ]]; then
-                export MANPAGER="nvim -R --cmd 'let g:minimal=0'  -c 'setlocal readonly' -c 'set ft=man' -"
-                export GIT_PAGER="nvim - --cmd 'let g:minimal=0'  -c 'setlocal readonly'  -c 'set filetype=git' -c 'set foldmethod=syntax'"
+            if [[ -z "$nvr" ]]; then
+                export MANPAGER="nvim -R --cmd 'let g:minimal=0' -c 'setlocal readonly nomodifiable ft=man' -"
+                export GIT_PAGER="nvim --cmd 'let g:minimal=0' -c 'setlocal ft=git readonly nomodifiable' - "
                 export EDITOR="nvim"
+                alias vi="nvim --cmd 'let g:minimal=0'"
+                alias viu="nvim -u NONE"
+                # Fucking typos
+                alias nvi="nvim"
+                alias vnim="nvim"
             else
-                export MANPAGER="nvr -c 'setlocal bufhidden=delete' -c 'setlocal readonly' -c 'silent! set ft=man' --remote-tab -"
-                export GIT_PAGER="nvr -c 'setlocal bufhidden=delete' -c 'setlocal ft=git' -c 'setlocal readonly' -c 'setlocal foldmethod=syntax' --remote-tab -"
+                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal ft=man' --remote-tab -"
+                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
                 export EDITOR="nvr --remote-tab"
+                alias vi="nvr --remote-silent"
+                alias nvi="nvr --remote-silent"
+                alias nvim="nvr --remote-silent"
+                alias vnim="nvr --remote-silent"
             fi
-
-            alias vi="nvim --cmd 'let g:minimal=0'"
-            alias viu="nvim -u NONE"
         fi
-        # Fucking typos
-        alias nvi="nvim"
-        alias vnim="nvim"
     else
         alias cdvim="cd ~/.vim"
-        export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -M +MANPAGER -"
-        export GIT_PAGER="vim - --cmd 'let g:minimal=0' -R -c 'set filetype=git' -c 'set foldmethod=syntax'"
+        export MANPAGER="env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -c 'silent! setlocal ft=man readonly nomodifiable' +MANPAGER -"
+        export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' -"
         export EDITOR="vim"
 
         alias vi="vim --cmd 'let g:minimal=0'"

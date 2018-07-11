@@ -31,35 +31,44 @@
 #                          Set the default text editor                         #
 ################################################################################
 
-# if hash nvim 2>/dev/null then
-#     export EDITOR='nvim'
-#     VIM_PATH="$(command -v vim)"
-#
-#     # Prevent to screw the path alias
-#     if [[ ! $VIM_PATH =~ "alias" ]] then
-#         export MANPAGER="nvim -c 'set ft=man' -"
-#         alias vim="nvim"
-#         alias vi="$VIM_PATH"
-#         alias cdvim="cd ~/.config/nvim"
-#         alias cdvi="cd ~/.vim"
-#     endif
-# else
-#     export EDITOR='vim'
-#     export MANPAGER="env MAN_PN=1 vim -M +MANPAGER -"
-#     alias cdvim="cd ~/.vim"
-# endif
+if ( `where vim` != "" ) then
+    if ( `where nvim` != "" ) then
+        alias cdvi "cd ~/.vim"
+        alias cdvim "cd ~/.conendifg/nvim"
+        # NOTE: This is set inside Neovim settings
+        # shellcheck disable=SC2154
+        if ( ! ($?nvr) ) then
+            setenv MANPAGER "nvim -R --cmd 'let g:minimal=0' -c 'setlocal readonly nomodifiable ft=man' -"
+            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' -c 'setlocal ft=git readonly nomodiendifable' - "
+            setenv EDITOR "nvim"
+            alias vi "nvim --cmd 'let g:minimal=0'"
+            alias viu "nvim -u NONE"
+            # Fucking typos
+            alias nvi "nvim"
+            alias vnim "nvim"
+        else
+            setenv MANPAGER "nvr -cc 'setlocal modiendifable' -c 'silent! setlocal ft=man' --remote-tab -"
+            setenv GIT_PAGER "nvr -cc 'setlocal modiendifable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
+            setenv EDITOR "nvr --remote-tab"
+            alias vi "nvr --remote-silent"
+            alias nvi "nvr --remote-silent"
+            alias nvim "nvr --remote-silent"
+            alias vnim "nvr --remote-silent"
+        endif
+    else
+        alias cdvim "cd ~/.vim"
+        setenv MANPAGER "env MAN_PN=1 vim -R --cmd 'let g:minimal=0' -c 'silent! setlocal ft=man readonly nomodifiable' +MANPAGER -"
+        setenv GIT_PAGER "vim --cmd 'let g:minimal=0' --cmd 'setlocal modiendifable' -c 'setlocal ft=git readonly nomodifiable' -"
+        setenv EDITOR "vim"
 
-setenv EDITOR vim
-
-setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=0' -M +MANPAGER -"
-alias cdvim "cd ~/.vim"
-
-alias vi "vim --cmd 'let g:minimal=0'"
-alias viu "vim -u NONE"
+        alias vi "vim --cmd 'let g:minimal=0'"
+        alias viu "vim -u NONE"
+    endif
+endif
 
 
 ################################################################################
-#                          Fix my common typos                                 #
+#                          endifx my common typos                                 #
 ################################################################################
 
 alias gti "git"
@@ -78,12 +87,6 @@ alias im "vim"
 alias q "exit"
 alias cl "clear"
 
-# if ( $EUID -ne 0 ) then
-#     alias turnoff "sudo poweroff"
-# else
-#     alias turnoff "poweroff"
-# endif
-
 # Show used ports
 alias ports "netstat -tulpn"
 
@@ -100,152 +103,8 @@ alias lla "ls -lhA"
 # This way sudo commands get the alias of the account
 # ( $EUID -ne 0 ) && alias sudo 'sudo '
 
-# Magnificent app which corrects your previous console command
-# https://github.com/nvbn/thefuck
-# if hash thefuck 2>/dev/null then
-#     eval "$(thefuck --alias)"
-#     alias fuck='eval $(thefuck $(fc -ln -1))'
-#     alias please='fuck'
-# endif
-
 # laod kernel module for virtualbox
 # ( $EUID -ne 0 ) && alias vbk "sudo modprobe vboxdrv"
-
-# Generate tags file
-# if hash ctags 2>/dev/null then
-#     alias gtf="ctags -R ."
-# endif
-
-################################################################################
-#                               Systemctl                                      #
-################################################################################
-
-# if hash systemctl 2>/dev/null then
-#     if ( $EUID -ne 0 ) then
-#         alias sysctl "sudo systemctl"
-#         alias usysctl "systemctl --user"
-#
-#         alias ctls "sudo systemctl start"   # Start
-#         alias ctlh "sudo systemctl stop"    # Halt
-#         alias ctlr "sudo systemctl restart" # Restart
-#         alias ctlw "sudo systemctl status"  # shoW
-#     else
-#         alias sysctl "systemctl"
-#         alias usysctl "systemctl --user"
-#
-#         alias ctls "systemctl start"   # Start
-#         alias ctlh "systemctl stop"    # Halt
-#         alias ctlr "systemctl restart" # Restart
-#         alias ctlw "systemctl status"  # shoW
-#     endif
-# endif
-
-################################################################################
-#                               Git shortcut                                   #
-################################################################################
-
-
-# if hash git 2>/dev/null then
-#     alias clone="git clone"
-#     alias ga="git add"
-#     alias gs="git status"
-#     alias gc="git commit"
-#     alias gps="git push"
-#     alias gpl="git pull"
-#     alias gco="git checkout "
-#     alias gr="git reset"
-#     alias gss="git stash save"
-#     alias gsp="git stash pop"
-#     alias gsd="git stash drop"
-#     alias gsa="git stash apply"
-#     alias gsl="git stash list"
-#     alias gsw="git stash show"
-# endif
-
-################################################################################
-#                         Package management shortcuts                         #
-################################################################################
-# TODO Make a small function to install system basics
-
-# if hash docker 2>/dev/null then
-#     if [[ $EUID -ne 0 ]] then
-#         alias docker="sudo docker"
-#         alias docker-compose="sudo docker-compose"
-#     endif
-#
-#     alias dkpa="docker ps -a"
-# endif
-
-# Yeah I'm too lazy to remember each command in every distro soooooo
-# I added this alias
-# TODO add other distros commands I've used, like Solus
-# if hash yaourt 2>/dev/null then
-#     # 'Install' package maybe in the PATH
-#     alias get="yaourt -S"
-#     alias getn="yaourt -S --noconfirm"
-#
-#     alias update="yaourt -Syyu --aur"
-#
-#     alias update="yaourt -Syyu --aur"
-#     alias updaten="yaourt -Syyu --aur --noconfirm"
-#
-#     alias remove="yaourt -Rns"
-#
-#     # Yeah Arch from scratch may not have yaourt
-# elif hash pacman 2>/dev/null then
-#     if [[ $EUID -ne 0 ]] then
-#         alias get="sudo pacman -S"
-#         alias getn="sudo pacman -S --noconfirm"
-#
-#         alias update="sudo pacman -Syyu"
-#         alias updaten="sudo pacman -Syyu --noconfirm"
-#
-#         alias remove="sudo pacman -Rns"
-#     else
-#         alias get="pacman -S"
-#         alias getn="pacman -S --noconfirm"
-#
-#         alias update="pacman -Syyu"
-#         alias updaten="pacman -Syyu --noconfirm"
-#
-#         alias remove="pacman -Rns"
-#     endif
-#
-# elif hash apt-get 2>/dev/null then
-#     if [[ $EUID -ne 0 ]] then
-#         alias get="sudo apt-get install"
-#         alias getn="sudo apt-get install -y"
-#
-#         alias update="sudo apt-get update && sudo apt-get upgrade"
-#
-#         alias remove="sudo apt-get remove"
-#     else
-#         alias get="apt-get install"
-#         alias getn="apt-get install -y"
-#
-#         alias update="apt-get update && apt-get upgrade"
-#
-#         alias remove="apt-get remove"
-#     endif
-#
-# elif hash dnf 2>/dev/null then
-#     if [[ $EUID -ne 0 ]] then
-#         alias get="sudo dnf install"
-#         alias getn="sudo dnf -y install"
-#
-#         alias update="sudo dnf update"
-#
-#         alias remove="sudo dnf remove"
-#     else
-#         alias get="dnf install"
-#         alias getn="dnf -y install"
-#
-#         alias update="dnf update"
-#
-#         alias remove="dnf remove"
-#     endif
-# endif
-
 
 ################################################################################
 #             Functions to move around dirs and other simple stuff             #
@@ -255,12 +114,6 @@ alias lla "ls -lhA"
 
 alias bk "cd .."
 
-
-# function llg() {
-#     if [[ ! -z "$1" ]] then
-#         ls -lhA | grep "$@"
-#     endif
-# }
 
 alias rl "rm -rf ./*.log"
 # function rl() {
