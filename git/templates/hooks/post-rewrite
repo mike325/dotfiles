@@ -1,5 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 case "$1" in
-    rebase) exec .git/hooks/post-merge ;;
+    rebase)
+        dir="$( git rev-parse --git-dir )"
+        if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
+            exec "${dir}"../../hooks/post-merge
+        else
+            exec .git/hooks/post-merge
+        fi
+        ;;
 esac

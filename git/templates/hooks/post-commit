@@ -1,3 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-.git/hooks/ctags >/dev/null 2>&1 &
+dir="$( git rev-parse --git-dir )"
+if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
+    "${dir}"../../hooks/ctags >/dev/null 2>&1 &
+else
+    .git/hooks/ctags >/dev/null 2>&1 &
+fi

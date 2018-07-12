@@ -2,8 +2,9 @@
 
 set -e
 dir="$( git rev-parse --git-dir )"
-# top="$( git rev-parse --show-toplevel )"
+top="$( git rev-parse --show-toplevel )"
 trap 'rm -f "$dir/tags.$$"' EXIT INT TERM
+trap 'rm -f "$top/tags.$$"' EXIT INT TERM
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
 
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
