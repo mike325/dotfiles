@@ -36,27 +36,46 @@
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
         if [[ $(uname --all) =~ MINGW ]]; then
-            function nvim() {
-                nvim-qt "$@" &
-            }
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
-            export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
-            export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
-            export EDITOR="vim"
+            # NOTE: This is set inside Neovim settings
+            # shellcheck disable=SC2154
+            if [[ -z "$nvr" ]]; then
+                function nvim() {
+                    # NOTE: This is set inside Neovim settings
+                    # shellcheck disable=SC2154
+                    if [[ -z "$nvr" ]]; then
+                        nvim-qt "$@" &
+                    else
+                        nvim "$@"
+                    fi
+                }
+                export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+                export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
+                export EDITOR="vim"
+                alias vi="vim --cmd 'let g:minimal=0'"
+                alias viu="vim -u NONE"
+                # Fucking typos
+                alias nvi="nvim"
+                alias vnim="nvim"
+            else
+                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal  nomodifiable ft=man' --remote-tab -"
+                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
+                export EDITOR="nvr --remote-tab-wait"
+                alias vi="nvr --remote-silent"
+                alias vim="nvr --remote-silent"
+                alias nvi="nvr --remote-silent"
+                alias nvim="nvr --remote-silent"
+                alias vnim="nvr --remote-silent"
+            fi
 
-            alias vi="vim --cmd 'let g:minimal=0'"
-            alias viu="vim -u NONE"
-            # Fucking typos
-            alias nvi="nvim"
-            alias vnim="nvim"
         else
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
             # NOTE: This is set inside Neovim settings
             # shellcheck disable=SC2154
             if [[ -z "$nvr" ]]; then
-                export MANPAGER="nvim -R --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
+                export MANPAGER="nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
                 export GIT_PAGER="nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' - "
                 export EDITOR="nvim"
                 alias vi="nvim --cmd 'let g:minimal=0'"
@@ -69,6 +88,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
                 export EDITOR="nvr --remote-tab-wait"
                 alias vi="nvr --remote-silent"
+                alias vim="nvr --remote-silent"
                 alias nvi="nvr --remote-silent"
                 alias nvim="nvr --remote-silent"
                 alias vnim="nvr --remote-silent"
