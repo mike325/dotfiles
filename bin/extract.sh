@@ -64,6 +64,8 @@ for key in "$@"; do
     esac
 done
 
+error_code=0
+
 while [[ $# -gt 0 ]]; do
     filename="$1"
 
@@ -83,6 +85,9 @@ while [[ $# -gt 0 ]]; do
         esac
     else
         error_msg "'$filename' is not a valid file"
+        error_code=1
     fi
     shift
 done
+
+exit $error_code

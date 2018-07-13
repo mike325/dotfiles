@@ -48,8 +48,15 @@ print(__header__)
 historyPath = os.path.expanduser("~/.pyhistory")
 try:
 
-    def save_history(history_file):
-        readline.write_history_file(history_file)
+    def save_history(historyPath=historyPath):
+        try:
+            import readline
+        except ImportError:
+            try:
+                import pyreadline as readline
+            except ImportError:
+                return
+        readline.write_history_file(historyPath)
 
     if os.path.exists(historyPath):
         readline.read_history_file(historyPath)

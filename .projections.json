@@ -5,6 +5,15 @@
     ".gitignore": {
         "type": "GitIgnore"
     },
+    "setup.cfg": {
+        "type": "Setup"
+    },
+    "test/*.sh": {
+        "type": "ShellTest"
+    },
+    "test/*.py": {
+        "type": "PythonTest"
+    },
     ".git/config": {
         "type": "Git"
     },
@@ -49,9 +58,6 @@
     "git/templates/hooks/*": {
         "type": "GitHooks"
     },
-    "git/gitignore": {
-        "type": "GitIgnore"
-    },
     "git/gitconfig": {
         "type": "GitConfig"
     },
@@ -72,9 +78,6 @@
     },
     "libs/*.py": {
         "type": "Libs"
-    },
-    "test/*.py": {
-        "type": "Tests"
     },
     "shell/banner": {
         "type": "Banner"

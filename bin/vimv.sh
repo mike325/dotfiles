@@ -88,3 +88,5 @@ done
 echo "$count" files renamed.
 
 rm /tmp/vimv.$$
+
+exit 0

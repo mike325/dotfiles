@@ -138,13 +138,37 @@ if  [[ $_IS_WINDOWS -eq 1 ]]; then
         export PATH="$HOME/AppData/Roaming/Python/Scripts:$PATH"
     fi
 
-    if [[ -d "$HOME/AppData/Roaming/Python/Python27/Scripts" ]]; then
-        export PATH="$HOME/AppData/Roaming/Python/Python27/Scripts:$PATH"
+    windows_root="/c/Python"
+    windows_user="$HOME/AppData/Roaming/Python/Python27/Scripts"
+
+    if [[ -d "${windows_root}/Python27/Scripts" ]]; then
+        export PATH="${windows_root}/Python27/Scripts:$PATH"
     fi
 
-    if [[ -d "$HOME/AppData/Roaming/Python/Python36/Scripts/" ]]; then
-        export PATH="$HOME/AppData/Roaming/Python/Python36/Scripts/:$PATH"
+    # Override Root packeges
+    if [[ -d "${windows_user}/Python/Python27/Scripts" ]]; then
+        export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
+
+    python3=("38" "37" "36" "35" "33")
+
+    for version in "${python3[@]}"; do
+        if [[ -d "${windows_root}/Python${version}/Scripts" ]]; then
+            export PATH="${windows_root}/Python${version}/Scripts:$PATH"
+        fi
+
+        # Override Root packeges
+        if [[ -d "${windows_user}/Python/Python${version}/Scripts" ]]; then
+            export PATH="${windows_user}/Python/Python${version}/Scripts:$PATH"
+        fi
+
+        if [[ -d "${windows_root}/Python${version}/Scripts" ]] || [[ -d "${windows_user}/Python/Python${version}/Scripts" ]]; then
+            break
+        fi
+    done
+
+    export PYTHONIOENCODING="utf8"
+
 fi
 
 export _DEFAULT_SHELL="${SHELL##*/}"

@@ -23,7 +23,8 @@
 
 [core]
     editor = $EDITOR
-    excludesfile = ~/.config/git/templates/gitignore
+    # Changed to the standar location $HOME/.config/git/ignore
+    # excludesfile = ~/.config/git/templates/gitignore
     autocrlf = input
 
 [user]
@@ -149,10 +150,10 @@
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
-    d   = diff --color=never
-    dc  = diff --color=never --cached
-    dk  = diff --color=never --check
-    dp  = diff --color=never --patience
+    d   = diff --diff-algorithm=minimal --color=never
+    dc  = diff --diff-algorithm=minimal --color=never --cached
+    dk  = diff --diff-algorithm=minimal --color=never --check
+    dp  = diff --diff-algorithm=minimal --color=never --patience
 
 ;###############################################################################
 ;                 Grep something in the current repo                           #
@@ -171,8 +172,8 @@
     ll  = log --color=never --pretty=custom               ; Short log with pretty format
     llg = log --color=never --graph --pretty=custom       ; Short pretty log with graph
     lln = log --color=never --name-status --pretty=custom ; get files that changed
-    w   = whatchanged --color=never                      ; Old whatchanged
-    wp  = whatchanged --color=never-p                    ; Old whatchanged with diff
+    w   = whatchanged --color=never                       ; Old whatchanged
+    wp  = whatchanged --color=never-p                     ; Old whatchanged with diff
 
 ;###############################################################################
 ;                 Git ls a bit simpler and with grep search                    #

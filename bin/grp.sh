@@ -115,3 +115,5 @@ else
         pwd -P
     fi
 fi
+
+exit 0

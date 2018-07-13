@@ -70,3 +70,5 @@ for i in "$@"; do
         error_msg "$i doesn't exists"
     fi
 done
+
+exit 0

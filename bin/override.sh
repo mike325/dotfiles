@@ -56,3 +56,5 @@ if [[ ! -z "$1" ]] && [[ ! -z "$2" ]]; then
     mv --backup=numbered "$2" /tmp/.trash
     mv "$1" "$2"
 fi
+
+exit 0
