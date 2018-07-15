@@ -149,10 +149,9 @@
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
-    d   = diff --color=never
-    dc  = diff --color=never --cached
-    dk  = diff --color=never --check
-    dp  = diff --color=never --patience
+    d   = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never
+    dc  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never --cached
+    dk  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never --check
 
 ;###############################################################################
 ;                 Grep something in the current repo                           #
