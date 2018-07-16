@@ -123,11 +123,11 @@
 ;                 Branch management                                            #
 ;###############################################################################
 
-    b   = branch        ; Show local branches
-    ba  = branch --all  ; Show all local and remote branches
-    bd  = branch -d     ; Delete a merged branch
-    bdd = branch -D     ; Force branch deletion
-    br  = branch -m     ; Rename a branch
+    b   = branch --color=never        ; Show local branches
+    ba  = branch --color=never --all  ; Show all local and remote branches
+    bd  = branch --color=never -d     ; Delete a merged branch
+    bdd = branch --color=never -D     ; Force branch deletion
+    br  = branch --color=never -m     ; Rename a branch
 
 ;###############################################################################
 ;                 Commit shortcuts                                             #
