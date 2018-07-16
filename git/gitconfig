@@ -124,11 +124,11 @@
 ;                 Branch management                                            #
 ;###############################################################################
 
-    b   = branch        ; Show local branches
-    ba  = branch --all  ; Show all local and remote branches
-    bd  = branch -d     ; Delete a merged branch
-    bdd = branch -D     ; Force branch deletion
-    br  = branch -m     ; Rename a branch
+    b   = branch --color=never        ; Show local branches
+    ba  = branch --color=never --all  ; Show all local and remote branches
+    bd  = branch --color=never -d     ; Delete a merged branch
+    bdd = branch --color=never -D     ; Force branch deletion
+    br  = branch --color=never -m     ; Rename a branch
 
 ;###############################################################################
 ;                 Commit shortcuts                                             #
@@ -150,10 +150,9 @@
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
-    d   = diff --diff-algorithm=minimal --color=never
-    dc  = diff --diff-algorithm=minimal --color=never --cached
-    dk  = diff --diff-algorithm=minimal --color=never --check
-    dp  = diff --diff-algorithm=minimal --color=never --patience
+    d   = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never
+    dc  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never --cached
+    dk  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=never --check
 
 ;###############################################################################
 ;                 Grep something in the current repo                           #
