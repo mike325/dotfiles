@@ -29,7 +29,10 @@
     ".travis.yml": {
         "type": "Travis"
     },
-    "install.sh": {
+    "install.py": {
+        "type": "Install"
+    },
+    "install.*": {
         "type": "Install"
     },
     "bin/*": {

@@ -26,15 +26,17 @@
     # Changed to the standar location $HOME/.config/git/ignore
     # excludesfile = ~/.config/git/templates/gitignore
     autocrlf = input
+    # TODO: Check if this has efect in linux
+    # symlinks = $CREATE_LINKS
 
 [user]
     name  = Mike
-    email = mike@prodeveloper.me
+    email = mickiller.25@gmail.com
 
 [github]
     user = mike325
 
-[url "git://github.com/"]
+[url "https://github.com/"]
     insteadOf = gh:
 
 [url "git@github.com:"]
@@ -172,7 +174,7 @@
     llg = log --color=never --graph --pretty=custom       ; Short pretty log with graph
     lln = log --color=never --name-status --pretty=custom ; get files that changed
     w   = whatchanged --color=never                       ; Old whatchanged
-    wp  = whatchanged --color=never-p                     ; Old whatchanged with diff
+    wp  = whatchanged --color=never -p                    ; Old whatchanged with diff
 
 ;###############################################################################
 ;                 Git ls a bit simpler and with grep search                    #
@@ -285,8 +287,8 @@
 
 ;   Auto create tags files and place it in .git dir Credits to Tpope
     ctags = "!f() {\
-            if [[ -f .git ]] || [[ -d .git ]]; then\
-                if [[ -f .git ]]; then \
+            if [ -f .git ] || [ -d .git ]; then\
+                if [ -f .git ]; then \
                     dir=$( git rev-parse --git-dir ) ; \
                     ${dir}/../../hooks/ctags ;\
                 else \

@@ -128,8 +128,10 @@ if [[ $(uname --all) =~ MINGW ]]; then
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     export _IS_WINDOWS=1
     export USER="$USERNAME"
+    export CREATE_LINKS=true
 else
     export _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $4 }')"
+    export CREATE_LINKS=false
 fi
 
 if  [[ $_IS_WINDOWS -eq 1 ]]; then
