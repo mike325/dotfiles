@@ -49,7 +49,6 @@
 # Logs and databases #
 ######################
 *.log
-*.sql
 *.sqlite
 
 # OS generated files #
@@ -170,7 +169,8 @@ UpgradeLog*.XML
 
 
 # Python
-*.py[co]
+*.pyo
+*.pyc
 *.ropeproject*/*
 
 # Packages
