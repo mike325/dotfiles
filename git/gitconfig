@@ -126,11 +126,11 @@
 ;                 Branch management                                            #
 ;###############################################################################
 
-    b   = branch --color=never        ; Show local branches
-    ba  = branch --color=never --all  ; Show all local and remote branches
-    bd  = branch --color=never -d     ; Delete a merged branch
-    bdd = branch --color=never -D     ; Force branch deletion
-    br  = branch --color=never -m     ; Rename a branch
+    b   = !git --no-pager branch        ; Show local branches
+    ba  = !git --no-pager branch --all  ; Show all local and remote branches
+    bd  = !git --no-pager branch -d     ; Delete a merged branch
+    bdd = !git --no-pager branch -D     ; Force branch deletion
+    br  = !git --no-pager branch -m     ; Rename a branch
 
 ;###############################################################################
 ;                 Commit shortcuts                                             #
