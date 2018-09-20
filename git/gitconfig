@@ -62,10 +62,11 @@
     new  = green
     old  = red
 
+# Bold colors are the only ones that works in windows
 [color "status"]
-    added     = green
-    changed   = yellow
-    untracked = red
+    added     = green bold
+    changed   = yellow bold
+    untracked = red bold
 
 [push]
     ; Make `git push` automatically push relevant annotated tags when pushing
@@ -144,9 +145,9 @@
 ;                 Cherry pick commits                                          #
 ;###############################################################################
 
-    chp  = cherry-pick
-    chpc = cherry-pick --continue
-    chpa = cherry-pick --abort
+    ch  = cherry-pick
+    chc = cherry-pick --continue
+    cha = cherry-pick --abort
 
 ;###############################################################################
 ;                 Diff stuff                                                   #
@@ -338,9 +339,9 @@
     }; f"
 
 [pretty]
-    custom = "%C(magenta)%h%C(red)%d %C(yellow)%ar %C(green)%s %C(yellow)(%an)"
-    ;                     │        │            │            │             └─ author name
-    ;                     │        │            │            └─ message
-    ;                     │        │            └─ date (relative)
-    ;                     │        └─ decorations (branch, heads or tags)
-    ;                     └─ hash (abbreviated)
+    custom = "%C(magenta bold)%h%C(red bold)%d %C(yellow bold)%ar %C(green bold)%s %C(yellow bold)(%an)"
+    ;          │               │            │                  │                └─ author name
+    ;          │               │            │                  └─ message
+    ;          │               │            └─ date (relative)
+    ;          │               └─ decorations (branch, heads or tags)
+    ;          └─ hash (abbreviated)
