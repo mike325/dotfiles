@@ -45,6 +45,18 @@ sys.ps2 = "Mike ... "
 
 print(__header__)
 
+class Quit(object):
+    def __init__(self):
+        super(Quit, self).__init__()
+
+    def __repr__(self):
+        exit(0)
+
+    def __call__(self):
+        exit(0)
+
+q = Quit()
+
 historyPath = os.path.expanduser("~/.pyhistory")
 try:
 
