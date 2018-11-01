@@ -34,7 +34,7 @@
 # Set vi to start as a minimal setup with just settings, mappings and autocmd; 0 plugins
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
-    if hash nvim 2>/dev/null && nvim --version 2> /dev/null; then
+    if hash nvim 2>/dev/null; then
         if [[ $(uname --all) =~ MINGW ]]; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
