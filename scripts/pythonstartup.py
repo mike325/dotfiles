@@ -6,10 +6,16 @@
 # to it:  export PYTHONSTARTUP="$HOME/path/to/the/file" in your ${SHELL}rc
 # Normally .bashrc or .zshrc
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import with_statement
+from __future__ import division
+
 import atexit
 import os
 import sys
 import rlcompleter
+
 try:
     import readline
 except ImportError:
@@ -40,8 +46,8 @@ __header__ = """
                    .`                                 `/
 """
 
-sys.ps1 = "Mike >>>"
-sys.ps2 = "Mike ..."
+sys.ps1 = "Mike >>> "
+sys.ps2 = "Mike ... "
 
 print(__header__)
 
