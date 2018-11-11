@@ -51,6 +51,18 @@ sys.ps2 = "Mike ... "
 
 print(__header__)
 
+class Quit(object):
+    def __init__(self):
+        super(Quit, self).__init__()
+
+    def __repr__(self):
+        exit(0)
+
+    def __call__(self):
+        exit(0)
+
+q = Quit()
+
 historyPath = os.path.expanduser("~/.pyhistory")
 try:
 
@@ -62,7 +74,10 @@ try:
                 import pyreadline as readline
             except ImportError:
                 return
-        readline.write_history_file(historyPath)
+        try:
+            readline.write_history_file(historyPath)
+        except OSError as e:
+            print('Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
 
     if os.path.exists(historyPath):
         readline.read_history_file(historyPath)
