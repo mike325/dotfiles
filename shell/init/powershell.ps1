@@ -90,6 +90,8 @@ else {
 }
 
 New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
+New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
+New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue
 
 function q {
     exit
@@ -105,6 +107,10 @@ if (Get-Command "git" -ErrorAction SilentlyContinue) {
     New-Alias -Name got -Value 'git' -ErrorAction SilentlyContinue
     New-Alias -Name gut -Value 'git' -ErrorAction SilentlyContinue
     # New-Alias -Name gi  -Value 'git' -ErrorAction SilentlyContinue
+}
+
+if ( Test-Path "$HOME\.local\bin" ) {
+    $env:path = "$HOME\.local\bin;$env:path"
 }
 
 if ( Test-Path ~/.local/lib/pythonstartup.py) {
@@ -170,6 +176,16 @@ function prompt {
     Write-Host ""
 
     return "$ "
+}
+
+$proxy = "$HOME\.config\shell\host\proxy.ps1"
+if (Test-Path($proxy)) {
+    . $proxy
+}
+
+$settings = "$HOME\.config\shell\host\settings.ps1"
+if (Test-Path($settings)) {
+    . $settings
 }
 
 Write-Host "
