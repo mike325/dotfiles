@@ -25,17 +25,35 @@
 #                                                                              #
 ################################################################################
 
+
+New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
+New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
+New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue
+
+function which($name) {
+    Get-Command $name | Select-Object -ExpandProperty Definition
+}
+
+function q {
+    exit
+}
+
+function touch {
+    New-Item -path $args -type file
+}
+
 if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue) {
     function cdvim {
-        cd ~/AppData/Local/nvim
+        cd "$HOME\AppData\Local\nvim"
     }
 
     function cdvi {
-        cd ~/vimfiles/
+        cd "$HOME\vimfiles\"
     }
 
     if ($env:nvr -ne $null) {
-        New-Alias -Name nvr -Value $env:USERPROFILE'\AppData\Roaming\Python\Python36\Scripts\nvr.exe' -ErrorAction SilentlyContinue
+        $nvr_path = (which nvr)
+        New-Alias -Name nvr -Value $nvr_path -ErrorAction SilentlyContinue
 
         function vi {
             nvr --remote-silent $args
@@ -81,24 +99,12 @@ if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue) {
 }
 else {
     function cdvim {
-        cd ~/vimfiles
+        cd "$HOME\vimfiles"
     }
 
     function cdvi {
-        cd ~/vimfiles/
+        cd "$HOME\vimfiles\"
     }
-}
-
-New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
-New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
-New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue
-
-function q {
-    exit
-}
-
-function touch {
-    New-Item -path $args -type file
 }
 
 # Typos
@@ -109,11 +115,25 @@ if (Get-Command "git" -ErrorAction SilentlyContinue) {
     # New-Alias -Name gi  -Value 'git' -ErrorAction SilentlyContinue
 }
 
+# Path settings
 if ( Test-Path "$HOME\.local\bin" ) {
     $env:path = "$HOME\.local\bin;$env:path"
 }
 
-if ( Test-Path ~/.local/lib/pythonstartup.py) {
+# $pythonscripts
+
+if (Test-Path "$HOME\AppData\Roaming\Python\Python27\Scripts") {
+    $env:path = "$HOME\AppData\Roaming\Python\Python27\Scripts;$env:path"
+}
+
+$python_versions = @('8', '7', '6', '5', '4', '3')
+foreach($version in $python_versions) {
+    if (Test-Path "$HOME\AppData\Roaming\Python\Python3$version\Scripts") {
+        $env:path = "$HOME\AppData\Roaming\Python\Python3$version\Scripts;$env:path"
+    }
+}
+
+if ( Test-Path "$HOME\.local\lib\pythonstartup.py") {
     $env:PYTHONSTARTUP = "$env:USERPROFILE\.local\lib\pythonstartup.py"
 }
 

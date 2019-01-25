@@ -25,31 +25,32 @@ except ImportError:
         print("Error importing readline and pyreadline modules")
 
 __header__ = """
-                                     -`
-                     ...            .o+`
-                  .+++s+   .h+     `ooo/
-                 `+++%++  .h+++   `+oooo:
-                 +++o+++ .hhs++o `+oooooo:
-                 +s%%so%.hohhooo -+oooooo+:
-                 `+ooohs+h+sh++`/:-:++oooo+:
-                  hh+o+hoso+h+`/++++/+++++++:
-                   `+h+++h.+ `/++++++++++++++:
-                            `/+++ooooooooooooo/`
-                           ./ooosssso++osssssso+`
-                          .oossssso-````/ossssss+`
-                         -osssssso.      :ssssssso.
-                        :osssssss/  Mike  osssso+++.
-                       /ossssssss/   8a   +ssssooo/-
-                     `/ossssso+/:-        -:/+osssso+-
-                    `+sso+:-`                 `.-/+oso:
-                   `++:.                           `-/+/
-                   .`                                 `/
+                               -'
+               ...            .o+'
+            .+++s+   .h'.    'ooo/
+           '+++%++  .h+++   '+oooo:
+           +++o+++ .hhs++. '+oooooo:
+           +s%%so%.hohhoo'  'oooooo+:
+           '+ooohs+h+sh++'/:  ++oooo+:
+            hh+o+hoso+h+'/++++.+++++++:
+             '+h+++h.+ '/++++++++++++++:
+                      '/+++ooooooooooooo/'
+                     ./ooosssso++osssssso+'
+                    .oossssso-''''/osssss::'
+                   -osssssso.      :ssss''to.
+                  :osssssss/  Mike  osssl   +
+                 /ossssssss/   8a   +sssslb
+               '/ossssso+/:-        -:/+ossss'.-
+              '+sso+:-'                 '.-/+oso:
+             '++:.                           '-/+/
+             .'                                 '/
 """
 
 sys.ps1 = "Mike >>> "
 sys.ps2 = "Mike ... "
 
 print(__header__)
+
 
 class Quit(object):
     def __init__(self):
@@ -58,11 +59,14 @@ class Quit(object):
     def __repr__(self):
         exit(0)
 
+    def __str__(self):
+        return 'Quit object to quick quit current prompt'
+
     def __call__(self):
         exit(0)
 
-q = Quit()
 
+q = Quit()
 historyPath = os.path.expanduser("~/.pyhistory")
 try:
 
@@ -76,7 +80,7 @@ try:
                 return
         try:
             readline.write_history_file(historyPath)
-        except OSError as e:
+        except OSError:
             print('Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
 
     if os.path.exists(historyPath):
