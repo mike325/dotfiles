@@ -289,16 +289,19 @@
 ;   Auto create tags files and place it in .git dir Credits to Tpope
     ctags = "!f() {\
             if [ -f .git ] || [ -d .git ]; then\
+                dir=$( git rev-parse --git-dir ) ; \
                 if [ -f .git ]; then \
-                    dir=$( git rev-parse --git-dir ) ; \
                     ${dir}/../../hooks/ctags ;\
                 else \
-                    .git/hooks/ctags; \
+                    ${dir}/hooks/ctags; \
                 fi ;\
             else \
                 git init && .git/hooks/ctags ;\
             fi;\
         }; f"
+
+    np  = "!f() { git --no-pager $@; }; f"
+    npc = "!f() { git --no-pager $@ --color; }; f"
 
 ;   Update just one file form specific remote
     updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
@@ -320,9 +323,9 @@
 
 ;   Apply, pop or drop a specific stash
     sa = "!f(){ if [ -z $1 ]; then git --no-pager stash apply; else git --no-pager stash apply stash@{$1}; fi; }; f"
-    sp = "!f(){ if [ -z $1 ]; then git --no-pager stash pop; else   git --no-pager stash pop stash@{$1}; fi; }; f"
-    sd = "!f(){ if [ -z $1 ]; then git --no-pager stash drop; else  git --no-pager stash drop stash@{$1}; fi; }; f"
-    sw = "!f(){ if [ -z $1 ]; then git --no-pager stash show; else  git --no-pager stash show stash@{$1}; fi; }; f"
+    sp = "!f(){ if [ -z $1 ]; then git --no-pager stash pop;   else git --no-pager stash pop stash@{$1};   fi; }; f"
+    sw = "!f(){ if [ -z $1 ]; then git --no-pager stash show;  else git --no-pager stash show stash@{$1};  fi; }; f"
+    # sd = "!f(){ if [ -z $1 ]; then git --no-pager stash drop;  else git --no-pager stash drop stash@{$1}; fi; }; f"
 
 ;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 

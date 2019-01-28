@@ -52,7 +52,7 @@
     "system/*": {
         "type": "System"
     },
-    "git/bin/*": {
+    "git/bin/git-*": {
         "type": "GitBins"
     },
     "git/templates/*": {

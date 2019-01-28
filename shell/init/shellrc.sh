@@ -65,7 +65,7 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     source "$HOME/.config/shell/host/proxy.sh"
     function toggleProxy() {
         # shellcheck disable=SC2154
-        if [[ "$http_proxy" =~ '' ]]; then
+        if [[ ! -z "$http_proxy" ]]; then
             unset "http_proxy"
             unset "https_proxy"
             unset "ftp_proxy"
@@ -139,12 +139,22 @@ _CURRENT_SHELL=""
 if [[ $(uname --all) =~ MINGW ]]; then
     export _CURRENT_SHELL="$(ps | grep $( echo $$ ) | awk '{ print $8 }')"
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    export _IS_WINDOWS=1
     export USER="$USERNAME"
     export CREATE_LINKS=true
 else
     export _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $4 }')"
     export CREATE_LINKS=false
+fi
+
+if [ -z "$SHELL_PLATFORM" ]; then
+    export SHELL_PLATFORM='OTHER'
+    case "$OSTYPE" in
+      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
+      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
+      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
+      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
+      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
+    esac
 fi
 
 if  [[ $_IS_WINDOWS -eq 1 ]]; then
@@ -165,7 +175,7 @@ if  [[ $_IS_WINDOWS -eq 1 ]]; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    python3=("38" "37" "36" "35" "33")
+    python3=("38" "37" "36" "35" "34")
 
     for version in "${python3[@]}"; do
         if [[ -d "${windows_root}/Python${version}/Scripts" ]]; then
@@ -240,6 +250,11 @@ if (( __INTERACTIVE == 1 )); then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090
         source "$HOME/.config/shell/host/settings.sh"
+    fi
+
+    if [[ -f "$HOME/.config/shell/scripts/z.sh" ]]; then
+        # shellcheck disable=SC1090
+        source "$HOME/.config/shell/scripts/z.sh"
     fi
 
     if [[ -f "$HOME/.config/shell/banner" ]]; then

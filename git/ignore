@@ -27,6 +27,11 @@
 *.xlsx
 *.odt
 
+# Config files
+*.xml
+!maven.xml
+!pom.xml
+
 # Media files
 *.mp4
 *.mpeg
@@ -77,18 +82,24 @@ ptags
 cscope.*
 cscope
 
+# VCS #
+############
 # Mercurial
+.hg/*
 /.hg/*
 */.hg/*
 .hgignore
 
 # SVN
+*.svn-base
+*.svn/*
 /.svn/*
 */.svn/*
 
 # Unix misc
 .*
 !.gitignore
+!.gitkeep
 *~
 
 # KDE

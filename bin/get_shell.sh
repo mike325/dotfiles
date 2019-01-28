@@ -38,7 +38,6 @@ if [[ $(uname --all) =~ MINGW ]]; then
     _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     # Windows does not support links we will use cp instead
-    _IS_WINDOWS=1
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
 fi

@@ -166,8 +166,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Windows stuff
-if [[ $(uname --all) =~ MINGW ]]; then
-    __IS_WINDOWS=1
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     warn_msg "Mingw platform is currently unsupported"
     error_msg "Please follow the official instructions to get Neovim in windows https://github.com/neovim/neovim/wiki/Installing-Neovim#windows"
     exit 1

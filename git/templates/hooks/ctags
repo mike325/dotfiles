@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 dir="$( git rev-parse --git-dir )"
@@ -8,10 +8,10 @@ trap 'rm -f "$top/tags.$$"' EXIT INT TERM
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
 
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
-git grep --cached -Il '' -- ':/' ':!*.xml' | ctags --tag-relative -L - -f"$dir/tags.$$"
+git ls-files --exclude-standard --cached | ctags --tag-relative -L - -f"$dir/tags.$$"
 
-if [[ $(uname --all) =~ MINGW ]]; then
-    mv "$dir/tags.$$" "$top/tags"
-else
+if [[ "$SHELL_PLATFORM" =~ "LINUX" ]]; then
     mv "$dir/tags.$$" "$dir/tags"
+else
+    mv "$dir/tags.$$" "$top/tags"
 fi

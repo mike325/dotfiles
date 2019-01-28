@@ -45,14 +45,11 @@ fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
-_IS_WINDOWS=0
 
 # Windows stuff
 if [[ $(uname --all) =~ MINGW ]]; then
     _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    # Windows does not support links we will use cp instead
-    _IS_WINDOWS=1
 else
     _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
     # Hack when using sudo
@@ -164,7 +161,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-_GITDIT="$(git rev-parse --git-dir)"
+_GITDIR="$(git rev-parse --git-dir)"
 worklist=($(git worktree list | awk '{print $1}'))
 for i in ${worklist[*]}; do
     [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && _WORKTREE="$i"
@@ -172,15 +169,15 @@ done
 
 if [[ ! -z "$_CACHED" ]]; then
     if [[ ! -z "$_WORKTREE" ]]; then
-        _FILES=($(git --git-dir="$_GITDIT" --work-tree="$_WORKTREE" diff-index --no-commit-id --name-only "$_CACHED" -r HEAD ))
+        _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
     else
-        _FILES=($(git --git-dir="$_GITDIT" diff-index --no-commit-id --name-only "$_CACHED" -r HEAD ))
+        _FILES=($(git --no-pager status --short | awk '{print $2}'))
     fi
 else
     if [[ ! -z "$_WORKTREE" ]]; then
-        _FILES=($(git --git-dir="$_GITDIT" --work-tree="$_WORKTREE" diff-index --no-commit-id --name-only -r HEAD ))
+        _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
     else
-        _FILES=($(git --git-dir="$_GITDIT" diff-index --no-commit-id --name-only -r HEAD ))
+        _FILES=($(git --no-pager status --short | awk '{print $2}'))
     fi
 fi
 

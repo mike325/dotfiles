@@ -70,7 +70,6 @@ _URL=""
 
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
-_IS_WINDOWS=0
 
 # Windows stuff
 if [[ $(uname --all) =~ MINGW ]]; then
@@ -84,7 +83,6 @@ if [[ $(uname --all) =~ MINGW ]]; then
     fi
 
     # Windows does not support links we will use cp instead
-    _IS_WINDOWS=1
     _CMD="cp -rf"
     USER="$USERNAME"
 else
@@ -457,7 +455,7 @@ function get_vim_dotfiles() {
     fi
 
     # Windows stuff
-    if [[ $_IS_WINDOWS -eq 1 ]]; then
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
         # If we couldn't clone our repo, return
         if [[ ! -d "$HOME/.vim" ]]; then
@@ -494,7 +492,7 @@ function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
     local nvim_version="v0.3.0"
-    if [[ $_IS_WINDOWS -eq 1 ]]; then
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
         # TODO: auto detect Windows arch and latest nvim version
         if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
@@ -634,6 +632,7 @@ function get_portables() {
             if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
                 if ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
                     status_msg "Getting python pip"
+
                     if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
                         chmod u+x "$_TMP/get-pip.py"
 
@@ -643,8 +642,15 @@ function get_portables() {
                         fi
 
                         if ! hash pip3 2>/dev/null; then
-                            status_msg "Installing pip3"
-                            python3 $_TMP/get-pip.py --user
+                            local python=("8" "7" "6" "5" "4")
+
+                            for version in "${python[@]}"; do
+                                if hash "python3.${version}"; then
+                                    status_msg "Installing pip3 with python3.${version}"
+                                    "python3.${version}" "$_TMP/get-pip.py" --user
+                                    break
+                                fi
+                            done
                         fi
                     else
                         error_msg "Curl couldn't get pip"
