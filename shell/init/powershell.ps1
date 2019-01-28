@@ -201,6 +201,18 @@ function prompt {
 $proxy = "$HOME\.config\shell\host\proxy.ps1"
 if (Test-Path($proxy)) {
     . $proxy
+    function toggleProxy {
+        if ($env:http_proxy -ne $null -AND $env:http_proxy -ne '') {
+            Remove-Item env:\http_proxy
+            Remove-Item env:\https_proxy
+            Remove-Item env:\ftp_proxy
+            Remove-Item env:\socks_proxy
+            Remove-Item env:\no_proxy
+        }
+        else {
+            . "$HOME\.config\shell\host\proxy.ps1"
+        }
+    }
 }
 
 $settings = "$HOME\.config\shell\host\settings.ps1"

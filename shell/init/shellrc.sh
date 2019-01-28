@@ -63,6 +63,19 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     # We already checked the file exists so its "safe"
     # shellcheck disable=SC1090
     source "$HOME/.config/shell/host/proxy.sh"
+    function toggleProxy() {
+        # shellcheck disable=SC2154
+        if [[ "$http_proxy" =~ '' ]]; then
+            unset "http_proxy"
+            unset "https_proxy"
+            unset "ftp_proxy"
+            unset "socks_proxy"
+            unset "no_proxy"
+        else
+            # shellcheck disable=SC1090
+            source "$HOME/.config/shell/host/proxy.sh"
+        fi
+    }
 fi
 
 # Load all ENV variables
