@@ -205,3 +205,5 @@ nosetests.xml
 # Temporal dirs
 tmp/
 tmp_*/
+
+.languageclient.*
