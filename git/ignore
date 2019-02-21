@@ -95,9 +95,10 @@ cscope
 */.svn/*
 
 # Unix misc
-.*
-!.gitignore
-!.gitkeep
+# !.gitignore
+# !.gitkeep
+# !.projections.json
+# !.projections.json
 *~
 
 # KDE

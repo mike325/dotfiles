@@ -29,6 +29,9 @@
     ".travis.yml": {
         "type": "Travis"
     },
+    "packages/*.json": {
+        "type": "Packages"
+    },
     "install.py": {
         "type": "Install"
     },
