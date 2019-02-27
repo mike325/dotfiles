@@ -157,7 +157,7 @@ if [ -z "$SHELL_PLATFORM" ]; then
     esac
 fi
 
-if  [[ $_IS_WINDOWS -eq 1 ]]; then
+if  [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then
         export PATH="$HOME/AppData/Roaming/Python/Scripts:$PATH"
