@@ -78,7 +78,7 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-if [[ $_IS_WINDOWS -eq 0 ]]; then
+if [[ $OSTYPE == 'MSYS' ]] || [[ $OSTYPE == 'CYGWIN' ]]; then
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
