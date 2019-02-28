@@ -592,7 +592,7 @@ function get_portables() {
     local rst=0
     if hash curl 2>/dev/null; then
         status_msg "Checking portable programs"
-        if [[ $_IS_WINDOWS -eq 1 ]]; then
+        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
@@ -741,7 +741,7 @@ function get_cool_fonts() {
         status_msg "Gettings powerline fonts"
         clone_repo "https://github.com/powerline/fonts" "$HOME/.local/fonts"
 
-        if [[ $_IS_WINDOWS -eq 1 ]]; then
+        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
             # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
             # BUT administrator promp will pop up for EVERY font (too fucking much)
             status_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
@@ -756,7 +756,7 @@ function get_cool_fonts() {
 }
 
 function setup_systemd() {
-    if [[ $_IS_WINDOWS -eq 0 ]]; then
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
         if hash systemctl 2> /dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user/" ]]; then
@@ -951,7 +951,7 @@ done
 
 # Because the "cp -rf" means there are no symbolic links
 # we must be sure we wont screw the shell host settings
-if [[ $_IS_WINDOWS -eq 1 ]] || [[ $_CMD == "cp -rf" ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]] || [[ $_CMD == "cp -rf" ]]; then
     verbose_msg "Activating backup"
     _BACKUP=1
 fi
@@ -992,7 +992,7 @@ verbose_msg "Using ${_URL}"
 verbose_msg "Protocol   : ${_PROTOCOL}"
 verbose_msg "User       : ${_GIT_USER}"
 verbose_msg "Host       : ${_GIT_HOST}"
-if [[ $_IS_WINDOWS -eq 0 ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     verbose_msg "Platform   : Linux"
 else
     verbose_msg "Platform   : Windows"
