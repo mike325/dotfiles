@@ -34,7 +34,7 @@ _BACKUP=0
 _VERBOSE=0
 
 # Windows stuff
-if [[ $(uname --all) =~ MINGW ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     # Windows does not support links we will use cp instead
