@@ -204,7 +204,7 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim screen meld htop top"
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim screen meld htop top ssh"
     eval "$(ntfy shell-integration)"
 fi
 
