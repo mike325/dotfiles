@@ -33,6 +33,7 @@
 
 NAME="$0"
 NAME="${NAME##*/}"
+_PING=0
 
 function help_user() {
     echo ""
@@ -51,6 +52,9 @@ function help_user() {
 
 for key in "$@"; do
     case "$key" in
+        -p|--ping)
+            _PING=1
+            ;;
         -h|--help)
             help_user
             exit 0
@@ -58,7 +62,13 @@ for key in "$@"; do
     esac
 done
 
-if [[ ! -z "$1" ]]; then
+if [[ $_PING -eq 1 ]]; then
+    if ! ping -c 5 www.downforeveryoneorjustme.com > /dev/null; then
+        echo 'You may not have network'
+    else
+        echo 'Great!! it seems you have external connectivity'
+    fi
+elif [[ ! -z "$1" ]]; then
     curl -s -L --max-redirs 1 "http://www.downforeveryoneorjustme.com/$1" | grep -oE "It's just you.|It's not just you!"
 fi
 

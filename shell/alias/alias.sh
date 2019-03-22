@@ -203,6 +203,11 @@ else
     # alias fuck='sudo $(history -p \!\!)'
 fi
 
+if hash ntfy 2>/dev/null; then
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim screen meld htop top"
+    eval "$(ntfy shell-integration)"
+fi
+
 if hash cleanswap 2>/dev/null; then
     alias cw="cleanswap"
 fi
