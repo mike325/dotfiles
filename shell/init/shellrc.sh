@@ -65,15 +65,17 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     source "$HOME/.config/shell/host/proxy.sh"
     function toggleProxy() {
         # shellcheck disable=SC2154
-        if [[ ! -z "$http_proxy" ]]; then
+        if [[ -n "$http_proxy" ]]; then
             unset "http_proxy"
             unset "https_proxy"
             unset "ftp_proxy"
             unset "socks_proxy"
             unset "no_proxy"
+            echo "Proxy disable"
         else
             # shellcheck disable=SC1090
             source "$HOME/.config/shell/host/proxy.sh"
+            echo "Proxy enable"
         fi
     }
 fi
@@ -134,9 +136,20 @@ fi
 
 # We don't need this stuff if we are in a non __INTERACTIVE session
 
+if [ -z "$SHELL_PLATFORM" ]; then
+    export SHELL_PLATFORM='UNKNOWN'
+    case "$OSTYPE" in
+      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
+      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
+      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
+      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
+      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
+    esac
+fi
+
 # Windows stuff
 _CURRENT_SHELL=""
-if [[ $(uname --all) =~ MINGW ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     export _CURRENT_SHELL="$(ps | grep $( echo $$ ) | awk '{ print $8 }')"
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
     export USER="$USERNAME"
@@ -146,16 +159,6 @@ else
     export CREATE_LINKS=false
 fi
 
-if [ -z "$SHELL_PLATFORM" ]; then
-    export SHELL_PLATFORM='OTHER'
-    case "$OSTYPE" in
-      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
-      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
-      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
-      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
-      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
-    esac
-fi
 
 if  [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     # Windows user paths where pip install python packages

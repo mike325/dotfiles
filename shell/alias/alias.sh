@@ -35,7 +35,7 @@
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
-        if [[ $(uname --all) =~ MINGW ]]; then
+        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
@@ -115,7 +115,7 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
-if [[ $(uname --all) =~ MINGW ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     alias bim="vim"
     alias cim="vim"
     alias im="vim"

@@ -71,8 +71,19 @@ _URL=""
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
 
+if [ -z "$SHELL_PLATFORM" ]; then
+    export SHELL_PLATFORM='UNKNOWN'
+    case "$OSTYPE" in
+      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
+      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
+      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
+      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
+      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
+    esac
+fi
+
 # Windows stuff
-if [[ $(uname --all) =~ MINGW ]]; then
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
 
@@ -491,7 +502,7 @@ function get_vim_dotfiles() {
 function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
-    local nvim_version="v0.3.0"
+    local nvim_version="v0.4.0"
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
         # TODO: auto detect Windows arch and latest nvim version

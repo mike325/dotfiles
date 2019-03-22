@@ -26,94 +26,23 @@
 ################################################################################
 
 
-New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
-New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
-New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue
-
 function which($name) {
     Get-Command $name | Select-Object -ExpandProperty Definition
 }
 
 function q {
-    exit
+    if ( Get-Command "deactivate" -ErrorAction SilentlyContinue ) {
+        deactivate
+    }
+    else {
+        exit
+    }
 }
 
 function touch {
     New-Item -path $args -type file
 }
 
-if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue) {
-    function cdvim {
-        cd "$HOME\AppData\Local\nvim"
-    }
-
-    function cdvi {
-        cd "$HOME\vimfiles\"
-    }
-
-    if ($env:nvr -ne $null) {
-        $nvr_path = (which nvr)
-        New-Alias -Name nvr -Value $nvr_path -ErrorAction SilentlyContinue
-
-        function vi {
-            nvr --remote-silent $args
-        }
-
-        function vim {
-            nvr --remote-silent $args
-        }
-
-        function nvim {
-            nvr --remote-silent $args
-        }
-
-        # No man pages for windows
-        # $env:MANPAGER  = "nvr.exe -cc 'setlocal modifiable' -c 'silent! setlocal nomodifiable ft=man' --remote-tab -"
-        $env:GIT_PAGER = "nvr.exe -cc 'setlocal modifiable' -c 'setlocal ft=git nomodifiable' --remote-tab -"
-        $env:EDITOR    = "nvr.exe --remote-tab-wait"
-
-    }
-    else {
-
-        # No man pages for windows
-        # $env:MANPAGER  = "nvim.exe --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal nomodifiable ft=man' -"
-        $env:GIT_PAGER = "nvim.exe --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git nomodifiable' - "
-        $env:EDITOR    = "nvim.exe"
-
-        function vi {
-            nvim.exe --cmd 'let g:minimal=0' $args
-        }
-
-        function viu {
-            nvim.exe -u NONE $args
-        }
-
-        # Fucking typos
-        New-Alias -Name nvi  -Value 'nvim.exe' -ErrorAction SilentlyContinue
-        New-Alias -Name vnim -Value 'nvim.exe' -ErrorAction SilentlyContinue
-
-    }
-
-    New-Alias -Name bi -Value 'vi' -ErrorAction SilentlyContinue
-    New-Alias -Name ci -Value 'vi' -ErrorAction SilentlyContinue
-}
-else {
-    function cdvim {
-        cd "$HOME\vimfiles"
-    }
-
-    function cdvi {
-        cd "$HOME\vimfiles\"
-    }
-}
-
-# Typos
-if (Get-Command "git" -ErrorAction SilentlyContinue) {
-    New-Alias -Name gti -Value 'git' -ErrorAction SilentlyContinue
-    New-Alias -Name got -Value 'git' -ErrorAction SilentlyContinue
-    New-Alias -Name gut -Value 'git' -ErrorAction SilentlyContinue
-    # New-Alias -Name gi  -Value 'git' -ErrorAction SilentlyContinue
-}
 
 # Path settings
 if ( Test-Path "$HOME\.local\bin" ) {
@@ -142,18 +71,6 @@ if ($env:PYTHONPATH -eq $null) {
 }
 else {
     $env:PYTHONPATH = "$env:USERPROFILE\cdf_engines;c:\PythonSv;$env:PYTHONPATH"
-}
-
-if (Get-Command "python" -ErrorAction SilentlyContinue) {
-    New-Alias -Name py  -Value 'python'  -ErrorAction SilentlyContinue
-}
-
-if (Get-Command "python2" -ErrorAction SilentlyContinue) {
-    New-Alias -Name py2 -Value 'python2' -ErrorAction SilentlyContinue
-}
-
-if (Get-Command "python3" -ErrorAction SilentlyContinue) {
-    New-Alias -Name py3 -Value 'python3' -ErrorAction SilentlyContinue
 }
 
 function Test-Administrator {
@@ -198,9 +115,9 @@ function prompt {
     return "$ "
 }
 
-$proxy = "$HOME\.config\shell\host\proxy.ps1"
-if (Test-Path($proxy)) {
-    . $proxy
+$powersource = "$HOME\.config\shell\host\proxy.ps1"
+if (Test-Path($powersource)) {
+    . $powersource
     function toggleProxy {
         if ($env:http_proxy -ne $null -AND $env:http_proxy -ne '') {
             Remove-Item env:\http_proxy
@@ -208,16 +125,28 @@ if (Test-Path($proxy)) {
             Remove-Item env:\ftp_proxy
             Remove-Item env:\socks_proxy
             Remove-Item env:\no_proxy
+            Write-Host " Proxy disable"
         }
         else {
             . "$HOME\.config\shell\host\proxy.ps1"
+            Write-Host " Proxy enable"
         }
     }
 }
 
-$settings = "$HOME\.config\shell\host\settings.ps1"
-if (Test-Path($settings)) {
-    . $settings
+$powersource = "$HOME\.config\shell\host\env.ps1"
+if (Test-Path($powersource)) {
+    . $powersource
+}
+
+$powersource = "$HOME\.config\shell\host\alias.ps1"
+if (Test-Path($powersource)) {
+    . $powersource
+}
+
+$powersource = "$HOME\.config\shell\host\settings.ps1"
+if (Test-Path($powersource)) {
+    . $powersource
 }
 
 Write-Host "
