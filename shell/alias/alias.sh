@@ -287,81 +287,89 @@ fi
 # Yeah I'm too lazy to remember each command in every distro soooooo
 # I added this alias
 # TODO add other distros commands I've used, like Solus
-if hash yaourt 2>/dev/null; then
+pkg=""
+if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
     # 'Install' package maybe in the PATH
-    alias getpkg="yaourt -S"
-    alias getpkgn="yaourt -S --noconfirm"
 
-    alias searchpkg="yaourt -Ss"
+    if hash yaourt 2>/dev/null; then
+        pkg="yaourt"
+    elif hash pacman 2>/dev/null; then
+        # Yeah Arch from scratch may not have yaourt
+        pkg="pacman"
+    fi
 
-    alias update="yaourt -Syyu --aur"
+    alias searchpkg="${pkg} -Ss"
 
-    alias update="yaourt -Syyu --aur"
-    alias updaten="yaourt -Syyu --aur --noconfirm"
+    alias getpkg="${pkg} -S"
+    alias getpkgn="${pkg} -S --noconfirm"
 
-    alias rmpkg="yaourt -Rns"
+    alias update="${pkg} -Syyu --aur"
+    alias updaten="${pkg} -Syyu --aur --noconfirm"
 
-    # Yeah Arch from scratch may not have yaourt
-elif hash pacman 2>/dev/null; then
-    alias searchpkg="pacman -Ss"
+    alias rmpkg="${pkg} -Rns"
 
-    if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo pacman -S"
-        alias getpkgn="sudo pacman -S --noconfirm"
+    if [[ $EUID -ne 0 ]] && hash pacman 2>/dev/null; then
+        unalias getpkg && alias getpkg="sudo ${pkg} -S"
+        unalias getpkgn && alias getpkgn="sudo ${pkg} -S --noconfirm"
 
-        alias update="sudo pacman -Syyu"
-        alias updaten="sudo pacman -Syyu --noconfirm"
+        unalias update && alias update="sudo ${pkg} -Syyu --aur"
+        unalias updaten && alias updaten="sudo ${pkg} -Syyu --aur --noconfirm"
 
-        alias rmpkg="sudo pacman -Rns"
-    else
-        alias getpkg="pacman -S"
-        alias getpkgn="pacman -S --noconfirm"
-
-        alias update="pacman -Syyu"
-        alias updaten="pacman -Syyu --noconfirm"
-
-        alias rmpkg="pacman -Rns"
+        unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
     fi
 
 elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
-    alias searchpkg="apt search"
 
-    if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo apt install"
-        alias getpkgn="sudo apt install -y"
-
-        alias update="sudo apt update && sudo apt upgrade"
-        alias updaten="sudo apt update && sudo apt upgrade -y"
-
-        alias rmpkg="sudo apt remove"
-    else
-        alias getpkg="apt install"
-        alias getpkgn="apt install -y"
-
-        alias update="apt update && apt upgrade"
-
-        alias rmpkg="apt remove"
+    if hash apt 2>/dev/null; then
+        pkg="apt"
+    elif hash apt-get 2>/dev/null; then
+        pkg="apt-get"
     fi
 
-elif hash dnf 2>/dev/null; then
-    alias searchpkg="dnf search"
+    # alias searchpkg="${apt} install"
+    if [[ $EUID -ne 0 ]]; then
+        alias getpkgn="sudo ${pkg} install -y"
+
+        alias update="sudo ${pkg} update && sudo ${pkg} upgrade"
+        alias updaten="sudo ${pkg} update && sudo ${pkg} upgrade -y"
+
+        alias rmpkg="sudo ${pkg} remove"
+    else
+        alias getpkg="${pkg} install"
+        alias getpkgn="${pkg} install -y"
+
+        alias update="${pkg} update && ${pkg} upgrade"
+
+        alias rmpkg="${pkg} remove"
+    fi
+
+elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
+
+    if hash dnf 2>/dev/null; then
+        pkg="dnf"
+    elif hash yum 2>/dev/null; then
+        pkg="yum"
+    fi
+
+    alias searchpkg="${pkg} search"
 
     if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo dnf install"
-        alias getpkgn="sudo dnf -y install"
+        alias getpkg="sudo ${pkg} install"
+        alias getpkgn="sudo ${pkg} -y install"
 
-        alias update="sudo dnf update"
+        alias update="sudo ${pkg} update"
 
-        alias rmpkg="sudo dnf remove"
+        alias rmpkg="sudo ${pkg} remove"
     else
-        alias getpkg="dnf install"
-        alias getpkgn="dnf -y install"
+        alias getpkg="${pkg} install"
+        alias getpkgn="${pkg} -y install"
 
-        alias update="dnf update"
+        alias update="${pkg} update"
 
-        alias rmpkg="dnf remove"
+        alias rmpkg="${pkg} remove"
     fi
 fi
+unset pkg
 
 
 ################################################################################
