@@ -49,8 +49,8 @@ if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue ) {
 
         # No man pages for windows
         # $env:MANPAGER  = "nvr.exe -cc 'setlocal modifiable' -c 'silent! setlocal nomodifiable ft=man' --remote-tab -"
-        $env:GIT_PAGER = "nvr.exe -cc 'setlocal modifiable' -c 'setlocal ft=git nomodifiable' --remote-tab -"
-        $env:EDITOR    = "nvr.exe --remote-tab-wait"
+        $env:GIT_PAGER = "nvr.exe -cc 'setlocal modifiable' -c 'setlocal ft=git nomodifiable' --remote -"
+        $env:EDITOR    = "nvr.exe --remote-wait"
 
     }
     else {

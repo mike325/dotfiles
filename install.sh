@@ -301,7 +301,7 @@ function setup_config() {
         fi
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$post_cmd"
-    elif [[ -e "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+    elif [[ -f "$post_cmd" ]] || [[ -e "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
         return 1
     fi

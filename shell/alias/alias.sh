@@ -59,9 +59,9 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias nvi="nvim"
                 alias vnim="nvim"
             else
-                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal  nomodifiable ft=man' --remote-tab -"
-                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
-                export EDITOR="nvr --remote-tab-wait"
+                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal  nomodifiable ft=man' --remote -"
+                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote -"
+                export EDITOR="nvr --remote-wait"
                 alias vi="nvr --remote-silent"
                 alias vim="nvr --remote-silent"
                 alias nvi="nvr --remote-silent"
@@ -204,7 +204,7 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim screen meld htop top ssh"
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim watch screen meld htop top ssh"
     eval "$(ntfy shell-integration)"
 fi
 

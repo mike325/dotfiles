@@ -1,91 +1,30 @@
 {
-    ".projections.json": {
-        "type": "Projections"
-    },
-    ".gitignore": {
-        "type": "GitIgnore"
-    },
-    "setup.cfg": {
-        "type": "Setup"
-    },
-    "test/*.sh": {
-        "type": "ShellTest"
-    },
-    "test/*.py": {
-        "type": "PythonTest"
-    },
-    ".git/config": {
-        "type": "Git"
-    },
-    ".git/info/*": {
-        "type": "Git"
-    },
-    "README.md": {
-        "type": "Readme"
-    },
-    "LICENSE": {
-        "type": "License"
-    },
-    ".travis.yml": {
-        "type": "Travis"
-    },
-    "packages/*.json": {
-        "type": "Packages"
-    },
-    "install.py": {
-        "type": "Install"
-    },
-    "install.*": {
-        "type": "Install"
-    },
-    "bin/*": {
-        "type": "Bins"
-    },
-    "dotconfigs/*": {
-        "type": "Dotconfigs"
-    },
-    "systemd/*.service": {
-        "type": "Services",
-        "alternate": "systemd/{}.timer"
-    },
-    "systemd/*.timer": {
-        "type": "Timers",
-        "alternate": "systemd/{}.service"
-    },
-    "system/*": {
-        "type": "System"
-    },
-    "git/bin/git-*": {
-        "type": "GitBins"
-    },
-    "git/templates/*": {
-        "type": "GitTemplates"
-    },
-    "git/templates/hooks/*": {
-        "type": "GitHooks"
-    },
-    "git/gitconfig": {
-        "type": "GitConfig"
-    },
-    "shell/alias/*": {
-        "type": "Alias"
-    },
-    "shell/init/*": {
-        "type": "ShellInit"
-    },
-    "shell/host/*": {
-        "type": "Host"
-    },
-    "shell/samples/*": {
-        "type": "ShellSamples"
-    },
-    "shell/settings/*": {
-        "type": "ShellSettings"
-    },
-    "libs/*.py": {
-        "type": "Libs"
-    },
-    "shell/banner": {
-        "type": "Banner"
-    }
+    ".projections.json"     : { "type": "Projections" },
+    ".gitignore"            : { "type": "GitIgnore" },
+    ".git/config"           : { "type": "Git" },
+    ".git/info/*"           : { "type": "Git" },
+    ".travis.yml"           : { "type": "Travis" },
+    "setup.cfg"             : { "type": "Setup" },
+    "test/*.sh"             : { "type": "ShellTest" },
+    "test/*.py"             : { "type": "PythonTest" },
+    "README.md"             : { "type": "Readme" },
+    "LICENSE"               : { "type": "License" },
+    "install.py"            : { "type": "Install" },
+    "install.*"             : { "type": "Install" },
+    "bin/*"                 : { "type": "Bins" },
+    "dotconfigs/*"          : { "type": "Dotconfigs" },
+    "systemd/*.service"     : { "type": "Services", "alternate": "systemd/{}.timer" },
+    "systemd/*.timer"       : { "type": "Timers",   "alternate": "systemd/{}.service" },
+    "system/*"              : { "type": "System" },
+    "git/bin/git-*"         : { "type": "GitBins" },
+    "git/templates/*"       : { "type": "GitTemplates" },
+    "git/templates/hooks/*" : { "type": "GitHooks" },
+    "git/gitconfig"         : { "type": "GitConfig" },
+    "shell/alias/*"         : { "type": "Alias" },
+    "shell/init/*"          : { "type": "ShellInit" },
+    "shell/host/*"          : { "type": "Host" },
+    "shell/samples/*"       : { "type": "ShellSamples" },
+    "shell/settings/*"      : { "type": "ShellSettings" },
+    "libs/*.py"             : { "type": "Libs" },
+    "shell/banner"          : { "type": "Banner" }
 }
