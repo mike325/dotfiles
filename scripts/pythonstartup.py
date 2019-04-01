@@ -68,9 +68,11 @@ class Quit(object):
 
 q = Quit()
 historyPath = os.path.expanduser("~/.pyhistory")
+historyPath = historyPath if os.name == 'nt' else historyPath.replace('/', '\\')
 try:
 
-    def save_history(historyPath=historyPath):
+    def save_history(historyPath=os.path.expanduser("~/.pyhistory").replace('/', '\\') if os.name == 'nt' else os.path.expanduser("~/.pyhistory")):
+        import traceback
         try:
             import readline
         except ImportError:
@@ -81,7 +83,11 @@ try:
         try:
             readline.write_history_file(historyPath)
         except OSError:
-            print('Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
+            traceback.print_exc()
+            print('OS Error: Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
+        except IOError:
+            traceback.print_exc()
+            print('IO Error: Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
 
     if os.path.exists(historyPath):
         readline.read_history_file(historyPath)

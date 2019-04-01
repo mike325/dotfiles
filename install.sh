@@ -39,7 +39,7 @@ _BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y_%H-%M-%S')"
 _VERBOSE=0
 _PORTABLES=0
 _SYSTEMD=0
-_GIT_SSH=0
+# _GIT_SSH=0
 
 _VERSION="0.1.0"
 _DATE="2018-06-12"
@@ -84,7 +84,9 @@ fi
 
 # Windows stuff
 if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $8 }')"
+    # Windows bash does not have pgrep by default
+    # shellcheck disable=SC2009
+    _CURRENT_SHELL="$(ps | grep $$ | awk '{ print $8 }')"
     _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
 
     # Horrible hack
@@ -236,10 +238,10 @@ function __parse_args() {
     local arg="$1"
     local name="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9.:@_-/~]+$"
+    local pattern="^--${name}[=][a-zA-Z0-9.:@_-/~]+$"
 
-    if [[ ! -z "$3" ]]; then
-        local pattern="^--$name[=]$3$"
+    if [[ -n "$3" ]]; then
+        local pattern="^--${name}[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then
@@ -348,7 +350,7 @@ function clone_repo() {
 function setup_bin() {
     status_msg "Getting shell functions and scripts"
 
-    for script in ${_SCRIPT_PATH}/bin/*; do
+    for script in "${_SCRIPT_PATH}"/bin/*; do
         local scriptname="${script##*/}"
 
         local file_basename="${scriptname%%.*}"
@@ -365,7 +367,7 @@ function setup_alias() {
     setup_config "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
 
     status_msg "Getting dotconfigs"
-    for script in ${_SCRIPT_PATH}/dotconfigs/*; do
+    for script in "${_SCRIPT_PATH}"/dotconfigs/*; do
         local scriptname="${script##*/}"
 
         local file_basename="${scriptname%%.*}"
