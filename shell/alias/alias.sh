@@ -371,6 +371,48 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
 fi
 unset pkg
 
+if hash fzf 2>/dev/null; then
+    if hash fd 2>dev/null; then
+        export FZF_DEFAULT_COMMAND="(git ls-tree -r --name-only HEAD || fd --type f . .) 2> /dev/null"
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+    fi
+    export FZF_CTRL_R_OPTS='--sort --exact'
+
+    export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+    # Use ~~ as the trigger sequence instead of the default **
+    export FZF_COMPLETION_TRIGGER='**'
+
+    # Options to fzf command
+    export FZF_COMPLETION_OPTS='+c -x'
+
+    fe() {
+        local files
+        IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+    }
+    function cd() {
+        if [[ "$#" != 0 ]]; then
+            builtin cd "$@";
+            return
+        fi
+        while true; do
+            local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+            local dir="$(printf '%s\n' "${lsd[@]}" |
+                fzf --reverse --preview '
+                    __cd_nxt="$(echo {})";
+                    __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+                    echo $__cd_path;
+                    echo;
+                    ls -p --color=always "${__cd_path}";
+            ')"
+            [[ ${#dir} != 0 ]] || return 0
+            builtin cd "$dir" &> /dev/null
+        done
+    }
+fi
+
+
 
 ################################################################################
 #               Functions to move around dirs and other simple stuff           #

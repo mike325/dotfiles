@@ -134,6 +134,11 @@ if (Test-Path($powersource)) {
     }
 }
 
+$powersource = "$HOME\.config\shell\alias\alias.ps1"
+if (Test-Path($powersource)) {
+    . $powersource
+}
+
 $powersource = "$HOME\.config\shell\host\env.ps1"
 if (Test-Path($powersource)) {
     . $powersource

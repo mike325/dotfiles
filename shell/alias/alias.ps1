@@ -86,3 +86,12 @@ else {
         cd "$HOME\vimfiles\"
     }
 }
+
+if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
+    if ( Get-Command "fd.exe" -ErrorAction SilentlyContinue ) {
+        $env:FZF_DEFAULT_COMMAND = "(git ls-tree -r --name-only HEAD || fd -t f . .) 2> nul"
+        $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND"
+        $env:FZF_ALT_C_COMMAND = "fd -t d . $HOME"
+    }
+    $env:FZF_DEFAULT_OPTS = '--layout=reverse --border'
+}
