@@ -376,45 +376,31 @@ function setup_alias() {
         setup_config "$script" "$HOME/.${file_basename}"
     done
 
-    status_msg "Getting Shell init file"
-    if [[ $_CURRENT_SHELL =~ bash ]] || [[ $_CURRENT_SHELL =~ zsh ]]; then
+    local sh_shells=(bash zsh)
+    local csh_shells=(tcsh csh)
 
-        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+    status_msg "Getting Shell init files"
+
+    for shell in "${sh_shells[@]}"; do
+        if [[ ! -f "$HOME/.${shell}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc" || return 1
         else
-            warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            warn_msg "The file $HOME/.${shell}rc already exists, trying $HOME/.${shell}rc.$USER"
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc.$USER" || return 1
         fi
-        # setup_config "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+    done
 
-        status_msg "Getting shell configs"
-
-        # Since we could fail linking/copying the dir, lets check it first
-        setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
-
-        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
-
-    elif [[ $_CURRENT_SHELL =~ csh ]]; then
-        # WARNING !! experimental
-
-        if [[ ! -f "$HOME/.${_CURRENT_SHELL}rc" ]]; then
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc" || return 1
+    for shell in "${csh_shells[@]}"; do
+        if [[ ! -f "$HOME/.${shell}rc" ]]; then
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc" || return 1
         else
-            warn_msg "The file $HOME/.${_CURRENT_SHELL}rc already exists, trying $HOME/.${_CURRENT_SHELL}rc.$USER"
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${_CURRENT_SHELL}rc.$USER" || return 1
+            warn_msg "The file $HOME/.${shell}rc already exists, trying $HOME/.${shell}rc.$USER"
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc.$USER" || return 1
         fi
-        # setup_config "${_SCRIPT_PATH}/shell/${_CURRENT_SHELL}_settings" "$HOME/.config/shell/shell_specific"
+    done
 
-        status_msg "Getting shell configs"
+    setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
 
-        # Since we could fail linking/copying the dir, lets check it first
-        setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
-
-        [[ ! -d  "$HOME/.config/shell/host" ]] && mkdir -p  "$HOME/.config/shell/host"
-    else
-        warn_msg "Current shell ( $_CURRENT_SHELL ) is unsupported"
-        return 1
-    fi
     return 0
 }
 

@@ -76,16 +76,38 @@ alias got "git"
 alias gut "git"
 alias gi "git"
 
-alias bim "vim"
-alias cim "vim"
-alias im "vim"
+if ( `where nvim` != "" ) then
+    alias bim "nvim"
+    alias cim "nvim"
+    alias im "nvim"
+else
+    alias bim "vim"
+    alias cim "vim"
+    alias im "vim"
+endif
+
+alias bi "vi"
+alias ci "vi"
+
+alias py "python"
+alias py2 "python2"
+alias py3 "python3"
 
 ################################################################################
 #                        Some useful shortcuts                                 #
 ################################################################################
 
-alias q "exit"
+alias sshkey 'ssh-keygen -t rsa -b 4096 -C "${MAIL:-mickiller.25@gmail.com}"'
+
+alias user "whoami"
+alias j "jobs"
+
+# Check all user process
+alias psu 'ps -u $USER'
+
 alias cl "clear"
+
+alias q "exit"
 
 # Show used ports
 alias ports "netstat -tulpn"
@@ -114,23 +136,4 @@ alias lla "ls -lhA"
 
 alias bk "cd .."
 
-
 alias rl "rm -rf ./*.log"
-# function rl() {
-#     rm "$@" ./*.log
-# }
-
-# Init original path with HOME dir
-# ORIGINAL_PATH="$(pwd)"
-
-# Move to the realpath version of the curren working dir
-# function crp() {
-#     # Save the current path
-#     ORIGINAL_PATH="$(pwd)"
-#     cd "$(grp)" || return 1
-# }
-
-# Go back to the last sym path or $HOME
-# function gobk() {
-#     cd "$ORIGINAL_PATH" || return 1
-# }
