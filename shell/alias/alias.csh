@@ -68,7 +68,7 @@ endif
 
 
 ################################################################################
-#                          endifx my common typos                                 #
+#                          Fix my common typos                                 #
 ################################################################################
 
 alias gti "git"
@@ -93,9 +93,20 @@ alias py "python"
 alias py2 "python2"
 alias py3 "python3"
 
+
 ################################################################################
 #                        Some useful shortcuts                                 #
 ################################################################################
+
+if ( `where thefuck` != "" ) then
+    alias fuck 'set fucked_cmd=`history -h 2 | head -n 1` && eval `thefuck ${fucked_cmd}`'
+
+    # Yep tons of fucks
+    alias guck 'fuck'
+    alias fukc 'fuck'
+    alias gukc 'fuck'
+    alias fuvk 'fuck'
+endif
 
 alias sshkey 'ssh-keygen -t rsa -b 4096 -C "${MAIL:-mickiller.25@gmail.com}"'
 

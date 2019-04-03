@@ -2,6 +2,7 @@ New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
 New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
 New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue
 
+$env:PYTHONIOENCODING="utf-8"
 if (Get-Command "python" -ErrorAction SilentlyContinue) {
     New-Alias -Name py  -Value 'python'  -ErrorAction SilentlyContinue
 }
@@ -94,4 +95,8 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
         $env:FZF_ALT_C_COMMAND = "fd -t d . $HOME"
     }
     $env:FZF_DEFAULT_OPTS = '--layout=reverse --border'
+}
+
+if ( Get-Command "thefuck.exe" -ErrorAction SilentlyContinue ) {
+    iex "$(thefuck --alias)"
 }
