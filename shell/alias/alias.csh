@@ -38,10 +38,10 @@ if ( `where vim` != "" ) then
         # NOTE: This is set inside Neovim settings
         # shellcheck disable=SC2154
         if ( ! ($?nvr) ) then
-            setenv MANPAGER "nvim -R --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal readonly nomodifiable ft=man' -"
-            setenv GIT_PAGER "nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' - "
+            setenv MANPAGER "nvim -R --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal readonly nomodifiable ft=man' -"
+            setenv GIT_PAGER "nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' - "
             setenv EDITOR "nvim"
-            alias vi "nvim --cmd 'let g:minimal=0'"
+            alias vi "nvim --cmd 'let g:minimal=1'"
             alias viu "nvim -u NONE"
             # Fucking typos
             alias nvi "nvim"
@@ -57,11 +57,11 @@ if ( `where vim` != "" ) then
         endif
     else
         alias cdvim "cd ~/.vim"
-        setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man readonly nomodifiable' +MANPAGER -"
-        setenv GIT_PAGER "vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' -"
+        setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man readonly nomodifiable' +MANPAGER -"
+        setenv GIT_PAGER "vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' -"
         setenv EDITOR "vim"
 
-        alias vi "vim --cmd 'let g:minimal=0'"
+        alias vi "vim --cmd 'let g:minimal=1'"
         alias viu "vim -u NONE"
     endif
 endif

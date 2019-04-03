@@ -56,12 +56,12 @@ if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue ) {
     else {
 
         # No man pages for windows
-        # $env:MANPAGER  = "nvim.exe --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal nomodifiable ft=man' -"
-        $env:GIT_PAGER = "nvim.exe --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git nomodifiable' - "
+        # $env:MANPAGER  = "nvim.exe --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal nomodifiable ft=man' -"
+        $env:GIT_PAGER = "nvim.exe --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git nomodifiable' - "
         $env:EDITOR    = "nvim.exe"
 
         function vi {
-            nvim.exe --cmd 'let g:minimal=0' $args
+            nvim.exe --cmd 'let g:minimal=1' $args
         }
 
         function viu {

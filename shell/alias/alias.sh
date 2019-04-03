@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2139,SC1090
 
 ################################################################################
 #                                                                              #
@@ -39,21 +40,19 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
-            # shellcheck disable=SC2154
-            if [[ -z "$nvr" ]]; then
+            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] && hash nvr 2>/dev/null; then
                 function nvim() {
                     # NOTE: This is set inside Neovim settings
-                    # shellcheck disable=SC2154
-                    if [[ -z "$nvr" ]]; then
+                    if [[ -z "$NVIM_LISTEN_ADDRESS" ]]; then
                         nvim-qt "$@" &
                     else
                         nvim "$@"
                     fi
                 }
-                export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
-                export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
+                export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+                export GIT_PAGER="vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
                 export EDITOR="vim"
-                alias vi="vim --cmd 'let g:minimal=0'"
+                alias vi="vim --cmd 'let g:minimal=1'"
                 alias viu="vim -u NONE"
                 # Fucking typos
                 alias nvi="nvim"
@@ -73,12 +72,11 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
             # NOTE: This is set inside Neovim settings
-            # shellcheck disable=SC2154
-            if [[ -z "$nvr" ]]; then
-                export MANPAGER="nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
-                export GIT_PAGER="nvim --cmd 'let g:minimal=0' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' - "
+            if [[ -z "$NVIM_LISTEN_ADDRESS" ]]; then
+                export MANPAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
+                export GIT_PAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' - "
                 export EDITOR="nvim"
-                alias vi="nvim --cmd 'let g:minimal=0'"
+                alias vi="nvim --cmd 'let g:minimal=1'"
                 alias viu="nvim -u NONE"
                 # Fucking typos
                 alias nvi="nvim"
@@ -97,11 +95,11 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     else
         alias cdvim="cd ~/.vim"
         alias cdvi="cd ~/.vim"
-        export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=0 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
-        export GIT_PAGER="vim --cmd 'let g:minimal=0' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
+        export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+        export GIT_PAGER="vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
         export EDITOR="vim"
 
-        alias vi="vim --cmd 'let g:minimal=0'"
+        alias vi="vim --cmd 'let g:minimal=1'"
         alias viu="vim -u NONE"
     fi
 fi
@@ -204,7 +202,7 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh"
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg"
     eval "$(ntfy shell-integration)"
 fi
 
@@ -276,7 +274,7 @@ fi
 # TODO Make a small function to install system basics
 
 if hash docker 2>/dev/null; then
-    if [[ $EUID -ne 0 ]]; then
+    if [[ $EUID -ne 0 ]] && [[ ! "$(groups)" =~ .*docker.* ]]; then
         alias docker="sudo docker"
         alias docker-compose="sudo docker-compose"
     fi
@@ -300,11 +298,9 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
 
     alias searchpkg="${pkg} -Ss"
 
-    alias getpkg="${pkg} -S"
-    alias getpkgn="${pkg} -S --noconfirm"
+    alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
-    alias update="${pkg} -Syyu --aur"
-    alias updaten="${pkg} -Syyu --aur --noconfirm"
+    alias update="${pkg} -Syyu --aur" && alias updaten="${pkg} -Syyu --aur --noconfirm"
 
     alias rmpkg="${pkg} -Rns"
 
@@ -386,30 +382,31 @@ if hash fzf 2>/dev/null; then
     # Options to fzf command
     export FZF_COMPLETION_OPTS='+c -x'
 
-    fe() {
-        local files
-        IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
-        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
-    }
-    function cd() {
-        if [[ "$#" != 0 ]]; then
-            builtin cd "$@";
-            return
-        fi
-        while true; do
-            local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
-            local dir="$(printf '%s\n' "${lsd[@]}" |
-                fzf --reverse --preview '
-                    __cd_nxt="$(echo {})";
-                    __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
-                    echo $__cd_path;
-                    echo;
-                    ls -p --color=always "${__cd_path}";
-            ')"
-            [[ ${#dir} != 0 ]] || return 0
-            builtin cd "$dir" &> /dev/null
-        done
-    }
+    #    fe() {
+    #        local files
+    #        IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+    #        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+    #    }
+
+    # function cd() {
+    #     if [[ "$#" != 0 ]]; then
+    #         builtin cd "$@";
+    #         return
+    #     fi
+    #     while true; do
+    #         local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+    #         local dir="$(printf '%s\n' "${lsd[@]}" |
+    #             fzf --reverse --preview '
+    #                 __cd_nxt="$(echo {})";
+    #                 __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+    #                 echo $__cd_path;
+    #                 echo;
+    #                 ls -p --color=always "${__cd_path}";
+    #         ')"
+    #         [[ ${#dir} != 0 ]] || return 0
+    #         builtin cd "$dir" &> /dev/null
+    #     done
+    # }
 fi
 
 
@@ -501,8 +498,9 @@ fi
 # TODO: Move this crap to ${SHELL}.logout
 function killssh() {
     if hash pgrep 2>/dev/null; then
-        if [[ ! -z $(pgrep -u $USER ssh-agent) ]]; then
-            kill -7 $(pgrep -u $USER ssh-agent)
+        if [[ -n $(pgrep -u "$USER" ssh-agent) ]]; then
+            # shellcheck disable=SC2046
+            kill -7 $(pgrep -u "$USER" ssh-agent)
         fi
     fi
     return 0
@@ -577,7 +575,6 @@ function venv() {
         return 1
     fi
 
-    # shellcheck disable=SC1090
     source "$_name/bin/activate"
 
     return 0
@@ -607,7 +604,7 @@ function bk() {
         esac
     done
 
-    if [[ ! -z "$1" ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
+    if [[ -n "$1" ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
         local parent="./"
         for (( i = 0; i < $1; i++ )); do
             local parent="${parent}../"
@@ -646,7 +643,7 @@ function mkcd() {
         esac
     done
 
-    if [[ ! -z "$1" ]]; then
+    if [[ -n "$1" ]]; then
         mkdir -p "$1"
         cd "$1" || return 1
         return 0
@@ -655,7 +652,8 @@ function mkcd() {
 }
 
 function llg() {
-    if [[ ! -z "$1" ]]; then
+    if [[ -n "$1" ]]; then
+        # shellcheck disable=SC2010
         ls -lhA | grep "$@"
     fi
 }
