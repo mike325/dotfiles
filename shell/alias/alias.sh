@@ -202,7 +202,7 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg"
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit"
     eval "$(ntfy shell-integration)"
 fi
 
