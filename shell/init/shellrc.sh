@@ -159,7 +159,6 @@ else
     export CREATE_LINKS=false
 fi
 
-
 if  [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then

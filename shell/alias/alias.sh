@@ -202,7 +202,12 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit make cmake cd bash zsh tcsh fzf cl clear"
+    # Programs
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit make cmake cd bash zsh tcsh fzf clear ctags"
+    # Typos
+    export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc fuvk $AUTO_NTFY_DONE_IGNORE"
+    # alias
+    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
 fi
 
