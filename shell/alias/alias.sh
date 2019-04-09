@@ -374,9 +374,13 @@ unset pkg
 
 if hash fzf 2>/dev/null; then
     if hash fd 2>dev/null; then
-        export FZF_DEFAULT_COMMAND="(git ls-tree -r --name-only HEAD || fd --type f . .) 2> /dev/null"
+        export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
         export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
         export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+    elif hash rg 2>/dev/null; then
+        export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . ) 2> /dev/null"
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
     fi
     export FZF_CTRL_R_OPTS='--sort --exact'
 
@@ -414,91 +418,17 @@ if hash fzf 2>/dev/null; then
     # }
 fi
 
+################################################################################
+#                              Some miscellaneous                              #
+################################################################################
 
+if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    export CYGWIN=winsymlinks:native
+fi
 
 ################################################################################
 #               Functions to move around dirs and other simple stuff           #
 ################################################################################
-
-# # FIXME
-# function __create_alias() {
-#     local test_path=""
-#     local test_cmd=0
-#
-#     for key in "$@"; do
-#         case "$key" in
-#             -h|--help)
-#
-#                 echo ""
-#                 echo "  This function create attempts to create an alias"
-#                 echo "  receives a name, alias and optionally a path"
-#                 echo ""
-#                 echo "  This function is not intended to be directly in the prompt"
-#                 echo "  instead it is expected to help automatize alias creation for"
-#                 echo "  different host, and help portability"
-#                 echo ""
-#                 echo "  Usage:"
-#                 echo "      $ __create_alias NAME ALIAS [OPTIONAL]"
-#                 echo "          Ex."
-#                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER"
-#                 echo "          $ __create_alias gohome 'cd ~/' -p /home/$USER -p /sbin/"
-#                 echo "          $ __create_alias fuck ' echo \"y u mad?\" ' -c"
-#                 echo ""
-#                 echo "      Optional Flags"
-#                 echo "          -c, --command"
-#                 echo "              Check if the given name already exists in the current"
-#                 echo "              shell"
-#                 echo ""
-#                 echo "          -p PATH, --path PATH"
-#                 echo "              Check whether or not the given path exists"
-#                 echo ""
-#                 echo "          -h, --help"
-#                 echo "              Display help and exit. If you are seeing this,"
-#                 echo "              that means that you already know it (nice)"
-#                 ;;
-#         esac
-#     done
-#
-#     if [[ $# -le 1 ]]; then
-#         echo "  ---- [X] Error This function receives at least 2 args, NAME and ALIAS" 1>&2
-#         return 1
-#     fi
-#
-#     local name="$1"
-#     shift
-#     local new_alias="$1"
-#     shift
-#
-#     while [[ $# -gt 0 ]]; do
-#         local key="$1"
-#         case "$key" in
-#             -p|--path)
-#                 local test_path="$2"
-#                 shift # Shift flag
-#                 shift # Shift path
-#
-#                 if [[ ! -d "$test_path" ]]; then
-#                     echo "  ---- [X] Error The given path ( $test_path ) doesn't exist" 1>&2
-#                     return 2
-#                 fi
-#                 ;;
-#             -c|--command)
-#                 local test_cmd=1
-#                 shift # Shift flag
-#                 ;;
-#         esac
-#     done
-#
-#     if [[ $test_cmd -eq 1 ]]; then
-#         if hash $name 2>/dev/null; then
-#             echo "  ---- [X] Error The given command already exists ( $name )" 1>&2
-#             return 2
-#         fi
-#     fi
-#
-#     alias $name="$new_alias"
-#     return 0
-# }
 
 # TODO: Move this crap to ${SHELL}.logout
 function killssh() {

@@ -609,7 +609,6 @@ function get_portables() {
                 rst=2
             fi
 
-
             if ! hash ctags 2>/dev/null; then
                 # TODO: auto detect latest version
                 local major="5"
