@@ -159,7 +159,7 @@ if ( `where fzf` != "" ) then
             setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . ) 2> /dev/null'
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
         else if ( `where ag` != "" ) then
-            setenv FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden -g "" ) 2> /dev/null'
+            setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden -g "" ) 2> /dev/null'
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
         else
             setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
