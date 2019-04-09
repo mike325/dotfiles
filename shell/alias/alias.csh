@@ -148,3 +148,30 @@ alias lla "ls -lhA"
 alias bk "cd .."
 
 alias rl "rm -rf ./*.log"
+
+if ( `where fzf` != "" ) then
+    if ( `where git` != "" ) then
+        if ( `where fd` != "" ) then
+            setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
+            setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+            setenv FZF_ALT_C_COMMAND "fd -t d . $HOME"
+        else if ( `where rg` != "" ) then
+            setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . ) 2> /dev/null'
+            setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+        else if ( `where ag` != "" ) then
+            setenv FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden -g "" ) 2> /dev/null'
+            setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+        else
+            setenv FZF_DEFAULT_COMMAND '(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
+            setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+        endif
+    endif
+    setenv FZF_CTRL_R_OPTS '--sort --exact'
+
+    setenv FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border'
+    # Use ~~ as the trigger sequence instead of the default **
+    setenv FZF_COMPLETION_TRIGGER '**'
+
+    # Options to fzf command
+    setenv FZF_COMPLETION_OPTS '+c -x'
+endif
