@@ -27,20 +27,20 @@
 #                                                                              #
 ################################################################################
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=100000
-HISTFILESIZE=20000
-
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
+shopt -s autocd
+shopt -s globstar
+shopt -s cdspell
+shopt -s direxpand dirspell
+
+# HISTCONTROL=ignoreboth
+HISTCONTROL='erasedups:ignoreboth'
+HISTFILESIZE=9999
+HISTSIZE=9999
+PROMPT_COMMAND='history -a'
+shopt -s histappend histverify
 
 # Path to the bash it configuration
 if [[ -d "$HOME/.bash-it" ]]; then

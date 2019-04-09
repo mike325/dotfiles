@@ -172,11 +172,19 @@ fi
 alias grepo="grep -o"
 alias grepe="grep -E"
 
-alias ls='ls --color'
-alias la="ls -hA"
-alias l="ls -h"
-alias ll="ls -lh"
-alias lla="ls -lhA"
+alias ls='ls --color --classify --human-readable'
+alias l="ls"
+alias la="ls -A"
+alias ll="ls -l"
+alias lla="ls -lA"
+
+alias lat="ls -A --sort=time"
+alias llt="ls -l --sort=time"
+alias llat="ls -lA --sort=time"
+
+alias las="ls -A --sort=size"
+alias lls="ls -l --sort=size"
+alias llas="ls -lA --sort=size"
 
 # We only want sudo alias when user =! root
 [[ $EUID -ne 0 ]] && alias sudo='sudo '
