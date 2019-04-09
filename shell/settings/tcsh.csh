@@ -32,3 +32,7 @@
 # Magic tcsh stuff
 set autolist
 set prompt="%B %n%b@%m at %B[%~]%b -> "
+
+if ( -d "$HOME/.fzf/bin/" ) then
+    setenv PATH "$HOME/.fzf/bin/:${PATH}"
+endif
