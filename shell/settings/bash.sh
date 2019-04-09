@@ -131,4 +131,6 @@ if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
 fi
 # pip bash completion end
 
+[[ -f "$HOME/.fzf.bash" ]] && source "$HOME/.fzf.bash"
+
 [[ -f "$BASH_IT/bash_it.sh" ]] && source "$BASH_IT/bash_it.sh"

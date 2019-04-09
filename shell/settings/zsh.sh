@@ -143,3 +143,5 @@ else
 
     PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
 fi
+
+[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"

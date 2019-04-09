@@ -373,14 +373,21 @@ fi
 unset pkg
 
 if hash fzf 2>/dev/null; then
-    if hash fd 2>dev/null; then
-        export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-        export FZF_ALT_C_COMMAND="fd -t d . $HOME"
-    elif hash rg 2>/dev/null; then
-        export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . ) 2> /dev/null"
-        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
+    if hash git 2>/dev/null; then
+        if hash fd 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E "C:/Users/mochoa/AppData/Local/Temp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+            export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+        elif hash rg 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        elif hash ag 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden -g "" ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        else
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        fi
     fi
     export FZF_CTRL_R_OPTS='--sort --exact'
 
