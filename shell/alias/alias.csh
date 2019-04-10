@@ -147,22 +147,22 @@ alias lla "ls -lhA"
 
 alias bk "cd .."
 
-alias rl "rm -rf ./*.log"
+alias rl "rm -rf ./.log"
 
 if ( `where fzf` != "" ) then
     if ( `where git` != "" ) then
         if ( `where fd` != "" ) then
-            setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . '
+            setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "/cache/" -E "/__pycache__/" -E "/tmp/" -E ".git/" -E ".svn/" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . '
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
             setenv FZF_ALT_C_COMMAND "fd -t d . $HOME"
         else if ( `where rg` != "" ) then
             setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files . '
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
         else if ( `where ag` != "" ) then
-            setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden --ignore "*.spl" --ignore "*.aux" --ignore "*.out" --ignore "*.o" --ignore "*.pyc" --ignore "*.gz" --ignore "*.pdf" --ignore "*.sw" --ignore "*.swp" --ignore "*.swap" --ignore "*.com" --ignore "*.exe" --ignore "*.so" --ignore "*/cache/*" --ignore "*/__pycache__/*" --ignore "/tmp/*" --ignore ".git/*" --ignore ".svn/*" --ignore ".xml" --ignore "*.log" --ignore "*.bin" --ignore "*.7z" --ignore "*.dmg" --ignore "*.gz" --ignore "*.iso" --ignore "*.jar" --ignore "*.rar" --ignore "*.tar" --ignore "*.zip" --ignore "TAGS" --ignore "tags" --ignore "GTAGS" --ignore "COMMIT_EDITMSG" -g "" '
+            setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden --ignore "*.spl" --ignore "*.aux" --ignore "*.out" --ignore "*.o" --ignore "*.pyc" --ignore "*.gz" --ignore "*.pdf" --ignore "*.sw" --ignore "*.swp" --ignore "*.swap" --ignore "*.com" --ignore "*.exe" --ignore "*.so" --ignore "/cache/" --ignore "/__pycache__/" --ignore "/tmp/" --ignore ".git/" --ignore ".svn/" --ignore ".xml" --ignore "*.log" --ignore "*.bin" --ignore "*.7z" --ignore "*.dmg" --ignore "*.gz" --ignore "*.iso" --ignore "*.jar" --ignore "*.rar" --ignore "*.tar" --ignore "*.zip" --ignore "TAGS" --ignore "tags" --ignore "GTAGS" --ignore "COMMIT_EDITMSG" -g "" '
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
         else
-            setenv FZF_DEFAULT_COMMAND 'git --no-pager ls-files -co --exclude-standard || find . -iname "*"'
+            setenv FZF_DEFAULT_COMMAND "git --no-pager ls-files -co --exclude-standard || find . -iname '*'"
             setenv FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
         endif
     endif
