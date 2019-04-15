@@ -211,11 +211,11 @@ fi
 
 if hash ntfy 2>/dev/null; then
     # Programs
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit make cmake cd bash zsh tcsh fzf clear ctags"
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit make cmake cd bash zsh tcsh fzf clear ctags fuck"
     # Typos
-    export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc fuvk $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
-    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
 fi
 
@@ -383,7 +383,7 @@ unset pkg
 if hash fzf 2>/dev/null; then
     if hash git 2>/dev/null; then
         if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.log" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" --type f --hidden --follow --color never . . ) 2> /dev/null'
             export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
             export FZF_ALT_C_COMMAND="fd -t d . $HOME"
         elif hash rg 2>/dev/null; then

@@ -206,3 +206,6 @@ tmp/
 tmp_*/
 
 .languageclient.*
+
+# Ignore git patches
+*.patch
