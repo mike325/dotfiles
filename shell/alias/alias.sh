@@ -215,7 +215,7 @@ if hash ntfy 2>/dev/null; then
     # Typos
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
-    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
 fi
 
