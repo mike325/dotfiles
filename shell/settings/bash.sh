@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2139,SC1090
 
 ################################################################################
 #                                                                              #
@@ -131,6 +132,8 @@ if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
 fi
 # pip bash completion end
 
-[[ -f "$HOME/.fzf.bash" ]] && source "$HOME/.fzf.bash"
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.bash" ]] && source "$HOME/.fzf.bash"
+fi
 
 [[ -f "$BASH_IT/bash_it.sh" ]] && source "$BASH_IT/bash_it.sh"
