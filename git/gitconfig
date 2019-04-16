@@ -324,7 +324,7 @@
 ;   Apply, pop or drop a specific stash
     sa = "!f(){ if [ -z $1 ]; then git --no-pager stash apply; else git --no-pager stash apply stash@{$1}; fi; }; f"
     sp = "!f(){ if [ -z $1 ]; then git --no-pager stash pop;   else git --no-pager stash pop stash@{$1};   fi; }; f"
-    sw = "!f(){ if [ -z $1 ]; then git --no-pager stash show;  else git --no-pager stash show stash@{$1};  fi; }; f"
+    sw = "!f(){ if [ -z $1 ]; then git --no-pager stash show -p;  else git --no-pager stash show -p stash@{$1};  fi; }; f"
     # sd = "!f(){ if [ -z $1 ]; then git --no-pager stash drop;  else git --no-pager stash drop stash@{$1}; fi; }; f"
 
 ;   --------- Below here credits to https://github.com/alrra/dotfiles ---------

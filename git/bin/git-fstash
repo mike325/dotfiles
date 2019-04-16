@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+#   Author: Awesome work from https://github.com/esc/git-stats
+#   Description: Get statistics of the current git dir (CWD)
+#
+#                                     -`
+#                     ...            .o+`
+#                  .+++s+   .h`.    `ooo/
+#                 `+++%++  .h+++   `+oooo:
+#                 +++o+++ .hhs++. `+oooooo:
+#                 +s%%so%.hohhoo'  'oooooo+:
+#                 `+ooohs+h+sh++`/:  ++oooo+:
+#                  hh+o+hoso+h+`/++++.+++++++:
+#                   `+h+++h.+ `/++++++++++++++:
+#                            `/+++ooooooooooooo/`
+#                           ./ooosssso++osssssso+`
+#                          .oossssso-````/osssss::`
+#                         -osssssso.      :ssss``to.
+#                        :osssssss/  Mike  osssl   +
+#                       /ossssssss/   8a   +sssslb
+#                     `/ossssso+/:-        -:/+ossss'.-
+#                    `+sso+:-`                 `.-/+oso:
+#                   `++:.                           `-/+/
+#                   .`   github.com/mike325/dotfiles   `/
+
+_NAME="$0"
+_NAME="${_NAME##*/}"
+_NAME="${_NAME##*-}"
+
+function help_user() {
+    echo ""
+    echo "  Script to pull changes from a repository"
+    echo ""
+    echo "  The script use git svn rebase and if it fails tries with git pull."
+    echo "  It passes all the args to the git commands"
+    echo ""
+    echo " NOTE: Since I don't use git svn too much, if any argument is given to the script"
+    echo "       it will automatically switch to git pull"
+    echo ""
+    echo "  Usage:"
+    echo "      $_NAME [OPTIONAL]"
+    echo "          Ex."
+    echo "          $ git $_NAME"
+    echo ""
+    echo "      Optional Flags"
+    echo "          -h, --help"
+    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
+    echo ""
+}
+
+function __parse_args() {
+    local arg="$1"
+    local _NAME="$2"
+
+    local pattern="^--$_NAME[=][a-zA-Z0-9./]+$"
+    if [[ ! -z "$3" ]]; then
+        local pattern="^--$_NAME[=]$3$"
+    fi
+
+    if [[ $arg =~ $pattern ]]; then
+        local left_side="${arg#*=}"
+        echo "$left_side"
+    else
+        echo "$arg"
+    fi
+}
+
+function warn_msg() {
+    WARN_MESSAGE="$1"
+    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
+}
+
+function error_msg() {
+    ERROR_MESSAGE="$1"
+    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+}
+
+function status_msg() {
+    STATUS_MESSAGGE="$1"
+    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
+}
+
+# fstash - easier way to deal with stashes
+# type fstash to get a list of your stashes
+# enter shows you the contents of the stash
+# ctrl-d shows a diff of the stash against your current HEAD
+# ctrl-b checks the stash out as a branch, for easier merging
+fstash() {
+    local out q k sha
+    while out=$(
+        git stash list --pretty="%C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
+        fzf --ansi --no-sort --query="$q" --print-query \
+            --expect=ctrl-d,ctrl-b);
+    do
+        mapfile -t out <<< "$out"
+        q="${out[0]}"
+        k="${out[1]}"
+        sha="${out[-1]}"
+        sha="${sha%% *}"
+        [[ -z "$sha" ]] && continue
+        if [[ "$k" == 'ctrl-d' ]]; then
+            if [[ -n "$GIT_PAGER" ]]; then
+                git diff --diff-algorithm=patience -B -C --find-copies-harder --color=never "$sha"
+            else
+                git diff --diff-algorithm=patience -B -C --find-copies-harder "$sha"
+            fi
+        elif [[ "$k" == 'ctrl-b' ]]; then
+            git stash branch "stash-$sha" "$sha"
+            break;
+        else
+            git stash show -p "$sha"
+        fi
+    done
+}
+
+for key in "$@"; do
+    case "$key" in
+        -h|--help)
+            help_user
+            exit 0
+            ;;
+    esac
+done
+
+if hash fzf 2>/dev/null; then
+    fstash
+else
+    error_msg "FZF is not install"
+    exit 1
+fi
+
+exit 0

@@ -215,7 +215,7 @@ if hash ntfy 2>/dev/null; then
     # Typos
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
-    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
 fi
 
@@ -309,7 +309,16 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         pkg="pacman"
     fi
 
-    alias searchpkg="${pkg} -Ss"
+    if ! hash fzf 2>/dev/null; then
+        alias searchpkg="${pkg} -Ss"
+    else
+        searchpkg(){
+            local name=$( ${pkg} -Ss "$@" | fzf)
+            if [[ -n "$name" ]]; then
+                echo "$name"
+            fi
+        }
+    fi
 
     alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
@@ -335,7 +344,17 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
         pkg="apt-get"
     fi
 
-    # alias searchpkg="${apt} install"
+    if ! hash fzf 2>/dev/null; then
+        alias searchpkg="apt-cache search"
+    else
+        searchpkg(){
+            local name=$(apt-cache search "$@" | fzf)
+            if [[ -n "$name" ]]; then
+                echo "$name"
+            fi
+        }
+
+    fi
     if [[ $EUID -ne 0 ]]; then
         alias getpkgn="sudo ${pkg} install -y"
 
@@ -360,7 +379,16 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
         pkg="yum"
     fi
 
-    alias searchpkg="${pkg} search"
+    if ! hash fzf 2>/dev/null; then
+        alias searchpkg="${pkg} search"
+    else
+        searchpkg(){
+            local name=$( ${pkg} search "$@" | fzf)
+            if [[ -n "$name" ]]; then
+                echo "$name"
+            fi
+        }
+    fi
 
     if [[ $EUID -ne 0 ]]; then
         alias getpkg="sudo ${pkg} install"
@@ -399,38 +427,67 @@ if hash fzf 2>/dev/null; then
     fi
     export FZF_CTRL_R_OPTS='--sort --exact'
 
-    export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+    export FZF_DEFAULT_OPTS='--layout=reverse --border'
+
+    if [[ ! $SHELL_PLATFORM == 'MSYS' ]] && [[ ! $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        export FZF_DEFAULT_OPTS="--height 40% $FZF_DEFAULT_OPTS"
+    fi
+
     # Use ~~ as the trigger sequence instead of the default **
     export FZF_COMPLETION_TRIGGER='**'
 
     # Options to fzf command
     export FZF_COMPLETION_OPTS='+c -x'
 
-    #    fe() {
-    #        local files
-    #        IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
-    #        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
-    #    }
+    function cd() {
+        if [[ "$#" != 0 ]]; then
+            builtin cd "$@" || return
+            return
+        fi
+        while true; do
+            local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+            local dir="$(printf '%s\n' "${lsd[@]}" |
+                fzf --reverse --preview '
+                    __cd_nxt="$(echo {})";
+                    __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+                    echo $__cd_path;
+                    echo;
+                    ls -p --color=always "${__cd_path}";
+            ')"
+            [[ ${#dir} != 0 ]] || return 0
+            builtin cd "$dir" &> /dev/null || return
+        done
+    }
 
-    # function cd() {
-    #     if [[ "$#" != 0 ]]; then
-    #         builtin cd "$@";
-    #         return
-    #     fi
-    #     while true; do
-    #         local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
-    #         local dir="$(printf '%s\n' "${lsd[@]}" |
-    #             fzf --reverse --preview '
-    #                 __cd_nxt="$(echo {})";
-    #                 __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
-    #                 echo $__cd_path;
-    #                 echo;
-    #                 ls -p --color=always "${__cd_path}";
-    #         ')"
-    #         [[ ${#dir} != 0 ]] || return 0
-    #         builtin cd "$dir" &> /dev/null
-    #     done
-    # }
+    fe() {
+        local files
+        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+    }
+
+    # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
+    fkill() {
+        local pid
+        if [ "$UID" != "0" ]; then
+            pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+        else
+            pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+        fi
+
+        if [ "x$pid" != "x" ]; then
+            echo "$pid" | xargs kill "-${1:-9}"
+        fi
+    }
+
+    if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
+        fssh() {
+            local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
+            if [[ -n "$host" ]]; then
+                ssh "$host"
+            fi
+        }
+    fi
+
 fi
 
 ################################################################################
