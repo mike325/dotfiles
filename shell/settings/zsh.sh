@@ -144,4 +144,27 @@ else
     PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
 fi
 
-[[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+if hash fzf 2>/dev/null; then
+
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+
+    function cd() {
+        if [[ "$#" != 0 ]]; then
+            builtin cd "$@" || return
+            return
+        fi
+        while true; do
+            local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+            local dir="$(printf '%s\n' "${lsd[@]}" |
+                fzf --reverse --preview '
+                    __cd_nxt="$(echo {})";
+                    __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+                    echo $__cd_path;
+                    echo;
+                    ls -p --color=always "${__cd_path}";
+            ')"
+            [[ ${#dir} != 0 ]] || return 0
+            builtin cd "$dir" &> /dev/null || return
+        done
+    }
+fi

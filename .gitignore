@@ -1,8 +1,7 @@
 .ropeproject/
 
 # Each host can have custom commands
-git/host/
-shell/host/
 
-shell/proxy
-shell/env
+git/host/
+
+shell/host/

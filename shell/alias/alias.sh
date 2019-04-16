@@ -439,32 +439,6 @@ if hash fzf 2>/dev/null; then
     # Options to fzf command
     export FZF_COMPLETION_OPTS='+c -x'
 
-    function cd() {
-        if [[ "$#" != 0 ]]; then
-            builtin cd "$@" || return
-            return
-        fi
-        while true; do
-            local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
-            local dir="$(printf '%s\n' "${lsd[@]}" |
-                fzf --reverse --preview '
-                    __cd_nxt="$(echo {})";
-                    __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
-                    echo $__cd_path;
-                    echo;
-                    ls -p --color=always "${__cd_path}";
-            ')"
-            [[ ${#dir} != 0 ]] || return 0
-            builtin cd "$dir" &> /dev/null || return
-        done
-    }
-
-    fe() {
-        local files
-        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
-        [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
-    }
-
     # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
     fkill() {
         local pid
@@ -475,7 +449,7 @@ if hash fzf 2>/dev/null; then
         fi
 
         if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs kill "-${1:-9}"
+            echo "$pid" | xargs kill "-${1:-7}"
         fi
     }
 

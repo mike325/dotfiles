@@ -83,30 +83,20 @@ cscope
 # VCS #
 ############
 # Mercurial
-.hg/*
-/.hg/*
-*/.hg/*
+.hg/
+/.hg/
 .hgignore
 
 # SVN
 *.svn-base
-*.svn/*
-/.svn/*
-*/.svn/*
-
-# Unix misc
-# !.gitignore
-# !.gitkeep
-# !.projections.json
-# !.projections.json
-*~
+*.svn/
+/.svn/
 
 # KDE
 .directory
 
 # vim
-.*.sw[a-z]
-*.un~
+*.sw[a-z]
 Session.vim
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -161,7 +151,6 @@ DocProject/Help/Html2
 DocProject/Help/html
 
 # Others
-[Bb]in
 [Oo]bj
 TestResults
 *.Cache
