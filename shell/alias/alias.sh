@@ -447,7 +447,7 @@ if hash fzf 2>/dev/null; then
         while true; do
             # collect dirs
             if [[ -n "$(git rev-parse --git-dir 2>/dev/null)" ]]; then
-                local folders=$(git ls-tree -rt HEAD | awk '{if ($2 == "tree") print $4;}')
+                local folders=$(git ls-tree -rt HEAD "$(git rev-parse --show-toplevel)" | awk '{if ($2 == "tree") print $4;}')
             elif hash fd 2>/dev/null; then
                 local folders="$(fd -t d . .)"
             else
