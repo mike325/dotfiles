@@ -81,19 +81,11 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
 fi
 
 # Load all ENV variables
-if [[ -f "$HOME/.config/shell/host/env.sh"  ]]; then
-    # We already checked the file exists so its "safe"
-    # shellcheck disable=SC1090
-    source "$HOME/.config/shell/host/env.sh"
-fi
-
-if [[ -d "$HOME/.config/git/bin" ]]; then
-    export PATH="$HOME/.config/git/bin:$PATH"
-fi
-
-if [[ -d "$HOME/.local/bin/" ]]; then
-    export PATH="$HOME/.local/bin/:$PATH"
-fi
+# We already checked the file exists so its "safe"
+# shellcheck disable=SC1090
+[[ -f "$HOME/.config/shell/host/env.sh"  ]] && source "$HOME/.config/shell/host/env.sh"
+[[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
+[[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
@@ -116,13 +108,8 @@ elif [[ -d "$NEOVIM_PATH" ]]; then
     export PATH="$NEOVIM_PATH:$PATH"
 fi
 
-if [[ -d "$HOME/.local/golang/bin" ]]; then
-    export PATH="$HOME/.local/golang/bin:$PATH"
-fi
-
-if [[ -d "$HOME/.local/golang/src" ]]; then
-    export GOPATH="$HOME/.local/golang/src"
-fi
+[[ -d "$HOME/.local/golang/bin" ]] && export PATH="$HOME/.local/golang/bin:$PATH"
+[[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
 
 if hash npm 2>/dev/null; then
     [[ ! -d "$HOME/.npm-global/" ]] && mkdir -p "$HOME/.npm-global"
