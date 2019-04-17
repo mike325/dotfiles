@@ -210,7 +210,7 @@ function help_user() {
     echo "              Download and install my Vim dotfiles"
     echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim"
     echo ""
-    echo "          -n, --neovim"
+    echo "          -n, --nvim, --neovim"
     echo "              Download Neovim executable (portable in windows and linux) if it hasn't been Installed"
     echo "              Download and install my Vim dotfiles in Neovim's dir."
     echo "              Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)"
@@ -230,8 +230,10 @@ function help_user() {
     echo "          -t, --portables"
     echo "              Install isolated/portable programs into $HOME/.local/bin"
     echo "              Install:"
-    echo "                  - pip2 and pip3 (GNU/Linux only)"
     echo "                  - shellcheck"
+    echo "                  - ctags (windows only)"
+    echo "                  - pip2 and pip3 (GNU/Linux only)"
+    echo "                  - FZF (GNU/Linux only)"
     echo ""
     echo "          --fonts, --powerline"
     echo "              Install the powerline patched fonts"
@@ -323,6 +325,13 @@ function verbose_msg() {
         fi
     fi
     return 0
+}
+
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
 }
 
 function setup_config() {
@@ -512,7 +521,7 @@ function get_vim_dotfiles() {
     # If we couldn't clone our repo, return
     if ! clone_repo "$_URL/.vim" "$HOME/.vim"; then
         error_msg "Failed to clone Vim's configs"
-        return 0
+        return 1
     fi
 
     if ! setup_config "$HOME/.vim/init.vim" "$HOME/.vimrc"; then
@@ -526,19 +535,19 @@ function get_vim_dotfiles() {
     fi
 
     # Windows stuff
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if is_windows; then
 
         # If we couldn't clone our repo, return
-        if [[ ! -d "$HOME/vimfiles" ]]; then
-            status_msg "Cloning vim dotfiles in $HOME/vimfiles"
-            if ! clone_repo "$_URL/.vim" "$HOME/vimfiles"; then
-                error_msg "Couldn't get vim repo"
-                return 1
-            fi
-        else
+        if [[ -d "$HOME/.vim" ]] && [[ ! -d "$HOME/vimfiles" ]]; then
             status_msg "Copying vim dir into in $HOME/vimfiles"
             if ! setup_config "$HOME/.vim" "$HOME/vimfiles"; then
                 error_msg "We couldn't copy vim dir"
+                return 1
+            fi
+        else
+            status_msg "Cloning vim dotfiles in $HOME/vimfiles"
+            if ! clone_repo "$_URL/.vim" "$HOME/vimfiles"; then
+                error_msg "Couldn't get vim repo"
                 return 1
             fi
         fi
@@ -574,75 +583,37 @@ function get_nvim_dotfiles() {
         error_msg "Neither Curl nor Wget are available"
     fi
 
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    local args
 
-        # TODO: auto detect Windows arch and latest nvim version
-        if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            if hash curl 2>/dev/null; then
-                status_msg "Getting neovim ${nvim_version} executable"
-                if ! curl -Ls "https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim-win64.zip" -o "$_TMP/nvim.zip"; then
-                    error_msg "Failed neovim download"
-                    return 1
-                fi
+    args="--portable"
 
-                [[ -d "$HOME/.local/Neovim" ]] && rm -rf "$HOME/.local/Neovim"
-                [[ -d "$HOME/.local/neovim" ]] && rm -rf "$HOME/.local/neovim"
+    [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
+    [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
 
-                status_msg "Extracting files"
-                [[ $_VERBOSE -eq 1 ]] && unzip "$_TMP/nvim.zip" -d "$HOME/.local/"
-                [[ $_VERBOSE -eq 0 ]] && unzip -q "$_TMP/nvim.zip" -d "$HOME/.local/"
-                # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
-                mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
-            else
-                error_msg "Curl is not available"
-                return 1
-            fi
+    if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
+            error_msg ""
+            return 1
         fi
+    fi
+
+    if is_windows; then
 
         # If we couldn't clone our repo, return
-        status_msg "Getting vim dotfiles in $HOME/AppData/Local/nvim"
+        status_msg "Getting neovim in $HOME/AppData/Local/nvim"
         if [[ -d "$HOME/.vim" ]]; then
             setup_config "$HOME/.vim" "$HOME/AppData/Local/nvim"
         elif [[ -d "$HOME/vimfiles" ]]; then
             setup_config "$HOME/vimfiles" "$HOME/AppData/Local/nvim"
         else
-            clone_repo "$_URL/.vim" "$HOME/AppData/Local/nvim" || return $?
+            status_msg "Cloning neovim dotfiles in $HOME/AppData/Local/nvim"
+            if ! clone_repo "$_URL/.vim" "$HOME/.config/nvim"; then
+                error_msg "Fail to clone dotvim files"
+                return 1
+            fi
         fi
 
     else
-        # Since no all systems have sudo/root access lets assume all dependencies are
-        # already installed; Lets clone neovim in $HOME/.local/neovim and install pip libs
-        if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            # Make Neovim only if it's not already installed
-
-            # local force_flag=""
-            # if [[ $_FORCE_INSTALL -eq 1 ]]; then
-            #     local force_flag="-f"
-            # fi
-
-            if hash curl 2>/dev/null; then
-                # If the repo was already cloned, lets just build it
-                # TODO: Considering to use appimage binary instead of compiling it from the source code
-                status_msg "Getting neovim ${nvim_version} executable"
-                if curl -Ls "https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim.appimage" -o "$HOME/.local/bin/nvim"; then
-                    chmod u+x "$HOME/.local/bin/nvim"
-                else
-                    error_msg "Curl failed to download Neovim"
-                    return 1
-                fi
-            else
-                error_msg "Curl is not available"
-                return 1
-            fi
-
-            # status_msg "Compiling neovim from source"
-            # if [[ -d "$HOME/.local/neovim" ]]; then
-            #     "${_SCRIPT_PATH}"/bin/get_nvim.sh -d "$HOME/.local/" -p $force_flag || return $?
-            # else
-            #     "${_SCRIPT_PATH}"/bin/get_nvim.sh -c -d "$HOME/.local/" -p $force_flag || return $?
-            # fi
-
-        fi
 
         # if the current command creates a symbolic link and we already have some vim
         # settings, lets use them
@@ -655,13 +626,12 @@ function get_nvim_dotfiles() {
                 return 1
             fi
         else
-            status_msg "Cloning vim dotfiles in $HOME/.config/nvim"
+            status_msg "Cloning neovim dotfiles in $HOME/.config/nvim"
             if ! clone_repo "$_URL/.vim" "$HOME/.config/nvim"; then
                 error_msg "Fail to clone dotvim files"
                 return 1
             fi
         fi
-
     fi
 
     # No errors so far
@@ -674,7 +644,7 @@ function get_portables() {
     local rst=0
     if hash curl 2>/dev/null; then
         status_msg "Checking portable programs"
-        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        if is_windows; then
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
@@ -763,6 +733,28 @@ function get_portables() {
                 rst=2
             fi
 
+            if ! hash fzf 2>/dev/null; then
+                status_msg "Getting FZF"
+                if ! clone_repo "https://github.com/junegunn/fzf" "$HOME/.fzf"; then
+                    error_msg "Fail to clone FZF"
+                    return 1
+                fi
+                if [[ $_VERBOSE -eq 0 ]]; then
+                    if ! "$HOME/.fzf/install" --all --no-update-rc 1> /dev/null; then
+                        error_msg "Fail to install FZF"
+                        return 1
+                    fi
+                else
+                    if ! "$HOME/.fzf/install" --all --no-update-rc; then
+                        error_msg "Fail to install FZF"
+                        return 1
+                    fi
+                fi
+            else
+                warn_msg "Skipping FZF, already installed"
+                rst=2
+            fi
+
             # if ! hash nvim 2>/dev/null; then
             #     status_msg "Getting Neovim"
             #     curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim.appimage -o "$HOME/.local/bin/nvim"
@@ -831,10 +823,10 @@ function get_cool_fonts() {
         status_msg "Gettings powerline fonts"
         clone_repo "https://github.com/powerline/fonts" "$HOME/.local/fonts"
 
-        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        if is_windows; then
             # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
             # BUT administrator promp will pop up for EVERY font (too fucking much)
-            status_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
+            warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
         else
             status_msg "Installing cool fonts"
             if [[ $_VERBOSE -eq 1 ]]; then
@@ -850,7 +842,7 @@ function get_cool_fonts() {
 }
 
 function setup_systemd() {
-    if [[ ! $SHELL_PLATFORM == 'MSYS' ]] && [[ ! $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if ! is_windows; then
         if hash systemctl 2> /dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user/" ]]; then
@@ -1037,7 +1029,7 @@ while [[ $# -gt 0 ]]; do
             _VIM=1
             _ALL=0
             ;;
-        -n|--neovim)
+        -n|--neovim|--nvim)
             _NVIM=1
             _ALL=0
             ;;
@@ -1082,7 +1074,7 @@ done
 
 # Because the "cp -rf" means there are no symbolic links
 # we must be sure we wont screw the shell host settings
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]] || [[ $_CMD == "cp -rf" ]]; then
+if is_windows || [[ $_CMD == "cp -rf" ]]; then
     verbose_msg "Activating backup"
     _BACKUP=1
 fi
@@ -1123,7 +1115,7 @@ verbose_msg "Using ${_URL}"
 verbose_msg "Protocol   : ${_PROTOCOL}"
 verbose_msg "User       : ${_GIT_USER}"
 verbose_msg "Host       : ${_GIT_HOST}"
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     verbose_msg "Platform   : Windows"
 else
     verbose_msg "Platform   : Linux"
