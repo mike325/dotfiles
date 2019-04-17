@@ -26,8 +26,7 @@
     # Changed to the standar location $HOME/.config/git/ignore
     # excludesfile = ~/.config/git/templates/gitignore
     autocrlf = input
-    # TODO: Check if this has efect in linux
-    # symlinks = $CREATE_LINKS
+    symlinks = true
 
 [user]
     name  = Mike

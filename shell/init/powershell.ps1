@@ -43,6 +43,9 @@ function touch {
     New-Item -path $args -type file
 }
 
+function ln ($target, $link) {
+    New-Item -Path $link -ItemType SymbolicLink -Value $target
+}
 
 # Path settings
 if ( Test-Path "$HOME\.local\bin" ) {
