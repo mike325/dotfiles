@@ -86,6 +86,7 @@ fi
 [[ -f "$HOME/.config/shell/host/env.sh"  ]] && source "$HOME/.config/shell/host/env.sh"
 [[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
+[[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
@@ -137,12 +138,14 @@ fi
 # Windows stuff
 _CURRENT_SHELL=""
 if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    export _CURRENT_SHELL="$(ps | grep $( echo $$ ) | awk '{ print $8 }')"
+    export _CURRENT_SHELL="$(ps | grep $(echo $$) | grep -Eo '(ba|z|tc|c)?sh')"
     export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+    export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
     export USER="$USERNAME"
     export CREATE_LINKS=true
 else
-    export _CURRENT_SHELL="$(ps | grep $(echo $$) | awk '{ print $4 }')"
+    export _CURRENT_SHELL="$(ps | grep $(echo $$) | grep -Eo '(ba|z|tc|c)?sh')"
+    export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
     export CREATE_LINKS=false
 fi
 

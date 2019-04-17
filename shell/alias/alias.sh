@@ -312,7 +312,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
     if ! hash fzf 2>/dev/null; then
         alias searchpkg="${pkg} -Ss"
     else
-        searchpkg(){
+        function searchpkg() {
             local name=$( ${pkg} -Ss "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -351,7 +351,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
     if ! hash fzf 2>/dev/null; then
         alias searchpkg="apt-cache search"
     else
-        searchpkg(){
+        function searchpkg() {
             local name=$(apt-cache search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -386,7 +386,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
     if ! hash fzf 2>/dev/null; then
         alias searchpkg="${pkg} search"
     else
-        searchpkg(){
+        function searchpkg() {
             local name=$( ${pkg} search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"

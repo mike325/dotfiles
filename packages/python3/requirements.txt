@@ -1,5 +1,5 @@
 # Python development
-jedi>=0.12.1
+jedi>=0.13.2
 flake8>=3.5.0
 pylint>=2.1.1
 pyflakes>=2.0.0
@@ -30,5 +30,3 @@ Pygments>=2.3.1
 PyYAML>=3.13
 requests>=2.21.0
 thefuck>=3.27
-ufw>=0.36
-

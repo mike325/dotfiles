@@ -62,7 +62,7 @@ fi
 
 _TMP="/tmp/"
 
-_CMD="ln -s"
+_CMD="ln -fns"
 
 _PROTOCOL="https"
 _GIT_USER="mike325"
@@ -111,11 +111,15 @@ fi
 # colors
 # shellcheck disable=SC2034
 black="\033[0;30m"
+# shellcheck disable=SC2034
 red="\033[0;31m"
+# shellcheck disable=SC2034
 green="\033[0;32m"
+# shellcheck disable=SC2034
 yellow="\033[0;33m"
 # shellcheck disable=SC2034
 blue="\033[0;34m"
+# shellcheck disable=SC2034
 purple="\033[0;35m"
 # shellcheck disable=SC2034
 cyan="\033[0;36m"
@@ -125,6 +129,7 @@ white="\033[0;37;1m"
 orange="\033[0;91m"
 # shellcheck disable=SC2034
 normal="\033[0m"
+# shellcheck disable=SC2034
 reset_color="\033[39m"
 
 # TODO:
@@ -352,7 +357,25 @@ function setup_config() {
     fi
 
     verbose_msg "Executing -> $_CMD $pre_cmd $post_cmd"
-    sh -c "$_CMD $pre_cmd $post_cmd" && return 0 || return "$?"
+    if sh -c "$_CMD $pre_cmd $post_cmd"; then
+        if [[ $_BACKUP -eq 1 ]] && [[ $_CMD == "cp -rf" ]]; then
+            local name="${post_cmd##*/}"
+            if [[ -d "${_BACKUP_DIR}/${name}/host" ]] && [[ $(ls -A "${_BACKUP_DIR}/${name}/host") ]]; then
+                status_msg "Restoring shell/host folder"
+                verbose_msg "Restoring shell host from ${_BACKUP_DIR}/${name}/host"
+                cp -rf "${_BACKUP_DIR}/${name}/host" "$post_cmd/host"
+            fi
+        fi
+        return 0
+    else
+        if [[ $_CMD == "cp -rf" ]]; then
+            error_msg "Fail to copy $pre_cmd"
+        else
+            error_msg "Fail to link $pre_cmd"
+        fi
+        return 1
+    fi
+
 }
 
 function clone_repo() {
@@ -380,7 +403,7 @@ function clone_repo() {
                 return 0
             fi
         else
-            if git clone --recursive "$repo" "$dest" 1>/dev/null; then
+            if git clone --quiet --recursive "$repo" "$dest" ; then
                 return 0
             fi
         fi
