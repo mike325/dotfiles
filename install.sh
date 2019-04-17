@@ -853,6 +853,7 @@ function version() {
     if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
         cat "${_SCRIPT_PATH}/shell/banner"
     elif hash curl 2>/dev/null; then
+        verbose_msg "No banner found"
         curl -Ls https://raw.githubusercontent.com/Mike325/dotfiles/master/shell/banner 2>/dev/null
     fi
 
