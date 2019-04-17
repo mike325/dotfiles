@@ -42,8 +42,7 @@ _SYSTEMD=0
 _NOCOLOR=0
 # _GIT_SSH=0
 
-_VERSION="0.1.0"
-_DATE="2018-06-12"
+_VERSION="0.2.0"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -335,13 +334,14 @@ function setup_config() {
             rm -rf "$post_cmd"
         fi
     elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+        verbose_msg "Removing $post_cmd"
         rm -rf "$post_cmd"
     elif [[ -f "$post_cmd" ]] || [[ -e "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
         return 1
     fi
 
-    verbose_msg "$_CMD $pre_cmd $post_cmd"
+    verbose_msg "Executing -> $_CMD $pre_cmd $post_cmd"
     sh -c "$_CMD $pre_cmd $post_cmd" && return 0 || return "$?"
 }
 
@@ -352,16 +352,18 @@ function clone_repo() {
     if hash git 2>/dev/null; then
         if [[ $_BACKUP -eq 1 ]]; then
             if [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+                verbose_msg "Backing up $dest into $_BACKUP_DIR"
                 mv --backup=numbered "$dest" "$_BACKUP_DIR"
             fi
         elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+            verbose_msg "Removing $dest"
             rm -rf "$dest"
         elif [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
             warn_msg "Skipping ${repo##*/}, already exists in $dest"
             return 1
         fi
 
-        verbose_msg "Cloning $repo"
+        verbose_msg "Cloning $repo into $dest"
         # TODO: simplify this crap
         if [[ $_VERBOSE -eq 1 ]]; then
             if git clone --recursive "$repo" "$dest"; then
@@ -389,6 +391,7 @@ function setup_bin() {
         local file_basename="${scriptname%%.*}"
         # local file_extention="${scriptname##*.}"
 
+        verbose_msg "Setup $script into $HOME/.local/bin/$file_basename"
         setup_config "$script" "$HOME/.local/bin/$file_basename"
     done
     return 0
@@ -406,6 +409,7 @@ function setup_shell() {
         local file_basename="${scriptname%%.*}"
         # local file_extention="${scriptname##*.}"
 
+        verbose_msg "Setup $script into $HOME/.${file_basename}"
         setup_config "$script" "$HOME/.${file_basename}"
     done
 
@@ -461,7 +465,7 @@ function setup_git() {
             local file_basename="${scriptname%%.*}"
             # local file_extention="${scriptname##*.}"
 
-            verbose_msg "$hooks"
+            verbose_msg "Getting $hooks into ${_SCRIPT_PATH}/.git/hooks/${hooks##*/}"
 
             setup_config "$hooks" "${_SCRIPT_PATH}/.git/hooks/${hooks##*/}"
         done
@@ -525,14 +529,24 @@ function get_vim_dotfiles() {
 function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
-    local nvim_version="v0.4.0"
+
+    if hash curl 2>/dev/null; then
+        verbose_msg "Getting neovim's version with curl"
+        local nvim_version="$( curl -sL "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+    elif hash wget 2>/dev/null; then
+        verbose_msg "Getting neovim's version with wget"
+        local nvim_version="$( wget -qO- "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+    else
+        error_msg "Neither Curl nor Wget are available"
+    fi
+
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
         # TODO: auto detect Windows arch and latest nvim version
         if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
             if hash curl 2>/dev/null; then
                 status_msg "Getting neovim ${nvim_version} executable"
-                if ! curl -Ls https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim-win64.zip -o "$_TMP/nvim.zip"; then
+                if ! curl -Ls "https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim-win64.zip" -o "$_TMP/nvim.zip"; then
                     error_msg "Failed neovim download"
                     return 1
                 fi
@@ -576,7 +590,7 @@ function get_nvim_dotfiles() {
                 # If the repo was already cloned, lets just build it
                 # TODO: Considering to use appimage binary instead of compiling it from the source code
                 status_msg "Getting neovim ${nvim_version} executable"
-                if curl -Ls https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim.appimage -o "$HOME/.local/bin/nvim"; then
+                if curl -Ls "https://github.com/neovim/neovim/releases/download/${nvim_version}/nvim.appimage" -o "$HOME/.local/bin/nvim"; then
                     chmod u+x "$HOME/.local/bin/nvim"
                 else
                     error_msg "Curl failed to download Neovim"
@@ -762,6 +776,7 @@ function setup_shell_framework() {
         local force=""
     fi
 
+    verbose_msg "Calling get_shell as -> ${_SCRIPT_PATH}/bin/get_shell.sh $force $nocolor -s $_CURRENT_SHELL"
     eval "${_SCRIPT_PATH}/bin/get_shell.sh $force $nocolor -s $_CURRENT_SHELL" || return 1
 
     return 0
@@ -788,7 +803,11 @@ function get_cool_fonts() {
             status_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
         else
             status_msg "Installing cool fonts"
-            "$HOME"/.local/fonts/install.sh
+            if [[ $_VERBOSE -eq 1 ]]; then
+                "$HOME"/.local/fonts/install.sh
+            else
+                "$HOME"/.local/fonts/install.sh 1> /dev/null
+            fi
         fi
     else
         warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
@@ -808,6 +827,7 @@ function setup_systemd() {
                     local file_basename="${servicename%%.*}"
                     # local file_extention="${scriptname##*.}"
 
+                    verbose_msg "Setup $service in $HOME/.config/systemd/user/${servicename}"
                     setup_config "${service}" "$HOME/.config/systemd/user/${servicename}"
                 done
             else
@@ -841,7 +861,7 @@ function version() {
     echo ""
     echo "       Author   : Mike 8a"
     echo "       Version  : ${_VERSION}"
-    echo "       Date     : ${_DATE}"
+    echo "       Date     : $(date)"
     # echo "       Page     : https://github.com/mike325/dotfiles"
     echo ""
 }
@@ -1043,6 +1063,7 @@ else
 fi
 
 if [[ $_ALL -eq 1 ]]; then
+    verbose_msg 'Setting up everything'
     setup_bin
     setup_shell
     setup_shell_framework
