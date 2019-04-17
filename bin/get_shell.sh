@@ -191,7 +191,15 @@ if [[ "$_CURRENT_SHELL" =~ "bash" ]]; then
 
     if [[ ! -d "$HOME/.bash_it" ]]; then
         status_msg "Cloning bash-it"
-        git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"
+        if [[ $_VERBOSE -eq 1 ]]; then
+            if git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"; then
+                return 0
+            fi
+        else
+            if git clone --quiet --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"; then
+                return 0
+            fi
+        fi
     else
         warn_msg "Bash-it is already install"
     fi
@@ -200,16 +208,16 @@ elif [[ "$_CURRENT_SHELL" =~ "zsh" ]]; then
     rm_framework "$HOME/.oh-my-zsh"
 
     if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-        # if hash curl 2>/dev/null && [[ ! -f "$HOME/.zshrc" ]]; then
-        #     status_msg "Getting oh-my-zsh with curl"
-        #     sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-        # elif hash wget 2>/dev/null && [[ ! -f "$HOME/.zshrc" ]]; then
-        #     status_msg "Getting oh-my-zsh with wget"
-        #     sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
-        # else
         status_msg "Cloning oh-my-zsh"
-        git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
-        # fi
+        if [[ $_VERBOSE -eq 1 ]]; then
+            if git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"; then
+                return 0
+            fi
+        else
+            if git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"; then
+                return 0
+            fi
+        fi
     else
         warn_msg "oh-my-zsh is already install"
     fi

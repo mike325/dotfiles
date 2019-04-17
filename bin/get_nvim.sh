@@ -299,7 +299,7 @@ fi
 
 if [[ "$_CLONE" -eq 1 ]] && [[ ! -d "$_LOCATION/neovim" ]]; then
     _LOCATION="$_LOCATION/neovim"
-    git clone --recursive "$_URL" "$_LOCATION" || exit 1
+    git clone --quiet --recursive "$_URL" "$_LOCATION" || exit 1
 
 elif [[ -d "$_LOCATION/neovim" ]]; then
     warn_msg "$_LOCATION/neovim already exists, skipping cloning"
