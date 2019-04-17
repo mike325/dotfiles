@@ -756,7 +756,7 @@ function get_cool_fonts() {
 }
 
 function setup_systemd() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if [[ ! $SHELL_PLATFORM == 'MSYS' ]] && [[ ! $SHELL_PLATFORM == 'CYGWIN' ]]; then
         if hash systemctl 2> /dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user/" ]]; then
