@@ -1,0 +1,8 @@
+yaourt -S --no-confirm
+spotify
+libtinfo
+ncurses5-compat-libs
+arc-gtk-theme
+jdk
+arc-firefox-theme
+nextcloud-client

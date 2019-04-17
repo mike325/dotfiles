@@ -40,6 +40,7 @@ _VERBOSE=0
 _PORTABLES=0
 _SYSTEMD=0
 _NOCOLOR=0
+_PYTHON=0
 # _GIT_SSH=0
 
 _VERSION="0.2.0"
@@ -108,15 +109,21 @@ else
 fi
 
 # colors
+# shellcheck disable=SC2034
 black="\033[0;30m"
 red="\033[0;31m"
 green="\033[0;32m"
 yellow="\033[0;33m"
+# shellcheck disable=SC2034
 blue="\033[0;34m"
 purple="\033[0;35m"
+# shellcheck disable=SC2034
 cyan="\033[0;36m"
+# shellcheck disable=SC2034
 white="\033[0;37;1m"
+# shellcheck disable=SC2034
 orange="\033[0;91m"
+# shellcheck disable=SC2034
 normal="\033[0m"
 reset_color="\033[39m"
 
@@ -226,6 +233,9 @@ function help_user() {
     echo "                  * Since the patched fonts have different install method for Windows"
     echo "                    they are just download"
     echo "                  * This options is ignored if the install script is executed in a SSH session"
+    echo ""
+    echo "          --python"
+    echo "              Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3"
     echo ""
     echo "          -y, systemd"
     echo "              Install user's systemd services (Just in Linux systems)"
@@ -530,12 +540,13 @@ function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
 
+    local nvim_version=''
     if hash curl 2>/dev/null; then
         verbose_msg "Getting neovim's version with curl"
-        local nvim_version="$( curl -sL "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        nvim_version="$( curl -sL "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
     elif hash wget 2>/dev/null; then
         verbose_msg "Getting neovim's version with wget"
-        local nvim_version="$( wget -qO- "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        nvim_version="$( wget -qO- "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
     else
         error_msg "Neither Curl nor Wget are available"
     fi
@@ -848,6 +859,34 @@ function setup_systemd() {
     return 0
 }
 
+function setup_python() {
+    if ! hash pip3 2>/dev/null && ! hash pip2 2>/dev/null; then
+        error_msg "No pip found"
+        return 1
+    fi
+
+    local versions=(2 3)
+    for version in "${versions[@]}"; do
+        if hash "pip${version}" 2>/dev/null; then
+            status_msg "Setting up python ${version} dependencies"
+            if [[ $_VERBOSE -eq 1 ]]; then
+                local quiet=""
+            else
+                # shellcheck disable=SC2034
+                local quiet="--quiet"
+            fi
+            # shellcheck disable=SC2016
+            local cmd='pip${version} install ${quiet} --user -r "${_SCRIPT_PATH}/packages/python${version}/requirements.txt"'
+            verbose_msg "Pip command --> ${cmd}"
+            if ! eval "$cmd"; then
+                error_msg "Fail to install python ${version} dependencies"
+            fi
+        fi
+    done
+
+    return 0
+}
+
 function version() {
 
     if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
@@ -983,6 +1022,10 @@ while [[ $# -gt 0 ]]; do
             _BIN=1
             _ALL=0
             ;;
+        --python)
+            _PYTHON=1
+            _ALL=0
+            ;;
         -g|--git)
             _GIT=1
             _ALL=0
@@ -1075,6 +1118,7 @@ if [[ $_ALL -eq 1 ]]; then
     get_emacs_dotfiles
     get_cool_fonts
     setup_systemd
+    setup_python
 else
     [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_SHELL -eq 1 ]] && setup_shell
@@ -1086,6 +1130,7 @@ else
     [[ $_EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
     [[ $_SYSTEMD -eq 1 ]] && setup_systemd
+    [[ $_PYTHON -eq 1 ]] && setup_python
 fi
 
 exit 0
