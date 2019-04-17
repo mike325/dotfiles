@@ -25,7 +25,7 @@
 
 _ALL=1
 _COOL_FONTS=0
-_ALIAS=0
+_SHELL=0
 _VIM=0
 _NVIM=0
 _BIN=0
@@ -154,7 +154,7 @@ function help_user() {
     echo "              Force installation, remove all previous conflict files before installing"
     echo "              This flag is always disable by default"
     echo ""
-    echo "          -s, --shell_frameworks"
+    echo "          -w, --shell_frameworks"
     echo "              Install shell frameworks, bash-it or oh-my-zsh according to the current shell"
     echo "              Current shell:   $_CURRENT_SHELL"
     echo ""
@@ -165,7 +165,7 @@ function help_user() {
     echo "              ----    Ignored option in Windows platform"
     echo "              ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!"
     echo ""
-    echo "          -a, --alias"
+    echo "          -s, --shell"
     echo "              Install:"
     echo "                  - Shell alias in $HOME/.config/shell"
     echo "                  - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh"
@@ -361,7 +361,7 @@ function setup_bin() {
     return 0
 }
 
-function setup_alias() {
+function setup_shell() {
 
     status_msg "Getting python startup script"
     setup_config "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
@@ -382,20 +382,22 @@ function setup_alias() {
     status_msg "Getting Shell init files"
 
     for shell in "${sh_shells[@]}"; do
+        status_msg "Setting up ${shell}rc"
         if [[ ! -f "$HOME/.${shell}rc" ]] || [[ $_FORCE_INSTALL -eq 1 ]]; then
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc"
         else
             warn_msg "The file $HOME/.${shell}rc already exists, trying $HOME/.${shell}rc.$USER"
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc.$USER" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc.$USER"
         fi
     done
 
     for shell in "${csh_shells[@]}"; do
+        status_msg "Setting up ${shell}rc"
         if [[ ! -f "$HOME/.${shell}rc" ]]; then
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc"
         else
             warn_msg "The file $HOME/.${shell}rc already exists, trying $HOME/.${shell}rc.$USER"
-            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc.$USER" || return 1
+            setup_config "${_SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc.$USER"
         fi
     done
 
@@ -889,11 +891,11 @@ while [[ $# -gt 0 ]]; do
         -c|--copy)
             _CMD="cp -rf"
             ;;
-        -a|--alias)
-            _ALIAS=1
+        -s|--shell)
+            _SHELL=1
             _ALL=0
             ;;
-        -s|--shell_frameworks)
+        -w|--shell_frameworks)
             _SHELL_FRAMEWORK=1
             _ALL=0
             ;;
@@ -998,7 +1000,7 @@ fi
 
 if [[ $_ALL -eq 1 ]]; then
     setup_bin
-    setup_alias
+    setup_shell
     setup_shell_framework
     setup_git
     get_portables
@@ -1009,7 +1011,7 @@ if [[ $_ALL -eq 1 ]]; then
     setup_systemd
 else
     [[ $_BIN -eq 1 ]] && setup_bin
-    [[ $_ALIAS -eq 1 ]] && setup_alias
+    [[ $_SHELL -eq 1 ]] && setup_shell
     [[ $_SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $_GIT -eq 1 ]] && setup_git
     [[ $_PORTABLES -eq 1 ]] && get_portables
