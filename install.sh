@@ -39,6 +39,7 @@ _BACKUP_DIR="$HOME/.local/backup_$(date '+%d.%b.%Y_%H-%M-%S')"
 _VERBOSE=0
 _PORTABLES=0
 _SYSTEMD=0
+_NOCOLOR=0
 # _GIT_SSH=0
 
 _VERSION="0.1.0"
@@ -106,6 +107,19 @@ else
         _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
     fi
 fi
+
+# colors
+black="\033[0;30m"
+red="\033[0;31m"
+green="\033[0;32m"
+yellow="\033[0;33m"
+blue="\033[0;34m"
+purple="\033[0;35m"
+cyan="\033[0;36m"
+white="\033[0;37;1m"
+orange="\033[0;91m"
+normal="\033[0m"
+reset_color="\033[39m"
 
 # TODO:
 # 1) Add colors to the script
@@ -224,6 +238,9 @@ function help_user() {
     echo "          --version"
     echo "              Display the version and exit"
     echo ""
+    echo "          --nocolor"
+    echo "              Disable color output"
+    echo ""
     echo "          --verbose"
     echo "              Output debug messages"
     echo ""
@@ -254,26 +271,42 @@ function __parse_args() {
 
 function warn_msg() {
     local warn_message="$1"
-    printf "[!]     ---- Warning!!! %s \n" "$warn_message"
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
+    else
+        printf "[!] Warning:\t %s \n" "$warn_message"
+    fi
     return 0
 }
 
 function error_msg() {
     local error_message="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$error_message" 1>&2
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
+    else
+        printf "[X] Error:\t %s \n" "$error_message" 1>&2
+    fi
     return 0
 }
 
 function status_msg() {
     local status_message="$1"
-    printf "[*]     ---- %s \n" "$status_message"
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
+    else
+        printf "[*] Info:\t %s \n" "$status_message"
+    fi
     return 0
 }
 
 function verbose_msg() {
     if [[ $_VERBOSE -eq 1 ]]; then
         local debug_message="$1"
-        printf "[+]     ---- Debug!!!   %s \n" "$debug_message"
+        if [[ $_NOCOLOR -eq 0 ]]; then
+            printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
+        else
+            printf "[+] Debug:\t %s \n" "$debug_message"
+        fi
     fi
     return 0
 }
@@ -459,7 +492,7 @@ function get_vim_dotfiles() {
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
 
         # If we couldn't clone our repo, return
-        if [[ ! -d "$HOME/.vim" ]]; then
+        if [[ ! -d "$HOME/vimfiles" ]]; then
             status_msg "Cloning vim dotfiles in $HOME/vimfiles"
             if ! clone_repo "$_URL/.vim" "$HOME/vimfiles"; then
                 error_msg "Couldn't get vim repo"
@@ -509,7 +542,7 @@ function get_nvim_dotfiles() {
 
                 status_msg "Extracting files"
                 [[ $_VERBOSE -eq 1 ]] && unzip "$_TMP/nvim.zip" -d "$HOME/.local/"
-                [[ $_VERBOSE -eq 0 ]] && unzip "$_TMP/nvim.zip" -d "$HOME/.local/" &> /dev/null
+                [[ $_VERBOSE -eq 0 ]] && unzip -q "$_TMP/nvim.zip" -d "$HOME/.local/"
                 # Since neovim dir has a 'bin' folder, it'll be added to the PATH automatically
                 mv "$HOME/.local/Neovim" "$HOME/.local/neovim"
             else
@@ -717,11 +750,19 @@ function get_emacs_dotfiles() {
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
-    if [[ $_FORCE_INSTALL -eq 1 ]]; then
-        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" -f || return 1
+    if [[ $_NOCOLOR -eq 1 ]]; then
+        local nocolor="--nocolor"
     else
-        "${_SCRIPT_PATH}"/bin/get_shell.sh -s "$_CURRENT_SHELL" || return 1
+        local nocolor=""
     fi
+
+    if [[ $_FORCE_INSTALL -eq 1 ]]; then
+        local force="-force"
+    else
+        local force=""
+    fi
+
+    eval "${_SCRIPT_PATH}/bin/get_shell.sh $force $nocolor -s $_CURRENT_SHELL" || return 1
 
     return 0
 }
@@ -932,6 +973,9 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        --nocolor)
+            _NOCOLOR=1
+            ;;
         --version)
             version
             exit 0
@@ -993,9 +1037,9 @@ verbose_msg "Protocol   : ${_PROTOCOL}"
 verbose_msg "User       : ${_GIT_USER}"
 verbose_msg "Host       : ${_GIT_HOST}"
 if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    verbose_msg "Platform   : Linux"
-else
     verbose_msg "Platform   : Windows"
+else
+    verbose_msg "Platform   : Linux"
 fi
 
 if [[ $_ALL -eq 1 ]]; then

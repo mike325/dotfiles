@@ -46,6 +46,20 @@ _BUILD_LIBS=0
 _CLONE=0
 _FORCE_INSTALL=0
 _PORTABLE=0
+_NOCOLOR=0
+
+# colors
+black="\033[0;30m"
+red="\033[0;31m"
+green="\033[0;32m"
+yellow="\033[0;33m"
+blue="\033[0;34m"
+purple="\033[0;35m"
+cyan="\033[0;36m"
+white="\033[0;37;1m"
+orange="\033[0;91m"
+normal="\033[0m"
+reset_color="\033[39m"
 
 _TMP='/tmp/'
 
@@ -136,20 +150,44 @@ function show_help() {
 }
 
 function warn_msg() {
-    WARN_MESSAGE="$1"
-    printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
+    local warn_message="$1"
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
+    else
+        printf "[!] Warning:\t %s \n" "$warn_message"
+    fi
     return 0
 }
 
 function error_msg() {
-    ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+    local error_message="$1"
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
+    else
+        printf "[X] Error:\t %s \n" "$error_message" 1>&2
+    fi
     return 0
 }
 
 function status_msg() {
-    STATUS_MESSAGGE="$1"
-    printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
+    local status_message="$1"
+    if [[ $_NOCOLOR -eq 0 ]]; then
+        printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
+    else
+        printf "[*] Info:\t %s \n" "$status_message"
+    fi
+    return 0
+}
+
+function verbose_msg() {
+    if [[ $_VERBOSE -eq 1 ]]; then
+        local debug_message="$1"
+        if [[ $_NOCOLOR -eq 0 ]]; then
+            printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
+        else
+            printf "[+] Debug:\t %s \n" "$debug_message"
+        fi
+    fi
     return 0
 }
 
@@ -208,6 +246,9 @@ function get_libs() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --nocolor)
+            _NOCOLOR=1
+            ;;
         --portable)
             _PORTABLE=1
             ;;
