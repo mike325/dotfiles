@@ -36,19 +36,33 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-__NAME="$0"
-__NAME="${__NAME##*/}"
-__LOCATION="$(pwd)"
-__URL="https://github.com/neovim/neovim"
-__PYTHON_LIBS=0
-__RUBY_LIBS=0
-__BUILD_LIBS=0
-__CLONE=0
-__FORCE_INSTALL=0
+_NAME="$0"
+_NAME="${_NAME##*/}"
+_LOCATION="$(pwd)"
+_URL="https://github.com/neovim/neovim"
+_PYTHON_LIBS=0
+_RUBY_LIBS=0
+_BUILD_LIBS=0
+_CLONE=0
+_FORCE_INSTALL=0
+_PORTABLE=0
+
+_TMP='/tmp/'
+
+if [ -z "$SHELL_PLATFORM" ]; then
+    SHELL_PLATFORM='UNKNOWN'
+    case "$OSTYPE" in
+      *'linux'*   ) SHELL_PLATFORM='LINUX' ;;
+      *'darwin'*  ) SHELL_PLATFORM='OSX' ;;
+      *'freebsd'* ) SHELL_PLATFORM='BSD' ;;
+      *'cygwin'*  ) SHELL_PLATFORM='CYGWIN' ;;
+      *'msys'*    ) SHELL_PLATFORM='MSYS' ;;
+    esac
+fi
 
 
 # Warning ! This script delete everything in the work directory before install
-function __show_nvim_libs() {
+function _show_nvim_libs() {
     echo "Please also consider to install the python libs"
     echo "  $ pip3 install --user neovim && pip2 install --user neovim"
     echo "and Ruby libs"
@@ -56,7 +70,7 @@ function __show_nvim_libs() {
     echo ""
 }
 
-function __show_nvim_help() {
+function _show_nvim_help() {
     # echo "    ---- [X] Error Please make sure you have all the dependencies in your system"
     echo ""
     echo "Ubuntu/Debian/Linux mint"
@@ -69,7 +83,7 @@ function __show_nvim_help() {
     echo "  # pacman -S base-devel cmake unzip"
     echo ""
 
-    __show_nvim_libs
+    _show_nvim_libs
 
     echo "For other Unix systems (BSD, Linux and MacOS) and Windows please check"
     echo "  https://github.com/neovim/neovim/wiki/Building-Neovim"
@@ -81,9 +95,15 @@ function show_help() {
     echo "  with some pretty basic options."
     echo ""
     echo "  Usage:"
-    echo "      $__NAME [OPTIONS]"
+    echo "      $_NAME [OPTIONS]"
     echo ""
     echo "      Optional Flags"
+    echo "          --version"
+    echo "              Neovim version to download or compile, default, latest"
+    echo ""
+    echo "          --portable"
+    echo "              Download the portable version and place it in $HOME/.local/bin"
+    echo ""
     echo "          -c, --clone"
     echo "              By default this script expect to run under a git directory with"
     echo "              the Neovim's source code, this options clone Neovim's repo and move"
@@ -112,45 +132,103 @@ function show_help() {
     echo "              Display help, if you are seeing this, that means that you already know it (nice)"
     echo ""
 
-    # __show_nvim_help
+    # _show_nvim_help
 }
 
 function warn_msg() {
     WARN_MESSAGE="$1"
     printf "[!]     ---- Warning!!! %s \n" "$WARN_MESSAGE"
+    return 0
 }
 
 function error_msg() {
     ERROR_MESSAGE="$1"
     printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+    return 0
 }
 
 function status_msg() {
     STATUS_MESSAGGE="$1"
     printf "[*]     ---- %s \n" "$STATUS_MESSAGGE"
+    return 0
+}
+
+function get_portable() {
+    if ! hash curl 2>/dev/null && ! hash wget 2>/dev/null; then
+        error_msg 'Must have curl or wget to download the latest portable'
+        exit 1
+    fi
+
+    # wget -qO- $URL
+    # wget $URL -O out
+
+    local dir="$HOME/.local/bin"
+
+    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+
+    if hash curl 2>/dev/null; then
+        local version="$( curl -sL "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+    else
+        local version="$( wget -qO- "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+    fi
+
+    status_msg "Downloading version: ${version}"
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        local name="nvim.zip"
+        if hash curl 2>/dev/null; then
+            curl -sL "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
+        else
+            wget -qL "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
+        fi
+        unzip -qo "$_TMP/$name" && mv "$_TMP/Neovim/*" "$HOME/.local/"
+    else
+        local name="nvim"
+        if hash curl 2>/dev/null; then
+            curl -sL "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
+        else
+            wget -qL "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
+        fi
+        chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
+    fi
+
+    return 0
+}
+
+function get_libs() {
+    if [[ $_PYTHON_LIBS -eq 1 ]]; then
+        hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --user neovim; }
+        hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --user neovim; }
+    fi
+
+    if [[ $_RUBY_LIBS -eq 1 ]]; then
+        hash gem 2> /dev/null && { status_msg "Installing ruby libs" && gem install --user-install neovim; }
+    fi
 }
 
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --portable)
+            _PORTABLE=1
+            ;;
         -f|--force)
-            __FORCE_INSTALL=1
+            _FORCE_INSTALL=1
             ;;
         -c|--clone)
-            __CLONE=1
+            _CLONE=1
             ;;
         -d|--dir)
-            __LOCATION="$2"
+            _LOCATION="$2"
             shift
             ;;
         -p|--python)
-            __PYTHON_LIBS=1
+            _PYTHON_LIBS=1
             ;;
         -r|--ruby)
-            __RUBY_LIBS=1
+            _RUBY_LIBS=1
             ;;
         -b|--build)
-            __BUILD_LIBS=1
+            _BUILD_LIBS=1
             ;;
         -h|--help)
             show_help
@@ -165,6 +243,12 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+if [[ $_PORTABLE -eq 1 ]]; then
+    get_portable
+    get_libs
+    exit 0
+fi
+
 # Windows stuff
 if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     warn_msg "Mingw platform is currently unsupported"
@@ -172,27 +256,27 @@ if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
     exit 1
 fi
 
-if [[ "$__CLONE" -eq 1 ]] && [[ ! -d "$__LOCATION/neovim" ]]; then
-    __LOCATION="$__LOCATION/neovim"
-    git clone --recursive "$__URL" "$__LOCATION" || exit 1
+if [[ "$_CLONE" -eq 1 ]] && [[ ! -d "$_LOCATION/neovim" ]]; then
+    _LOCATION="$_LOCATION/neovim"
+    git clone --recursive "$_URL" "$_LOCATION" || exit 1
 
-elif [[ -d "$__LOCATION/neovim" ]]; then
-    warn_msg "$__LOCATION/neovim already exists, skipping cloning"
-    __LOCATION="$__LOCATION/neovim"
+elif [[ -d "$_LOCATION/neovim" ]]; then
+    warn_msg "$_LOCATION/neovim already exists, skipping cloning"
+    _LOCATION="$_LOCATION/neovim"
 fi
 
-if [[ -f "$__LOCATION/bin/nvim" ]] && [[ $__FORCE_INSTALL -eq 0 ]]; then
+if [[ -f "$_LOCATION/bin/nvim" ]] && [[ $_FORCE_INSTALL -eq 0 ]]; then
     status_msg "Neovim is already compiled, aborting"
     exit 0
-elif [[ $__FORCE_INSTALL -eq 1 ]]; then
+elif [[ $_FORCE_INSTALL -eq 1 ]]; then
     warn_msg "Neovim is already compiled, but fuck it, you want to recompile"
 fi
 
 
-if [[ -d "$__LOCATION" ]]; then
-    pushd "$__LOCATION" > /dev/null
+if [[ -d "$_LOCATION" ]]; then
+    pushd "$_LOCATION" > /dev/null || "$( error_msg "Could not get to $_LOCATION" && exit 1)"
 else
-    error_msg "$__LOCATION doesn't exist"
+    error_msg "$_LOCATION doesn't exist"
     exit 1
 fi
 
@@ -211,7 +295,7 @@ rm -fr build/
 git checkout master
 git pull origin master
 
-if [[ "$__BUILD_LIBS" -eq 1 ]]; then
+if [[ "$_BUILD_LIBS" -eq 1 ]]; then
     status_msg "Looking for system dependencies"
 
     if hash apt-get 2> /dev/null; then
@@ -303,31 +387,17 @@ if make CMAKE_BUILD_TYPE=Release; then
         # echo "You may want to add 'export PATH=\"$(pwd)/bin:\$PATH\"' in your ~/.${SHELL##*/}rc"
         echo ""
 
-        if [[ $__PYTHON_LIBS -eq 1 ]]; then
-            status_msg "Installing python2 libs"
-            hash pip2 2> /dev/null && /usr/bin/yes | pip2 install --user neovim
-            status_msg "Installing python3 libs"
-            hash pip3 2> /dev/null && /usr/bin/yes | pip3 install --user neovim
-        fi
-
-        if [[ $__RUBY_LIBS -eq 1 ]]; then
-            status_msg "Installing ruby libs"
-            hash gem 2> /dev/null && gem install --user-install neovim
-        fi
-
-        if [[ $__PYTHON_LIBS -eq 1 ]] || [[ $__RUBY_LIBS -eq 1 ]]; then
-            __show_nvim_libs
-        fi
+        get_libs
 
     else
-        __show_nvim_help
+        _show_nvim_help
         popd > /dev/null && exit 1
     fi
 else
-    __show_nvim_help
+    _show_nvim_help
     popd > /dev/null && exit 1
 fi
 
-popd > /dev/null
+popd > /dev/null || exit 1
 
 exit 0

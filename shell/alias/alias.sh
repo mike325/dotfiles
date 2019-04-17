@@ -320,6 +320,8 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         }
     fi
 
+    alias cleanpkg="${pkg} -Sc"
+
     alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
     alias update="${pkg} -Syyu --aur" && alias updaten="${pkg} -Syyu --aur --noconfirm"
@@ -334,6 +336,8 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         unalias updaten && alias updaten="sudo ${pkg} -Syyu --aur --noconfirm"
 
         unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
+
+        unalias cleanpkg && alias cleanpkg="sudo ${pkg} -S"
     fi
 
 elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
@@ -353,8 +357,8 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
                 echo "$name"
             fi
         }
-
     fi
+
     if [[ $EUID -ne 0 ]]; then
         alias getpkgn="sudo ${pkg} install -y"
 
@@ -406,6 +410,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
         alias rmpkg="${pkg} remove"
     fi
 fi
+
 unset pkg
 
 if hash fzf 2>/dev/null; then

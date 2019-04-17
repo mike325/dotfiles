@@ -29,10 +29,10 @@ NAME="${NAME##*/}"
 
 function help_user() {
     echo ""
-    echo "  Lists the current directory's files in Vim, so you can edit "
+    echo "  Lists the current directory's files in Vim/Neovim, so you can edit "
     echo "  it and save to rename them "
     echo ""
-    echo "  Don't delete or swap the lines while in Vim or things will get ugly."
+    echo "  Don't delete or swap the lines while in Vim/Neovim or things will get ugly."
     echo ""
     echo "  Credits: https://github.com/thameera/vimv"
     echo ""

@@ -136,4 +136,8 @@ if hash fzf 2>/dev/null; then
     [[ -f "$HOME/.fzf.bash" ]] && source "$HOME/.fzf.bash"
 fi
 
-[[ -f "$BASH_IT/bash_it.sh" ]] && source "$BASH_IT/bash_it.sh"
+if [[ -f "$BASH_IT/bash_it.sh" ]]; then
+    source "$BASH_IT/bash_it.sh"
+else
+    PS1='[\n\u at \[\e[0;36m\]\h: \[\e[39m\] \[\e[0;33m\]\w \n\[\e[39m\]→ '
+fi
