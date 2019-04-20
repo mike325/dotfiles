@@ -216,6 +216,8 @@ if hash ntfy 2>/dev/null; then
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
     export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
+    # GUI
+    export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
 fi
 
@@ -313,6 +315,12 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         alias searchpkg="${pkg} -Ss"
     else
         function searchpkg() {
+            if hash yaourt 2>/dev/null; then
+                local pkg="yaourt"
+            elif hash pacman 2>/dev/null; then
+                local pkg="pacman"
+            fi
+
             local name=$( ${pkg} -Ss "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -352,6 +360,11 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
         alias searchpkg="apt-cache search"
     else
         function searchpkg() {
+            if hash apt 2>/dev/null; then
+                local pkg="apt"
+            elif hash apt-get 2>/dev/null; then
+                local pkg="apt-get"
+            fi
             local name=$(apt-cache search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -387,6 +400,11 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
         alias searchpkg="${pkg} search"
     else
         function searchpkg() {
+            if hash dnf 2>/dev/null; then
+                local pkg="dnf"
+            elif hash yum 2>/dev/null; then
+                local pkg="yum"
+            fi
             local name=$( ${pkg} search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
