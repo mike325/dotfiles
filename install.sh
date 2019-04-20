@@ -575,7 +575,7 @@ function get_nvim_dotfiles() {
     local nvim_version=''
     if hash curl 2>/dev/null; then
         verbose_msg "Getting neovim's version with curl"
-        nvim_version="$( curl -sL "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        nvim_version="$( curl -Ls "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
     elif hash wget 2>/dev/null; then
         verbose_msg "Getting neovim's version with wget"
         nvim_version="$( wget -qO- "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
@@ -687,12 +687,12 @@ function get_portables() {
                     if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
                         chmod u+x "$_TMP/get-pip.py"
 
-                        if ! hash pip2 2>/dev/null; then
+                        if ! hash pip2 2>/dev/null && hash python2 2>/dev/null; then
                             status_msg "Installing pip2"
                             python2 $_TMP/get-pip.py --user
                         fi
 
-                        if ! hash pip3 2>/dev/null; then
+                        if ! hash pip3 2>/dev/null && hash python3 2>/dev/null; then
                             local python=("8" "7" "6" "5" "4")
 
                             for version in "${python[@]}"; do

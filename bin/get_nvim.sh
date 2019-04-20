@@ -205,7 +205,7 @@ function get_portable() {
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
     if hash curl 2>/dev/null; then
-        local version="$( curl -sL "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        local version="$( curl -Ls "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
     else
         local version="$( wget -qO- "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
     fi
@@ -214,7 +214,7 @@ function get_portable() {
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
         local name="nvim.zip"
         if hash curl 2>/dev/null; then
-            curl -sL "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
+            curl -Ls "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
         else
             wget -qL "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
         fi
@@ -222,7 +222,7 @@ function get_portable() {
     else
         local name="nvim"
         if hash curl 2>/dev/null; then
-            curl -sL "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
+            curl -Ls "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
         else
             wget -qL "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
         fi

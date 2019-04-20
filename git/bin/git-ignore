@@ -60,9 +60,9 @@ function status_msg() {
 
 __gi() {
     if [[ $# -gt 0 ]]; then
-        curl -L -s https://www.gitignore.io/api/"$@"
+        curl -Ls https://www.gitignore.io/api/"$*"
     else
-        curl -L -s https://www.gitignore.io/api/list
+        curl -Ls https://www.gitignore.io/api/list
     fi
 }
 
