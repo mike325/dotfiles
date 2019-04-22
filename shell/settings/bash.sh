@@ -79,7 +79,7 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'

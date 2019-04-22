@@ -37,15 +37,21 @@ else
     popd 1> /dev/null || exit 1
 fi
 
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
 
-# Windows stuff
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
-    _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-else
-    _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
+# shellcheck disable=SC2009,SC2046
+_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+
+if ! is_windows; then
     # Hack when using sudo
     # TODO: Must fix this
     if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
@@ -117,7 +123,7 @@ done
 
 status_msg "Cleaning swap files"
 
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     [[ -d "$HOME/AppData/Local/nvim/.resources/swap/" ]] && rm -rf ~/AppData/Local/nvim/.resources/swap/*
     [[ -d "$HOME/vimfiles/.resources/swap/" ]] && rm -rf ~/vimfiles/.resources/swap/*
 else

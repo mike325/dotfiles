@@ -83,24 +83,25 @@ if [ -z "$SHELL_PLATFORM" ]; then
     esac
 fi
 
-# Windows stuff
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    # Windows bash does not have pgrep by default
-    # shellcheck disable=SC2009
-    _CURRENT_SHELL="$(ps | grep $$ | awk '{ print $8 }')"
-    _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-
-    # Horrible hack
-    if [[ $_CURRENT_SHELL =~ "ps" ]]; then
-        _CURRENT_SHELL="$(ps | tail -n 1 | awk '{ print $8 }')"
-        _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
     fi
+    return 1
+}
+
+# shellcheck disable=SC2009,SC2046
+_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+
+if is_windows; then
+    # Windows bash does not have pgrep by default
 
     # Windows does not support links we will use cp instead
     _CMD="cp -rf"
     USER="$USERNAME"
 else
-    _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
     # Hack when using sudo
     # TODO: Must fix this
     if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
@@ -137,129 +138,129 @@ reset_color="\033[39m"
 # 2) Improve Neovim and portables install
 
 function help_user() {
-    echo ""
-    echo "  Simple installer of this dotfiles, by default install (link) all settings and configurations"
-    echo "  if any flag ins given, the script will install just want is being told to do."
-    echo "      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONAL]"
-    echo ""
-    echo "      Optional Flags"
-    echo "          --host"
-    echo "              Change default git host, the new host (ex. gitlab.com) must have the following repos"
-    echo "                  - .vim"
-    echo "                  - .emacs.d"
-    echo "                  - dotfiles"
-    echo ""
-    echo "          --user"
-    echo "              Change default git user, the new user (ex. mike325) must have the following repos"
-    echo "                  - .vim"
-    echo "                  - .emacs.d"
-    echo "                  - dotfiles"
-    echo ""
-    echo "          -p, --protocol"
-    echo "              Alternate between different git protocol"
-    echo "                  - https (default)"
-    echo "                  - ssh"
-    echo "                  - git (not tested)"
-    echo ""
-    echo "          --url"
-    echo "              Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have"
-    echo "              the following repos"
-    echo "                  - .vim"
-    echo "                  - .emacs.d"
-    echo "                  - dotfiles"
-    echo ""
-    echo "          --backup, --backup=DIR"
-    echo "              Backup all existing files into $HOME/.local/backup or the provided dir"
-    echo "              ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used"
-    echo ""
-    echo "          -f, --force"
-    echo "              Force installation, remove all previous conflict files before installing"
-    echo "              This flag is always disable by default"
-    echo ""
-    echo "          -w, --shell_frameworks"
-    echo "              Install shell frameworks, bash-it or oh-my-zsh according to the current shell"
-    echo "              Current shell:   $_CURRENT_SHELL"
-    echo ""
-    echo "          -c, --copy"
-    echo "              By default all dotfiles are linked using 'ln -s' command, this flag change"
-    echo "              the command to 'cp -rf' this way you can remove the folder after installation"
-    echo "              but you need to re-download the files each time you want to update the files"
-    echo "              ----    Ignored option in Windows platform"
-    echo "              ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!"
-    echo ""
-    echo "          -s, --shell"
-    echo "              Install:"
-    echo "                  - Shell alias in $HOME/.config/shell"
-    echo "                  - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh"
-    echo "                  - Everything inside ./dotconfigs into $HOME"
-    echo "                  - Python startup script in $HOME/.local/lib/"
-    echo ""
-    echo "          -d, --dotfiles"
-    echo "              Download my dotfiles repo in case, this options is meant to be used in case this"
-    echo "              script is standalone executed"
-    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles"
-    echo ""
-    echo "          -e, --emacs"
-    echo "              Download and install my evil Emacs dotfiles"
-    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d"
-    echo ""
-    echo "          -v, --vim"
-    echo "              Download and install my Vim dotfiles"
-    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim"
-    echo ""
-    echo "          -n, --nvim, --neovim"
-    echo "              Download Neovim executable (portable in windows and linux) if it hasn't been Installed"
-    echo "              Download and install my Vim dotfiles in Neovim's dir."
-    echo "              Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)"
-    echo "              them, otherwise download them from my vim's dotfiles repo"
-    echo "                  Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim"
-    echo ""
-    echo "          -b, --bin"
-    echo "              Install shell functions and scripts in $HOME/.local/bin"
-    echo ""
-    echo "          -g, --git"
-    echo "              Install git configurations into $HOME/.config/git and $HOME/.gitconfig"
-    echo "              Install:"
-    echo "                  - Gitconfigs"
-    echo "                  - Hooks"
-    echo "                  - Templates"
-    echo ""
-    echo "          -t, --portables"
-    echo "              Install isolated/portable programs into $HOME/.local/bin"
-    echo "              Install:"
-    echo "                  - shellcheck"
-    echo "                  - ctags (windows only)"
-    echo "                  - pip2 and pip3 (GNU/Linux only)"
-    echo "                  - FZF (GNU/Linux only)"
-    echo ""
-    echo "          --fonts, --powerline"
-    echo "              Install the powerline patched fonts"
-    echo "                  * Since the patched fonts have different install method for Windows"
-    echo "                    they are just download"
-    echo "                  * This options is ignored if the install script is executed in a SSH session"
-    echo ""
-    echo "          --python"
-    echo "              Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3"
-    echo ""
-    echo "          -y, systemd"
-    echo "              Install user's systemd services (Just in Linux systems)"
-    echo "                  * Services are install in $HOME/.config/systemd/user"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
-    echo ""
-    echo "          --version"
-    echo "              Display the version and exit"
-    echo ""
-    echo "          --nocolor"
-    echo "              Disable color output"
-    echo ""
-    echo "          --verbose"
-    echo "              Output debug messages"
-    echo ""
+    cat<<EOF
+ Simple installer of this dotfiles, by default install (link) all settings and configurations
+ if any flag ins given, the script will install just want is being told to do.
+     By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts
+
+ Usage:
+     $_NAME [OPTIONAL]
+
+     Optional Flags
+         --host
+             Change default git host, the new host (ex. gitlab.com) must have the following repos
+                 - .vim
+                 - .emacs.d
+                 - dotfiles
+
+         --user
+             Change default git user, the new user (ex. mike325) must have the following repos
+                 - .vim
+                 - .emacs.d
+                 - dotfiles
+
+         -p, --protocol
+             Alternate between different git protocol
+                 - https (default)
+                 - ssh
+                 - git (not tested)
+
+         --url
+             Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have
+             the following repos
+                 - .vim
+                 - .emacs.d
+                 - dotfiles
+
+         --backup, --backup=DIR
+             Backup all existing files into $HOME/.local/backup or the provided dir
+             ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used
+
+         -f, --force
+             Force installation, remove all previous conflict files before installing
+             This flag is always disable by default
+
+         -w, --shell_frameworks
+             Install shell frameworks, bash-it or oh-my-zsh according to the current shell
+             Current shell:   $_CURRENT_SHELL
+
+         -c, --copy
+             By default all dotfiles are linked using 'ln -s' command, this flag change
+             the command to 'cp -rf' this way you can remove the folder after installation
+             but you need to re-download the files each time you want to update the files
+             ----    Ignored option in Windows platform
+             ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
+
+         -s, --shell
+             Install:
+                 - Shell alias in $HOME/.config/shell
+                 - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
+                 - Everything inside ./dotconfigs into $HOME
+                 - Python startup script in $HOME/.local/lib/
+
+         -d, --dotfiles
+             Download my dotfiles repo in case, this options is meant to be used in case this
+             script is standalone executed
+                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles
+
+         -e, --emacs
+             Download and install my evil Emacs dotfiles
+                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d
+
+         -v, --vim
+             Download and install my Vim dotfiles
+                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+
+         -n, --nvim, --neovim
+             Download Neovim executable (portable in windows and linux) if it hasn't been Installed
+             Download and install my Vim dotfiles in Neovim's dir.
+             Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)
+             them, otherwise download them from my vim's dotfiles repo
+                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+
+         -b, --bin
+             Install shell functions and scripts in $HOME/.local/bin
+
+         -g, --git
+             Install git configurations into $HOME/.config/git and $HOME/.gitconfig
+             Install:
+                 - Gitconfigs
+                 - Hooks
+                 - Templates
+
+         -t, --portables
+             Install isolated/portable programs into $HOME/.local/bin
+             Install:
+                 - shellcheck
+                 - ctags (windows only)
+                 - pip2 and pip3 (GNU/Linux only)
+                 - FZF (GNU/Linux only)
+
+         --fonts, --powerline
+             Install the powerline patched fonts
+                 * Since the patched fonts have different install method for Windows
+                   they are just download
+                 * This options is ignored if the install script is executed in a SSH session
+
+         --python
+             Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3
+
+         -y, systemd
+             Install user's systemd services (Just in Linux systems)
+                 * Services are install in $HOME/.config/systemd/user
+
+         -h, --help
+             Display help, if you are seeing this, that means that you already know it (nice)
+
+         --version
+             Display the version and exit
+
+         --nocolor
+             Disable color output
+
+         --verbose
+             Output debug messages
+EOF
 }
 
 function __parse_args() {
@@ -325,13 +326,6 @@ function verbose_msg() {
         fi
     fi
     return 0
-}
-
-function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-        return 0
-    fi
-    return 1
 }
 
 function setup_config() {
@@ -911,14 +905,13 @@ function version() {
         curl -Ls https://raw.githubusercontent.com/Mike325/dotfiles/master/shell/banner 2>/dev/null
     fi
 
-    echo ""
-    echo "  Mike's install script"
-    echo ""
-    echo "       Author   : Mike 8a"
-    echo "       Version  : ${_VERSION}"
-    echo "       Date     : $(date)"
-    # echo "       Page     : https://github.com/mike325/dotfiles"
-    echo ""
+    cat<<EOF
+Mike's install script"
+
+    Author   : Mike 8a"
+    Version  : ${_VERSION}"
+    Date     : $(date)"
+EOF
 }
 
 while [[ $# -gt 0 ]]; do

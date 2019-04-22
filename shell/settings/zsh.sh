@@ -63,26 +63,23 @@ if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
 fi
 # pip zsh completion end
 
-# Write to the history file immediately, not when the shell exits.
-setopt INC_APPEND_HISTORY
-# Share history between all sessions.
-setopt SHARE_HISTORY
-# Expire duplicate entries first when trimming history.
-setopt HIST_EXPIRE_DUPS_FIRST
-# Do not record an entry that was just recorded again.
-setopt HIST_IGNORE_DUPS
-# Delete old recorded entry if new entry is a duplicate.
-setopt HIST_IGNORE_ALL_DUPS
-# Do not display a line previously found.
-setopt HIST_FIND_NO_DUPS
-# Do not record an entry starting with a space.
-setopt HIST_IGNORE_SPACE
-# Do not write duplicate entries in the history file.
-setopt HIST_SAVE_NO_DUPS
-# Remove superfluous blanks before recording entry.
-setopt HIST_REDUCE_BLANKS
-# Do not execute immediately upon history expansion.
-setopt HIST_VERIFY
+[[ ! -d "$HOME/.zsh/" ]] && mkdir -p "$HOME/.zsh/"
+
+HISTFILE="$HOME/.zsh/history"
+HISTSIZE=2048
+SAVEHIST=2048
+
+setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
+setopt share_history          # Share history between all sessions.
+setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
+setopt hist_ignore_dups       # Do not record an entry that was just recorded again.
+setopt hist_ignore_all_dups   # Delete old recorded entry if new entry is a duplicate.
+setopt hist_find_no_dups      # Do not display a line previously found.
+setopt hist_ignore_space      # Do not record an entry starting with a space.
+setopt hist_save_no_dups      # Do not write duplicate entries in the history file.
+setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
+setopt hist_verify            # Do not execute immediately upon history expansion.
+setopt hist_reduce_blanks
 
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     plugins=(go git python)
@@ -91,8 +88,7 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
     [[ -z $ZSH_THEME ]] && ZSH_THEME="agnoster"
 
-    # Uncomment the following line to use case-sensitive completion.
-    CASE_SENSITIVE="true"
+    # CASE_SENSITIVE="true"
 
     # Uncomment the following line to use hyphen-insensitive completion. Case
     # sensitive completion must be off. _ and - will be interchangeable.
@@ -110,7 +106,6 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     # Uncomment the following line to disable auto-setting terminal title.
     # DISABLE_AUTO_TITLE="true"
 
-    # Uncomment the following line to enable command auto-correction.
     [[ -z $ENABLE_CORRECTION ]] && ENABLE_CORRECTION="true"
 
     # Uncomment the following line to display red dots whilst waiting for completion.

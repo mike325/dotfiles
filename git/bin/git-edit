@@ -43,15 +43,22 @@ else
     popd 1> /dev/null || exit 1
 fi
 
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
 
-# Windows stuff
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
-    _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-else
-    _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
+# shellcheck disable=SC2009,SC2046
+_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+
+if ! is_windows; then
     # Hack when using sudo
     # TODO: Must fix this
     if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
@@ -60,28 +67,28 @@ else
 fi
 
 function help_user() {
-    echo ""
-    echo "  Quick edit modified files in a git repo"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONAL]"
-    echo ""
-    echo "          Ex."
-    echo "          $ git $_NAME"
-    echo "          $ git $_NAME -c    # just the staged files"
-    echo "          $ git $_NAME -e ed # uses ed editor"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -c, --cached"
-    echo "              Edit just the staged files"
-    echo ""
-    echo "          -e, --editor"
-    echo "              Change the default editor"
-    echo "                  By default this uses \$EDITOR var and fallback vi in it's unset or empty"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+Quick edit modified files in a git repo"
+
+Usage:"
+    $_NAME [OPTIONAL]"
+
+        Ex."
+        $ git $_NAME"
+        $ git $_NAME -c    # just the staged files"
+        $ git $_NAME -e ed # uses ed editor"
+
+    Optional Flags"
+        -c, --cached"
+            Edit just the staged files"
+
+        -e, --editor"
+            Change the default editor"
+                By default this uses \$EDITOR var and fallback vi in it's unset or empty"
+
+        -h, --help"
+            Display help, if you are seeing this, that means that you already know it (nice)"
+EOF
 }
 
 function __parse_args() {
@@ -92,10 +99,10 @@ function __parse_args() {
     local arg="$1"
     local name="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9._-/~]+$"
+    local pattern="^--${name}[=][a-zA-Z0-9._-/~]+$"
 
-    if [[ ! -z "$3" ]]; then
-        local pattern="^--$name[=]$3$"
+    if [[ -n "$3" ]]; then
+        local pattern="^--${name}[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then
@@ -161,20 +168,20 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-_GITDIR="$(git rev-parse --git-dir)"
+# _GITDIR="$(git rev-parse --git-dir)"
 worklist=($(git worktree list | awk '{print $1}'))
 for i in ${worklist[*]}; do
     [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && _WORKTREE="$i"
 done
 
-if [[ ! -z "$_CACHED" ]]; then
-    if [[ ! -z "$_WORKTREE" ]]; then
+if [[ -n "$_CACHED" ]]; then
+    if [[ -n "$_WORKTREE" ]]; then
         _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
     else
         _FILES=($(git --no-pager status --short | awk '{print $2}'))
     fi
 else
-    if [[ ! -z "$_WORKTREE" ]]; then
+    if [[ -n "$_WORKTREE" ]]; then
         _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
     else
         _FILES=($(git --no-pager status --short | awk '{print $2}'))
@@ -182,7 +189,7 @@ else
 fi
 
 
-if [[ ! -z $_FILES ]]; then
+if [[ -n $_FILES ]]; then
     "$_EDITOR" "${_FILES[@]}"
 else
     warn_msg "No files to edit"

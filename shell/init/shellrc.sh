@@ -135,21 +135,23 @@ if [ -z "$SHELL_PLATFORM" ]; then
     esac
 fi
 
-# Windows stuff
-_CURRENT_SHELL=""
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    export _CURRENT_SHELL="$(ps | grep $(echo $$) | grep -Eo '(ba|z|tc|c)?sh')"
-    export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# shellcheck disable=SC2009,SC2046
+export _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+
+if is_windows; then
     export USER="$USERNAME"
-    export CREATE_LINKS=true
-else
-    export _CURRENT_SHELL="$(ps | grep $(echo $$) | grep -Eo '(ba|z|tc|c)?sh')"
-    export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
-    export CREATE_LINKS=false
 fi
 
-if  [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then
         export PATH="$HOME/AppData/Roaming/Python/Scripts:$PATH"

@@ -49,16 +49,27 @@ _PORTABLE=0
 _NOCOLOR=0
 
 # colors
+# shellcheck disable=SC2034
 black="\033[0;30m"
+# shellcheck disable=SC2034
 red="\033[0;31m"
+# shellcheck disable=SC2034
 green="\033[0;32m"
+# shellcheck disable=SC2034
 yellow="\033[0;33m"
+# shellcheck disable=SC2034
 blue="\033[0;34m"
+# shellcheck disable=SC2034
 purple="\033[0;35m"
+# shellcheck disable=SC2034
 cyan="\033[0;36m"
+# shellcheck disable=SC2034
 white="\033[0;37;1m"
+# shellcheck disable=SC2034
 orange="\033[0;91m"
+# shellcheck disable=SC2034
 normal="\033[0m"
+# shellcheck disable=SC2034
 reset_color="\033[39m"
 
 _TMP='/tmp/'
@@ -77,75 +88,76 @@ fi
 
 # Warning ! This script delete everything in the work directory before install
 function _show_nvim_libs() {
-    echo "Please also consider to install the python libs"
-    echo "  $ pip3 install --user neovim && pip2 install --user neovim"
-    echo "and Ruby libs"
-    echo "  $ gem install --user-install neovim"
-    echo ""
+    cat << EOF
+Please also consider to install the python libs
+    $ pip3 install --user neovim && pip2 install --user neovim
+and Ruby libs
+    $ gem install --user-install neovim
+EOF
 }
 
 function _show_nvim_help() {
-    # echo "    ---- [X] Error Please make sure you have all the dependencies in your system"
-    echo ""
-    echo "Ubuntu/Debian/Linux mint"
-    echo "  # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip"
-    echo ""
-    echo "CentOS/RetHat/Fedora"
-    echo "  # dnf install libtool autoconf automake cmake gcc gcc-c++ make pkgconfig unzip"
-    echo ""
-    echo "ArchLinux/Antergos/Manjaro"
-    echo "  # pacman -S base-devel cmake unzip"
-    echo ""
+    cat << EOF
+Ubuntu/Debian/Linux mint
+    # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip
+
+CentOS/RetHat/Fedora
+    # dnf install libtool autoconf automake cmake gcc gcc-c++ make pkgconfig unzip
+
+ArchLinux/Antergos/Manjaro
+    # pacman -S base-devel cmake unzip
+EOF
 
     _show_nvim_libs
 
-    echo "For other Unix systems (BSD, Linux and MacOS) and Windows please check"
-    echo "  https://github.com/neovim/neovim/wiki/Building-Neovim"
+    cat << EOF
+For other Unix systems (BSD, Linux and MacOS) and Windows please check
+    https://github.com/neovim/neovim/wiki/Building-Neovim
+EOF
 }
 
 function show_help() {
-    echo ""
-    echo "  Simple script to build and install Neovim directly from the source"
-    echo "  with some pretty basic options."
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONS]"
-    echo ""
-    echo "      Optional Flags"
-    echo "          --version"
-    echo "              Neovim version to download or compile, default, latest"
-    echo ""
-    echo "          --portable"
-    echo "              Download the portable version and place it in $HOME/.local/bin"
-    echo ""
-    echo "          -c, --clone"
-    echo "              By default this script expect to run under a git directory with"
-    echo "              the Neovim's source code, this options clone Neovim's repo and move"
-    echo "              to the repo's root before starts the compile process"
-    echo ""
-    echo "          -d <DIR> , --dir <DIR>"
-    echo "              Choose the base root of the repo and move to it before compile"
-    echo "              the source code, if this options is used with -c/--clone flag"
-    echo "              it will clone the repo in the desire <DIR>"
-    echo ""
-    echo "          -p, --python"
-    echo "              Install Neovim's python package for python2 and python3"
-    echo ""
-    echo "          -r, --ruby"
-    echo "              Install Neovim's ruby package"
-    echo ""
-    echo "          -f, --force"
-    echo "              Ignore errors and warnings and force compilation"
-    echo ""
-    echo "          -b, --build"
-    echo "              Install all dependencies of the before build neovim's source code"
-    echo "              Just few systems are supported, Debian's family, Fedora's family and"
-    echo "              ArchLinux's family"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+Simple script to build and install Neovim directly from the source
+with some pretty basic options.
 
+Usage:
+    $_NAME [OPTIONS]
+
+    Optional Flags
+        --version
+            Neovim version to download or compile, default, latest
+
+        --portable
+            Download the portable version and place it in $HOME/.local/bin
+
+        -c, --clone
+            By default this script expect to run under a git directory with
+            the Neovim's source code, this options clone Neovim's repo and move
+            to the repo's root before starts the compile process
+
+        -d <DIR> , --dir <DIR>
+            Choose the base root of the repo and move to it before compile
+            the source code, if this options is used with -c/--clone flag
+            it will clone the repo in the desire <DIR>
+
+        -p, --python
+            Install Neovim's python package for python2 and python3
+
+        -r, --ruby
+            Install Neovim's ruby package
+
+        -f, --force
+            Ignore errors and warnings and force compilation
+
+        -b, --build
+            Install all dependencies of the before build neovim's source code
+            Just few systems are supported, Debian's family, Fedora's family and
+            ArchLinux's family
+
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
+EOF
     # _show_nvim_help
 }
 
@@ -191,6 +203,13 @@ function verbose_msg() {
     return 0
 }
 
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function get_portable() {
     if ! hash curl 2>/dev/null && ! hash wget 2>/dev/null; then
         error_msg 'Must have curl or wget to download the latest portable'
@@ -211,7 +230,7 @@ function get_portable() {
     fi
 
     status_msg "Downloading version: ${version}"
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if is_windows; then
         local name="nvim.zip"
         if hash curl 2>/dev/null; then
             curl -Ls "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
@@ -291,7 +310,7 @@ if [[ $_PORTABLE -eq 1 ]]; then
 fi
 
 # Windows stuff
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     warn_msg "Mingw platform is currently unsupported"
     error_msg "Please follow the official instructions to get Neovim in windows https://github.com/neovim/neovim/wiki/Installing-Neovim#windows"
     exit 1
@@ -315,7 +334,7 @@ fi
 
 
 if [[ -d "$_LOCATION" ]]; then
-    pushd "$_LOCATION" > /dev/null || "$( error_msg "Could not get to $_LOCATION" && exit 1)"
+    pushd "$_LOCATION" > /dev/null || { error_msg "Could not get to $_LOCATION" && exit 1; }
 else
     error_msg "$_LOCATION doesn't exist"
     exit 1

@@ -36,7 +36,7 @@
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
-        if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        if is_windows; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
@@ -113,7 +113,7 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     alias bim="vim"
     alias cim="vim"
     alias im="vim"
@@ -452,7 +452,7 @@ if hash fzf 2>/dev/null; then
 
     export FZF_DEFAULT_OPTS='--layout=reverse --border'
 
-    if [[ ! $SHELL_PLATFORM == 'MSYS' ]] && [[ ! $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if ! is_windows; then
         export FZF_DEFAULT_OPTS="--height 40% $FZF_DEFAULT_OPTS"
     fi
 
@@ -513,7 +513,7 @@ fi
 #                              Some miscellaneous                              #
 ################################################################################
 
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+if is_windows; then
     export CYGWIN=winsymlinks:native
 fi
 

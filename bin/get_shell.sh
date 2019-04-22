@@ -34,26 +34,33 @@ _FORCE_INSTALL=0
 _BACKUP=0
 _VERBOSE=0
 
-# Windows stuff
-if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-    _CURRENT_SHELL="$(ps | grep `echo $$` | awk '{ print $8 }')"
-    _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    # Windows does not support links we will use cp instead
-else
-    _CURRENT_SHELL="$(ps | head -2 | tail -n 1 | awk '{ print $4 }')"
-fi
+# shellcheck disable=SC2009,SC2046
+_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
 
 # colors
+# shellcheck disable=SC2034
 black="\033[0;30m"
+# shellcheck disable=SC2034
 red="\033[0;31m"
+# shellcheck disable=SC2034
 green="\033[0;32m"
+# shellcheck disable=SC2034
 yellow="\033[0;33m"
+# shellcheck disable=SC2034
 blue="\033[0;34m"
+# shellcheck disable=SC2034
 purple="\033[0;35m"
+# shellcheck disable=SC2034
 cyan="\033[0;36m"
+# shellcheck disable=SC2034
 white="\033[0;37;1m"
+# shellcheck disable=SC2034
 orange="\033[0;91m"
+# shellcheck disable=SC2034
 normal="\033[0m"
+# shellcheck disable=SC2034
 reset_color="\033[39m"
 
 function help_user() {
@@ -150,7 +157,7 @@ while [[ $# -gt 0 ]]; do
             _VERBOSE=1
             ;;
         -s|--shell)
-            if [[ ! -z "$2" ]]; then
+            if [[ -n "$2" ]]; then
                 case $2 in
                     bash|bash_it|bash-it)
                         _CURRENT_SHELL="bash"
