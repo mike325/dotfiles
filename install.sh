@@ -23,6 +23,7 @@
 #            `++:.                           `-/+/
 #            .`   github.com/mike325/dotfiles   `/
 
+
 _ALL=1
 _COOL_FONTS=0
 _SHELL=0
@@ -41,25 +42,7 @@ _PORTABLES=0
 _SYSTEMD=0
 _NOCOLOR=0
 _PYTHON=0
-# _GIT_SSH=0
-
-_VERSION="0.2.0"
-
-_NAME="$0"
-_NAME="${_NAME##*/}"
-
-_SCRIPT_PATH="$0"
-
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
-
-if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
-else
-    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
-    _SCRIPT_PATH="$(pwd -P)"
-    popd 1> /dev/null || exit 1
-fi
-
+_NOLOG=0
 _TMP="/tmp/"
 
 _CMD="ln -fns"
@@ -71,6 +54,31 @@ _URL=""
 
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"
+
+# _GIT_SSH=0
+
+_VERSION="0.3.0"
+
+_NAME="$0"
+_NAME="${_NAME##*/}"
+_LOG="${_NAME%%.*}.log"
+
+_WARN_COUNT=0
+_ERR_COUNT=0
+
+_SCRIPT_PATH="$0"
+
+_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+
+trap '{ exit_append; }' EXIT
+
+if hash realpath 2>/dev/null; then
+    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
+else
+    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
+    _SCRIPT_PATH="$(pwd -P)"
+    popd 1> /dev/null || exit 1
+fi
 
 if [ -z "$SHELL_PLATFORM" ]; then
     export SHELL_PLATFORM='UNKNOWN'
@@ -144,122 +152,125 @@ function help_user() {
      By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts
 
  Usage:
-     $_NAME [OPTIONAL]
+    $_NAME [OPTIONAL]
 
-     Optional Flags
-         --host
-             Change default git host, the new host (ex. gitlab.com) must have the following repos
-                 - .vim
-                 - .emacs.d
-                 - dotfiles
+    Optional Flags
+        --host
+            Change default git host, the new host (ex. gitlab.com) must have the following repos
+                - .vim
+                - .emacs.d
+                - dotfiles
 
-         --user
-             Change default git user, the new user (ex. mike325) must have the following repos
-                 - .vim
-                 - .emacs.d
-                 - dotfiles
+        --user
+            Change default git user, the new user (ex. mike325) must have the following repos
+                - .vim
+                - .emacs.d
+                - dotfiles
 
-         -p, --protocol
-             Alternate between different git protocol
-                 - https (default)
-                 - ssh
-                 - git (not tested)
+        -p, --protocol
+            Alternate between different git protocol
+                - https (default)
+                - ssh
+                - git (not tested)
 
-         --url
-             Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have
-             the following repos
-                 - .vim
-                 - .emacs.d
-                 - dotfiles
+        --url
+            Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have
+            the following repos
+                - .vim
+                - .emacs.d
+                - dotfiles
 
-         --backup, --backup=DIR
-             Backup all existing files into $HOME/.local/backup or the provided dir
-             ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used
+        --backup, --backup=DIR
+            Backup all existing files into $HOME/.local/backup or the provided dir
+            ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used
 
-         -f, --force
-             Force installation, remove all previous conflict files before installing
-             This flag is always disable by default
+        -f, --force
+            Force installation, remove all previous conflict files before installing
+            This flag is always disable by default
 
-         -w, --shell_frameworks
-             Install shell frameworks, bash-it or oh-my-zsh according to the current shell
-             Current shell:   $_CURRENT_SHELL
+        -w, --shell_frameworks
+            Install shell frameworks, bash-it or oh-my-zsh according to the current shell
+            Current shell:   $_CURRENT_SHELL
 
-         -c, --copy
-             By default all dotfiles are linked using 'ln -s' command, this flag change
-             the command to 'cp -rf' this way you can remove the folder after installation
-             but you need to re-download the files each time you want to update the files
-             ----    Ignored option in Windows platform
-             ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
+        -c, --copy
+            By default all dotfiles are linked using 'ln -s' command, this flag change
+            the command to 'cp -rf' this way you can remove the folder after installation
+            but you need to re-download the files each time you want to update the files
+            ----    Ignored option in Windows platform
+            ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
 
-         -s, --shell
-             Install:
-                 - Shell alias in $HOME/.config/shell
-                 - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
-                 - Everything inside ./dotconfigs into $HOME
-                 - Python startup script in $HOME/.local/lib/
+        -s, --shell
+            Install:
+                - Shell alias in $HOME/.config/shell
+                - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
+                - Everything inside ./dotconfigs into $HOME
+                - Python startup script in $HOME/.local/lib/
 
-         -d, --dotfiles
-             Download my dotfiles repo in case, this options is meant to be used in case this
-             script is standalone executed
-                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles
+        -d, --dotfiles
+            Download my dotfiles repo in case, this options is meant to be used in case this
+            script is standalone executed
+                Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles
 
-         -e, --emacs
-             Download and install my evil Emacs dotfiles
-                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d
+        -e, --emacs
+            Download and install my evil Emacs dotfiles
+                Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d
 
-         -v, --vim
-             Download and install my Vim dotfiles
-                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+        -v, --vim
+            Download and install my Vim dotfiles
+                Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
 
-         -n, --nvim, --neovim
-             Download Neovim executable (portable in windows and linux) if it hasn't been Installed
-             Download and install my Vim dotfiles in Neovim's dir.
-             Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)
-             them, otherwise download them from my vim's dotfiles repo
-                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+        -n, --nvim, --neovim
+            Download Neovim executable (portable in windows and linux) if it hasn't been Installed
+            Download and install my Vim dotfiles in Neovim's dir.
+            Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)
+            them, otherwise download them from my vim's dotfiles repo
+                Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
 
-         -b, --bin
-             Install shell functions and scripts in $HOME/.local/bin
+        -b, --bin
+            Install shell functions and scripts in $HOME/.local/bin
 
-         -g, --git
-             Install git configurations into $HOME/.config/git and $HOME/.gitconfig
-             Install:
-                 - Gitconfigs
-                 - Hooks
-                 - Templates
+        -g, --git
+            Install git configurations into $HOME/.config/git and $HOME/.gitconfig
+            Install:
+                - Gitconfigs
+                - Hooks
+                - Templates
 
-         -t, --portables
-             Install isolated/portable programs into $HOME/.local/bin
-             Install:
-                 - shellcheck
-                 - ctags (windows only)
-                 - pip2 and pip3 (GNU/Linux only)
-                 - FZF (GNU/Linux only)
+        -t, --portables
+            Install isolated/portable programs into $HOME/.local/bin
+            Install:
+                - shellcheck
+                - ctags (windows only)
+                - pip2 and pip3 (GNU/Linux only)
+                - FZF (GNU/Linux only)
 
-         --fonts, --powerline
-             Install the powerline patched fonts
-                 * Since the patched fonts have different install method for Windows
-                   they are just download
-                 * This options is ignored if the install script is executed in a SSH session
+        --fonts, --powerline
+            Install the powerline patched fonts
+                * Since the patched fonts have different install method for Windows
+                they are just download
+                * This options is ignored if the install script is executed in a SSH session
 
-         --python
-             Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3
+        --python
+            Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3
 
-         -y, systemd
-             Install user's systemd services (Just in Linux systems)
-                 * Services are install in $HOME/.config/systemd/user
+        -y, systemd
+            Install user's systemd services (Just in Linux systems)
+                * Services are install in $HOME/.config/systemd/user
 
-         -h, --help
-             Display help, if you are seeing this, that means that you already know it (nice)
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
 
-         --version
-             Display the version and exit
+        --version
+            Display the version and exit
 
-         --nocolor
-             Disable color output
+        --nolog
+            Disable log writting
 
-         --verbose
-             Output debug messages
+        --nocolor
+            Disable color output
+
+        --verbose
+            Output debug messages
 EOF
 }
 
@@ -289,9 +300,13 @@ function __parse_args() {
 function warn_msg() {
     local warn_message="$1"
     if [[ $_NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
     else
-        printf "[!] Warning:\t %s \n" "$warn_message"
+        printf "[!] Warning:\t %s\n" "$warn_message"
+    fi
+    _WARN_COUNT=$(( _WARN_COUNT + 1 ))
+    if [[ $_NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$warn_message" >> "${_LOG}"
     fi
     return 0
 }
@@ -299,9 +314,13 @@ function warn_msg() {
 function error_msg() {
     local error_message="$1"
     if [[ $_NOCOLOR -eq 0 ]]; then
-        printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
     else
-        printf "[X] Error:\t %s \n" "$error_message" 1>&2
+        printf "[X] Error:\t %s\n" "$error_message" 1>&2
+    fi
+    _ERR_COUNT=$(( _ERR_COUNT + 1 ))
+    if [[ $_NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t\t %s\n" "$error_message" >> "${_LOG}"
     fi
     return 0
 }
@@ -309,20 +328,53 @@ function error_msg() {
 function status_msg() {
     local status_message="$1"
     if [[ $_NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
     else
-        printf "[*] Info:\t %s \n" "$status_message"
+        printf "[*] Info:\t %s\n" "$status_message"
+    fi
+    if [[ $_NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$status_message" >> "${_LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
+    local debug_message="$1"
     if [[ $_VERBOSE -eq 1 ]]; then
-        local debug_message="$1"
         if [[ $_NOCOLOR -eq 0 ]]; then
-            printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
         else
-            printf "[+] Debug:\t %s \n" "$debug_message"
+            printf "[+] Debug:\t %s\n" "$debug_message"
+        fi
+    fi
+    if [[ $_NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${_LOG}"
+    fi
+    return 0
+}
+
+function initlog() {
+    if [[ $_NOLOG -eq 0 ]]; then
+        rm -f "${_LOG}" 2>/dev/null
+        touch "${_LOG}" &>/dev/null
+        if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
+        fi
+    fi
+    return 0
+}
+
+function exit_append() {
+    if [[ $_NOLOG -eq 0 ]]; then
+        if [[ $_WARN_COUNT -gt 0 ]] || [[ $_ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >> "${_LOG}"
+        fi
+
+        if [[ $_WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$_WARN_COUNT" >> "${_LOG}"
+        fi
+        if [[ $_ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
         fi
     fi
     return 0
@@ -1038,6 +1090,9 @@ while [[ $# -gt 0 ]]; do
             _GIT=1
             _ALL=0
             ;;
+        --nolog)
+            _NOLOG=1
+            ;;
         --verbose)
             _VERBOSE=1
             ;;
@@ -1053,6 +1108,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         *)
+            initlog
             error_msg "Unknown argument $key"
             help_user
             exit 1
@@ -1060,6 +1116,8 @@ while [[ $# -gt 0 ]]; do
     esac
     shift
 done
+
+initlog
 
 [[ ! -d "$HOME/.local/bin" ]] && verbose_msg "Creating dir $HOME/.local/bin" && mkdir -p "$HOME/.local/bin"
 [[ ! -d "$HOME/.local/lib" ]] && verbose_msg "Creating dir $HOME/.local/lib" && mkdir -p "$HOME/.local/lib"
