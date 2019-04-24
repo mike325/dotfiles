@@ -458,7 +458,7 @@ function clone_repo() {
                 return 0
             fi
         else
-            if git clone --quiet --recursive "$repo" "$dest" ; then
+            if git clone --quiet --recursive "$repo" "$dest" &>/dev/null; then
                 return 0
             fi
         fi
@@ -1163,13 +1163,16 @@ if [[ -z $_URL ]]; then
 fi
 
 verbose_msg "Using ${_URL}"
-verbose_msg "Protocol   : ${_PROTOCOL}"
-verbose_msg "User       : ${_GIT_USER}"
-verbose_msg "Host       : ${_GIT_HOST}"
+verbose_msg "Protocol      : ${_PROTOCOL}"
+verbose_msg "User          : ${_GIT_USER}"
+verbose_msg "Host          : ${_GIT_HOST}"
+verbose_msg "Backup Enable : ${_BACKUP}"
+verbose_msg "Log Enable    : ${_NOLOG}"
+verbose_msg "Current Shell : ${_CURRENT_SHELL}"
 if is_windows; then
-    verbose_msg "Platform   : Windows"
+    verbose_msg "Platform      : Windows"
 else
-    verbose_msg "Platform   : Linux"
+    verbose_msg "Platform      : Linux"
 fi
 
 if [[ $_ALL -eq 1 ]]; then

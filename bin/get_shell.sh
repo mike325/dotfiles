@@ -204,7 +204,7 @@ if [[ "$_CURRENT_SHELL" =~ "bash" ]]; then
                 exit 1
             fi
         else
-            if ! git clone --quiet --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"; then
+            if ! git clone --quiet --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it" &>/dev/null; then
                 error_msg "Fail to clone bash-it"
                 exit 1
             fi
@@ -224,7 +224,7 @@ elif [[ "$_CURRENT_SHELL" =~ "zsh" ]]; then
                 exit 1
             fi
         else
-            if ! git clone --quiet --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"; then
+            if ! git clone --quiet --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh" &>/dev/null; then
                 error_msg "Fail to clone oh-my-zsh"
                 exit 1
             fi
