@@ -384,6 +384,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
         alias getpkgn="${pkg} install -y"
 
         alias update="${pkg} update && ${pkg} upgrade"
+        alias updaten="${pkg} update && ${pkg} upgrade -y"
 
         alias rmpkg="${pkg} remove"
     fi
@@ -417,6 +418,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
         alias getpkgn="sudo ${pkg} -y install"
 
         alias update="sudo ${pkg} update"
+        alias updaten="sudo ${pkg} update -y"
 
         alias rmpkg="sudo ${pkg} remove"
     else
@@ -424,6 +426,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
         alias getpkgn="${pkg} -y install"
 
         alias update="${pkg} update"
+        alias updaten="${pkg} update -y"
 
         alias rmpkg="${pkg} remove"
     fi

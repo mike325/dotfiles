@@ -785,13 +785,13 @@ function get_portables() {
                     error_msg "Fail to clone FZF"
                     return 1
                 fi
-                if [[ $_VERBOSE -eq 0 ]]; then
-                    if ! "$HOME/.fzf/install" --all --no-update-rc 1> /dev/null; then
+                if [[ $_VERBOSE -eq 1 ]]; then
+                    if ! "$HOME/.fzf/install" --all --no-update-rc; then
                         error_msg "Fail to install FZF"
                         return 1
                     fi
                 else
-                    if ! "$HOME/.fzf/install" --all --no-update-rc; then
+                    if ! "$HOME/.fzf/install" --all --no-update-rc &>/dev/null; then
                         error_msg "Fail to install FZF"
                         return 1
                     fi
