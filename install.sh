@@ -71,6 +71,7 @@ _SCRIPT_PATH="$0"
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
 trap '{ exit_append; }' EXIT
+trap '{ clean_up; }' SIGTERM SIGINT
 
 if hash realpath 2>/dev/null; then
     _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
@@ -368,6 +369,7 @@ function initlog() {
     return 0
 }
 
+
 function exit_append() {
     if [[ $_NOLOG -eq 0 ]]; then
         if [[ $_WARN_COUNT -gt 0 ]] || [[ $_ERR_COUNT -gt 0 ]]; then
@@ -382,6 +384,20 @@ function exit_append() {
         fi
     fi
     return 0
+}
+
+function clean_up() {
+    verbose_msg "Cleaning up by interrupt"
+    verbose_msg "Cleanning up rg ${_TMP}/rg.*" && rm -rf "${_TMP}/rg.*" 2>/dev/null
+    verbose_msg "Cleanning up rg $_TMP/ripgrep-*" && rm -rf "$_TMP/ripgrep-*" 2>/dev/null
+    verbose_msg "Cleanning up fd ${_TMP}/fd.*" && rm -rf "${_TMP}/fd.*" 2>/dev/null
+    verbose_msg "Cleanning up fd $_TMP/fd-*" && rm -rf "$_TMP/fd-*" 2>/dev/null
+    verbose_msg "Cleanning up pip $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py" 2>/dev/null
+    verbose_msg "Cleanning up shellcheck $_TMP/shellcheck*" && rm -rf "$_TMP/shellcheck*" 2>/dev/null
+    verbose_msg "Cleanning up ctags $_TMP/ctags*" && rm -rf "$_TMP/ctags*" 2>/dev/null
+    verbose_msg "Cleanning up nvim $_TMP/nvim" && rm -rf "$_TMP/nvim" 2>/dev/null
+    exit_append
+    exit 1
 }
 
 function setup_config() {
