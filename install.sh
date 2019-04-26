@@ -693,7 +693,7 @@ function get_portables() {
         #     local nolog='--nolog'
         # fi
 
-        if ! eval "${_SCRIPT_PATH}/bin/get_nvim --portable $nocolor"; then
+        if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh --portable $nocolor"; then
             error_msg "Fail to install Neovim"
             rst=1
         fi
@@ -784,9 +784,11 @@ function get_portables() {
                 local pkg='shellcheck.tar.xz'
                 if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
-                    tar xf "$_TMP/${pkg}"
+                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/shellcheck-latest/shellcheck"
                     mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get shellcheck"
@@ -830,11 +832,14 @@ function get_portables() {
                 else
                     local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 fi
+                status_msg "Downloading fd version: ${version}"
                 if curl -Ls "${url}/releases/download/${version}/fd-${version}-x86_64-unknown-linux-gnu.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
-                    tar xf "$_TMP/${pkg}"
+                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd"
                     mv "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd" "$HOME/.local/bin/"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up data $_TMP/fd-${version}-x86_64-unknown-linux-gnu" && rm -rf "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get fd"
@@ -855,11 +860,14 @@ function get_portables() {
                 else
                     local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
                 fi
+                status_msg "Downloading rg version: ${version}"
                 if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-x86_64-unknown-linux-musl.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
-                    tar xf "$_TMP/${pkg}"
+                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg"
                     mv "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg" "$HOME/.local/bin/"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-x86_64-unknown-linux-musl" && rm -rf "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get rg"
