@@ -680,7 +680,7 @@ function get_portables() {
 
     local github='https://github.com'
 
-    if ! hash nvim 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+    if ! hash nvim 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
         status_msg "Getting Neovim"
         local nocolor=''
@@ -706,7 +706,7 @@ function get_portables() {
         status_msg "Checking portable programs"
         if is_windows; then
 
-            if ! hash shellcheck 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
@@ -723,7 +723,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash ctags 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash ctags 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing ctags install'
                 # TODO: auto detect latest version
                 local major="5"
@@ -778,7 +778,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash shellcheck 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 local pkg='shellcheck.tar.xz'
@@ -797,7 +797,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash fzf 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash fzf 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing FZF install'
                 status_msg "Getting FZF"
                 if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
@@ -820,7 +820,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash fd 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
                 status_msg "Getting fd"
                 local pkg='fd.tar.xz'
@@ -845,7 +845,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash rg 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+            if ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
                 status_msg "Getting rg"
                 local pkg='rg.tar.xz'
