@@ -244,6 +244,7 @@ function help_user() {
                 - pip2 and pip3 (GNU/Linux only)
                 - FZF (GNU/Linux only)
                 - fd (64 bits GNU/Linux only)
+                - ripgrep (64 bits GNU/Linux only)
 
         --fonts, --powerline
             Install the powerline patched fonts
@@ -819,11 +820,11 @@ function get_portables() {
                 local pkg='fd.tar.xz'
                 local url="${github}/sharkdp/fd"
                 if hash curl 2>/dev/null; then
-                    local version="$( curl -Ls "${url}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+                    local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 else
-                    local version="$( wget -qO- "${url}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+                    local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 fi
-                if curl -Ls "${url}/releases/download/${version}/fd-v7.3.0-x86_64-unknown-linux-gnu.tar.gz" -o "$_TMP/${pkg}"; then
+                if curl -Ls "${url}/releases/download/${version}/fd-${version}-x86_64-unknown-linux-gnu.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
                     tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd"
@@ -837,6 +838,31 @@ function get_portables() {
                 warn_msg "Skipping fd, already installed"
                 rst=2
             fi
+
+            if ! hash rg 2>/dev/null; then
+                status_msg "Getting rg"
+                local pkg='rg.tar.xz'
+                local url="${github}/BurntSushi/ripgrep"
+                if hash curl 2>/dev/null; then
+                    local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+                else
+                    local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+                fi
+                if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-x86_64-unknown-linux-musl.tar.gz" -o "$_TMP/${pkg}"; then
+                    pushd "$_TMP" 1> /dev/null || return 1
+                    tar xf "$_TMP/${pkg}"
+                    chmod u+x "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg"
+                    mv "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg" "$HOME/.local/bin/"
+                    popd 1> /dev/null || return 1
+                else
+                    error_msg "Curl couldn't get rg"
+                    rst=1
+                fi
+            else
+                warn_msg "Skipping rg, already installed"
+                rst=2
+            fi
+
         fi
     else
         error_msg "Curl is not available"
