@@ -24,4 +24,3 @@ ntfy[telegram,emoji]>=2.7.0
 Pygments>=2.3.1
 PyYAML>=3.13
 requests>=2.21.0
-thefuck>=3.27

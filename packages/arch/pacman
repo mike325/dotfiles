@@ -18,7 +18,6 @@ base-devel
 python-pip
 python2-pip
 docker
-clang
 jdk8-openjdk
 the_silver_searcher
 ripgrep
