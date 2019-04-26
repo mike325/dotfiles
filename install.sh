@@ -238,7 +238,7 @@ function help_user() {
 
         -t, --portables
             Install isolated/portable programs into $HOME/.local/bin
-            Install:
+                - Neovim
                 - shellcheck
                 - ctags (windows only)
                 - pip2 and pip3 (GNU/Linux only)
@@ -688,6 +688,28 @@ function get_nvim_dotfiles() {
 # TODO: Add compile option to auto compile some programs
 function get_portables() {
     local rst=0
+
+    if ! hash nvim 2>/dev/null; then
+            status_msg "Getting Neovim"
+            local nocolor=''
+            if [[ $_NOCOLOR -eq 1 ]]; then
+                local nocolor='--nocolor'
+            fi
+
+            # local nolog=''
+            # if [[ $_NOLOG -eq 1 ]]; then
+            #     local nolog='--nolog'
+            # fi
+
+            if ! eval "${_SCRIPT_PATH}/bin/get_nvim --portable $nocolor"; then
+                error_msg "Fail to install Neovim"
+                rst=1
+            fi
+    else
+        warn_msg "Skipping Neovim, already installed"
+        rst=2
+    fi
+
     if hash curl 2>/dev/null; then
         status_msg "Checking portable programs"
         if is_windows; then
@@ -788,27 +810,18 @@ function get_portables() {
                 if [[ $_VERBOSE -eq 1 ]]; then
                     if ! "$HOME/.fzf/install" --all --no-update-rc; then
                         error_msg "Fail to install FZF"
-                        return 1
+                        rst=1
                     fi
                 else
                     if ! "$HOME/.fzf/install" --all --no-update-rc &>/dev/null; then
                         error_msg "Fail to install FZF"
-                        return 1
+                        rst=1
                     fi
                 fi
             else
                 warn_msg "Skipping FZF, already installed"
                 rst=2
             fi
-
-            # if ! hash nvim 2>/dev/null; then
-            #     status_msg "Getting Neovim"
-            #     curl -Ls https://github.com/neovim/neovim/releases/download/v0.3.0/nvim.appimage -o "$HOME/.local/bin/nvim"
-            #     chmod u+x "$HOME/.local/bin/nvim"
-            # else
-            #     warn_msg "Neovim is already installed"
-            # fi
-
         fi
     else
         error_msg "Curl is not available"
