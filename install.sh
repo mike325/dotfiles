@@ -680,22 +680,23 @@ function get_portables() {
 
     local github='https://github.com'
 
-    if ! hash nvim 2>/dev/null; then
-            status_msg "Getting Neovim"
-            local nocolor=''
-            if [[ $_NOCOLOR -eq 1 ]]; then
-                local nocolor='--nocolor'
-            fi
+    if ! hash nvim 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
+        status_msg "Getting Neovim"
+        local nocolor=''
+        if [[ $_NOCOLOR -eq 1 ]]; then
+            local nocolor='--nocolor'
+        fi
 
-            # local nolog=''
-            # if [[ $_NOLOG -eq 1 ]]; then
-            #     local nolog='--nolog'
-            # fi
+        # local nolog=''
+        # if [[ $_NOLOG -eq 1 ]]; then
+        #     local nolog='--nolog'
+        # fi
 
-            if ! eval "${_SCRIPT_PATH}/bin/get_nvim --portable $nocolor"; then
-                error_msg "Fail to install Neovim"
-                rst=1
-            fi
+        if ! eval "${_SCRIPT_PATH}/bin/get_nvim --portable $nocolor"; then
+            error_msg "Fail to install Neovim"
+            rst=1
+        fi
     else
         warn_msg "Skipping Neovim, already installed"
         rst=2
@@ -705,7 +706,8 @@ function get_portables() {
         status_msg "Checking portable programs"
         if is_windows; then
 
-            if ! hash shellcheck 2>/dev/null; then
+            if ! hash shellcheck 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
                     [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
@@ -721,7 +723,8 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash ctags 2>/dev/null; then
+            if ! hash ctags 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing ctags install'
                 # TODO: auto detect latest version
                 local major="5"
                 local minor="8"
@@ -775,7 +778,8 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash shellcheck 2>/dev/null; then
+            if ! hash shellcheck 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 local pkg='shellcheck.tar.xz'
                 if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
@@ -793,7 +797,8 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash fzf 2>/dev/null; then
+            if ! hash fzf 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing FZF install'
                 status_msg "Getting FZF"
                 if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
                     error_msg "Fail to clone FZF"
@@ -815,7 +820,8 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash fd 2>/dev/null; then
+            if ! hash fd 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
                 status_msg "Getting fd"
                 local pkg='fd.tar.xz'
                 local url="${github}/sharkdp/fd"
@@ -839,7 +845,8 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash rg 2>/dev/null; then
+            if ! hash rg 2>/dev/null && [[ $_FORCE_INSTALL -eq 0 ]]; then
+                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
                 status_msg "Getting rg"
                 local pkg='rg.tar.xz'
                 local url="${github}/BurntSushi/ripgrep"
