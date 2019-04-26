@@ -620,16 +620,21 @@ function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
 
-    local args="--portable"
 
-    [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
-    [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
+    if [[ $_PORTABLES -eq 0 ]] && [[ $_ALL -eq 0 ]]; then
+        local args="--portable"
 
-    if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-        if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
-            error_msg ""
-            return 1
+        [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
+        [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
+        [[ $_VERBOSE -eq 1 ]] && args=" --verbose $args"
+        if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+            if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
+                error_msg ""
+                return 1
+            fi
         fi
+    else
+        verbose_msg "Skipping neovim install, already install with defaults or portables"
     fi
 
     if is_windows; then
@@ -683,17 +688,14 @@ function get_portables() {
     if ! hash nvim 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
         status_msg "Getting Neovim"
-        local nocolor=''
-        if [[ $_NOCOLOR -eq 1 ]]; then
-            local nocolor='--nocolor'
-        fi
 
-        # local nolog=''
-        # if [[ $_NOLOG -eq 1 ]]; then
-        #     local nolog='--nolog'
-        # fi
+        local args="--portable"
 
-        if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh --portable $nocolor"; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
+        [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
+        [[ $_VERBOSE -eq 1 ]] && args=" --verbose $args"
+
+        if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
             error_msg "Fail to install Neovim"
             rst=1
         fi
@@ -905,20 +907,14 @@ function get_emacs_dotfiles() {
 function setup_shell_framework() {
     status_msg "Getting shell framework"
 
-    if [[ $_NOCOLOR -eq 1 ]]; then
-        local nocolor="--nocolor"
-    else
-        local nocolor=""
-    fi
+    local args=""
 
-    if [[ $_FORCE_INSTALL -eq 1 ]]; then
-        local force="-force"
-    else
-        local force=""
-    fi
+    [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
+    [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
+    [[ $_VERBOSE -eq 1 ]] && args=" --verbose $args"
 
-    verbose_msg "Calling get_shell as -> ${_SCRIPT_PATH}/bin/get_shell.sh $force $nocolor -s $_CURRENT_SHELL"
-    eval "${_SCRIPT_PATH}/bin/get_shell.sh $force $nocolor -s $_CURRENT_SHELL" || return 1
+    verbose_msg "Calling get_shell as -> ${_SCRIPT_PATH}/bin/get_shell.sh $args -s $_CURRENT_SHELL"
+    eval "${_SCRIPT_PATH}/bin/get_shell.sh $args -s $_CURRENT_SHELL" || return 1
 
     return 0
 }
