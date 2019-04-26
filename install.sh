@@ -243,6 +243,7 @@ function help_user() {
                 - ctags (windows only)
                 - pip2 and pip3 (GNU/Linux only)
                 - FZF (GNU/Linux only)
+                - fd (64 bits GNU/Linux only)
 
         --fonts, --powerline
             Install the powerline patched fonts
@@ -618,20 +619,7 @@ function get_nvim_dotfiles() {
     # Windows stuff
     status_msg "Setting up neovim"
 
-    local nvim_version=''
-    if hash curl 2>/dev/null; then
-        verbose_msg "Getting neovim's version with curl"
-        nvim_version="$( curl -Ls "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
-    elif hash wget 2>/dev/null; then
-        verbose_msg "Getting neovim's version with wget"
-        nvim_version="$( wget -qO- "https://github.com/neovim/neovim/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
-    else
-        error_msg "Neither Curl nor Wget are available"
-    fi
-
-    local args
-
-    args="--portable"
+    local args="--portable"
 
     [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
     [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
@@ -688,6 +676,8 @@ function get_nvim_dotfiles() {
 # TODO: Add compile option to auto compile some programs
 function get_portables() {
     local rst=0
+
+    local github='https://github.com'
 
     if ! hash nvim 2>/dev/null; then
             status_msg "Getting Neovim"
@@ -786,9 +776,10 @@ function get_portables() {
 
             if ! hash shellcheck 2>/dev/null; then
                 status_msg "Getting shellcheck"
-                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/shellcheck.tar.xz"; then
+                local pkg='shellcheck.tar.xz'
+                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
-                    tar xf "$_TMP/shellcheck.tar.xz"
+                    tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/shellcheck-latest/shellcheck"
                     mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
                     popd 1> /dev/null || return 1
@@ -803,7 +794,7 @@ function get_portables() {
 
             if ! hash fzf 2>/dev/null; then
                 status_msg "Getting FZF"
-                if ! clone_repo "https://github.com/junegunn/fzf" "$HOME/.fzf"; then
+                if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
                     error_msg "Fail to clone FZF"
                     return 1
                 fi
@@ -820,6 +811,30 @@ function get_portables() {
                 fi
             else
                 warn_msg "Skipping FZF, already installed"
+                rst=2
+            fi
+
+            if ! hash fd 2>/dev/null; then
+                status_msg "Getting fd"
+                local pkg='fd.tar.xz'
+                local url="${github}/sharkdp/fd"
+                if hash curl 2>/dev/null; then
+                    local version="$( curl -Ls "${url}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+                else
+                    local version="$( wget -qO- "${url}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+                fi
+                if curl -Ls "${url}/releases/download/${version}/fd-v7.3.0-x86_64-unknown-linux-gnu.tar.gz" -o "$_TMP/${pkg}"; then
+                    pushd "$_TMP" 1> /dev/null || return 1
+                    tar xf "$_TMP/${pkg}"
+                    chmod u+x "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd"
+                    mv "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd" "$HOME/.local/bin/"
+                    popd 1> /dev/null || return 1
+                else
+                    error_msg "Curl couldn't get fd"
+                    rst=1
+                fi
+            else
+                warn_msg "Skipping fd, already installed"
                 rst=2
             fi
         fi
@@ -878,9 +893,10 @@ function get_dotfiles() {
 }
 
 function get_cool_fonts() {
+    local github='https://github.com'
     if [[ -z $SSH_CONNECTION ]]; then
         status_msg "Gettings powerline fonts"
-        clone_repo "https://github.com/powerline/fonts" "$HOME/.local/fonts"
+        clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"
 
         if is_windows; then
             # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
