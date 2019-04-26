@@ -362,6 +362,8 @@ function initlog() {
         if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
             cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
         fi
+        _LOG="$(readlink -e ${_LOG})"
+        verbose_msg "Using log at ${_LOG}"
     fi
     return 0
 }
@@ -745,28 +747,46 @@ function get_portables() {
             fi
         else
             if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
-                if ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
+                if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
                     status_msg "Getting python pip"
 
                     if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
                         chmod u+x "$_TMP/get-pip.py"
 
-                        if ! hash pip2 2>/dev/null && hash python2 2>/dev/null; then
+                        if { ! hash pip2 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python2 2>/dev/null; then
                             status_msg "Installing pip2"
-                            python2 $_TMP/get-pip.py --user
+                            if [[ $_VERBOSE -eq 1 ]]; then
+                                if ! python2 $_TMP/get-pip.py --user; then
+                                    error_msg "Fail to install pip for python2"
+                                fi
+                            else
+                                if ! python2 $_TMP/get-pip.py --user 1>/dev/null; then
+                                    error_msg "Fail to install pip for python2"
+                                fi
+                            fi
                         fi
 
-                        if ! hash pip3 2>/dev/null && hash python3 2>/dev/null; then
+                        if { ! hash pip3 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python3 2>/dev/null; then
                             local python=("8" "7" "6" "5" "4")
 
                             for version in "${python[@]}"; do
-                                if hash "python3.${version}"; then
+                                if hash "python3.${version}" 2>/dev/null; then
                                     status_msg "Installing pip3 with python3.${version}"
-                                    "python3.${version}" "$_TMP/get-pip.py" --user
+                                    if [[ $_VERBOSE -eq 1 ]]; then
+                                        if ! "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                            error_msg "Fail to install pip for python3.${version}"
+                                        fi
+                                    else
+                                        if ! "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                            error_msg "Fail to install pip for python3.${version}"
+                                        fi
+                                    fi
+
                                     break
                                 fi
                             done
                         fi
+                        verbose_msg "Cleanning up $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py"
                     else
                         error_msg "Curl couldn't get pip"
                         rst=1
