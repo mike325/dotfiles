@@ -13,7 +13,6 @@
     "systemd/*.service"     : { "type": "Services", "alternate": "systemd/{}.timer" },
     "systemd/*.timer"       : { "type": "Timers", "alternate"  : "systemd/{}.service" },
     "system/*"              : { "type": "System" },
-    "system/install.py"     : { "type": "Install" },
     "system/install.*"      : { "type": "Install" },
     "settings/*"            : { "type": "Settings" },
     "git/bin/git-*"         : { "type": "GitBins" },

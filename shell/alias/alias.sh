@@ -210,8 +210,12 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
+    # VCS
+    export AUTO_NTFY_DONE_IGNORE="git hg svn"
+    # Editors
+    export AUTO_NTFY_DONE_IGNORE="nvim vi vim emacs $AUTO_NTFY_DONE_IGNORE"
     # Programs
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim sudo watch screen meld htop top ssh git fg sudoedit make cmake cd bash zsh tcsh fzf clear ctags fuck"
+    export AUTO_NTFY_DONE_IGNORE="sudo watch screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
     # Typos
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
