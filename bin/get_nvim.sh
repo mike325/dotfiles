@@ -47,6 +47,7 @@ _CLONE=0
 _FORCE_INSTALL=0
 _PORTABLE=0
 _NOCOLOR=0
+_VERBOSE=0
 
 # colors
 # shellcheck disable=SC2034
@@ -155,6 +156,9 @@ Usage:
             Just few systems are supported, Debian's family, Fedora's family and
             ArchLinux's family
 
+        -v, --verbose
+            Enable debug messages
+
         -h, --help
             Display help, if you are seeing this, that means that you already know it (nice)
 EOF
@@ -224,27 +228,42 @@ function get_portable() {
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
     if hash curl 2>/dev/null; then
-        local version="$( curl -Ls "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        local version="$( curl -Ls "${_URL}/tags/" | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1)"
     else
-        local version="$( wget -qO- "${_URL}/tags" | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        local version="$( wget -qO- "${_URL}/tags/" | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1)"
     fi
 
     status_msg "Downloading version: ${version}"
+
     if is_windows; then
         local name="nvim.zip"
-        if hash curl 2>/dev/null; then
-            curl -Ls "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
-        else
-            wget -qL "$_URL/releases/download/${version}/nvim-win64.zip" -o "$_TMP/$name"
-        fi
-        unzip -qo "$_TMP/$name" && mv "$_TMP/Neovim/*" "$HOME/.local/"
+        local pkg='nvim-win64.zip'
     else
         local name="nvim"
-        if hash curl 2>/dev/null; then
-            curl -Ls "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
+        local pkg='nvim.appimage'
+    fi
+
+    verbose_msg "Downloading ${pkg} from $_URL/releases/download/stable/${pkg} to $_TMP/$name"
+
+    if hash curl 2>/dev/null; then
+        if [[ $_VERBOSE -eq 0 ]]; then
+            curl -Ls "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
         else
-            wget -qL "$_URL/releases/download/${version}/nvim.appimage" -o "$_TMP/$name"
+            curl -L "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
         fi
+    else
+        if [[ $_VERBOSE -eq 0 ]]; then
+            wget -qL "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
+        else
+            wget -L "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
+        fi
+    fi
+
+    verbose_msg "Unpacking ${name}"
+
+    if is_windows; then
+        unzip -qo "$_TMP/$name" && mv "$_TMP/Neovim/*" "$HOME/.local/"
+    else
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi
 
@@ -290,13 +309,16 @@ while [[ $# -gt 0 ]]; do
         -b|--build)
             _BUILD_LIBS=1
             ;;
+        -v|--verbose)
+            _VERBOSE=1
+            ;;
         -h|--help)
             show_help
             exit 0
             ;;
         *)
             error_msg "Unknown argument $key"
-            help_user
+            show_help
             exit 1
             ;;
     esac
