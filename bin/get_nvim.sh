@@ -224,14 +224,20 @@ function get_portable() {
     # wget $URL -O out
 
     local dir="$HOME/.local/bin"
+    local cmd=''
+
+    if hash curl 2>/dev/null; then
+        local cmd='curl -L'
+        [[ $_VERBOSE -eq 0 ]] && local cmd="${cmd} -s"
+    else
+        local cmd='wget -q0-'
+    fi
+
+    verbose_msg "Using ${cmd} as command"
 
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
-    if hash curl 2>/dev/null; then
-        local version="$( curl -Ls "${_URL}/tags/" | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1)"
-    else
-        local version="$( wget -qO- "${_URL}/tags/" | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1)"
-    fi
+    local version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
 
     status_msg "Downloading version: ${version}"
 
@@ -245,24 +251,15 @@ function get_portable() {
 
     verbose_msg "Downloading ${pkg} from $_URL/releases/download/stable/${pkg} to $_TMP/$name"
 
-    if hash curl 2>/dev/null; then
-        if [[ $_VERBOSE -eq 0 ]]; then
-            curl -Ls "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
-        else
-            curl -L "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
-        fi
-    else
-        if [[ $_VERBOSE -eq 0 ]]; then
-            wget -qL "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
-        else
-            wget -L "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"
-        fi
+    if ! eval '${cmd} "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"'; then
+        error_msg "Fail to download neovim"
+        return 1
     fi
 
-    verbose_msg "Unpacking ${name}"
-
     if is_windows; then
+        verbose_msg "Unpacking ${name}"
         unzip -qo "$_TMP/$name" && mv "$_TMP/Neovim/*" "$HOME/.local/"
+        rm -rf "${_TMP:?}/${name}"
     else
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi
@@ -326,9 +323,12 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ $_PORTABLE -eq 1 ]]; then
-    get_portable
-    get_libs
-    exit 0
+    if get_portable; then
+        if get_libs; then
+            exit 0
+        fi
+    fi
+    exit 1
 fi
 
 # Windows stuff
