@@ -334,7 +334,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
 
     alias cleanpkg="${pkg} -Sc"
 
-    alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
+    alias getpkg="${pkg} -S" alias getpkgn="${pkg} -S --noconfirm"
 
     alias update="${pkg} -Syyu --aur" && alias updaten="${pkg} -Syyu --aur --noconfirm"
 
@@ -377,6 +377,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
     fi
 
     if [[ $EUID -ne 0 ]]; then
+        alias getpkg="sudo ${pkg} install"
         alias getpkgn="sudo ${pkg} install -y"
 
         alias update="sudo ${pkg} update && sudo ${pkg} upgrade"
