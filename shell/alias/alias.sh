@@ -334,7 +334,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
 
     alias cleanpkg="${pkg} -Sc"
 
-    alias getpkg="${pkg} -S" alias getpkgn="${pkg} -S --noconfirm"
+    alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
     alias update="${pkg} -Syyu --aur" && alias updaten="${pkg} -Syyu --aur --noconfirm"
 
