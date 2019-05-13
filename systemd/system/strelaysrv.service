@@ -1,0 +1,9 @@
+[Unit]
+Description=Relay service for syncthing
+
+[Service]
+ExecStart=/usr/bin/strelaysrv
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
