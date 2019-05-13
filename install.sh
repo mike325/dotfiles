@@ -994,7 +994,7 @@ function setup_systemd() {
         if hash systemctl 2> /dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user" ]] && [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && { warn_msg "Removing old systemd dir" && rm -f "$HOME/.config/systemd/user"; }
+                [[ $_FORCE_INSTALL -eq 1 ]] && { warn_msg "Removing old systemd dir" && rm -rf "$HOME/.config/systemd/user"; }
                 setup_config "${_SCRIPT_PATH}/systemd/user" "$HOME/.config/systemd/user"
             elif [[ -d "$HOME/.config/systemd/user/" ]]; then
                 warn_msg "Systemd folder already exist, copying files manually, files won't be auto updated"
