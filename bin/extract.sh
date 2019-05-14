@@ -27,18 +27,21 @@ _NAME="$0"
 _NAME="${_NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Extract any given number of compressed files"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME FILE(S) [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $_NAME file.zip stuff.tar foo.rar"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Extract any given number of compressed files
+
+Usage:
+    $_NAME FILE(S) [OPTIONAL]
+        Ex.
+        $ $_NAME file.zip stuff.tar foo.rar
+
+Optional Flags
+    -h, --help
+        Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function extraction() {

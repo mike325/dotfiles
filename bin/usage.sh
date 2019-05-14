@@ -35,21 +35,24 @@ SORT=0
 declare -a ARGS
 
 function help_user() {
-    echo ""
-    echo "  Disk usage per directory/file in Linux"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [PATH/FILE] [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $_NAME ./folder"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -s, --sort"
-    echo "              Sort the results"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+Description:
+    Disk usage per directory/file in Linux
+
+Usage:
+    $_NAME [PATH/FILE] [OPTIONAL]
+        Ex.
+        $ $_NAME
+        $ $_NAME ./folder
+
+    Optional Flags
+        -s, --sort
+            Sort the results
+
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 i=0

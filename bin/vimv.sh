@@ -28,23 +28,27 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Lists the current directory's files in Vim/Neovim, so you can edit "
-    echo "  it and save to rename them "
-    echo ""
-    echo "  Don't delete or swap the lines while in Vim/Neovim or things will get ugly."
-    echo ""
-    echo "  Credits: https://github.com/thameera/vimv"
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME [OPTIONAL] FILES"
-    echo "          Ex."
-    echo "          $ $NAME *.mp4"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+
+    Lists the current directory's files in Vim/Neovim, so you can edit
+    it and save to rename them
+
+    Don't delete or swap the lines while in Vim/Neovim or things will get ugly.
+
+    Credits: https://github.com/thameera/vimv
+
+Usage:
+    $NAME [OPTIONAL] FILES
+        Ex.
+        $ $NAME *.mp4
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 for key in "$@"; do

@@ -27,19 +27,22 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Move a original dir to the 'trash' and move/rename the first dir."
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME FILE/DIR FILE/DIR [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $NAME ~/stuff ./mistake    # will 'remove' ./mistake  and move/rename ~/stuff to ./mistake"
-    echo "          $ $NAME file_stuff new_stuff # will 'remove' new_stuff and move/rename file_stuff to new_stuff"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Move a original dir to the 'trash' and move/rename the first dir.
+
+Usage:
+    $NAME FILE/DIR FILE/DIR [OPTIONAL]
+        Ex.
+        $ $NAME ~/stuff ./mistake    # will 'remove' ./mistake  and move/rename ~/stuff to ./mistake
+        $ $NAME file_stuff new_stuff # will 'remove' new_stuff and move/rename file_stuff to new_stuff
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 for key in "$@"; do

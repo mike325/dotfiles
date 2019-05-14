@@ -68,26 +68,28 @@ fi
 
 function help_user() {
     cat << EOF
-Quick edit modified files in a git repo"
 
-Usage:"
-    $_NAME [OPTIONAL]"
+Description:
+    Quick edit modified files in a git repo
 
-        Ex."
-        $ git $_NAME"
-        $ git $_NAME -c    # just the staged files"
-        $ git $_NAME -e ed # uses ed editor"
+Usage:
+    $_NAME [OPTIONAL]
 
-    Optional Flags"
-        -c, --cached"
-            Edit just the staged files"
+        Ex.
+        $ git $_NAME
+        $ git $_NAME -c    # just the staged files
+        $ git $_NAME -e ed # uses ed editor
 
-        -e, --editor"
-            Change the default editor"
-                By default this uses \$EDITOR var and fallback vi in it's unset or empty"
+    Optional Flags
+        -c, --cached
+            Edit just the staged files
 
-        -h, --help"
-            Display help, if you are seeing this, that means that you already know it (nice)"
+        -e, --editor
+            Change the default editor
+                By default this uses \$EDITOR var and fallback vi in it's unset or empty
+
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
 EOF
 }
 

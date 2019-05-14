@@ -32,19 +32,22 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Move files/folders to hidden location in tmp, that gets cleared on each reboot"
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME PATH/FILE [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $NAME ./folder"
-    echo "          $ $NAME ./foo ./bar ~/tmp"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Move files/folders to hidden location in tmp, that gets cleared on each reboot
+
+Usage:
+    $NAME PATH/FILE [OPTIONAL]
+        Ex.
+        $ $NAME ./folder
+        $ $NAME ./foo ./bar ~/tmp
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function error_msg() {

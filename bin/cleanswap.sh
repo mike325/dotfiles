@@ -60,17 +60,20 @@ if ! is_windows; then
 fi
 
 function help_user() {
-    echo ""
-    echo "  Clean (Neo)vim swap files"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONAL]"
-    echo ""
-    echo "      Optional Flags"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Clean (Neo)vim swap files
+
+Usage:
+    $_NAME [OPTIONAL]
+
+    Optional Flags
+
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function __parse_args() {

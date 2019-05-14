@@ -488,7 +488,7 @@ if hash fzf 2>/dev/null; then
             local select=$(printf '%s\n' "${folders[@]}" | fzf)
 
             [[ ${#select} != 0 ]] || return 0
-            builtin cd "$select" && return 0 || return 1
+            builtin pushd "$select" &>/dev/null && return 0 || return 1
         done
     }
 

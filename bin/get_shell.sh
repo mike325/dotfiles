@@ -64,36 +64,39 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    echo ""
-    echo "  Small script to install bash-it or oh-my-zsh shell frameworks"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONS]"
-    echo "          Ex."
-    echo "          $ get_shell"
-    echo "          $ get_shell -s bash"
-    echo "          $ get_shell -s oh-my-zsh -f"
-    echo "          $ get_shell -s bash-it"
-    echo ""
-    echo "      Optional Flags"
-    echo "          --verbose"
-    echo "              Output debug messages"
-    echo ""
-    echo "          --backup"
-    echo "              Enable backup of existing files, this flag enables --force but"
-    echo "              makes a backup before deletion"
-    echo "                  BACKUP_DIR: $HOME/.local/backup"
-    echo ""
-    echo "          -f, --force"
-    echo "              Force installation, remove all previous conflict files before installing"
-    echo "              This flag is always disable by default"
-    echo ""
-    echo "          -s, --shell"
-    echo "              Force a shell install. Available: bash/bash-it and zsh/oh-my-zsh"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Small script to install bash-it or oh-my-zsh shell frameworks
+
+Usage:
+    $_NAME [OPTIONS]
+        Ex.
+        $ get_shell
+        $ get_shell -s bash
+        $ get_shell -s oh-my-zsh -f
+        $ get_shell -s bash-it
+
+    Optional Flags
+        --verbose
+            Output debug messages
+
+        --backup
+            Enable backup of existing files, this flag enables --force but
+            makes a backup before deletion
+                BACKUP_DIR: $HOME/.local/backup
+
+        -f, --force
+            Force installation, remove all previous conflict files before installing
+            This flag is always disable by default
+
+        -s, --shell
+            Force a shell install. Available: bash/bash-it and zsh/oh-my-zsh
+
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function warn_msg() {

@@ -25,22 +25,32 @@ _VERBOSE=0
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
+_EDITOR="${EDITOR:-vim}"
 
 function help_user() {
-    echo ""
-    echo "  Description"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME"
-    echo ""
-    echo "      Optional Flags"
-    echo ""
-    echo "          -v, --verbose"
-    echo "              Enable debug messages"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help, if you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat<<EOF
+
+Description
+    Quick edit files using FZF and default editor
+
+Usage:
+
+    $_NAME [OPTIONAL]
+
+        Ex.
+        $ $_NAME
+        $ $_NAME -e ed # uses ed editor
+
+    Optional Flags
+
+        -e, --editor
+            Change the default editor
+                By default this uses \$EDITOR var and fallback vi in it's unset or empty
+
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
+EOF
+
 }
 
 function warn_msg() {
@@ -65,10 +75,40 @@ function verbose_msg() {
     fi
 }
 
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+        --verbose)
+            _VERBOSE=1
+            ;;
+        -e|--editor)
+            if [[ -z "$2" ]]; then
+                error_msg "No editor received"
+                exit 1
+            elif ! hash "$2" 2> /dev/null; then
+                error_msg "Not a valid editor $2"
+                exit 1
+            fi
+            _EDITOR="$2"
+            shift
+            ;;
+        -h|--help)
+            help_user
+            exit 0
+            ;;
+        *)
+            error_msg "Unknown argument $key"
+            help_user
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 fe() {
     local files
     IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
-    [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+    [[ -n "$files" ]] && ${_EDITOR} "${files[@]}"
 }
 
 if hash fzf 2>/dev/null; then

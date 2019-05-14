@@ -27,27 +27,25 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Get statistics of the current git dir (CWD)"
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $NAME"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
-    echo "          -w"
-    echo "              Add '-w' to 'git log', check 'git log --help' for more info"
-    echo ""
-    echo "          -M"
-    echo "              Add '-w' to 'git log', check 'git log --help' for more info"
-    echo ""
-    echo "          -C"
-    echo "              Add '-C' and '--find-copies-harder' to 'git log', check 'git log --help' for more info"
-    echo ""
+    cat << EOF
+
+Description:
+    Get statistics of the current git dir (CWD)
+
+Usage:
+    $NAME [OPTIONAL]
+        Ex.
+        $ $NAME
+
+    Optional Flags
+        -w   Add '-w' to 'git log', check 'git log --help' for more info
+        -M   Add '-w' to 'git log', check 'git log --help' for more info
+        -C   Add '-C' and '--find-copies-harder' to 'git log', check 'git log --help' for more info
+
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function error_msg() {

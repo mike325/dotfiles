@@ -27,25 +27,28 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    echo ""
-    echo "  Tries to get the real path of the given dir/file"
-    echo "  The following tools are used in the given order:"
-    echo "      1) realpath"
-    echo "      2) readlink -f"
-    echo "      3) pwd"
-    echo ""
-    echo "  If realpath is available, you can give any argument directly to it."
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME [PATH] [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $NAME ./foo_link/file"
-    echo "          $ $NAME"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Tries to get the real path of the given dir/file
+    The following tools are used in the given order:
+        1) realpath
+        2) readlink -f
+        3) pwd
+
+    If realpath is available, you can give any argument directly to it.
+
+Usage:
+    $NAME [PATH] [OPTIONAL]
+        Ex.
+        $ $NAME ./foo_link/file
+        $ $NAME
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function error_msg() {

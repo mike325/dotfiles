@@ -36,18 +36,21 @@ NAME="${NAME##*/}"
 _PING=0
 
 function help_user() {
-    echo ""
-    echo "  Checks whether a website is down for you, or everybody"
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME URL"
-    echo "          Ex."
-    echo "          $ $NAME google.com"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Checks whether a website is down for you, or everybody
+
+Usage:
+    $NAME URL
+        Ex.
+        $ $NAME google.com
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 for key in "$@"; do

@@ -35,30 +35,33 @@ ALL=0
 REAL=0
 
 function help_user() {
-    echo ""
-    echo "  Display all ip addresses for this host"
-    echo ""
-    echo "  Usage:"
-    echo "      $NAME [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ $NAME"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -a, --all"
-    echo "              Display all IPs, local and real"
-    echo ""
-    echo "          -l, --local"
-    echo "              Display local IPs, this option is enable by default"
-    echo "              This option is enable by default"
-    echo "              ----    Turn off real IP"
-    echo ""
-    echo "          -r, --real"
-    echo "              Display the real IP (as seen from the internet)"
-    echo "              ----    Turn off local IP"
-    echo ""
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Display all ip addresses for this host
+
+Usage:
+    $NAME [OPTIONAL]
+        Ex.
+        $ $NAME
+
+    Optional Flags
+        -a, --all
+            Display all IPs, local and real
+
+        -l, --local
+            Display local IPs, this option is enable by default
+            This option is enable by default
+            ----    Turn off real IP
+
+        -r, --real
+            Display the real IP (as seen from the internet)
+            ----    Turn off local IP
+
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function error_msg() {

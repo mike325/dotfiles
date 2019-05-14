@@ -28,24 +28,27 @@ _NAME="${_NAME##*/}"
 _NAME="${_NAME##*-}"
 
 function help_user() {
-    echo ""
-    echo "  Script to pull changes from a repository"
-    echo ""
-    echo "  The script use git svn rebase and if it fails tries with git pull."
-    echo "  It passes all the args to the git commands"
-    echo ""
-    echo " NOTE: Since I don't use git svn too much, if any argument is given to the script"
-    echo "       it will automatically switch to git pull"
-    echo ""
-    echo "  Usage:"
-    echo "      $_NAME [OPTIONAL]"
-    echo "          Ex."
-    echo "          $ git $_NAME"
-    echo ""
-    echo "      Optional Flags"
-    echo "          -h, --help"
-    echo "              Display help and exit. If you are seeing this, that means that you already know it (nice)"
-    echo ""
+    cat << EOF
+
+Description:
+    Script to pull changes from a repository
+
+    The script use git svn rebase and if it fails tries with git pull.
+    It passes all the args to the git commands
+
+    NOTE: Since I don't use git svn too much, if any argument is given to the script
+          it will automatically switch to git pull
+
+Usage:
+    $_NAME [OPTIONAL]
+        Ex.
+        $ git $_NAME
+
+    Optional Flags
+        -h, --help
+            Display help and exit. If you are seeing this, that means that you already know it (nice)
+
+EOF
 }
 
 function __parse_args() {
