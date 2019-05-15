@@ -142,7 +142,7 @@ function is_windows() {
     return 1
 }
 
-# shellcheck disable=SC2009,SC2046
+# shellcheck disable=SC2009,SC2046,SC2155
 export _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
 export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
 export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"

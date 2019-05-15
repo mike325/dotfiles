@@ -63,6 +63,7 @@ done
 if [ $# -ne 0 ]; then
     src=( "$@" )
 else
+    # shellcheck disable=SC2016
     IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
 fi
 
@@ -79,10 +80,12 @@ done
 
 ${EDITOR:-vi} /tmp/vimv.$$
 
+# shellcheck disable=SC2016
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
 
 count=0
 for ((i=0;i<${#src[@]};++i)); do
+    # shellcheck disable=SC2154
     if [ "${src[i]}" != "${dest[i]}" ]; then
         $MOVE_CMD "${src[i]}" "${dest[i]}"
         ((count++))

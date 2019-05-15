@@ -324,7 +324,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
             elif hash pacman 2>/dev/null; then
                 local pkg="pacman"
             fi
-
+            # shellcheck disable=SC2155
             local name=$( ${pkg} -Ss "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -369,6 +369,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
             elif hash apt-get 2>/dev/null; then
                 local pkg="apt-get"
             fi
+            # shellcheck disable=SC2155
             local name=$(apt-cache search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -411,6 +412,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
             elif hash yum 2>/dev/null; then
                 local pkg="yum"
             fi
+            # shellcheck disable=SC2155
             local name=$( ${pkg} search "$@" | fzf)
             if [[ -n "$name" ]]; then
                 echo "$name"
@@ -442,7 +444,7 @@ unset pkg
 if hash fzf 2>/dev/null; then
     if hash git 2>/dev/null; then
         if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --ansi --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
             export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
             export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
         elif hash rg 2>/dev/null; then
@@ -477,14 +479,18 @@ if hash fzf 2>/dev/null; then
         fi
         while true; do
             # collect dirs
+            # shellcheck disable=SC2155
             if [[ -n "$(git rev-parse --git-dir 2>/dev/null)" ]]; then
                 local folders=$(git ls-tree -rt HEAD "$(git rev-parse --show-toplevel)" | awk '{if ($2 == "tree") print $4;}')
             elif hash fd 2>/dev/null; then
+                # shellcheck disable=SC2155
                 local folders="$(fd -t d . .)"
             else
+                # shellcheck disable=SC2155
                 local folders="$(find . -type d -iname '*')"
             fi
 
+            # shellcheck disable=SC2155
             local select=$(printf '%s\n' "${folders[@]}" | fzf)
 
             [[ ${#select} != 0 ]] || return 0
@@ -508,6 +514,7 @@ if hash fzf 2>/dev/null; then
 
     if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
         fssh() {
+            # shellcheck disable=SC2155
             local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
             if [[ -n "$host" ]]; then
                 ssh "$host"

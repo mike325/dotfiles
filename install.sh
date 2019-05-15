@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1117
 
 #   Author: Mike 8a
 #   Description: Install all my basic configs and scripts
@@ -363,7 +364,7 @@ function initlog() {
         if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
             cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
         fi
-        _LOG="$(readlink -e ${_LOG})"
+        _LOG=$(readlink -e "${_LOG}")
         verbose_msg "Using log at ${_LOG}"
     fi
     return 0
@@ -825,7 +826,7 @@ function get_portables() {
                     verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/shellcheck-latest/shellcheck"
                     mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
                     verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
                     popd 1> /dev/null || return 1
                 else
@@ -866,8 +867,10 @@ function get_portables() {
                 local pkg='fd.tar.xz'
                 local url="${github}/sharkdp/fd"
                 if hash curl 2>/dev/null; then
+                    # shellcheck disable=SC2155
                     local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 else
+                    # shellcheck disable=SC2155
                     local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading fd version: ${version}"
@@ -876,7 +879,7 @@ function get_portables() {
                     verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd"
                     mv "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
                     verbose_msg "Cleanning up data $_TMP/fd-${version}-x86_64-unknown-linux-gnu" && rm -rf "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/"
                     popd 1> /dev/null || return 1
                 else
@@ -894,8 +897,10 @@ function get_portables() {
                 local pkg='rg.tar.xz'
                 local url="${github}/BurntSushi/ripgrep"
                 if hash curl 2>/dev/null; then
+                    # shellcheck disable=SC2155
                     local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
                 else
+                    # shellcheck disable=SC2155
                     local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading rg version: ${version}"
@@ -904,7 +909,7 @@ function get_portables() {
                     verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
                     chmod u+x "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg"
                     mv "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP}/${pkg}"
+                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
                     verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-x86_64-unknown-linux-musl" && rm -rf "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl"
                     popd 1> /dev/null || return 1
                 else

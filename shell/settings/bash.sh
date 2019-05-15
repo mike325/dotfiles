@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2139,SC1090
+# shellcheck disable=SC2139,SC1090,SC1117
 
 ################################################################################
 #                                                                              #
