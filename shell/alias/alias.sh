@@ -444,7 +444,7 @@ unset pkg
 if hash fzf 2>/dev/null; then
     if hash git 2>/dev/null; then
         if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color never -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
             export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
             export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
         elif hash rg 2>/dev/null; then
@@ -458,9 +458,10 @@ if hash fzf 2>/dev/null; then
             export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
         fi
     fi
-    export FZF_CTRL_R_OPTS='--sort --exact'
 
-    export FZF_DEFAULT_OPTS='--layout=reverse --border'
+    export FZF_CTRL_R_OPTS='--sort'
+
+    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi'
 
     if ! is_windows; then
         export FZF_DEFAULT_OPTS="--height 40% $FZF_DEFAULT_OPTS"

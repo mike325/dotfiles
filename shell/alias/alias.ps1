@@ -91,20 +91,20 @@ else {
 if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
     if ( Get-Command "git.exe" -ErrorAction SilentlyContinue ) {
         if ( Get-Command "fd.exe" -ErrorAction SilentlyContinue ) {
-            $env:FZF_DEFAULT_COMMAND = '(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color never -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> nul'
+            $env:FZF_DEFAULT_COMMAND = '(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> nul'
             $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND"
-            $env:FZF_ALT_C_COMMAND = "fd -t d . $HOME"
+            $env:FZF_ALT_C_COMMAND = "fd --color always -t d . $HOME"
         }
         elseif ( Get-Command "rg.exe" -ErrorAction SilentlyContinue ) {
-            $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color never --no-search-zip --hidden --trim --files ) 2> nul"
+            $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files ) 2> nul"
             $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND"
         }
         elseif ( Get-Command "ag.exe" -ErrorAction SilentlyContinue ) {
-            $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || ag -l --follow --nocolor --nogroup --hidden -g '') 2> nul"
+            $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g '') 2> nul"
             $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND"
         }
     }
-    $env:FZF_DEFAULT_OPTS = '--layout=reverse --border'
+    $env:FZF_DEFAULT_OPTS = '--layout=reverse --border --ansi'
 }
 
 if ( Get-Command "thefuck.exe" -ErrorAction SilentlyContinue ) {
