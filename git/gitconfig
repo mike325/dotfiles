@@ -302,6 +302,8 @@
     np  = "!f() { git --no-pager $@; }; f"
     npc = "!f() { git --no-pager $@ --color; }; f"
 
+    norm2bare = "!f() { mv .git .. && rm -rf * && mv ../.git . && mv .git/* . && rm -rf .git && git config --local --bool core.bare true; }; f"
+
 ;   Update just one file form specific remote
     updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
 
