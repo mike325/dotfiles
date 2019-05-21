@@ -32,8 +32,8 @@
     name  = Mike
     email = mickiller.25@gmail.com
 
-[github]
-    user = mike325
+[credential "https://github.com"]
+	username = mike325
 
 [url "https://github.com/"]
     insteadOf = gh:
