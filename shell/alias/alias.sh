@@ -215,7 +215,7 @@ if hash ntfy 2>/dev/null; then
     # Editors
     export AUTO_NTFY_DONE_IGNORE="nvim vi vim emacs $AUTO_NTFY_DONE_IGNORE"
     # Programs
-    export AUTO_NTFY_DONE_IGNORE="less more man sudo watch screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="less more man watch screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
     # Typos
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
@@ -340,7 +340,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
 
     alias rmpkg="${pkg} -Rns"
 
-    if [[ $EUID -ne 0 ]] && hash pacman 2>/dev/null; then
+    if [[ $EUID -ne 0 ]] && ! hash yaourt 2>/dev/null; then
         unalias getpkg && alias getpkg="sudo ${pkg} -S"
         unalias getpkgn && alias getpkgn="sudo ${pkg} -S --noconfirm"
 
