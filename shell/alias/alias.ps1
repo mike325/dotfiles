@@ -1,3 +1,28 @@
+#
+#   Author: Mike 8a
+#   Description: Some useful alias and functions
+#
+#                                     -`
+#                     ...            .o+`
+#                  .+++s+   .h`.    `ooo/
+#                 `+++%++  .h+++   `+oooo:
+#                 +++o+++ .hhs++. `+oooooo:
+#                 +s%%so%.hohhoo'  'oooooo+:
+#                 `+ooohs+h+sh++`/:  ++oooo+:
+#                  hh+o+hoso+h+`/++++.+++++++:
+#                   `+h+++h.+ `/++++++++++++++:
+#                            `/+++ooooooooooooo/`
+#                           ./ooosssso++osssssso+`
+#                          .oossssso-````/osssss::`
+#                         -osssssso.      :ssss``to.
+#                        :osssssss/  Mike  osssl   +
+#                       /ossssssss/   8a   +sssslb
+#                     `/ossssso+/:-        -:/+ossss'.-
+#                    `+sso+:-`                 `.-/+oso:
+#                   `++:.                           `-/+/
+#                   .`   github.com/mike325/dotfiles   `/
+#
+
 New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
 New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
 New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue

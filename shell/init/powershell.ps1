@@ -44,7 +44,7 @@ function touch {
 }
 
 function ln ($target, $link) {
-    New-Item -Path $link -ItemType SymbolicLink -Value $target
+    New-Item -Target $target -ItemType SymbolicLink -Path $link
 }
 
 # Path settings
