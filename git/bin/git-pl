@@ -84,7 +84,7 @@ function status_msg() {
 }
 
 function runGit() {
-    local gitdir worktree init
+    local gitdir worktree
     gitdir="$(git rev-parse --git-dir)"
     if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
         worklist=($(git worktree list | awk '{print $1}'))
@@ -94,7 +94,7 @@ function runGit() {
     fi
     if [[ ! -z "$worktree" ]]; then
         if [[ -z "$1" ]]; then
-            if git --git-dir="$gitdir" --work-tree="$worktree" svn fetch 2>/dev/null; then
+            if hash git-svn 2>/dev/null && git --git-dir="$gitdir" --work-tree="$worktree" svn fetch 2>/dev/null; then
                 git --git-dir="$gitdir" --work-tree="$worktree" svn rebase "$@"
             else
                 git --git-dir="$gitdir" --work-tree="$worktree" pull "$@"
@@ -103,7 +103,7 @@ function runGit() {
             git --git-dir="$gitdir" --work-tree="$worktree" pull "$@"
         fi
     else
-        if [[ -z "$1" ]]; then
+        if [[ -z "$1" ]] && hash git-svn 2>/dev/null; then
             if git --git-dir="$gitdir" svn fetch 2>/dev/null; then
                 git --git-dir="$gitdir" svn rebase "$@"
             else

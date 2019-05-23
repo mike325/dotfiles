@@ -149,9 +149,11 @@ reset_color="\033[39m"
 
 function help_user() {
     cat<<EOF
- Simple installer of this dotfiles, by default install (link) all settings and configurations
- if any flag ins given, the script will install just want is being told to do.
-     By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts
+
+Description
+    Simple installer of this dotfiles, by default install (link) all settings and configurations
+    if any flag ins given, the script will install just want is being told to do.
+        By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts
 
  Usage:
     $_NAME [OPTIONAL]
