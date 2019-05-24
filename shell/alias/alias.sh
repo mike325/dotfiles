@@ -40,7 +40,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
-            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] && hash nvr 2>/dev/null; then
+            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
                 function nvim() {
                     # NOTE: This is set inside Neovim settings
                     if [[ -z "$NVIM_LISTEN_ADDRESS" ]]; then
@@ -72,7 +72,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
             # NOTE: This is set inside Neovim settings
-            if [[ -z "$NVIM_LISTEN_ADDRESS" ]]; then
+            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
                 export MANPAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
                 export GIT_PAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' - "
                 export EDITOR="nvim"
