@@ -100,6 +100,8 @@ case "$SHELL_PLATFORM" in
     LINUX)
         if [[ -f /etc/arch-release ]]; then
             _OS='arch'
+        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+            _OS='ubuntu'
         elif [[ -f /etc/debian_version ]]; then
             if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
                 _OS='raspbian'
