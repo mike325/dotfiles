@@ -1,0 +1,24 @@
+# Python development
+jedi>=0.12.1
+flake8>=3.5.0
+pyflakes>=2.0.0
+pycodestyle>=2.4.0
+yapf>=0.22.0
+virtualenv>=16.0.0
+python-language-server>=0.21.5
+mccabe>=0.6.1
+# pydoc
+
+# JS development
+jsbeautifier>=1.7.5
+
+# (Neo)vim stuff
+pynvim>=0.3.1
+
+# notifications
+ntfy[telegram,emoji,pid]>=2.7.0
+
+# Misc
+Pygments>=2.3.1
+PyYAML>=3.13
+requests>=2.21.0
