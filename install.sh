@@ -121,6 +121,8 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
+_ARCH="$(uname -m)"
+
 function is_windows() {
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
         return 0
@@ -852,7 +854,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]]; then
+            if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 local pkg='shellcheck.tar.xz'
@@ -868,8 +870,8 @@ function get_portables() {
                     error_msg "Curl couldn't get shellcheck"
                     rst=1
                 fi
-            elif [[ $_OS == 'raspbian' ]]; then
-                warn_msg "Shellcheck does not have prebuild binaries for ARM devices"
+            elif [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]]; then
+                warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
                 rst=2
             else
                 warn_msg "Skipping shellcheck, already installed"
@@ -912,7 +914,7 @@ function get_portables() {
                     local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading fd version: ${version}"
-                local os_type="x86_64-unknown-linux-gnu"
+                local os_type="${_ARCH}-unknown-linux-musl"
                 [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
                 if curl -Ls "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
@@ -944,7 +946,7 @@ function get_portables() {
                     local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading rg version: ${version}"
-                local os_type="x86_64-unknown-linux-musl"
+                local os_type="${_ARCH}-unknown-linux-musl"
                 [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
                 if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
@@ -1087,6 +1089,7 @@ function setup_python() {
             if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
                warn_msg "Skipping requirements for pip ${version} in OS: ${_OS}"
            else
+                [[ $_OS == unknown ]] && warn_msg "Unknown OS, trying to install generic pip packages"
                 status_msg "Setting up python ${version} dependencies"
                 verbose_msg "Using ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
 
@@ -1336,6 +1339,7 @@ else
     verbose_msg "Platform      : Linux"
 fi
 verbose_msg "OS Name       : ${_OS}"
+verbose_msg "Architecture  : ${_ARCH}"
 
 if [[ $_ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
