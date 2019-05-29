@@ -71,6 +71,8 @@ _SCRIPT_PATH="$0"
 
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
+_OS='unknown'
+
 trap '{ exit_append; }' EXIT
 trap '{ clean_up; }' SIGTERM SIGINT
 
@@ -92,6 +94,30 @@ if [ -z "$SHELL_PLATFORM" ]; then
       *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
     esac
 fi
+
+case "$SHELL_PLATFORM" in
+    # TODO: support more linux distros
+    LINUX)
+        if [[ -f /etc/arch-release ]]; then
+            _OS='arch'
+        elif [[ -f /etc/debian_version ]]; then
+            if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+                _OS='raspbian'
+            else
+                _OS='debian'
+            fi
+        fi
+        ;;
+    CYGWIN|MSYS)
+        _OS='windows'
+        ;;
+    OSX)
+        _OS='macos'
+        ;;
+    BSD)
+        _OS='bsd'
+        ;;
+esac
 
 function is_windows() {
     if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
@@ -474,16 +500,21 @@ function clone_repo() {
             return 1
         fi
 
-        verbose_msg "Cloning $repo into $dest"
-        # TODO: simplify this crap
-        if [[ $_VERBOSE -eq 1 ]]; then
-            if git clone --recursive "$repo" "$dest"; then
-                return 0
+        if [[ ! -d "$dest" ]] && [[ ! -f "$dest" ]]; then
+            verbose_msg "Cloning $repo into $dest"
+            # TODO: simplify this crap
+            if [[ $_VERBOSE -eq 1 ]]; then
+                if git clone --recursive "$repo" "$dest"; then
+                    return 0
+                fi
+            else
+                if git clone --quiet --recursive "$repo" "$dest" &>/dev/null; then
+                    return 0
+                fi
             fi
         else
-            if git clone --quiet --recursive "$repo" "$dest" &>/dev/null; then
-                return 0
-            fi
+            warn_msg "$dest already exists, skipping clonning"
+            return 3
         fi
     else
         error_msg "Git command is not available"
@@ -819,7 +850,7 @@ function get_portables() {
                 rst=2
             fi
 
-            if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+            if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]]; then
                 [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
                 status_msg "Getting shellcheck"
                 local pkg='shellcheck.tar.xz'
@@ -835,6 +866,9 @@ function get_portables() {
                     error_msg "Curl couldn't get shellcheck"
                     rst=1
                 fi
+            elif [[ $_OS == 'raspbian' ]]; then
+                warn_msg "Shellcheck does not have prebuild binaries for ARM devices"
+                rst=2
             else
                 warn_msg "Skipping shellcheck, already installed"
                 rst=2
@@ -876,13 +910,15 @@ function get_portables() {
                     local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading fd version: ${version}"
-                if curl -Ls "${url}/releases/download/${version}/fd-${version}-x86_64-unknown-linux-gnu.tar.gz" -o "$_TMP/${pkg}"; then
+                local os_type="x86_64-unknown-linux-gnu"
+                [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+                if curl -Ls "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
                     verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-                    chmod u+x "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd"
-                    mv "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/fd" "$HOME/.local/bin/"
+                    chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
+                    mv "$_TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
                     verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-                    verbose_msg "Cleanning up data $_TMP/fd-${version}-x86_64-unknown-linux-gnu" && rm -rf "$_TMP/fd-${version}-x86_64-unknown-linux-gnu/"
+                    verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get fd"
@@ -906,13 +942,15 @@ function get_portables() {
                     local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
                 fi
                 status_msg "Downloading rg version: ${version}"
-                if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-x86_64-unknown-linux-musl.tar.gz" -o "$_TMP/${pkg}"; then
+                local os_type="x86_64-unknown-linux-musl"
+                [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+                if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
                     pushd "$_TMP" 1> /dev/null || return 1
                     verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-                    chmod u+x "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg"
-                    mv "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl/rg" "$HOME/.local/bin/"
+                    chmod u+x "$_TMP/ripgrep-${version}-${os_type}/rg"
+                    mv "$_TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
                     verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-                    verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-x86_64-unknown-linux-musl" && rm -rf "$_TMP/ripgrep-${version}-x86_64-unknown-linux-musl"
+                    verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-${os_type}" && rm -rf "$_TMP/ripgrep-${version}-${os_type}"
                     popd 1> /dev/null || return 1
                 else
                     error_msg "Curl couldn't get rg"
@@ -1286,6 +1324,7 @@ if is_windows; then
 else
     verbose_msg "Platform      : Linux"
 fi
+verbose_msg "OS Name       : ${_OS}"
 
 if [[ $_ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'

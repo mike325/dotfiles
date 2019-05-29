@@ -49,6 +49,8 @@ _PORTABLE=0
 _NOCOLOR=0
 _VERBOSE=0
 
+_OS='unknown'
+
 # colors
 # shellcheck disable=SC2034
 black="\033[0;30m"
@@ -86,6 +88,29 @@ if [ -z "$SHELL_PLATFORM" ]; then
     esac
 fi
 
+case "$SHELL_PLATFORM" in
+    # TODO: support more linux distros
+    LINUX)
+        if [[ -f /etc/arch-release ]]; then
+            _OS='arch'
+        elif [[ -f /etc/debian_version ]]; then
+            if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+                _OS='raspbian'
+            else
+                _OS='debian'
+            fi
+        fi
+        ;;
+    CYGWIN|MSYS)
+        _OS='windows'
+        ;;
+    OSX)
+        _OS='macos'
+        ;;
+    BSD)
+        _OS='bsd'
+        ;;
+esac
 
 # Warning ! This script delete everything in the work directory before install
 function _show_nvim_libs() {
@@ -215,9 +240,14 @@ function is_windows() {
 }
 
 function get_portable() {
+    if [[ $_OS == 'raspbian' ]]; then
+        error_msg "There's no neovim portable version for ARM devices"
+        return 1
+    fi
+
     if ! hash curl 2>/dev/null && ! hash wget 2>/dev/null; then
         error_msg 'Must have curl or wget to download the latest portable'
-        exit 1
+        return 1
     fi
 
     # wget -qO- $URL
@@ -225,6 +255,7 @@ function get_portable() {
 
     local dir="$HOME/.local/bin"
     local cmd=''
+    local version
 
     if hash curl 2>/dev/null; then
         local cmd='curl -L'
@@ -237,7 +268,7 @@ function get_portable() {
 
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
-    local version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
+    version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
 
     status_msg "Downloading version: ${version}"
 
