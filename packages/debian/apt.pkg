@@ -1,4 +1,4 @@
-sudo pacman -S --no-confirm
+sudo apt install -y
 curl
 git
 wget
@@ -22,7 +22,6 @@ jdk8-openjdk
 the_silver_searcher
 ripgrep
 shellcheck
-vlc
-gimp
-darktable
-firefox
+ntfs-3g
+davfs2
+libssl-dev

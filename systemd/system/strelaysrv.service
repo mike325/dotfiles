@@ -1,9 +1,18 @@
 [Unit]
-Description=Relay service for syncthing
+Description=Syncthing relay server
+After=network.target
 
 [Service]
+User=strelaysrv
+Group=strelaysrv
 ExecStart=/usr/bin/strelaysrv
+WorkingDirectory=/var/lib/strelaysrv
 Restart=on-failure
 
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+sudo apt install -y
+curl
+git
+wget
+gcc
+clang
+make
+sed
+htop
+cmake
+ctags
+sl
+vim
+neovim
+emacs
+unzip
+base-devel
+python-pip
+python2-pip
+docker
+jdk8-openjdk
+the_silver_searcher
+ripgrep
+shellcheck
+ntfs-3g
+davfs2

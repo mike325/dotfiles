@@ -1,0 +1,9 @@
+[Unit]
+Description=Syncthing service
+
+[Service]
+ExecStart=/usr/bin/syncthing -home=/media/syncthing -no-browser -no-restart --gui-address=0.0.0.0:8384
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

@@ -283,7 +283,7 @@ Description
                 * This options is ignored if the install script is executed in a SSH session
 
         --python
-            Install python2 and python3 dependencies from ./packages/python2 and ./packages/python3
+            Install python2 and python3 dependencies from ./packages/${_OS}/python2 and ./packages/${_OS}/python3
 
         -y, systemd
             Install user's systemd services (Just in Linux systems)
@@ -1082,18 +1082,24 @@ function setup_python() {
     local versions=(2 3)
     for version in "${versions[@]}"; do
         if hash "pip${version}" 2>/dev/null; then
-            status_msg "Setting up python ${version} dependencies"
-            if [[ $_VERBOSE -eq 1 ]]; then
-                local quiet=""
-            else
-                # shellcheck disable=SC2034
-                local quiet="--quiet"
-            fi
-            # shellcheck disable=SC2016
-            local cmd='pip${version} install ${quiet} --user -r "${_SCRIPT_PATH}/packages/python${version}/requirements.txt"'
-            verbose_msg "Pip command --> ${cmd}"
-            if ! eval "$cmd"; then
-                error_msg "Fail to install python ${version} dependencies"
+            if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
+               warn_msg "Skipping requirements for pip ${version} in OS: ${_OS}"
+           else
+                status_msg "Setting up python ${version} dependencies"
+                verbose_msg "Using ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+
+                if [[ $_VERBOSE -eq 1 ]]; then
+                    local quiet=""
+                else
+                    # shellcheck disable=SC2034
+                    local quiet="--quiet"
+                fi
+                # shellcheck disable=SC2016
+                local cmd="pip${version} install ${quiet} --user -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+                verbose_msg "Pip command --> ${cmd}"
+                if ! eval "$cmd"; then
+                    error_msg "Fail to install python ${version} dependencies"
+                fi
             fi
         fi
     done
