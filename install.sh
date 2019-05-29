@@ -1014,20 +1014,23 @@ function get_cool_fonts() {
     local github='https://github.com'
     if [[ -z $SSH_CONNECTION ]]; then
         status_msg "Gettings powerline fonts"
-        clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"
-
-        if is_windows; then
-            # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
-            # BUT administrator promp will pop up for EVERY font (too fucking much)
-            warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
-        else
-            status_msg "Installing cool fonts"
-            if [[ $_VERBOSE -eq 1 ]]; then
-                "$HOME"/.local/fonts/install.sh
+        if clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"; then
+            if is_windows; then
+                # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
+                # BUT administrator promp will pop up for EVERY font (too fucking much)
+                warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
             else
-                "$HOME"/.local/fonts/install.sh 1> /dev/null
+                status_msg "Installing cool fonts"
+                if [[ $_VERBOSE -eq 1 ]]; then
+                    "$HOME"/.local/fonts/install.sh
+                else
+                    "$HOME"/.local/fonts/install.sh 1> /dev/null
+                fi
             fi
+        else
+            error_msg "Fail to install cool fonts"
         fi
+
     else
         warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
     fi
