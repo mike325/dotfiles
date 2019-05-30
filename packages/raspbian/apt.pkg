@@ -25,3 +25,4 @@ shellcheck
 ntfs-3g
 davfs2
 libssl-dev
+btrfs-tools
