@@ -1,4 +1,5 @@
 sudo pacman -S --no-confirm
+btrfs-progs
 curl
 git
 wget
@@ -27,3 +28,4 @@ gimp
 darktable
 firefox
 davfs2
+rsync
