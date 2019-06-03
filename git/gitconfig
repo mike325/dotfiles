@@ -35,6 +35,12 @@
 [credential "https://github.com"]
     username = mike325
 
+[url "https://github.com/mike325/"]
+    insteadOf = mike:
+
+[url "git@github.com:mike325/"]
+    insteadOf = smike:
+
 [url "https://github.com/"]
     insteadOf = gh:
 
@@ -214,6 +220,7 @@
 ;###############################################################################
 
     ; pl    = pull
+    pl    = pull
     plo   = pull origin
     plom  = pull origin master
     pb    = pull --rebase
