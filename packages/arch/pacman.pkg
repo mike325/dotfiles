@@ -30,3 +30,6 @@ firefox
 davfs2
 btrfs-progs
 snapper
+exfat-utils
+dosfstools
+ntfs-3g
