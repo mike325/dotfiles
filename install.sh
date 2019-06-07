@@ -53,12 +53,9 @@ _GIT_USER="mike325"
 _GIT_HOST="github.com"
 _URL=""
 
-# _DEFAULT_SHELL="${SHELL##*/}"
-_CURRENT_SHELL="bash"
-
 # _GIT_SSH=0
 
-_VERSION="0.3.0"
+_VERSION="0.4.0"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -130,10 +127,21 @@ function is_windows() {
     return 1
 }
 
-# shellcheck disable=SC2009,SC2046
-_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+if [[ -n "$ZSH_NAME" ]]; then
+    _CURRENT_SHELL="zsh"
+elif [[ -n "$BASH" ]]; then
+    _CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    # _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+    # _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+    # _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+    if [[ -z "$_CURRENT_SHELL" ]]; then
+        _CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
+
+_PYTHON_VERSION="all"
 
 if is_windows; then
     # Windows bash does not have pgrep by default
@@ -319,10 +327,10 @@ function __parse_args() {
     local arg="$1"
     local name="$2"
 
-    local pattern="^--${name}[=][a-zA-Z0-9.:@_-/~]+$"
+    local pattern="^--${name}=[a-zA-Z0-9.:@_-/~]+$"
 
     if [[ -n "$3" ]]; then
-        local pattern="^--${name}[=]$3$"
+        local pattern="^--${name}=$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then
@@ -1078,12 +1086,19 @@ function setup_systemd() {
 }
 
 function setup_python() {
-    if ! hash pip3 2>/dev/null && ! hash pip2 2>/dev/null; then
-        error_msg "No pip found"
-        return 1
+    if [[ $_PYTHON_VERSION == 'all' ]]; then
+        if ! hash pip3 2>/dev/null && ! hash pip2 2>/dev/null; then
+            error_msg "No pip found"
+            return 1
+        fi
+        local versions=(2 3)
+    else
+        if ! hash "pip${_PYTHON_VERSION}" 2>/dev/null; then
+            error_msg "No pip found"
+            return 1
+        fi
+        local versions=("$_PYTHON_VERSION")
     fi
-
-    local versions=(2 3)
     for version in "${versions[@]}"; do
         if hash "pip${version}" 2>/dev/null; then
             if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
@@ -1220,9 +1235,23 @@ while [[ $# -gt 0 ]]; do
             _SHELL=1
             _ALL=0
             ;;
+        --shell_frameworks=*)
+            _result=$(__parse_args "$key" "shell_frameworks" '(ba|z)sh')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid shell ${_result##*=}, available shell are bash and zsh"
+                exit 1
+            fi
+            _CURRENT_SHELL="$_result"
+            _SHELL_FRAMEWORK=1
+            _ALL=0
+            ;;
         -w|--shell_frameworks)
             _SHELL_FRAMEWORK=1
             _ALL=0
+            if [[ "$2" =~ ^(ba|z)sh$ ]]; then
+                _CURRENT_SHELL="$2"
+                shift
+            fi
             ;;
         -f|--force)
             _FORCE_INSTALL=1
@@ -1246,9 +1275,23 @@ while [[ $# -gt 0 ]]; do
             _BIN=1
             _ALL=0
             ;;
+        --python=*)
+            _result=$(__parse_args "$key" "python" '(2|3)')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid python version ${_result##*=}"
+                exit 1
+            fi
+            _PYTHON_VERSION="$_result"
+            _PYTHON=1
+            _ALL=0
+            ;;
         --python)
             _PYTHON=1
             _ALL=0
+            if [[ "$2" =~ ^(2|3)$ ]]; then
+                _PYTHON_VERSION="$2"
+                shift
+            fi
             ;;
         -g|--git)
             _GIT=1

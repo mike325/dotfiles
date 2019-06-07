@@ -1,4 +1,5 @@
 sudo pacman -S --no-confirm
+zsh
 grub
 curl
 git

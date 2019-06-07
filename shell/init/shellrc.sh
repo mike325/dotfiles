@@ -142,10 +142,19 @@ function is_windows() {
     return 1
 }
 
-# shellcheck disable=SC2009,SC2046,SC2155
-export _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-export _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-export _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+if [[ -n "$ZSH_NAME" ]]; then
+    _CURRENT_SHELL="zsh"
+elif [[ -n "$BASH" ]]; then
+    _CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    # _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+    # _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+    # _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+    if [[ -z "$_CURRENT_SHELL" ]]; then
+        _CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
 
 if is_windows; then
     export USER="$USERNAME"
