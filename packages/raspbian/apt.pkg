@@ -15,13 +15,9 @@ vim
 neovim
 emacs
 unzip
-base-devel
 python-pip
-python2-pip
+python3-pip
 docker
-jdk8-openjdk
-the_silver_searcher
-ripgrep
 shellcheck
 ntfs-3g
 davfs2
