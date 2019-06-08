@@ -1,11 +1,9 @@
-yaourt -S --no-confirm
+yaourt -S --noconfirm
 spotify
-libtinfo
 ncurses5-compat-libs
 arc-gtk-theme
 jdk
 arc-firefox-theme
 nextcloud-client
 syncthing
-thunderbird
 zfs-linux

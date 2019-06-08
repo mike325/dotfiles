@@ -44,7 +44,9 @@ _SYSTEMD=0
 _NOCOLOR=0
 _PYTHON=0
 _NOLOG=0
+_PKGS=1
 _TMP="/tmp/"
+_PKG_FILE=""
 
 _CMD="ln -fns"
 
@@ -55,7 +57,7 @@ _URL=""
 
 # _GIT_SSH=0
 
-_VERSION="0.4.0"
+_VERSION="0.5.0"
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -190,11 +192,10 @@ function help_user() {
 
 Description
     Simple installer of this dotfiles, by default install (link) all settings and configurations
-    if any flag ins given, the script will install just want is being told to do.
-        By default command (if none flag is given): $_NAME -s -a -e -v -n -b -g -y -t --fonts
+    if any flag is given, the script will install just want is being told to do.
 
- Usage:
-    $_NAME [OPTIONAL]
+Usage:
+    $_NAME [OPTIONS]
 
     Optional Flags
         --host
@@ -203,11 +204,15 @@ Description
                 - .emacs.d
                 - dotfiles
 
+            Default: github.com
+
         --user
             Change default git user, the new user (ex. mike325) must have the following repos
                 - .vim
                 - .emacs.d
                 - dotfiles
+
+            Default: mike325
 
         -p, --protocol
             Alternate between different git protocol
@@ -215,24 +220,35 @@ Description
                 - ssh
                 - git (not tested)
 
+            Default: https
+
         --url
-            Provie full git url (ex. https://gitlab.com/mike325), the new base user mus have
+            Provie full git url (ex. https://gitlab.com/mike325), the new base user must have
             the following repos
                 - .vim
                 - .emacs.d
                 - dotfiles
 
-        --backup, --backup=DIR
+            Default: https://$_GIT_HOST/$_GIT_USER
+
+        --backup,
             Backup all existing files into $HOME/.local/backup or the provided dir
             ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used
+
+            Default: off in linux on in windows
 
         -f, --force
             Force installation, remove all previous conflict files before installing
             This flag is always disable by default
 
-        -w, --shell_frameworks
+            Default: off
+
+        -w, --shell_frameworks, --SHELL_PLATFORM=SHELL
             Install shell frameworks, bash-it or oh-my-zsh according to the current shell
             Current shell:   $_CURRENT_SHELL
+            If SHELL is given then force install SHELL framework (bash or zsh)
+
+            Default: on
 
         -c, --copy
             By default all dotfiles are linked using 'ln -s' command, this flag change
@@ -241,6 +257,8 @@ Description
             ----    Ignored option in Windows platform
             ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
 
+            Default: off in linux on in windows
+
         -s, --shell
             Install:
                 - Shell alias in $HOME/.config/shell
@@ -248,28 +266,40 @@ Description
                 - Everything inside ./dotconfigs into $HOME
                 - Python startup script in $HOME/.local/lib/
 
+            Default: on
+
         -d, --dotfiles
             Download my dotfiles repo in case, this options is meant to be used in case this
             script is standalone executed
                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/dotfiles
 
+            Default: off unless this script is executed from outside of the repo
+
         -e, --emacs
             Download and install my evil Emacs dotfiles
                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.emacs.d
+
+            Default: on
 
         -v, --vim
             Download and install my Vim dotfiles
                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
 
+            Default: on
+
         -n, --nvim, --neovim
             Download Neovim executable (portable in windows and linux) if it hasn't been Installed
             Download and install my Vim dotfiles in Neovim's dir.
-            Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag)
-            them, otherwise download them from my vim's dotfiles repo
+            Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag) them,
+            otherwise download them from vim's dotfiles repo
                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+
+            Default: on
 
         -b, --bin
             Install shell functions and scripts in $HOME/.local/bin
+
+            Default: on
 
         -g, --git
             Install git configurations into $HOME/.config/git and $HOME/.gitconfig
@@ -277,6 +307,8 @@ Description
                 - Gitconfigs
                 - Hooks
                 - Templates
+
+            Default: on
 
         -t, --portables
             Install isolated/portable programs into $HOME/.local/bin
@@ -288,33 +320,57 @@ Description
                 - fd (64 bits GNU/Linux only)
                 - ripgrep (64 bits GNU/Linux only)
 
+            Default: on
+
         --fonts, --powerline
             Install the powerline patched fonts
                 * Since the patched fonts have different install method for Windows
                 they are just download
                 * This options is ignored if the install script is executed in a SSH session
 
-        --python
-            Install python2 and python3 dependencies from ./packages/${_OS}/python2 and ./packages/${_OS}/python3
+            Default: on
+
+        --python, --python=VERSION
+            If no version is given install python2 and python3 dependencies from:
+                - ./packages/${_OS}/python2
+                - ./packages/${_OS}/python3
+            else install packages from the given version (2 or 3)
+
+            Default: on with python2 and python3
+
+        --pkgs, --packages, --packages=PKG_FILE
+            Install all .pkg files from ./packages/${_OS}/
+            if the package file is given then force install packages from there
+
+            Default: off
 
         -y, systemd
             Install user's systemd services (Just in Linux systems)
                 * Services are install in $HOME/.config/systemd/user
 
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
-
-        --version
-            Display the version and exit
+            Default: on
 
         --nolog
             Disable log writting
 
+            Default: off
+
         --nocolor
             Disable color output
 
+            Default: off
+
         --verbose
             Output debug messages
+
+            Default: off
+
+        --version
+            Display the version and exit
+
+        -h, --help
+            Display help, if you are seeing this, that means that you already know it (nice)
+
 EOF
 }
 
@@ -327,7 +383,7 @@ function __parse_args() {
     local arg="$1"
     local name="$2"
 
-    local pattern="^--${name}=[a-zA-Z0-9.:@_-/~]+$"
+    local pattern="^--${name}=[a-zA-Z0-9.:@_/~-]+$"
 
     if [[ -n "$3" ]]; then
         local pattern="^--${name}=$3$"
@@ -1127,21 +1183,56 @@ function setup_python() {
     return 0
 }
 
+function setup_pkgs() {
+    local rc=0
+    if is_windows; then
+        warn_msg "Windows support is WIP"
+    else
+        if [[ $EUID -ne 0 ]] && [[ ! $(groups) =~ sudo ]]; then
+            error_msg "User: ${USER} is neither root nor belongs to the sudo group"
+            return 1
+        fi
+        local cmd=""
+        if [[ -z "$_PKG_FILE" ]]; then
+            local pkgs=($(ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg))
+        else
+            local pkgs=("$_PKG_FILE")
+        fi
+        for pkg in "${pkgs[@]}"; do
+            verbose_msg "Package file $pkg"
+            local cmd=""
+            local filename=""
+            while IFS= read -r line; do
+                if [[ -z "$cmd" ]] && [[ "$line" =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
+                    cmd="${line##*sudo}"
+                else
+                    cmd="$cmd $line"
+                fi
+            done < "$pkg"
+            filename=$(basename "$pkg")
+            status_msg "Installing packages from ${filename%.pkg}"
+            verbose_msg "Using command $cmd"
+            if ! eval "$cmd"; then
+                error_msg "Fail to install packages from ${filename%.pkg}"
+                rc=1
+            fi
+        done
+    fi
+    return $rc
+}
+
 function version() {
 
     if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
         cat "${_SCRIPT_PATH}/shell/banner"
-    elif hash curl 2>/dev/null; then
-        verbose_msg "No banner found"
-        curl -Ls https://raw.githubusercontent.com/Mike325/dotfiles/master/shell/banner 2>/dev/null
     fi
 
     cat<<EOF
-Mike's install script"
+Mike's install script
 
-    Author   : Mike 8a"
-    Version  : ${_VERSION}"
-    Date     : $(date)"
+    Author   : Mike 8a
+    Version  : ${_VERSION}
+    Date     : Fri 07 Jun 2019
 EOF
 }
 
@@ -1293,6 +1384,46 @@ while [[ $# -gt 0 ]]; do
                 shift
             fi
             ;;
+        --pkgs=*)
+            _result=$(__parse_args "$key" "pkgs")
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid package file ${_result##*=}"
+                exit 1
+            elif [[ ! -f "$_result" ]]; then
+                error_msg "Package file $_result does not exists"
+                exit 1
+            elif [[ ! "$_result" =~ \.pkg$ ]]; then
+                error_msg "$_result is not a valid package file, the file must have .pkg extention"
+                exit 1
+            fi
+            _PKG_FILE="$_result"
+            _PKGS=1
+            _ALL=0
+            ;;
+        --packages=*)
+            _result=$(__parse_args "$key" "packages")
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid package file ${_result##*=}"
+                exit 1
+            elif [[ ! -f "$_result" ]]; then
+                error_msg "Package file $_result does not exists"
+                exit 1
+            elif [[ ! "$_result" =~ \.pkg$ ]]; then
+                error_msg "$_result is not a valid package file, the file must have .pkg extention"
+                exit 1
+            fi
+            _PKG_FILE="$_result"
+            _PKGS=1
+            _ALL=0
+            ;;
+        --pkgs|--packages)
+            _PKGS=1
+            _ALL=0
+            if [[ ! "$2" =~ ^-(-)?.*$ ]] && [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]]; then
+                _PKG_FILE="$2"
+                shift
+            fi
+            ;;
         -g|--git)
             _GIT=1
             _ALL=0
@@ -1409,6 +1540,10 @@ else
     [[ $_COOL_FONTS -eq 1 ]] && get_cool_fonts
     [[ $_SYSTEMD -eq 1 ]] && setup_systemd
     [[ $_PYTHON -eq 1 ]] && setup_python
+fi
+
+if [[ $_PKGS -eq 1 ]]; then
+    setup_pkgs
 fi
 
 exit 0

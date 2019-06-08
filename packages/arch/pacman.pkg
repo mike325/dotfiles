@@ -1,4 +1,4 @@
-sudo pacman -S --no-confirm
+sudo pacman -S --noconfirm
 zsh
 grub
 curl
@@ -34,3 +34,4 @@ snapper
 exfat-utils
 dosfstools
 ntfs-3g
+thunderbird
