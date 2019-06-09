@@ -81,6 +81,9 @@ setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry
 setopt hist_verify            # Do not execute immediately upon history expansion.
 setopt hist_reduce_blanks
 
+# Don't ask for rm * confirmation
+setopt rmstarsilent
+
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     plugins=(go git python)
     # Set name of the theme to load. Optionally, if you set this to "random"

@@ -44,7 +44,7 @@ _SYSTEMD=0
 _NOCOLOR=0
 _PYTHON=0
 _NOLOG=0
-_PKGS=1
+_PKGS=0
 _TMP="/tmp/"
 _PKG_FILE=""
 
@@ -1170,8 +1170,13 @@ function setup_python() {
                     # shellcheck disable=SC2034
                     local quiet="--quiet"
                 fi
-                # shellcheck disable=SC2016
-                local cmd="pip${version} install ${quiet} --user -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+                if [[ -z $VIRTUAL_ENV ]]; then
+                    # shellcheck disable=SC2016
+                    local cmd="pip${version} install ${quiet} --user -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+                else
+                    # shellcheck disable=SC2016
+                    local cmd="pip${version} install ${quiet} -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+                fi
                 verbose_msg "Pip command --> ${cmd}"
                 if ! eval "$cmd"; then
                     error_msg "Fail to install python ${version} dependencies"
@@ -1384,6 +1389,10 @@ while [[ $# -gt 0 ]]; do
                 shift
             fi
             ;;
+        -g|--git)
+            _GIT=1
+            _ALL=0
+            ;;
         --pkgs=*)
             _result=$(__parse_args "$key" "pkgs")
             if [[ "$_result" == "$key" ]]; then
@@ -1398,7 +1407,6 @@ while [[ $# -gt 0 ]]; do
             fi
             _PKG_FILE="$_result"
             _PKGS=1
-            _ALL=0
             ;;
         --packages=*)
             _result=$(__parse_args "$key" "packages")
@@ -1414,19 +1422,13 @@ while [[ $# -gt 0 ]]; do
             fi
             _PKG_FILE="$_result"
             _PKGS=1
-            _ALL=0
             ;;
         --pkgs|--packages)
             _PKGS=1
-            _ALL=0
             if [[ ! "$2" =~ ^-(-)?.*$ ]] && [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]]; then
                 _PKG_FILE="$2"
                 shift
             fi
-            ;;
-        -g|--git)
-            _GIT=1
-            _ALL=0
             ;;
         --nolog)
             _NOLOG=1

@@ -556,10 +556,9 @@ function ssha() {
 
 # Simple map of "q" to deactivate virtualenv or exit terminal session
 function q() {
-    if hash deactivate 2> /dev/null; then
+    if hash deactivate 2> /dev/null || [[ -n $VIRTUAL_ENV ]]; then
         deactivate
     else
-        killssh
         exit
     fi
 }
