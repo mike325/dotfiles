@@ -1077,15 +1077,17 @@ function get_portables() {
     status_msg "Checking portable programs"
     if hash curl 2>/dev/null; then
         if is_windows; then
-            rst=$(_windows_portables)
+            _windows_portables
+            rst=$?
         else
-            rst=$(_linux_portables)
+            _linux_portables
+            rst=$?
         fi
     else
         error_msg "Curl is not available"
         return 1
     fi
-    return "$rst"
+    return $rst
 }
 
 
