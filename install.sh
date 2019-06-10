@@ -338,9 +338,10 @@ Usage:
 
             Default: on with python2 and python3
 
-        --pkgs, --packages, --packages=PKG_FILE
+        --pkgs, --packages, --packages=PKG_FILE [--only]
             Install all .pkg files from ./packages/${_OS}/
             if the package file is given then force install packages from there
+            Additional flag --only cancel all other flags
 
             Default: off
 
@@ -1407,6 +1408,10 @@ while [[ $# -gt 0 ]]; do
             fi
             _PKG_FILE="$_result"
             _PKGS=1
+            if [[ "$2" =~ ^--only$ ]]; then
+                _ALL=0
+                shift
+            fi
             ;;
         --packages=*)
             _result=$(__parse_args "$key" "packages")
@@ -1422,11 +1427,20 @@ while [[ $# -gt 0 ]]; do
             fi
             _PKG_FILE="$_result"
             _PKGS=1
+            if [[ "$2" =~ ^--only$ ]]; then
+                _ALL=0
+                shift
+            fi
             ;;
         --pkgs|--packages)
             _PKGS=1
             if [[ ! "$2" =~ ^-(-)?.*$ ]] && [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]]; then
                 _PKG_FILE="$2"
+                shift
+            fi
+
+            if [[ "$2" =~ ^--only$ ]]; then
+                _ALL=0
                 shift
             fi
             ;;
