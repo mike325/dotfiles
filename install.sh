@@ -50,6 +50,7 @@ _PKG_FILE=""
 
 _CMD="ln -fns"
 
+_PYTHON_VERSION="all"
 _PROTOCOL="https"
 _GIT_USER="mike325"
 _GIT_HOST="github.com"
@@ -143,7 +144,13 @@ else
     fi
 fi
 
-_PYTHON_VERSION="all"
+# TODO: This should work with ARM 64bits
+function is_64bits() {
+    if [[ $_ARCH == 'x86_64' ]]; then
+        return 0
+    fi
+    return 1
+}
 
 if is_windows; then
     # Windows bash does not have pgrep by default
@@ -799,6 +806,248 @@ function get_nvim_dotfiles() {
     return 0
 }
 
+function _windows_portables() {
+    local rst=0
+    local github='https://github.com'
+
+    if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
+        status_msg "Getting shellcheck"
+        if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
+            [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
+            unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
+            chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
+            mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
+        else
+            error_msg "Curl couldn't get shellcheck"
+            rst=1
+        fi
+    else
+        warn_msg "Skipping shellcheck, already installed"
+        rst=2
+    fi
+
+    if ! hash ctags 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing ctags install'
+        # TODO: auto detect latest version
+        local major="5"
+        local minor="8"
+        status_msg "Getting ctags"
+        [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
+        curl -Ls "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" -o "$_TMP/ctags${major}${minor}.zip"
+        if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
+            error_msg "An error occurred extracting zip file"
+            rst=1
+        else
+            chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
+            mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
+        fi
+    else
+        warn_msg "Skipping ctags, already installed"
+        rst=2
+    fi
+
+    if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
+        status_msg "Getting minio client"
+        curl -Ls "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+        chmod +x "$HOME/.local/bin/mc.exe"
+    elif ! is_64bits; then
+        error_msg "Minio portable is only Available for x86 64 bits"
+        rst=1
+    else
+        warn_msg "Skipping minio client, already installed"
+        rst=2
+    fi
+
+    return $rst
+}
+
+function _linux_portables() {
+    local rst=0
+    local github='https://github.com'
+
+    if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
+        if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
+            status_msg "Getting python pip"
+
+            if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
+                chmod u+x "$_TMP/get-pip.py"
+
+                if { ! hash pip2 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python2 2>/dev/null; then
+                    status_msg "Installing pip2"
+                    if [[ $_VERBOSE -eq 1 ]]; then
+                        if ! python2 $_TMP/get-pip.py --user; then
+                            error_msg "Fail to install pip for python2"
+                        fi
+                    else
+                        if ! python2 $_TMP/get-pip.py --user 1>/dev/null; then
+                            error_msg "Fail to install pip for python2"
+                        fi
+                    fi
+                fi
+
+                if { ! hash pip3 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python3 2>/dev/null; then
+                    local python=("8" "7" "6" "5" "4")
+
+                    for version in "${python[@]}"; do
+                        if hash "python3.${version}" 2>/dev/null; then
+                            status_msg "Installing pip3 with python3.${version}"
+                            if [[ $_VERBOSE -eq 1 ]]; then
+                                if ! "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                    error_msg "Fail to install pip for python3.${version}"
+                                fi
+                            else
+                                if ! "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                    error_msg "Fail to install pip for python3.${version}"
+                                fi
+                            fi
+
+                            break
+                        fi
+                    done
+                fi
+                verbose_msg "Cleanning up $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py"
+            else
+                error_msg "Curl couldn't get pip"
+                rst=1
+            fi
+        else
+            warn_msg "Skipping pip, already installed"
+            rst=2
+        fi
+    else
+        warn_msg "Skipping pip, the system doesn't have python"
+        rst=2
+    fi
+
+    if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
+        status_msg "Getting shellcheck"
+        local pkg='shellcheck.tar.xz'
+        if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/shellcheck-latest/shellcheck"
+            mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
+            popd 1> /dev/null || return 1
+        else
+            error_msg "Curl couldn't get shellcheck"
+            rst=1
+        fi
+    elif [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]]; then
+        warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
+        rst=2
+    else
+        warn_msg "Skipping shellcheck, already installed"
+        rst=2
+    fi
+
+    if ! hash fzf 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing FZF install'
+        status_msg "Getting FZF"
+        if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
+            error_msg "Fail to clone FZF"
+            return 1
+        fi
+        if [[ $_VERBOSE -eq 1 ]]; then
+            if ! "$HOME/.fzf/install" --all --no-update-rc; then
+                error_msg "Fail to install FZF"
+                rst=1
+            fi
+        else
+            if ! "$HOME/.fzf/install" --all --no-update-rc &>/dev/null; then
+                error_msg "Fail to install FZF"
+                rst=1
+            fi
+        fi
+    else
+        warn_msg "Skipping FZF, already installed"
+        rst=2
+    fi
+
+    if ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
+        status_msg "Getting fd"
+        local pkg='fd.tar.xz'
+        local url="${github}/sharkdp/fd"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading fd version: ${version}"
+        local os_type="${_ARCH}-unknown-linux-musl"
+        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+        if curl -Ls "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
+            mv "$_TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            error_msg "Curl couldn't get fd"
+            rst=1
+        fi
+    else
+        warn_msg "Skipping fd, already installed"
+        rst=2
+    fi
+
+    if ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
+        status_msg "Getting rg"
+        local pkg='rg.tar.xz'
+        local url="${github}/BurntSushi/ripgrep"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading rg version: ${version}"
+        local os_type="${_ARCH}-unknown-linux-musl"
+        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+        if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/ripgrep-${version}-${os_type}/rg"
+            mv "$_TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-${os_type}" && rm -rf "$_TMP/ripgrep-${version}-${os_type}"
+            popd 1> /dev/null || return 1
+        else
+            error_msg "Curl couldn't get rg"
+            rst=1
+        fi
+    else
+        warn_msg "Skipping rg, already installed"
+        rst=2
+    fi
+
+    if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
+        status_msg "Getting minio client"
+        curl -Ls "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+        chmod +x "$HOME/.local/bin/mc"
+    elif ! is_64bits; then
+        error_msg "Minio portable is only Available for x86 64 bits"
+        rst=1
+    else
+        warn_msg "Skipping minio client, already installed"
+        rst=2
+    fi
+
+    return $rst
+}
+
 # TODO: Add GNU global as a windows portable
 # TODO: Add compile option to auto compile some programs
 function get_portables() {
@@ -825,217 +1074,18 @@ function get_portables() {
         rst=2
     fi
 
+    status_msg "Checking portable programs"
     if hash curl 2>/dev/null; then
-        status_msg "Checking portable programs"
         if is_windows; then
-
-            if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
-                status_msg "Getting shellcheck"
-                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
-                    [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
-                    unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
-                    chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
-                    mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
-                else
-                    error_msg "Curl couldn't get shellcheck"
-                    rst=1
-                fi
-            else
-                warn_msg "Skipping shellcheck, already installed"
-                rst=2
-            fi
-
-            if ! hash ctags 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing ctags install'
-                # TODO: auto detect latest version
-                local major="5"
-                local minor="8"
-                status_msg "Getting ctags"
-                curl -Ls "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" -o "$_TMP/ctags${major}${minor}.zip"
-                [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
-                if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
-                    error_msg "An error occurred extracting zip file"
-                    rst=1
-                fi
-                chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
-                mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
-            else
-                warn_msg "Skipping ctags, already installed"
-                rst=2
-            fi
+            rst=$(_windows_portables)
         else
-            if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
-                if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
-                    status_msg "Getting python pip"
-
-                    if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
-                        chmod u+x "$_TMP/get-pip.py"
-
-                        if { ! hash pip2 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python2 2>/dev/null; then
-                            status_msg "Installing pip2"
-                            if [[ $_VERBOSE -eq 1 ]]; then
-                                if ! python2 $_TMP/get-pip.py --user; then
-                                    error_msg "Fail to install pip for python2"
-                                fi
-                            else
-                                if ! python2 $_TMP/get-pip.py --user 1>/dev/null; then
-                                    error_msg "Fail to install pip for python2"
-                                fi
-                            fi
-                        fi
-
-                        if { ! hash pip3 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python3 2>/dev/null; then
-                            local python=("8" "7" "6" "5" "4")
-
-                            for version in "${python[@]}"; do
-                                if hash "python3.${version}" 2>/dev/null; then
-                                    status_msg "Installing pip3 with python3.${version}"
-                                    if [[ $_VERBOSE -eq 1 ]]; then
-                                        if ! "python3.${version}" "$_TMP/get-pip.py" --user; then
-                                            error_msg "Fail to install pip for python3.${version}"
-                                        fi
-                                    else
-                                        if ! "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
-                                            error_msg "Fail to install pip for python3.${version}"
-                                        fi
-                                    fi
-
-                                    break
-                                fi
-                            done
-                        fi
-                        verbose_msg "Cleanning up $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py"
-                    else
-                        error_msg "Curl couldn't get pip"
-                        rst=1
-                    fi
-                else
-                    warn_msg "Skipping pip, already installed"
-                    rst=2
-                fi
-            else
-                warn_msg "Skipping pip, the system doesn't have python"
-                rst=2
-            fi
-
-            if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
-                status_msg "Getting shellcheck"
-                local pkg='shellcheck.tar.xz'
-                if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
-                    pushd "$_TMP" 1> /dev/null || return 1
-                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-                    chmod u+x "$_TMP/shellcheck-latest/shellcheck"
-                    mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-                    verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
-                    popd 1> /dev/null || return 1
-                else
-                    error_msg "Curl couldn't get shellcheck"
-                    rst=1
-                fi
-            elif [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]]; then
-                warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
-                rst=2
-            else
-                warn_msg "Skipping shellcheck, already installed"
-                rst=2
-            fi
-
-            if ! hash fzf 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing FZF install'
-                status_msg "Getting FZF"
-                if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
-                    error_msg "Fail to clone FZF"
-                    return 1
-                fi
-                if [[ $_VERBOSE -eq 1 ]]; then
-                    if ! "$HOME/.fzf/install" --all --no-update-rc; then
-                        error_msg "Fail to install FZF"
-                        rst=1
-                    fi
-                else
-                    if ! "$HOME/.fzf/install" --all --no-update-rc &>/dev/null; then
-                        error_msg "Fail to install FZF"
-                        rst=1
-                    fi
-                fi
-            else
-                warn_msg "Skipping FZF, already installed"
-                rst=2
-            fi
-
-            if ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
-                status_msg "Getting fd"
-                local pkg='fd.tar.xz'
-                local url="${github}/sharkdp/fd"
-                if hash curl 2>/dev/null; then
-                    # shellcheck disable=SC2155
-                    local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
-                else
-                    # shellcheck disable=SC2155
-                    local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
-                fi
-                status_msg "Downloading fd version: ${version}"
-                local os_type="${_ARCH}-unknown-linux-musl"
-                [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-                if curl -Ls "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
-                    pushd "$_TMP" 1> /dev/null || return 1
-                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-                    chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
-                    mv "$_TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-                    verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
-                    popd 1> /dev/null || return 1
-                else
-                    error_msg "Curl couldn't get fd"
-                    rst=1
-                fi
-            else
-                warn_msg "Skipping fd, already installed"
-                rst=2
-            fi
-
-            if ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-                [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
-                status_msg "Getting rg"
-                local pkg='rg.tar.xz'
-                local url="${github}/BurntSushi/ripgrep"
-                if hash curl 2>/dev/null; then
-                    # shellcheck disable=SC2155
-                    local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
-                else
-                    # shellcheck disable=SC2155
-                    local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
-                fi
-                status_msg "Downloading rg version: ${version}"
-                local os_type="${_ARCH}-unknown-linux-musl"
-                [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-                if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
-                    pushd "$_TMP" 1> /dev/null || return 1
-                    verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-                    chmod u+x "$_TMP/ripgrep-${version}-${os_type}/rg"
-                    mv "$_TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
-                    verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-                    verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-${os_type}" && rm -rf "$_TMP/ripgrep-${version}-${os_type}"
-                    popd 1> /dev/null || return 1
-                else
-                    error_msg "Curl couldn't get rg"
-                    rst=1
-                fi
-            else
-                warn_msg "Skipping rg, already installed"
-                rst=2
-            fi
-
+            rst=$(_linux_portables)
         fi
     else
         error_msg "Curl is not available"
         return 1
     fi
-    return $rst
+    return "$rst"
 }
 
 
