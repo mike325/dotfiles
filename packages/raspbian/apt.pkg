@@ -1,4 +1,5 @@
 sudo apt install -y
+ufw
 zsh
 curl
 git
@@ -24,3 +25,7 @@ libssl-dev
 btrfs-tools
 exfat-fuse
 exfat-utils
+apt-transport-https
+ca-certificates
+gnupg2
+software-properties-common
