@@ -11,7 +11,7 @@ htop
 cmake
 ctags
 sl
-vim
+vim-nox
 neovim
 unzip
 python-pip

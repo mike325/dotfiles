@@ -850,7 +850,11 @@ function _windows_portables() {
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
         status_msg "Getting minio client"
-        curl -Ls "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+        if [[ $_VERBOSE -eq 0 ]]; then
+            curl -Ls "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+        else
+            curl -L "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+        fi
         chmod +x "$HOME/.local/bin/mc.exe"
     elif ! is_64bits; then
         error_msg "Minio portable is only Available for x86 64 bits"
@@ -1035,7 +1039,11 @@ function _linux_portables() {
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
-        curl -Ls "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+        if [[ $_VERBOSE -eq 0 ]]; then
+            curl -Ls "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+        else
+            curl -L "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+        fi
         chmod +x "$HOME/.local/bin/mc"
     elif ! is_64bits; then
         error_msg "Minio portable is only Available for x86 64 bits"
@@ -1269,6 +1277,9 @@ function setup_pkgs() {
             done < "$pkg"
             filename=$(basename "$pkg")
             status_msg "Installing packages from ${filename%.pkg}"
+            if [[ $_VERBOSE -eq 0 ]]; then
+                cmd="$cmd &>/dev/null"
+            fi
             verbose_msg "Using command $cmd"
             if ! eval "$cmd"; then
                 error_msg "Fail to install packages from ${filename%.pkg}"
