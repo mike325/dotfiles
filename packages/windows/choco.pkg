@@ -1,0 +1,20 @@
+choco install -y
+vim
+neovim
+llvm
+mingw
+ruby
+rust
+golang
+shellcheck
+putty
+openssh
+git
+tortoisesvn
+ctags
+texstudio
+7zip
+vlc
+gimp
+firefox
+spotify
