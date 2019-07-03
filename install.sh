@@ -941,7 +941,7 @@ function _linux_portables() {
             error_msg "Curl couldn't get shellcheck"
             rst=1
         fi
-    elif [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]]; then
+    elif ! hash shellcheck 2>/dev/null && { [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]] ; }; then
         warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
         rst=2
     else
