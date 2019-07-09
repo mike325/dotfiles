@@ -127,12 +127,14 @@ done
 status_msg "Cleaning swap files"
 
 if is_windows; then
-    [[ -d "$HOME/AppData/Local/nvim/.resources/swap/" ]] && rm -rf ~/AppData/Local/nvim/.resources/swap/*
-    [[ -d "$HOME/vimfiles/.resources/swap/" ]] && rm -rf ~/vimfiles/.resources/swap/*
+    [[ -d "$HOME/AppData/Local/nvim/data/swap/" ]] && rm -rf ~/AppData/Local/nvim/data/swap/*
+    [[ -d "$HOME/AppData/Local/nvim-data/swap/" ]] && rm -rf ~/AppData/Local/nvim-data/swap/*
+    [[ -d "$HOME/vimfiles/data/swap/" ]] && rm -rf ~/vimfiles/data/swap/*
 else
-    [[ -d "$HOME/.config/nvim/.resources/swap/" ]] && rm -rf ~/.config/nvim/.resources/swap/*
+    [[ -d "$HOME/.config/nvim/data/swap/" ]] && rm -rf ~/.config/nvim/data/swap/*
+    [[ -d "$HOME/.local/share/nvim/swap/" ]] && rm -rf ~/.local/share/nvim/swap/*
 fi
 
-[[ -d "$HOME/.vim/.resources/swap/" ]] && rm -rf ~/.vim/.resources/swap/*
+[[ -d "$HOME/.vim/data/swap/" ]] && rm -rf ~/.vim/data/swap/*
 
 exit 0

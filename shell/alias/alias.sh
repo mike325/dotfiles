@@ -305,13 +305,14 @@ fi
 # I added this alias
 # TODO add other distros commands I've used, like Solus
 pkg=""
-if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
+if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; then
     # 'Install' package maybe in the PATH
 
-    if hash yaourt 2>/dev/null; then
+    if hash yay 2>/dev/null; then
+        pkg="yay"
+    elif hash yaourt 2>/dev/null; then
         pkg="yaourt"
     elif hash pacman 2>/dev/null; then
-        # Yeah Arch from scratch may not have yaourt
         pkg="pacman"
     fi
 
@@ -319,7 +320,9 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         alias searchpkg="${pkg} -Ss"
     else
         function searchpkg() {
-            if hash yaourt 2>/dev/null; then
+            if hash yay 2>/dev/null; then
+                local pkg="yay"
+            elif hash yaourt 2>/dev/null; then
                 local pkg="yaourt"
             elif hash pacman 2>/dev/null; then
                 local pkg="pacman"
@@ -336,7 +339,7 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
 
     alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
-    alias update="${pkg} -Syyu --aur" && alias updaten="${pkg} -Syyu --aur --noconfirm"
+    alias update="${pkg} -Syu --aur" && alias updaten="${pkg} -Syu --aur --noconfirm"
 
     alias rmpkg="${pkg} -Rns"
 
@@ -344,8 +347,8 @@ if hash yaourt 2>/dev/null || hash pacman 2>/dev/null; then
         unalias getpkg && alias getpkg="sudo ${pkg} -S"
         unalias getpkgn && alias getpkgn="sudo ${pkg} -S --noconfirm"
 
-        unalias update && alias update="sudo ${pkg} -Syyu --aur"
-        unalias updaten && alias updaten="sudo ${pkg} -Syyu --aur --noconfirm"
+        unalias update && alias update="sudo ${pkg} -Syu --aur"
+        unalias updaten && alias updaten="sudo ${pkg} -Syu --aur --noconfirm"
 
         unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
 
@@ -565,7 +568,7 @@ function q() {
 
 function venv() {
     local _git=0
-    local _name="env"
+    local _name="./env"
     local _top="."
 
     while [[ $# -gt 0 ]]; do
