@@ -301,7 +301,10 @@ function get_portable() {
 
     if is_windows; then
         verbose_msg "Unpacking ${name}"
-        unzip -qo "$_TMP/$name" -d "$HOME/.local/" && rm -rf "${_TMP:?}/${name}"
+        if ! unzip -qo "$_TMP/$name" -d "$HOME/AppData/Roaming/" && rm -rf "${_TMP:?}/${name}"; then
+            return 1
+        fi
+        rm -rf "${_TMP:?}/${name}"
     else
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi

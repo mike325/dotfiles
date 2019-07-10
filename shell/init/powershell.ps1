@@ -52,6 +52,11 @@ if ( Test-Path "$HOME\.local\bin" ) {
     $env:path = "$HOME\.local\bin;$env:path"
 }
 
+# Path settings
+if ( Test-Path "$HOME\AppData\Roaming\Neovim\bin" ) {
+    $env:path = "$HOME\AppData\Roaming\Neovim\bin;$env:path"
+}
+
 # $pythonscripts
 
 if (Test-Path "$HOME\AppData\Roaming\Python\Python27\Scripts") {
