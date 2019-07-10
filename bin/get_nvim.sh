@@ -48,6 +48,7 @@ _FORCE_INSTALL=0
 _PORTABLE=0
 _NOCOLOR=0
 _VERBOSE=0
+_DEV=0
 
 _OS='unknown'
 
@@ -93,6 +94,8 @@ case "$SHELL_PLATFORM" in
     LINUX)
         if [[ -f /etc/arch-release ]]; then
             _OS='arch'
+        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+            _OS='ubuntu'
         elif [[ -f /etc/debian_version ]]; then
             if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
                 _OS='raspbian'
@@ -112,11 +115,20 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
+# _ARCH="$(uname -m)"
+
+function is_windows() {
+    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # Warning ! This script delete everything in the work directory before install
 function _show_nvim_libs() {
     cat << EOF
 Please also consider to install the python libs
-    $ pip3 install --user neovim && pip2 install --user neovim
+    $ pip3 install --upgrade --user pynvim && pip2 install --upgrade --user pynvim
 and Ruby libs
     $ gem install --user-install neovim
 EOF
@@ -151,9 +163,6 @@ Usage:
     $_NAME [OPTIONS]
 
     Optional Flags
-        --version
-            Neovim version to download or compile, default, latest
-
         --portable
             Download the portable version and place it in $HOME/.local/bin
 
@@ -180,6 +189,9 @@ Usage:
             Install all dependencies of the before build neovim's source code
             Just few systems are supported, Debian's family, Fedora's family and
             ArchLinux's family
+
+        --dev
+            Use developement builds/portables instead of stable
 
         -v, --verbose
             Enable debug messages
@@ -232,13 +244,6 @@ function verbose_msg() {
     return 0
 }
 
-function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-        return 0
-    fi
-    return 1
-}
-
 function get_portable() {
     if [[ $_OS == 'raspbian' ]]; then
         error_msg "There's no neovim portable version for ARM devices"
@@ -268,9 +273,12 @@ function get_portable() {
 
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
-    version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
-
-    status_msg "Downloading version: ${version}"
+    if [[ $_DEV -eq 0 ]]; then
+        version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
+        status_msg "Downloading version: ${version}"
+    else
+        status_msg "Downloading Nightly"
+    fi
 
     if is_windows; then
         local name="nvim.zip"
@@ -280,17 +288,20 @@ function get_portable() {
         local pkg='nvim.appimage'
     fi
 
-    verbose_msg "Downloading ${pkg} from $_URL/releases/download/stable/${pkg} to $_TMP/$name"
+    local build='stable'
+    if [[ $_DEV -eq 1 ]]; then
+        build='nightly'
+    fi
+    verbose_msg "Downloading ${pkg} from $_URL/releases/download/${build}/${pkg} to $_TMP/$name"
 
-    if ! eval '${cmd} "$_URL/releases/download/stable/${pkg}" -o "$_TMP/$name"'; then
+    if ! eval '${cmd} "$_URL/releases/download/${build}/${pkg}" -o "$_TMP/$name"'; then
         error_msg "Fail to download neovim"
         return 1
     fi
 
     if is_windows; then
         verbose_msg "Unpacking ${name}"
-        unzip -qo "$_TMP/$name" && mv "$_TMP/Neovim/*" "$HOME/.local/"
-        rm -rf "${_TMP:?}/${name}"
+        unzip -qo "$_TMP/$name" -d "$HOME/.local/" && rm -rf "${_TMP:?}/${name}"
     else
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi
@@ -300,8 +311,8 @@ function get_portable() {
 
 function get_libs() {
     if [[ $_PYTHON_LIBS -eq 1 ]]; then
-        hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --user neovim; }
-        hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --user neovim; }
+        hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --upgrade --user pynvim; }
+        hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --upgrade --user pynvim; }
     fi
 
     if [[ $_RUBY_LIBS -eq 1 ]]; then
@@ -339,6 +350,9 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v|--verbose)
             _VERBOSE=1
+            ;;
+        --dev)
+            _DEV=1
             ;;
         -h|--help)
             show_help
@@ -456,16 +470,16 @@ if [[ "$_BUILD_LIBS" -eq 1 ]]; then
             # python2-dev
             # ruby-dev
     else
-        echo ""
-        echo "    ---- [X] Error your system is not supported to preinstall deps"
-        echo "             Supported systems are:"
-        echo "                  - Debian family"
-        echo "                  - Ubuntu family"
-        echo "                  - Archlinux, Antergos and Manjaro"
-        echo "                  - Fedora"
-        echo "             Please check the ependencies in Neovim's page:"
-        echo "             https://github.com/neovim/neovim/wiki/Building-Neovim"
-        echo ""
+        cat << EOF
+    ---- [X] Error your system is not supported to preinstall deps
+             Supported systems are:
+                  - Debian family
+                  - Ubuntu family
+                  - Archlinux, Antergos and Manjaro
+                  - Fedora
+             Please check the ependencies in Neovim's page:
+             https://github.com/neovim/neovim/wiki/Building-Neovim
+EOF
         exit 1
     fi
 fi
@@ -475,9 +489,11 @@ fi
 GCC_VERSION="$(gcc --version | head -1 | awk '{print $3}')"
 GCC_VERSION="${GCC_VERSION%%.*}"
 # Checkout to the latest stable version
-if (( GCC_VERSION < 7 )); then
+if (( GCC_VERSION < 7 )) || [[ $_DEV -eq 0 ]]; then
     status_msg "Using latest stable version $( git tag | tail -n 1 )"
     git checkout "$( git tag | tail -n 1 )" 2>/dev/null
+elif [[ $_DEV -eq 1 ]]; then
+    status_msg "Using master HEAD"
 else
     warn_msg "GCC version is > 7, using master to compile source code"
 fi
