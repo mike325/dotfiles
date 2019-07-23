@@ -29,17 +29,8 @@
 
 [[ $- == *i* ]] && __INTERACTIVE=1 || __INTERACTIVE=0
 
-
-################################################################################
-#                               Some vim stuff                                 #
-# Use <C-s> in terminal vim                                                    #
-(( __INTERACTIVE == 1 )) && stty -ixon                                         #
-# Set vi keys in the shell                                                     #
-set -o vi
-#                                                                              #
-# Make backspace delete in a sane way                                          #
-stty erase '^?'
-################################################################################
+# Use <C-s> in terminal vim
+(( __INTERACTIVE == 1 )) && stty -ixon
 
 ################################################################################
 #                         Make some dir that I normally use                    #

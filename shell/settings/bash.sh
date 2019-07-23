@@ -28,6 +28,12 @@
 #                                                                              #
 ################################################################################
 
+# Set vi keys
+set -o vi
+
+# Make backspace delete in a sane way
+stty erase '^?'
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize

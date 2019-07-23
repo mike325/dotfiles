@@ -30,59 +30,18 @@
 # Remove terminal sounds
 unsetopt beep
 
-# Path to your oh-my-zsh installation.
-if [[ -d "$HOME/.oh-my-zsh" ]]; then
-    export ZSH="$HOME/.oh-my-zsh"
-fi
-
-# User configuration
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
-# pip zsh completion start
-if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
-    function _pip_completion {
-        local words cword
-        read -Ac words
-        read -cn cword
-        reply=( $( COMP_WORDS="$words[*]" \
-                    COMP_CWORD=$(( cword-1 )) \
-                    PIP_AUTO_COMPLETE=1 $words[1] ) )
-    }
-    hash pip 2>/dev/null && compctl -K _pip_completion pip
-    hash pip2 2>/dev/null && compctl -K _pip_completion pip2
-    hash pip3 2>/dev/null && compctl -K _pip_completion pip3
-fi
-# pip zsh completion end
-
 [[ ! -d "$HOME/.zsh/" ]] && mkdir -p "$HOME/.zsh/"
 
-HISTFILE="$HOME/.zsh/history"
-HISTSIZE=2048
-SAVEHIST=2048
-
-setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
-setopt share_history          # Share history between all sessions.
-setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
-setopt hist_ignore_dups       # Do not record an entry that was just recorded again.
-setopt hist_ignore_all_dups   # Delete old recorded entry if new entry is a duplicate.
-setopt hist_find_no_dups      # Do not display a line previously found.
-setopt hist_ignore_space      # Do not record an entry starting with a space.
-setopt hist_save_no_dups      # Do not write duplicate entries in the history file.
-setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
-setopt hist_verify            # Do not execute immediately upon history expansion.
-setopt hist_reduce_blanks
-
-# Don't ask for rm * confirmation
-setopt rmstarsilent
+# Path to your oh-my-zsh installation.
+if [[ -d "$HOME/.oh-my-zsh" ]]; then
+    export ZSH="$HOME/.oh-my-zsh"
+fi
 
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     plugins=(go git python)
@@ -145,3 +104,49 @@ fi
 if hash fzf 2>/dev/null; then
     [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
 fi
+
+# pip zsh completion start
+if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
+    function _pip_completion {
+        local words cword
+        read -Ac words
+        read -cn cword
+        reply=( $( COMP_WORDS="$words[*]" \
+                    COMP_CWORD=$(( cword-1 )) \
+                    PIP_AUTO_COMPLETE=1 $words[1] ) )
+    }
+    hash pip 2>/dev/null && compctl -K _pip_completion pip
+    hash pip2 2>/dev/null && compctl -K _pip_completion pip2
+    hash pip3 2>/dev/null && compctl -K _pip_completion pip3
+fi
+# pip zsh completion end
+
+HISTFILE="$HOME/.zsh/history"
+HISTSIZE=2048
+SAVEHIST=2048
+
+setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
+setopt share_history          # Share history between all sessions.
+setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
+setopt hist_ignore_dups       # Do not record an entry that was just recorded again.
+setopt hist_ignore_all_dups   # Delete old recorded entry if new entry is a duplicate.
+setopt hist_find_no_dups      # Do not display a line previously found.
+setopt hist_ignore_space      # Do not record an entry starting with a space.
+setopt hist_save_no_dups      # Do not write duplicate entries in the history file.
+setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
+setopt hist_verify            # Do not execute immediately upon history expansion.
+setopt hist_reduce_blanks
+
+# Don't ask for rm * confirmation
+setopt rmstarsilent
+
+# Set vi key mode
+bindkey -v
+bindkey '^P' up-history
+bindkey '^N' down-history
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey '^w' backward-kill-word
+bindkey '^r' history-incremental-search-backward
+
+KEYTIMEOUT=1
