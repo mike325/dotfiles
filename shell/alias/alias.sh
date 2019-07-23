@@ -567,9 +567,9 @@ function q() {
 }
 
 function venv() {
-    local _git=0
-    local _name="./env"
-    local _top="."
+    local _name=("env" "venv" ".env" ".venv")
+    local _top=""
+    local _success=0
 
     while [[ $# -gt 0 ]]; do
         local key="$1"
@@ -591,37 +591,39 @@ function venv() {
                 echo ""
                 return 0
                 ;;
-            -g|--git)
-                local _git=1
+            -n|--name)
+                _name=("$2")
+                shift
                 ;;
             *)
-                local _name="$2"
-                shift
                 ;;
         esac
         shift
     done
 
-    if [[ $_git -eq 1 ]]; then
-        if ! git rev-parse --show-toplevel 1> /dev/null; then
-            echo "[X]     ---- Error!!!   Git repo error"
-            return 1
-        fi
-
+    if git rev-parse --show-toplevel &>/dev/null; then
         _top="$(git rev-parse --show-toplevel)"
-        _top="$_top/.git"
+        _git_dir="$(git rev-parse --git-dir)"
 
-        _name="$_top/$_name"
+        for i in "${_name[@]}"; do
+            _name+=("$_top/$i")
+            _name+=("$_git_dir/$i")
+        done
     fi
 
-    if [[ ! -f "$_name/bin/activate" ]]; then
-        echo "[X]     ---- Error!!!  Missing activate file, $_name/bin/activate" 1>&2
-        return 1
+    for i in "${_name[@]}"; do
+        if [[ -f "$i/bin/activate" ]]; then
+            source "$i/bin/activate"
+            _success=1
+            break
+        fi
+    done
+
+    if [[ $_success -eq 1 ]]; then
+        return 0
     fi
 
-    source "$_name/bin/activate"
-
-    return 0
+    return 1
 }
 
 function bk() {
