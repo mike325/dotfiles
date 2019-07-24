@@ -86,8 +86,8 @@ function status_msg() {
 function runGit() {
     local gitdir worktree
     gitdir="$(git rev-parse --git-dir)"
-    if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
-        worklist=($(git worktree list | awk '{print $1}'))
+    if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
+        worklist=($(git worktree list 2>/dev/null | awk '{print $1}'))
         for i in ${worklist[*]}; do
             [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && worktree="$i"
         done
