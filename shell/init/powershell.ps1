@@ -74,13 +74,6 @@ if ( Test-Path "$HOME\.local\lib\pythonstartup.py") {
     $env:PYTHONSTARTUP = "$env:USERPROFILE\.local\lib\pythonstartup.py"
 }
 
-if ($env:PYTHONPATH -eq $null) {
-    $env:PYTHONPATH = "$env:USERPROFILE\cdf_engines;c:\PythonSv"
-}
-else {
-    $env:PYTHONPATH = "$env:USERPROFILE\cdf_engines;c:\PythonSv;$env:PYTHONPATH"
-}
-
 function Test-Administrator {
     $user = [Security.Principal.WindowsIdentity]::GetCurrent();
     (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
