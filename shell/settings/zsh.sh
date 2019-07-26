@@ -101,10 +101,6 @@ else
     PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
 fi
 
-if hash fzf 2>/dev/null; then
-    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
-fi
-
 # pip zsh completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
     function _pip_completion {
@@ -150,3 +146,8 @@ bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
 
 KEYTIMEOUT=1
+
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+fi
+
