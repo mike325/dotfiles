@@ -223,6 +223,10 @@ if hash ntfy 2>/dev/null; then
     # GUI
     export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
     eval "$(ntfy shell-integration)"
+
+    if hash xclip 2>/dev/null; then
+        alias clipsend='ntfy send "$(xclip -o)"'
+    fi
 fi
 
 if hash cleanswap 2>/dev/null; then
@@ -570,6 +574,7 @@ function venv() {
     local _name=("env" "venv" ".env" ".venv")
     local _top=""
     local _success=0
+    local _nogit=0
 
     while [[ $# -gt 0 ]]; do
         local key="$1"
@@ -593,6 +598,7 @@ function venv() {
                 ;;
             -n|--name)
                 _name=("$2")
+                _nogit=1
                 shift
                 ;;
             *)
@@ -601,14 +607,16 @@ function venv() {
         shift
     done
 
-    if git rev-parse --show-toplevel &>/dev/null; then
-        _top="$(git rev-parse --show-toplevel)"
-        _git_dir="$(git rev-parse --git-dir)"
+    if [[ $_nogit -eq 0 ]]; then
+        if git rev-parse --show-toplevel &>/dev/null; then
+            _top="$(git rev-parse --show-toplevel)"
+            _git_dir="$(git rev-parse --git-dir)"
 
-        for i in "${_name[@]}"; do
-            _name+=("$_top/$i")
-            _name+=("$_git_dir/$i")
-        done
+            for i in "${_name[@]}"; do
+                _name+=("$_top/$i")
+                _name+=("$_git_dir/$i")
+            done
+        fi
     fi
 
     for i in "${_name[@]}"; do
@@ -625,6 +633,10 @@ function venv() {
 
     return 1
 }
+
+alias vven="venv"
+alias vnev="venv"
+alias vevn="venv"
 
 function bk() {
     for key in "$@"; do
