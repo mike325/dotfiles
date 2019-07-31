@@ -71,7 +71,7 @@ if [[ $_PING -eq 1 ]]; then
     else
         echo 'Great!! it seems you have external connectivity'
     fi
-elif [[ ! -z "$1" ]]; then
+elif [[ -n "$1" ]]; then
     curl -Ls --max-redirs 1 "http://www.downforeveryoneorjustme.com/$1" | grep -oE "It's just you.|It's not just you!"
 fi
 
