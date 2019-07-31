@@ -1,14 +1,5 @@
 language: python
 
-sudo: false
-
-addons:
-  apt:
-    sources:
-        - debian-sid
-    packages:
-        - shellcheck
-
 python:
     - "2.7"
     - "3.5"
