@@ -938,16 +938,18 @@ function _linux_portables() {
                         if hash "python3.${version}" 2>/dev/null; then
                             status_msg "Installing pip3 with python3.${version}"
                             if [[ $_VERBOSE -eq 1 ]]; then
-                                if ! "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                if "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                    break
+                                else
                                     error_msg "Fail to install pip for python3.${version}"
                                 fi
                             else
-                                if ! "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                if "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                    break
+                                else
                                     error_msg "Fail to install pip for python3.${version}"
                                 fi
                             fi
-
-                            break
                         fi
                     done
                 fi
