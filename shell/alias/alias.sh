@@ -113,6 +113,10 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
+if hash bat 2>/dev/null; then
+    alias cat="bat"
+fi
+
 if is_windows; then
     alias bim="vim"
     alias cim="vim"

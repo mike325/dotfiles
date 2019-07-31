@@ -107,7 +107,9 @@ done
 
 fe() {
     local files
+    # shellcheck disable=SC2207
     IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+    # shellcheck disable=SC2128
     [[ -n "$files" ]] && ${_EDITOR} "${files[@]}"
 }
 

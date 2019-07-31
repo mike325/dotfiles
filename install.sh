@@ -1260,6 +1260,7 @@ function setup_pkgs() {
         fi
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
+            # shellcheck disable=SC2086,SC2207
             local pkgs=($(ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg))
         else
             local pkgs=("$_PKG_FILE")
