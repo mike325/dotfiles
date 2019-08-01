@@ -11,7 +11,7 @@ install:
 
 script:
     - flake8 --ignore=E501 --show-source
-    - shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*')
+    - shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*')
 
 notifications:
     email:
