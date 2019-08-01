@@ -270,7 +270,7 @@ fi
 status_msg 'Starting basic shell check test'
 verbose_msg "Shellcheck version: $(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
 # shellcheck disable=SC2046
-if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
+if ! shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
     error_msg 'Fail test'
     exit 2
 fi
