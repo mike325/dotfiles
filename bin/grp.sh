@@ -67,20 +67,20 @@ for key in "$@"; do
 done
 
 if hash realpath 2>/dev/null; then
-    if [[ ! -z "$1" ]]; then
+    if [[ -n "$1" ]]; then
         realpath "$@"
     else
         realpath "."
     fi
 elif hash readlink 2>/dev/null; then
-    if [[ ! -z "$1" ]]; then
+    if [[ -n "$1" ]]; then
         readlink -f "$@"
     else
         readlink -f "."
     fi
 else
     # TODO Optimize code for file management
-    if [[ ! -z "$1" ]]; then
+    if [[ -n "$1" ]]; then
         FULL_PATH="$1"
         ROOT_PATH="${FULL_PATH%/*}"
         FILE_PATH="${FULL_PATH##*/}"

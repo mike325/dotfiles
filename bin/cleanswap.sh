@@ -80,9 +80,9 @@ function __parse_args() {
     local arg="$1"
     local name="$2"
 
-    local pattern="^--$name[=][a-zA-Z0-9./]+$"
-    if [[ ! -z "$3" ]]; then
-        local pattern="^--$name[=]$3$"
+    local pattern="^--${name}[=][a-zA-Z0-9./]+$"
+    if [[ -n "$3" ]]; then
+        local pattern="^--${name}[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then

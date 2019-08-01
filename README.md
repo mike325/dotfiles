@@ -1,9 +1,7 @@
-# Dotfiles
+# Dotfiles [![Build Status](https://travis-ci.com/Mike325/dotfiles.svg?branch=master)](https://travis-ci.com/Mike325/dotfiles)
 
 Here are most of my dotfiles. Since my Vim settings are quite big, I prefer to
-have them in a different [repo](https://github.com/mike325/.vim), Same goes for
-my Emacs settings [here](https://github.com/mike325/.emacs.d)
-(unfortunately, I'm not so evil lately).
+have them in a different [repo](https://github.com/mike325/.vim), Same goes for my Emacs settings [here](https://github.com/mike325/.emacs.d)
 
 Feel free to make comments about my configuration and of course take anything
 you want or find useful.
@@ -19,12 +17,12 @@ If you prefer to test some specific "modules" I recommend you to use my simple
 install script.
 
 ```sh
-$ ./install.sh -g       # To install Git settings
-$ ./install.sh -v -a    # To install Vim dotfiles and shell alias
-$ ./install.sh -f       # To force install by removing all previous files
-$ ./install.sh -f -v    # To force install Vim dotfiles
-$ ./install.sh --backup # To backup all files before install dotfiles
-$ ./install.sh --help   # To get all the
+$ ./install.sh --force           # To force install by removing all previous files
+$ ./install.sh --git             # To install Git settings
+$ ./install.sh --vim --shell     # To install Vim dotfiles and shell alias
+$ ./install.sh --bin --portables # Install bin binaries and download some portable programs
+$ ./install.sh --backup          # To backup all files before install dotfiles
+$ ./install.sh --help            # To get all the
 ```
 
 !!! WARNING  !!!

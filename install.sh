@@ -48,6 +48,8 @@ _PKGS=0
 _TMP="/tmp/"
 _PKG_FILE=""
 
+_NEOVIM_DEV=0
+
 _CMD="ln -fns"
 
 _PYTHON_VERSION="all"
@@ -755,6 +757,7 @@ function get_nvim_dotfiles() {
         [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
         [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
         [[ $_VERBOSE -eq 1 ]] && args=" --verbose $args"
+        [[ $_NEOVIM_DEV -eq 1 ]] && args=" --dev $args"
         if ! hash nvim 2> /dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
             if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
                 error_msg ""
@@ -847,6 +850,43 @@ function _windows_portables() {
         rst=2
     fi
 
+    if ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
+        status_msg "Getting bat"
+        local pkg='bat.zip'
+        local url="${github}/sharkdp/bat"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading bat version: ${version}"
+        local os_type='x86_64-pc-windows-msvc'
+        if curl -Ls "${url}/releases/download/${version}/bat-${version}-${os_type}.zip" -o "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}"
+            if ! unzip "$_TMP/${pkg}" -d "$_TMP/bat-${version}-${os_type}/"; then
+                error_msg "An error occurred extracting zip file"
+                rst=1
+            else
+                chmod u+x "$_TMP/bat-${version}-${os_type}/bat.exe"
+                mv "$_TMP/bat-${version}-${os_type}/bat.exe" "$HOME/.local/bin/"
+            fi
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            error_msg "Curl couldn't get bat"
+            rst=1
+        fi
+    else
+        warn_msg "Skipping bat, already installed"
+        rst=2
+    fi
+
+
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
         status_msg "Getting minio client"
@@ -898,16 +938,18 @@ function _linux_portables() {
                         if hash "python3.${version}" 2>/dev/null; then
                             status_msg "Installing pip3 with python3.${version}"
                             if [[ $_VERBOSE -eq 1 ]]; then
-                                if ! "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                if "python3.${version}" "$_TMP/get-pip.py" --user; then
+                                    break
+                                else
                                     error_msg "Fail to install pip for python3.${version}"
                                 fi
                             else
-                                if ! "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                if "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                                    break
+                                else
                                     error_msg "Fail to install pip for python3.${version}"
                                 fi
                             fi
-
-                            break
                         fi
                     done
                 fi
@@ -1036,6 +1078,38 @@ function _linux_portables() {
         rst=2
     fi
 
+    if ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
+        status_msg "Getting bat"
+        local pkg='bat.tar.xz'
+        local url="${github}/sharkdp/bat"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading bat version: ${version}"
+        local os_type="${_ARCH}-unknown-linux-musl"
+        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+        if curl -Ls "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/bat-${version}-${os_type}/bat"
+            mv "$_TMP/bat-${version}-${os_type}/bat" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            error_msg "Curl couldn't get bat"
+            rst=1
+        fi
+    else
+        warn_msg "Skipping bat, already installed"
+        rst=2
+    fi
+
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
@@ -1072,6 +1146,7 @@ function get_portables() {
         [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
         [[ $_NOCOLOR -eq 1 ]] && args=" --nocolor $args"
         [[ $_VERBOSE -eq 1 ]] && args=" --verbose $args"
+        [[ $_NEOVIM_DEV -eq 1 ]] && args=" --dev $args"
 
         if ! eval "${_SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
             error_msg "Fail to install Neovim"
@@ -1260,6 +1335,7 @@ function setup_pkgs() {
         fi
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
+            # shellcheck disable=SC2086,SC2207
             local pkgs=($(ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg))
         else
             local pkgs=("$_PKG_FILE")
@@ -1427,9 +1503,30 @@ while [[ $# -gt 0 ]]; do
             _VIM=1
             _ALL=0
             ;;
+        --nvim=*)
+            _result=$(__parse_args "$key" "nvim" '(stable|dev(elop(ment)?)?)')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid neovim build type ${_result##*=}"
+                exit 1
+            fi
+            if [[ $_result == 'dev' ]]; then
+                _NEOVIM_DEV=1
+            else
+                _NEOVIM_DEV=0
+            fi
+            _NVIM=1
+            _ALL=0
+            ;;
         -n|--neovim|--nvim)
             _NVIM=1
             _ALL=0
+            if [[ "$2" =~ ^stable$ ]]; then
+                _NEOVIM_DEV=0
+                shift
+            elif [[ "$2" =~ ^dev(elop(ment)?)?$ ]]; then
+                _NEOVIM_DEV=1
+                shift
+            fi
             ;;
         -b|--bin)
             _BIN=1

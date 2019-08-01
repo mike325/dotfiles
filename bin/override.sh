@@ -54,7 +54,7 @@ for key in "$@"; do
     esac
 done
 
-if [[ ! -z "$1" ]] && [[ ! -z "$2" ]]; then
+if [[ -n "$1" ]] && [[ -n "$2" ]]; then
     mkdir -p /tmp/.trash
     mv --backup=numbered "$2" /tmp/.trash
     mv "$1" "$2"
