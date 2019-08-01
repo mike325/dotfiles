@@ -10,8 +10,7 @@ install:
     - pip install flake8 pycodestyle mccabe pyflakes
 
 script:
-    - flake8 --ignore=E501 --show-source
-    - shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*')
+    - bash -c "./test/basic.sh --verbose"
 
 notifications:
     email:
