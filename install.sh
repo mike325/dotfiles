@@ -1722,4 +1722,8 @@ if [[ $_PKGS -eq 1 ]]; then
     setup_pkgs
 fi
 
+if [[ $_ERR_COUNT -gt 0 ]]; then
+    exit 1
+fi
+
 exit 0
