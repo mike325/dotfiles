@@ -1,5 +1,10 @@
+# Neomake leftovers
+*@neomake*
+
+# Dia leftovers
+*.dia~
+
 # Compiled source #
-###################
 *.com
 *.class
 *.dll
