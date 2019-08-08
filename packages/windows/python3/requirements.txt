@@ -1,3 +1,6 @@
+# C/C++ development
+compiledb>=7.0
+
 # Python development
 jedi>=0.13.2
 flake8>=3.5.0
