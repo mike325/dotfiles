@@ -1,3 +1,17 @@
 sudo dnf install -y
 zsh
 davfs2
+curl
+git
+wget
+gcc
+clang
+clang-devel
+llvm-devel
+make
+sed
+htop
+cmake
+ctags
+sl
+neovim

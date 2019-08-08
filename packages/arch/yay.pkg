@@ -1,0 +1,9 @@
+yay -S --noconfirm
+spotify
+ncurses5-compat-libs
+arc-gtk-theme
+jdk
+arc-firefox-theme
+nextcloud-client
+syncthing
+zfs-linux
