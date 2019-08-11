@@ -66,6 +66,9 @@ if ( `where vim` != "" ) then
     endif
 endif
 
+if ( `where bat` != "" ) then
+    setenv GIT_PAGER "bat"
+endif
 
 ################################################################################
 #                          Fix my common typos                                 #

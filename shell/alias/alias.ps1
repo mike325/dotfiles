@@ -113,6 +113,10 @@ else {
     }
 }
 
+if ( Get-Command "bat.exe" -ErrorAction SilentlyContinue ) {
+    $env:GIT_PAGER = "bat.exe"
+}
+
 if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
     if ( Get-Command "git.exe" -ErrorAction SilentlyContinue ) {
         if ( Get-Command "fd.exe" -ErrorAction SilentlyContinue ) {

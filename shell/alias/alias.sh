@@ -49,7 +49,6 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                         nvim "$@"
                     fi
                 }
-                # export GIT_PAGER="vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
                 export EDITOR="vim"
                 alias vi="vim --cmd 'let g:minimal=1'"
                 alias viu="vim -u NONE"
@@ -73,7 +72,6 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             # NOTE: This is set inside Neovim settings
             if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
                 export MANPAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
-                # export GIT_PAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' - "
                 export EDITOR="nvim"
                 alias vi="nvim --cmd 'let g:minimal=1'"
                 alias viu="nvim -u NONE"
@@ -95,12 +93,15 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
         alias cdvim="cd ~/.vim"
         alias cdvi="cd ~/.vim"
         export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
-        # export GIT_PAGER="vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git  nomodifiable' -"
         export EDITOR="vim"
 
         alias vi="vim --cmd 'let g:minimal=1'"
         alias viu="vim -u NONE"
     fi
+fi
+
+if hash bat 2>/dev/null; then
+    export GIT_PAGER="bat"
 fi
 
 ################################################################################
