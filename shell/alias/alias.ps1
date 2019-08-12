@@ -134,6 +134,9 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
         }
     }
     $env:FZF_DEFAULT_OPTS = '--layout=reverse --border --ansi'
+    if ( Get-Command "bat.exe" -ErrorAction SilentlyContinue ) {
+        $env:FZF_DEFAULT_OPTS = "$env:FZF_DEFAULT_OPTS  --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
+    }
 }
 
 if ( Get-Command "thefuck.exe" -ErrorAction SilentlyContinue ) {

@@ -475,7 +475,11 @@ if hash fzf 2>/dev/null; then
     export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi'
 
     if ! is_windows; then
-        export FZF_DEFAULT_OPTS="--height 40% $FZF_DEFAULT_OPTS"
+        export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
+    fi
+
+    if hash bat 2>/dev/null; then
+        export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
     fi
 
     # Use ~~ as the trigger sequence instead of the default **

@@ -171,10 +171,13 @@ if ( `where fzf` != "" ) then
     endif
     setenv FZF_CTRL_R_OPTS '--sort'
 
-    setenv FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border --ansi'
+    setenv FZF_DEFAULT_OPTS '--height 70% --layout=reverse --border --ansi'
     # Use ~~ as the trigger sequence instead of the default **
     setenv FZF_COMPLETION_TRIGGER '**'
 
     # Options to fzf command
     setenv FZF_COMPLETION_OPTS '+c -x'
+    if ( `where bat` != "" ) then
+        setenv FZF_DEFAULT_OPTS "$FZF_DEFAULT_COMMAND  --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
+    endif
 endif
