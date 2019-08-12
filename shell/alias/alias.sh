@@ -249,6 +249,97 @@ if hash ctags 2>/dev/null; then
     alias gft="ctags -R ."
 fi
 
+if hash fzf 2>/dev/null; then
+    if hash git 2>/dev/null; then
+        if hash fd 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+            export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
+        elif hash rg 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files . ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        elif hash ag 2>/dev/null; then
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g "" ) 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        else
+            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
+            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        fi
+    fi
+
+    export FZF_CTRL_R_OPTS='--sort'
+
+    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi'
+
+    if ! is_windows; then
+        export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
+    fi
+
+    # Known fzf/kernel issue
+    # https://github.com/junegunn/fzf/issues/1486
+    if hash bat 2>/dev/null && [[ ! "$(uname -r)" =~ 4\.(4\.0-142|15.0-44) ]]; then
+        export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
+    fi
+
+    # Use ~~ as the trigger sequence instead of the default **
+    export FZF_COMPLETION_TRIGGER='**'
+
+    # Options to fzf command
+    export FZF_COMPLETION_OPTS='+c -x'
+
+    function cd() {
+        if [[ "$#" != 0 ]]; then
+            builtin cd "$@" || return
+            return
+        fi
+        while true; do
+            # collect dirs
+            # shellcheck disable=SC2155
+            if [[ -n "$(git rev-parse --git-dir 2>/dev/null)" ]]; then
+                local folders=$(git ls-tree -rt HEAD "$(git rev-parse --show-toplevel)" | awk '{if ($2 == "tree") print $4;}')
+            elif hash fd 2>/dev/null; then
+                # shellcheck disable=SC2155
+                local folders="$(fd -t d . .)"
+            else
+                # shellcheck disable=SC2155
+                local folders="$(find . -type d -iname '*')"
+            fi
+
+            # shellcheck disable=SC2155
+            local select=$(printf '%s\n' "${folders[@]}" | fzf)
+
+            [[ ${#select} != 0 ]] || return 0
+            builtin pushd "$select" &>/dev/null && return 0 || return 1
+        done
+    }
+
+    # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
+    fkill() {
+        local pid
+        if [ "$UID" != "0" ]; then
+            pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+        else
+            pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+        fi
+
+        if [ "x$pid" != "x" ]; then
+            echo "$pid" | xargs kill "-${1:-7}"
+        fi
+    }
+
+    if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
+        fssh() {
+            # shellcheck disable=SC2155
+            local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
+            if [[ -n "$host" ]]; then
+                ssh "$host"
+            fi
+        }
+    fi
+
+fi
+
+
 ################################################################################
 #                               Systemctl                                      #
 ################################################################################
@@ -451,94 +542,6 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
 fi
 
 unset pkg
-
-if hash fzf 2>/dev/null; then
-    if hash git 2>/dev/null; then
-        if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
-            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-            export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
-        elif hash rg 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files . ) 2> /dev/null'
-            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-        elif hash ag 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g "" ) 2> /dev/null'
-            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-        else
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
-            export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-        fi
-    fi
-
-    export FZF_CTRL_R_OPTS='--sort'
-
-    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi'
-
-    if ! is_windows; then
-        export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
-    fi
-
-    if hash bat 2>/dev/null; then
-        export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
-    fi
-
-    # Use ~~ as the trigger sequence instead of the default **
-    export FZF_COMPLETION_TRIGGER='**'
-
-    # Options to fzf command
-    export FZF_COMPLETION_OPTS='+c -x'
-
-    function cd() {
-        if [[ "$#" != 0 ]]; then
-            builtin cd "$@" || return
-            return
-        fi
-        while true; do
-            # collect dirs
-            # shellcheck disable=SC2155
-            if [[ -n "$(git rev-parse --git-dir 2>/dev/null)" ]]; then
-                local folders=$(git ls-tree -rt HEAD "$(git rev-parse --show-toplevel)" | awk '{if ($2 == "tree") print $4;}')
-            elif hash fd 2>/dev/null; then
-                # shellcheck disable=SC2155
-                local folders="$(fd -t d . .)"
-            else
-                # shellcheck disable=SC2155
-                local folders="$(find . -type d -iname '*')"
-            fi
-
-            # shellcheck disable=SC2155
-            local select=$(printf '%s\n' "${folders[@]}" | fzf)
-
-            [[ ${#select} != 0 ]] || return 0
-            builtin pushd "$select" &>/dev/null && return 0 || return 1
-        done
-    }
-
-    # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
-    fkill() {
-        local pid
-        if [ "$UID" != "0" ]; then
-            pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
-        else
-            pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
-        fi
-
-        if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs kill "-${1:-7}"
-        fi
-    }
-
-    if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
-        fssh() {
-            # shellcheck disable=SC2155
-            local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
-            if [[ -n "$host" ]]; then
-                ssh "$host"
-            fi
-        }
-    fi
-
-fi
 
 ################################################################################
 #                              Some miscellaneous                              #
