@@ -1,27 +1,6 @@
-#
-#   Author: Mike 8a
-#   Description: Some useful alias and functions
-#
-#                                     -`
-#                     ...            .o+`
-#                  .+++s+   .h`.    `ooo/
-#                 `+++%++  .h+++   `+oooo:
-#                 +++o+++ .hhs++. `+oooooo:
-#                 +s%%so%.hohhoo'  'oooooo+:
-#                 `+ooohs+h+sh++`/:  ++oooo+:
-#                  hh+o+hoso+h+`/++++.+++++++:
-#                   `+h+++h.+ `/++++++++++++++:
-#                            `/+++ooooooooooooo/`
-#                           ./ooosssso++osssssso+`
-#                          .oossssso-````/osssss::`
-#                         -osssssso.      :ssss``to.
-#                        :osssssss/  Mike  osssl   +
-#                       /ossssssss/   8a   +sssslb
-#                     `/ossssso+/:-        -:/+ossss'.-
-#                    `+sso+:-`                 `.-/+oso:
-#                   `++:.                           `-/+/
-#                   .`   github.com/mike325/dotfiles   `/
-#
+# Author: Mike 8a
+# Description: Some useful alias and functions
+# github.com/mike325/dotfiles
 
 New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue
 New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue
@@ -134,9 +113,6 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
         }
     }
     $env:FZF_DEFAULT_OPTS = '--layout=reverse --border --ansi'
-    if ( Get-Command "bat.exe" -ErrorAction SilentlyContinue ) {
-        $env:FZF_DEFAULT_OPTS = "$env:FZF_DEFAULT_OPTS  --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
-    }
 }
 
 if ( Get-Command "thefuck.exe" -ErrorAction SilentlyContinue ) {

@@ -1,26 +1,5 @@
 #!/usr/bin/env bash
 
-#
-#                              -`
-#              ...            .o+`
-#           .+++s+   .h`.    `ooo/
-#          `+++%++  .h+++   `+oooo:
-#          +++o+++ .hhs++. `+oooooo:
-#          +s%%so%.hohhoo'  'oooooo+:
-#          `+ooohs+h+sh++`/:  ++oooo+:
-#           hh+o+hoso+h+`/++++.+++++++:
-#            `+h+++h.+ `/++++++++++++++:
-#                     `/+++ooooooooooooo/`
-#                    ./ooosssso++osssssso+`
-#                   .oossssso-````/osssss::`
-#                  -osssssso.      :ssss``to.
-#                 :osssssss/  Mike  osssl   +
-#                /ossssssss/   8a   +sssslb
-#              `/ossssso+/:-        -:/+ossss'.-
-#             `+sso+:-`                 `.-/+oso:
-#            `++:.                           `-/+/
-#            .`                                 `/
-
 _VERBOSE=0
 
 _NAME="$0"
@@ -108,7 +87,7 @@ done
 fe() {
     local files
     # shellcheck disable=SC2207
-    IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+    IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview-window 'right:60%' --preview '(bat --color=always {} || cat {}) 2> /dev/null'))
     # shellcheck disable=SC2128
     [[ -n "$files" ]] && ${_EDITOR} "${files[@]}"
 }

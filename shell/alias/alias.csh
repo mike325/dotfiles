@@ -1,31 +1,8 @@
 #!/usr/bin/env tcsh
 
-################################################################################
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Some useful alias                                             #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
+# Author: Mike 8a
+# Description: Some useful alias and functions
+# github.com/mike325/dotfiles
 
 ################################################################################
 #                          Set the default text editor                         #
@@ -177,7 +154,4 @@ if ( `where fzf` != "" ) then
 
     # Options to fzf command
     setenv FZF_COMPLETION_OPTS '+c -x'
-    if ( `where bat` != "" ) then
-        setenv FZF_DEFAULT_OPTS "$FZF_DEFAULT_COMMAND  --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
-    endif
 endif

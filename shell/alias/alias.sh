@@ -1,32 +1,9 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2139,SC1090
 
-################################################################################
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Some useful alias and functions                               #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
+# Author: Mike 8a
+# Description: Some useful alias and functions
+# github.com/mike325/dotfiles
 
 ################################################################################
 #                          Set the default text editor                         #
@@ -275,13 +252,6 @@ if hash fzf 2>/dev/null; then
         export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
     fi
 
-    # Known fzf/kernel issue
-    # https://github.com/junegunn/fzf/issues/1486
-    if hash bat 2>/dev/null && [[ ! "$(uname -r)" =~ 4\.(4\.0-142|15.0-44) ]]; then
-        export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview-window 'right:60%' --preview 'bat --color=always --line-range :300 {}'"
-    fi
-
-    # Use ~~ as the trigger sequence instead of the default **
     export FZF_COMPLETION_TRIGGER='**'
 
     # Options to fzf command
