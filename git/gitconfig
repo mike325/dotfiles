@@ -47,6 +47,9 @@
 [url "git@github.com:"]
     insteadOf = sgh:
 
+# [credential]
+#     helper = cache --timeout=28800
+
 [color]
     ui          = auto
     diff        = auto

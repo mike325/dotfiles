@@ -1,16 +1,16 @@
 # C/C++ development
-compiledb>=7.0
+compiledb>=0.10.1
 
 # Python development
-jedi>=0.13.2
+jedi!=0.14.0,<0.15,>=0.13.2
 mypy==0.710
 flake8>=3.5.0
 flake8-mypy>=17.8.0
 yapf>=0.22.0
 mccabe>=0.6.1
-
 virtualenv>=16.0.0
 python-language-server>=0.21.5
+pluggy<1,>=0.12.0
 
 # JS development
 jsbeautifier>=1.7.5
@@ -25,7 +25,7 @@ vim-vint>=0.3.19
 neovim-remote>=2.0.10
 
 # Containers
-docker-compose
+docker-compose>=1.24.1
 
 # notifications
 ntfy[telegram,emoji,pid]>=2.7.0
