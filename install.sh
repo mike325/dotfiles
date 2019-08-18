@@ -31,6 +31,7 @@ _SHELL=0
 _VIM=0
 _NVIM=0
 _BIN=0
+_SHELL_SCRIPTS=0
 _SHELL_FRAMEWORK=0
 _EMACS=0
 _DOTFILES=0
@@ -251,6 +252,13 @@ Usage:
             This flag is always disable by default
 
             Default: off
+
+        --shell_scripts
+            Install some bash/zsh shell scripts like:
+                - z.sh
+            Current shell:   $_CURRENT_SHELL
+
+            Default: on
 
         -w, --shell_frameworks, --SHELL_PLATFORM=SHELL
             Install shell frameworks, bash-it or oh-my-zsh according to the current shell
@@ -661,6 +669,33 @@ function setup_shell() {
     setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
 
     return 0
+}
+
+function setup_shell_scripts {
+    if [[ $_CURRENT_SHELL =~ (ba|z)?sh ]]; then
+        local rst=0
+        local github='https://raw.githubusercontent.com'
+        [[ ! -d "$HOME/.config/shell/scripts/" ]] && mkdir -p "$HOME/.config/shell/scripts/"
+
+        if [[ ! -f "$HOME/.config/shell/scripts/z.sh" ]]; then
+            status_msg 'Getting Z'
+            local z="${github}/rupa/z/master/z.sh"
+            if curl -Ls "${z}" -o "$_TMP/z.sh"; then
+                mv "$_TMP/z.sh" "$HOME/.config/shell/scripts/z.sh"
+                [[ ! -f "$HOME/.z" ]] && touch "$HOME/.z"
+            else
+                error_msg "Curl couldn't get Z script"
+                rst=1
+            fi
+        else
+            warn_msg "Z script already install"
+        fi
+
+        return $rst
+    else
+        error_msg "Not compatible shell ${_CURRENT_SHELL}"
+    fi
+    return 1
 }
 
 function setup_git() {
@@ -1471,6 +1506,11 @@ while [[ $# -gt 0 ]]; do
             _SHELL=1
             _ALL=0
             ;;
+        --shell_scripts)
+            _SHELL=1
+            _SHELL_SCRIPTS=1
+            _ALL=0
+            ;;
         --shell_frameworks=*)
             _result=$(__parse_args "$key" "shell_frameworks" '(ba|z)sh')
             if [[ "$_result" == "$key" ]]; then
@@ -1695,6 +1735,7 @@ if [[ $_ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
     setup_bin
     setup_shell
+    setup_shell_scripts
     setup_shell_framework
     setup_git
     get_portables
@@ -1707,6 +1748,7 @@ if [[ $_ALL -eq 1 ]]; then
 else
     [[ $_BIN -eq 1 ]] && setup_bin
     [[ $_SHELL -eq 1 ]] && setup_shell
+    [[ $_SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
     [[ $_SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $_GIT -eq 1 ]] && setup_git
     [[ $_PORTABLES -eq 1 ]] && get_portables
