@@ -35,6 +35,21 @@
 ################################################################################
 #                         Make some dir that I normally use                    #
 ################################################################################
+if [[ -z "$XDG_DATA_HOME" ]]; then
+    export XDG_DATA_HOME="$HOME/.local/share"
+    [[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
+fi
+
+if [[ -z "$XDG_CONFIG_HOME" ]]; then
+    export XDG_CONFIG_HOME="$HOME/.config"
+    [[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
+fi
+
+if [[ -z "$XDG_CACHE_HOME" ]]; then
+    export XDG_CACHE_HOME="$HOME/.cache"
+    [[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
+fi
+
 [[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
 [[ ! -d "$HOME/.local/lib" ]] && mkdir -p "$HOME/.local/lib"
 [[ ! -d "$HOME/.local/share" ]] && mkdir -p "$HOME/.local/share"
