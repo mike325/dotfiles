@@ -71,7 +71,48 @@ historyPath = os.path.expanduser("~/.pyhistory")
 historyPath = historyPath if os.name == 'nt' else historyPath.replace('/', '\\')
 try:
 
-    def save_history(historyPath=os.path.expanduser("~/.pyhistory").replace('/', '\\') if os.name == 'nt' else os.path.expanduser("~/.pyhistory")):
+    def rl_autoindent():
+        """
+        Auto-indent upon typing a new line according to the contents of the
+        previous line.  This function will be used as Readline's
+        pre-input-hook.
+        """
+        try:
+            import readline
+        except ImportError:
+            try:
+                import pyreadline as readline
+            except ImportError:
+                return
+        hist_len = readline.get_current_history_length()
+        last_input = readline.get_history_item(hist_len)
+        indent = ''
+        try:
+            last_indent_index = last_input.rindex("    ")
+        except Exception:
+            last_indent = 0
+        else:
+            last_indent = int(last_indent_index / 4) + 1
+        if len(last_input.strip()) > 1:
+            if last_input.count("(") > last_input.count(")"):
+                indent = ''.join(["    " for n in range(last_indent + 2)])
+            elif last_input.count(")") > last_input.count("("):
+                indent = ''.join(["    " for n in range(last_indent - 1)])
+            elif last_input.count("[") > last_input.count("]"):
+                indent = ''.join(["    " for n in range(last_indent + 2)])
+            elif last_input.count("]") > last_input.count("["):
+                indent = ''.join(["    " for n in range(last_indent - 1)])
+            elif last_input.count("{") > last_input.count("}"):
+                indent = ''.join(["    " for n in range(last_indent + 2)])
+            elif last_input.count("}") > last_input.count("{"):
+                indent = ''.join(["    " for n in range(last_indent - 1)])
+            elif last_input[-1] == ":":
+                indent = ''.join(["    " for n in range(last_indent + 1)])
+            else:
+                indent = ''.join(["    " for n in range(last_indent)])
+        readline.insert_text(indent)
+
+    def save_history(historyPath=os.path.expanduser('~/pyhistory').replace('/', '\\') if os.name == 'nt' else os.path.expanduser('~/.pyhistory')):
         import traceback
         try:
             import readline
@@ -84,19 +125,19 @@ try:
             readline.write_history_file(historyPath)
         except OSError:
             traceback.print_exc()
-            print('OS Error: Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
+            print('OS Error: Failed to write history file: {}, please check the file has permisions to be written or it is not hidden (Windows)'.format(historyPath))
         except IOError:
             traceback.print_exc()
-            print('IO Error: Failed to write history file, please check the file has permisions to be written or it is not hidden (Windows)')
+            print('IO Error: Failed to write history file: {}, please check the file has permisions to be written or it is not hidden (Windows)'.format(historyPath))
 
     if os.path.exists(historyPath):
         readline.read_history_file(historyPath)
 
+    readline.set_pre_input_hook(rl_autoindent)
     readline.parse_and_bind("tab: complete")
 
     atexit.register(save_history)
-    del readline
 except NameError:
     pass
 finally:
-    del os, atexit, rlcompleter, save_history, historyPath, sys
+    del os, atexit, rlcompleter, save_history, historyPath, sys, readline
