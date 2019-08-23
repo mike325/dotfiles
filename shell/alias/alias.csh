@@ -15,7 +15,7 @@ if ( `where vim` != "" ) then
         # NOTE: This is set inside Neovim settings
         # shellcheck disable=SC2154
         if ( ! ($?nvr) ) then
-            setenv MANPAGER "nvim -R --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal readonly nomodifiable ft=man' -"
+            setenv MANPAGER "nvim --cmd 'let g:minimal=1' +Man!"
             # setenv GIT_PAGER "nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' - "
             setenv EDITOR "nvim"
             alias vi "nvim --cmd 'let g:minimal=1'"
@@ -24,7 +24,7 @@ if ( `where vim` != "" ) then
             alias nvi "nvim"
             alias vnim "nvim"
         else
-            setenv MANPAGER "nvr -cc 'setlocal modifiable' -c 'silent! setlocal ft=man' --remote-tab -"
+            setenv MANPAGER "nvr -c 'Man!' --remote-tab -"
             # setenv GIT_PAGER "nvr -cc 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
             setenv EDITOR "nvr --remote-tab-wait"
             alias vi "nvr --remote-silent"

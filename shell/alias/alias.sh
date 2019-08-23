@@ -33,7 +33,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias nvi="nvim"
                 alias vnim="nvim"
             else
-                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal  nomodifiable ft=man' --remote -"
+                export MANPAGER="nvr -c 'Man!' --remote -"
                 export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote -"
                 export EDITOR="nvr --remote-wait"
                 alias vi="nvr --remote-silent"
@@ -48,7 +48,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvim="cd ~/.config/nvim"
             # NOTE: This is set inside Neovim settings
             if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
-                export MANPAGER="nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal  nomodifiable ft=man' -"
+                export MANPAGER="nvim --cmd 'let g:minimal=1' +Man!"
                 export EDITOR="nvim"
                 alias vi="nvim --cmd 'let g:minimal=1'"
                 alias viu="nvim -u NONE"
@@ -56,7 +56,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias nvi="nvim"
                 alias vnim="nvim"
             else
-                export MANPAGER="nvr -cc 'setlocal modifiable' -c 'silent! setlocal  nomodifiable ft=man' --remote-tab -"
+                export MANPAGER="nvr -c 'Man!' --remote-tab -"
                 export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
                 export EDITOR="nvr --remote-tab-wait"
                 alias vi="nvr --remote-silent"
