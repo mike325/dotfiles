@@ -1,3 +1,6 @@
+# http querys
+httpie>=1.0.3
+
 # C/C++ development
 compiledb>=0.10.1
 
@@ -40,4 +43,6 @@ requests==2.20
 thefuck>=3.27
 
 # HW dev
-esptool>=2.7
+esptool>=2.6
+rshell>=0.0.26
+adafruit-ampy>=1.0.7
