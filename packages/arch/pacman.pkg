@@ -36,3 +36,5 @@ exfat-utils
 dosfstools
 ntfs-3g
 thunderbird
+cryptsetup
+rsync

@@ -24,3 +24,5 @@ ripgrep
 shellcheck
 ntfs-3g
 davfs2
+cryptsetup
+rsync
