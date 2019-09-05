@@ -155,6 +155,10 @@ if (Test-Path($powersource)) {
     . $powersource
 }
 
+if ($env:VIRTUAL_ENV -ne $null) {
+    . "$env:VIRTUAL_ENV\Scripts\activate"
+}
+
 Write-Host "
                                -'
                ...            .o+'

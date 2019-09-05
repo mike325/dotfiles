@@ -68,7 +68,7 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     # Uncomment the following line to disable auto-setting terminal title.
     # DISABLE_AUTO_TITLE="true"
 
-    [[ -z $ENABLE_CORRECTION ]] && ENABLE_CORRECTION="true"
+    # [[ -z $ENABLE_CORRECTION ]] && ENABLE_CORRECTION="true"
 
     # Uncomment the following line to display red dots whilst waiting for completion.
     # COMPLETION_WAITING_DOTS="true"
