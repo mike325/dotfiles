@@ -156,7 +156,7 @@ if (Test-Path($powersource)) {
 }
 
 if ($env:VIRTUAL_ENV -ne $null) {
-    . "$env:VIRTUAL_ENV\Scripts\activate"
+    . "$env:VIRTUAL_ENV\Scripts\activate.ps1"
 }
 
 Write-Host "
