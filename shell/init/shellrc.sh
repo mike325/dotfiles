@@ -266,6 +266,11 @@ if (( __INTERACTIVE == 1 )); then
         source "$HOME/.config/shell/scripts/z.sh"
     fi
 
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        # shellcheck disable=SC1090
+        source "$VIRTUAL_ENV/bin/activate"
+    fi
+
     if [[ -f "$HOME/.config/shell/banner" ]]; then
         cat "$HOME/.config/shell/banner"
     fi
