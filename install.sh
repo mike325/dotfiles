@@ -133,6 +133,13 @@ function is_windows() {
     return 1
 }
 
+function has_fetcher() {
+    if hash curl 2>/dev/null || hash wget 2>/ddv/null; then
+        return 0
+    fi
+    return 1
+}
+
 if [[ -n "$ZSH_NAME" ]]; then
     _CURRENT_SHELL="zsh"
 elif [[ -n "$BASH" ]]; then
@@ -304,12 +311,13 @@ Usage:
 
             Default: on
 
-        -n, --nvim, --neovim
+        -n, --nvim, --neovim=[stable|dev]
             Download Neovim executable (portable in windows and linux) if it hasn't been Installed
             Download and install my Vim dotfiles in Neovim's dir.
             Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag) them,
             otherwise download them from vim's dotfiles repo
                 Default URL: $_PROTOCOL://$_GIT_HOST/$_GIT_USER/.vim
+            Select the type of neovim version to download using 'stable' or 'dev'
 
             Default: on
 
@@ -568,6 +576,76 @@ function setup_config() {
 
 }
 
+function download_asset() {
+
+    if [[ $# -lt 2 ]]; then
+        error_msg "Not enough args"
+        return 1
+    fi
+
+    if ! has_fetcher; then
+        error_msg "This system has neither curl nor wget to download the asset $1"
+        return 2
+    fi
+
+    local asset="$1"
+    local url="$2"
+    local dest=""
+    if [[ -n "$3" ]]; then
+        local dest="$3"
+    fi
+
+    local cmd=""
+
+    if hash curl 2>/dev/null; then
+        cmd='curl -L '
+        if [[ $_VERBOSE -eq 0 ]]; then
+            cmd="$cmd -s "
+        fi
+        cmd="$cmd $url"
+        if [[ -n "$dest" ]]; then
+            cmd="$cmd -o $dest"
+        fi
+    else  # If not curl, wget is available since we checked with "has_fetcher"
+        cmd='wget '
+        if [[ $_VERBOSE -eq 0 ]]; then
+            cmd="$cmd -q "
+        fi
+        if [[ -n "$dest" ]]; then
+            cmd="$cmd -O $dest"
+        fi
+        cmd="$cmd $url"
+    fi
+
+    if [[ $_BACKUP -eq 1 ]]; then
+        if [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+            verbose_msg "Backing up $dest into $_BACKUP_DIR"
+            mv --backup=numbered "$dest" "$_BACKUP_DIR"
+        fi
+    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+        verbose_msg "Removing $dest"
+        rm -rf "$dest"
+    elif [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+        warn_msg "Skipping $asset, already exists in ${dest%/*}"
+        return 4
+    fi
+
+    if [[ ! -d "$dest" ]] && [[ ! -f "$dest" ]]; then
+        verbose_msg "Downloading $asset"
+        if eval "$cmd"; then
+            return 0
+        else
+            error_msg "Failed to download $asset"
+            return 5
+        fi
+    else
+        warn_msg "$asset already exists in $dest, skipping download"
+        return 5
+    fi
+
+    return 1
+}
+
 function clone_repo() {
     local repo="$1"
     local dest="$2"
@@ -680,11 +758,10 @@ function setup_shell_scripts {
         if [[ ! -f "$HOME/.config/shell/scripts/z.sh" ]]; then
             status_msg 'Getting Z'
             local z="${github}/rupa/z/master/z.sh"
-            if curl -Ls "${z}" -o "$_TMP/z.sh"; then
+            if  download_asset "Z script" "${z}" "$_TMP/z.sh"; then
                 mv "$_TMP/z.sh" "$HOME/.config/shell/scripts/z.sh"
                 [[ ! -f "$HOME/.z" ]] && touch "$HOME/.z"
             else
-                error_msg "Curl couldn't get Z script"
                 rst=1
             fi
         else
@@ -851,13 +928,12 @@ function _windows_portables() {
     if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
-        if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.zip -o "$_TMP/shellcheck-latest.zip"; then
+        if download_asset "Shellcheck" 'https://storage.googleapis.com/shellcheck/shellcheck-latest.zip' "$_TMP/shellcheck-latest.zip"; then
             [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
             unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
             chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
             mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
         else
-            error_msg "Curl couldn't get shellcheck"
             rst=1
         fi
     else
@@ -872,20 +948,23 @@ function _windows_portables() {
         local minor="8"
         status_msg "Getting ctags"
         [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
-        curl -Ls "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" -o "$_TMP/ctags${major}${minor}.zip"
-        if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
-            error_msg "An error occurred extracting zip file"
-            rst=1
+        if download_asset "Ctags" "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" "$_TMP/ctags${major}${minor}.zip"; then
+            if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
+                error_msg "An error occurred extracting zip file"
+                rst=1
+            else
+                chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
+                mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
+            fi
         else
-            chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
-            mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
+            rst=2
         fi
     else
         warn_msg "Skipping ctags, already installed"
         rst=2
     fi
 
-    if ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if has_fetcher && { ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.zip'
@@ -899,7 +978,7 @@ function _windows_portables() {
         fi
         status_msg "Downloading bat version: ${version}"
         local os_type='x86_64-pc-windows-msvc'
-        if curl -Ls "${url}/releases/download/${version}/bat-${version}-${os_type}.zip" -o "$_TMP/${pkg}"; then
+        if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}"
             if ! unzip "$_TMP/${pkg}" -d "$_TMP/bat-${version}-${os_type}/"; then
@@ -913,9 +992,11 @@ function _windows_portables() {
             verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
             popd 1> /dev/null || return 1
         else
-            error_msg "Curl couldn't get bat"
             rst=1
         fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download Bat"
+        rst=1
     else
         warn_msg "Skipping bat, already installed"
         rst=2
@@ -925,12 +1006,11 @@ function _windows_portables() {
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
         status_msg "Getting minio client"
-        if [[ $_VERBOSE -eq 0 ]]; then
-            curl -Ls "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+        if download_asset "Minio client" "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "$HOME/.local/bin/mc.exe"; then
+            chmod +x "$HOME/.local/bin/mc.exe"
         else
-            curl -L "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" -o "$HOME/.local/bin/mc.exe"
+            rst=1
         fi
-        chmod +x "$HOME/.local/bin/mc.exe"
     elif ! is_64bits; then
         error_msg "Minio portable is only Available for x86 64 bits"
         rst=1
@@ -950,7 +1030,7 @@ function _linux_portables() {
         if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
             status_msg "Getting python pip"
 
-            if curl -Ls https://bootstrap.pypa.io/get-pip.py -o "$_TMP/get-pip.py"; then
+            if download_asset "PIP" "https://bootstrap.pypa.io/get-pip.py" "$_TMP/get-pip.py"; then
                 chmod u+x "$_TMP/get-pip.py"
 
                 if { ! hash pip2 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python2 2>/dev/null; then
@@ -990,7 +1070,6 @@ function _linux_portables() {
                 fi
                 verbose_msg "Cleanning up $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py"
             else
-                error_msg "Curl couldn't get pip"
                 rst=1
             fi
         else
@@ -1006,7 +1085,7 @@ function _linux_portables() {
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck.tar.xz'
-        if curl -Ls https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz -o "$_TMP/${pkg}"; then
+        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
             chmod u+x "$_TMP/shellcheck-latest/shellcheck"
@@ -1015,7 +1094,6 @@ function _linux_portables() {
             verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
             popd 1> /dev/null || return 1
         else
-            error_msg "Curl couldn't get shellcheck"
             rst=1
         fi
     elif ! hash shellcheck 2>/dev/null && { [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]] ; }; then
@@ -1031,7 +1109,7 @@ function _linux_portables() {
         status_msg "Getting FZF"
         if ! clone_repo "${github}/junegunn/fzf" "$HOME/.fzf"; then
             error_msg "Fail to clone FZF"
-            return 1
+            rst=1
         fi
         if [[ $_VERBOSE -eq 1 ]]; then
             if ! "$HOME/.fzf/install" --all --no-update-rc; then
@@ -1049,7 +1127,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if has_fetcher && { ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
         local pkg='fd.tar.xz'
@@ -1064,7 +1142,7 @@ function _linux_portables() {
         status_msg "Downloading fd version: ${version}"
         local os_type="${_ARCH}-unknown-linux-musl"
         [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-        if curl -Ls "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+        if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
             chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
@@ -1073,15 +1151,17 @@ function _linux_portables() {
             verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
             popd 1> /dev/null || return 1
         else
-            error_msg "Curl couldn't get fd"
             rst=1
         fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download Bat"
+        rst=2
     else
         warn_msg "Skipping fd, already installed"
         rst=2
     fi
 
-    if ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if has_fetcher && { ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
         local pkg='rg.tar.xz'
@@ -1096,7 +1176,7 @@ function _linux_portables() {
         status_msg "Downloading rg version: ${version}"
         local os_type="${_ARCH}-unknown-linux-musl"
         [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-        if curl -Ls "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+        if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
             chmod u+x "$_TMP/ripgrep-${version}-${os_type}/rg"
@@ -1105,15 +1185,17 @@ function _linux_portables() {
             verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-${os_type}" && rm -rf "$_TMP/ripgrep-${version}-${os_type}"
             popd 1> /dev/null || return 1
         else
-            error_msg "Curl couldn't get rg"
             rst=1
         fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download Bat"
+        rst=2
     else
         warn_msg "Skipping rg, already installed"
         rst=2
     fi
 
-    if ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if has_fetcher && { ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.tar.xz'
@@ -1128,7 +1210,7 @@ function _linux_portables() {
         status_msg "Downloading bat version: ${version}"
         local os_type="${_ARCH}-unknown-linux-musl"
         [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-        if curl -Ls "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" -o "$_TMP/${pkg}"; then
+        if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
             chmod u+x "$_TMP/bat-${version}-${os_type}/bat"
@@ -1137,9 +1219,11 @@ function _linux_portables() {
             verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
             popd 1> /dev/null || return 1
         else
-            error_msg "Curl couldn't get bat"
             rst=1
         fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download Bat"
+        rst=2
     else
         warn_msg "Skipping bat, already installed"
         rst=2
@@ -1148,12 +1232,11 @@ function _linux_portables() {
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
-        if [[ $_VERBOSE -eq 0 ]]; then
-            curl -Ls "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+        if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
+            chmod +x "$HOME/.local/bin/mc"
         else
-            curl -L "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "$HOME/.local/bin/mc"
+            rst=1
         fi
-        chmod +x "$HOME/.local/bin/mc"
     elif ! is_64bits; then
         error_msg "Minio portable is only Available for x86 64 bits"
         rst=1
@@ -1193,7 +1276,7 @@ function get_portables() {
     fi
 
     status_msg "Checking portable programs"
-    if hash curl 2>/dev/null; then
+    if has_fetcher; then
         if is_windows; then
             _windows_portables
             rst=$?
@@ -1202,7 +1285,7 @@ function get_portables() {
             rst=$?
         fi
     else
-        error_msg "Curl is not available"
+        error_msg "Curl is not available to download portables"
         return 1
     fi
     return $rst
