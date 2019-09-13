@@ -196,7 +196,7 @@ if hash ntfy 2>/dev/null; then
     # Editors
     export AUTO_NTFY_DONE_IGNORE="nvim vi vim emacs $AUTO_NTFY_DONE_IGNORE"
     # Programs
-    export AUTO_NTFY_DONE_IGNORE="less more man watch tmux screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
+    export AUTO_NTFY_DONE_IGNORE="cat bat less more man watch tmux screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
     # Typos
     export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
     # alias
