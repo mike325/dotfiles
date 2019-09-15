@@ -1,3 +1,7 @@
+# ccls cache
+.ccls-cache/
+
+
 # Neomake leftovers
 *@neomake*
 
