@@ -191,19 +191,24 @@ else
 fi
 
 if hash ntfy 2>/dev/null; then
-    # VCS
-    export AUTO_NTFY_DONE_IGNORE="git hg svn"
-    # Editors
-    export AUTO_NTFY_DONE_IGNORE="nvim vi vim emacs $AUTO_NTFY_DONE_IGNORE"
-    # Programs
-    export AUTO_NTFY_DONE_IGNORE="cat bat less more man watch tmux screen meld htop top ssh fg sudoedit make cmake cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
-    # Typos
-    export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
-    # alias
-    export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
-    # GUI
-    export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
-    eval "$(ntfy shell-integration)"
+
+    if [[ -z $_NO_NTFY ]]; then
+        # VCS
+        export AUTO_NTFY_DONE_IGNORE="git hg svn"
+        # Editors
+        export AUTO_NTFY_DONE_IGNORE="nvim vi vim emacs sudoedit $AUTO_NTFY_DONE_IGNORE"
+        # Readers
+        export AUTO_NTFY_DONE_IGNORE="cat bat less more man watch $AUTO_NTFY_DONE_IGNORE"
+        # Typos
+        export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
+        # alias
+        export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
+        # GUI
+        export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
+        # Misc
+        export AUTO_NTFY_DONE_IGNORE="tmux screen meld htop top ssh fg cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
+        eval "$(ntfy shell-integration)"
+    fi
 
     if hash xclip 2>/dev/null; then
         alias clipsend='ntfy send "$(xclip -o)"'
