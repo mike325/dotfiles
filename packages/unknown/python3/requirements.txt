@@ -2,7 +2,6 @@
 httpie>=1.0.3
 
 # C/C++ development
-compiledb>=0.10.1
 
 # Python development
 jedi!=0.14.0,<0.15,>=0.13.2
@@ -30,9 +29,6 @@ neovim-remote>=2.0.10
 
 # Containers
 docker-compose>=1.24.1
-
-# notifications
-ntfy[telegram,emoji,pid]>=2.7.0
 
 # Misc
 Pygments>=2.3.1

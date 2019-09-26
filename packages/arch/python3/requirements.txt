@@ -2,7 +2,6 @@
 httpie>=1.0.3
 
 # C/C++ development
-compiledb>=0.10.1
 
 # Python development
 jedi!=0.14.0,<0.15,>=0.13.2
