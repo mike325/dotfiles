@@ -67,8 +67,8 @@ class Quit(object):
 
 
 q = Quit()
-historyPath = os.path.expanduser("~/.pyhistory")
-historyPath = historyPath if os.name == 'nt' else historyPath.replace('/', '\\')
+history_file = os.path.join(os.environ['HOME'], '.pyhistory')
+
 try:
 
     def rl_autoindent():
@@ -112,32 +112,17 @@ try:
                 indent = ''.join(["    " for n in range(last_indent)])
         readline.insert_text(indent)
 
-    def save_history(historyPath=os.path.expanduser('~/pyhistory').replace('/', '\\') if os.name == 'nt' else os.path.expanduser('~/.pyhistory')):
-        import traceback
-        try:
-            import readline
-        except ImportError:
-            try:
-                import pyreadline as readline
-            except ImportError:
-                return
-        try:
-            readline.write_history_file(historyPath)
-        except OSError:
-            traceback.print_exc()
-            print('OS Error: Failed to write history file: {}, please check the file has permisions to be written or it is not hidden (Windows)'.format(historyPath))
-        except IOError:
-            traceback.print_exc()
-            print('IO Error: Failed to write history file: {}, please check the file has permisions to be written or it is not hidden (Windows)'.format(historyPath))
-
-    if os.path.exists(historyPath):
-        readline.read_history_file(historyPath)
+    try:
+        readline.read_history_file(history_file)
+    except IOError:
+        pass
 
     readline.set_pre_input_hook(rl_autoindent)
     readline.parse_and_bind("tab: complete")
+    readline.set_history_length(1000)
+    atexit.register(readline.write_history_file, history_file)
 
-    atexit.register(save_history)
 except NameError:
     pass
 finally:
-    del os, atexit, rlcompleter, save_history, historyPath, sys, readline
+    del os, sys, readline, rlcompleter, atexit, history_file
