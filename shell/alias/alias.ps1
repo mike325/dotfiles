@@ -92,7 +92,9 @@ else {
     }
 }
 
-if ( Get-Command "bat.exe" -ErrorAction SilentlyContinue ) {
+
+if (Get-Command "bat" -ErrorAction SilentlyContinue) {
+    New-Alias -Name cat -Value 'bat' -ErrorAction SilentlyContinue
     $env:GIT_PAGER = "bat.exe"
 }
 

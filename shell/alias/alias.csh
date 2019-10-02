@@ -45,6 +45,7 @@ endif
 
 if ( `where bat` != "" ) then
     setenv GIT_PAGER "bat"
+    alias cat bat
 endif
 
 ################################################################################
