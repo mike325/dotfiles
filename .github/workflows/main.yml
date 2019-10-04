@@ -4,8 +4,16 @@ on: [push, pull_request]
 
 jobs:
   linux-build:
-    name: Testing install script in Ubuntu
-    runs-on: ubuntu-latest
+    name: Testing install script in ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [
+          ubuntu-latest,
+          ubuntu-18.04,
+          ubuntu-16.04
+        ]
 
     env:
       GITHUB: true
@@ -32,8 +40,15 @@ jobs:
           sudo ./install.sh --verbose --packages --only
 
   osx-build:
-    name: Testing install script in macOS
-    runs-on: macOS-latest
+    name: Testing install script in ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [
+          macOS-latest,
+          macOS-10.14
+        ]
 
     env:
       GITHUB: true
@@ -54,8 +69,16 @@ jobs:
           ./install.sh --verbose --force
 
   windows-build:
-    name: Testing install script in Windows
-    runs-on: windows-latest
+    name: Testing install script in ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [
+          windows-latest,
+          windows-2019,
+          windows-2016
+        ]
 
     env:
       GITHUB: true
