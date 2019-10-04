@@ -696,7 +696,7 @@ function clone_repo() {
                 fi
             fi
         else
-            warn_msg "$dest already exists, skipping clonning"
+            warn_msg "$dest already exists, skipping cloning"
             return 3
         fi
     else
@@ -1361,6 +1361,9 @@ function get_cool_fonts() {
                 # BUT administrator promp will pop up for EVERY font (too fucking much)
                 warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
             else
+                if is_osx; then
+                    mkdir -p "$HOME/Library/Fonts"
+                fi
                 status_msg "Installing cool fonts"
                 if [[ $_VERBOSE -eq 1 ]]; then
                     "$HOME"/.local/fonts/install.sh

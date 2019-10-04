@@ -1,3 +1,6 @@
+# Extra modules
+setuptools==41.2.0
+
 # http querys
 httpie>=1.0.3
 
