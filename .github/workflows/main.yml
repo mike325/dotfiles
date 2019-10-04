@@ -3,6 +3,37 @@ name: dotfiles
 on: [push, pull_request]
 
 jobs:
+  parameter-checks-build:
+    name: Testing install with parameters in ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt autoremove
+          sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
+      - name: Basic shellcheck
+        run: |
+          ./test/basic.sh --verbose
+      - name: Full install
+        run: |
+          ./install.sh --verbose --portables
+          ./install.sh --verbose --bin
+          ./install.sh --verbose --shell  --shell_scripts --shell_frameworks=bash
+          ./install.sh --verbose --emacs
+          ./install.sh --verbose --vim --nvim=development
+          ./install.sh --verbose --python=3
+          ./install.sh --verbose --python=2
+          ./install.sh --verbose --git
+      - name: Full force install
+        run: |
+          ./install.sh --force --packages
+
   linux-build:
     name: Testing install script in ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -24,7 +55,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt autoremove
-          sudo apt upgrade -y
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
       - name: Basic shellcheck
         run: |
