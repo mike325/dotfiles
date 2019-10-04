@@ -277,11 +277,20 @@ if ! hash shellcheck 2>/dev/null; then
 fi
 
 status_msg 'Starting basic shell check test'
-verbose_msg "Shellcheck version: $(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
+_version="$(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
+verbose_msg "Shellcheck version: ${_version}"
+
 # shellcheck disable=SC2046
-if ! shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
-    error_msg 'Fail test'
-    exit 2
+if [[ $_version =~ 4 ]]; then
+    if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
+        error_msg 'Fail test'
+        exit 2
+    fi
+else
+    if ! shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
+        error_msg 'Fail test'
+        exit 2
+    fi
 fi
 
 exit 0
