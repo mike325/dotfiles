@@ -943,7 +943,7 @@ function _windows_portables() {
         status_msg "Getting shellcheck"
         if download_asset "Shellcheck" 'https://storage.googleapis.com/shellcheck/shellcheck-latest.zip' "$_TMP/shellcheck-latest.zip"; then
             [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
-            unzip "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
+            unzip -o "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
             chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
             mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
         else
@@ -962,7 +962,7 @@ function _windows_portables() {
         status_msg "Getting ctags"
         [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
         if download_asset "Ctags" "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" "$_TMP/ctags${major}${minor}.zip"; then
-            if ! unzip "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
+            if ! unzip -o "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
                 error_msg "An error occurred extracting zip file"
                 rst=1
             else
@@ -994,7 +994,7 @@ function _windows_portables() {
         if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}"
-            if ! unzip "$_TMP/${pkg}" -d "$_TMP/bat-${version}-${os_type}/"; then
+            if ! unzip -o "$_TMP/${pkg}" -d "$_TMP/bat-${version}-${os_type}/"; then
                 error_msg "An error occurred extracting zip file"
                 rst=1
             else
@@ -1398,11 +1398,11 @@ function setup_systemd() {
             # status_msg "Reloding User's units"
             # systemctl --user daemon-reload
         else
-            error_msg "This system doesn't have systemd package"
+            warn_msg "This system doesn't have systemd package"
             return 1
         fi
     else
-        error_msg "Systemd's services work just in Linux environment"
+        warn_msg "Systemd's services work just in Linux environment"
         return 1
     fi
     return 0

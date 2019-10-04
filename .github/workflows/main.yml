@@ -16,16 +16,17 @@ jobs:
           sudo apt-get install curl git shellcheck -y
       - name: Basic shellcheck
         run: |
-          bash -c "./test/basic.sh --verbose"
+          ls -la
+          bash -C 'test/basic.sh' --verbose
       - name: Full install
         run: |
-          bash -C './install.sh' --verbose
+          bash -C 'install.sh' --verbose
       - name: Full force install
         run: |
-          bash -C './install.sh' --verbose --force
+          bash -C 'install.sh' --verbose --force
       - name: Packages install
         run: |
-          bash -C './install.sh' --verbose --packages
+          bash -C 'install.sh' --verbose --packages
 
   osx-build:
     name: Testing install script in macOS
@@ -37,16 +38,17 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          brew install git curl shellcheckl
+          brew install git curl shellcheck
       - name: Basic shellcheck
         run: |
-          bash -c "./test/basic.sh --verbose"
+          ls -la
+          bash -c "test/basic.sh --verbose"
       - name: Full install
         run: |
-          bash -C './install.sh' --verbose
+          bash -C 'install.sh' --verbose
       - name: Full force install
         run: |
-          bash -C './install.sh' --verbose --force
+          bash -C 'install.sh' --verbose --force
 
 
   windows-build:
@@ -68,8 +70,8 @@ jobs:
       - name: Full install
         shell: bash
         run: |
-          bash -C './install.sh' --verbose
+          bash -C 'install.sh' --verbose
       - name: Force install
         shell: bash
         run: |
-          bash -C './install.sh' --verbose --force
+          bash -C 'install.sh' --verbose --force

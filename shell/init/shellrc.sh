@@ -288,6 +288,3 @@ if (( __INTERACTIVE == 1 )); then
         cat "$HOME/.config/shell/banner"
     fi
 fi
-
-# added by travis gem
-[ -f /home/mike/.travis/travis.sh ] && source /home/mike/.travis/travis.sh
