@@ -1,21 +1,43 @@
-language: python
+language: shell
 
-python:
-    - "2.7"
-    - "3.5"
-    - "3.6"
-    - "3.7"
-
-install:
-    - pip install flake8 pycodestyle mccabe pyflakes
+matrix:
+    include:
+      - name: "Testing install script with Linux"
+        os: linux
+        sudo: true
+        before_install:
+          - sudo apt-get install curl git shellcheck -y
+        before_script:
+          - bash -c "./test/basic.sh --verbose"
+        env:
+          - IS_LINUX=1
+      - name: "Testing install script with macOS"
+        os: osx
+        osx_image: xcode11
+        before_install:
+          - brew install git curl shellcheck
+        before_script:
+          - bash -c "./test/basic.sh --verbose"
+        env:
+          - PATH="/Users/travis/Library/Python/3.7/bin:$PATH"
+          - IS_MACOS=1
+      - name: "Testing install script with Windows"
+        os: windows
+        before_install:
+          - choco install python git curl -y
+        env:
+          - PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+          - IS_WINDOWS=1
 
 script:
-    - bash -c "./test/basic.sh --verbose"
+  - ./install.sh --verbose
+  - ./install.sh --verbose --force
+  - [[ -n $IS_LINUX ]] && ./install.sh --verbose --packages
 
 notifications:
-    email:
-        recipients:
-            - mickiller.25@gmail.com
-        on_success: never
-        on_failure: always
+  email:
+    recipients:
+      - mickiller.25@gmail.com
+    on_success: never
+    on_failure: always
 

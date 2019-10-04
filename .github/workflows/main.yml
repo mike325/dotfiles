@@ -1,0 +1,75 @@
+name: dotfiles
+
+on: [push, pull_request]
+
+jobs:
+  linux-build:
+    name: Testing install script in Ubuntu
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install curl git shellcheck -y
+      - name: Basic shellcheck
+        run: |
+          ./test/basic.sh --verbose
+      - name: Full install
+        run: |
+          ./install.sh --verbose
+      - name: Full force install
+        run: |
+          ./install.sh --verbose --force
+      - name: Packages install
+        run: |
+          ./install.sh --verbose --packages
+
+  osx-build:
+    name: Testing install script in macOS
+    runs-on: macOS-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - name: Install dependencies
+        run: |
+          brew install git cur shellcheckl
+      - name: Basic shellcheck
+        run: |
+          ./test/basic.sh --verbose
+      - name: Full install
+        run: |
+          ./install.sh --verbose
+      - name: Full force install
+        run: |
+          ./install.sh --verbose --force
+
+
+  windows-build:
+    name: Testing install script in Windows
+    runs-on: windows-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - name: Enable Chocolatey
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      - name: Install dependencies
+        shell: bash
+        run: |
+          choco install python git curl -y
+      - name: Full install
+        shell: bash
+        run: |
+          ./install.sh --verbose
+      - name: Force install
+        shell: bash
+        run: |
+          ./install.sh --verbose --force

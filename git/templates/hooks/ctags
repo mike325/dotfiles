@@ -10,7 +10,7 @@ trap 'rm -f "$top/tags.$$"' EXIT INT TERM
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
 git ls-files --exclude-standard --cached | ctags --tag-relative -L - -f"$dir/tags.$$"
 
-if [[ "$SHELL_PLATFORM" =~ "LINUX" ]]; then
+if [[ "$SHELL_PLATFORM" =~ "linux" ]]; then
     mv "$dir/tags.$$" "$dir/tags"
 else
     mv "$dir/tags.$$" "$top/tags"

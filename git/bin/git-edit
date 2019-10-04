@@ -43,12 +43,21 @@ else
     popd 1> /dev/null || exit 1
 fi
 
-function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-        return 0
-    fi
-    return 1
-}
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
+            return 0
+        fi
+        return 1
+    }
+
+    function is_osx() {
+        if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
 _CURRENT_SHELL="bash"

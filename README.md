@@ -1,4 +1,7 @@
-# Dotfiles [![Build Status](https://travis-ci.com/Mike325/dotfiles.svg?branch=master)](https://travis-ci.com/Mike325/dotfiles)
+# Dotfiles
+
+[![Travis Status](https://travis-ci.com/Mike325/dotfiles.svg?branch=master)](https://travis-ci.com/Mike325/dotfiles)
+[![Github Status](https://github.com/Mike325/dotfiles/workflows/dotfiles/badge.svg)](https://github.com/Mike325/dotfiles/actions)
 
 Here are most of my dotfiles. Since my Vim settings are quite big, I prefer to
 have them in a different [repo](https://github.com/mike325/.vim), Same goes for my Emacs settings [here](https://github.com/mike325/.emacs.d)

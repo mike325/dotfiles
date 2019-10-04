@@ -131,18 +131,30 @@ fi
 # We don't need this stuff if we are in a non __INTERACTIVE session
 
 if [ -z "$SHELL_PLATFORM" ]; then
-    export SHELL_PLATFORM='UNKNOWN'
-    case "$OSTYPE" in
-      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
-      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
-      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
-      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
-      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
-    esac
+    if [[ -n $TRAVIS_OS_NAME ]]; then
+        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
+    else
+        case "$OSTYPE" in
+            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
+            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
+            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
+            *'windows'* ) export SHELL_PLATFORM='windows' ;;
+            *           ) export SHELL_PLATFORM='unknown' ;;
+        esac
+    fi
 fi
 
 function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function is_osx() {
+    if [[ $SHELL_PLATFORM == 'osx' ]]; then
         return 0
     fi
     return 1

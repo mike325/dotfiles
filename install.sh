@@ -88,19 +88,25 @@ else
 fi
 
 if [ -z "$SHELL_PLATFORM" ]; then
-    export SHELL_PLATFORM='UNKNOWN'
-    case "$OSTYPE" in
-      *'linux'*   ) export SHELL_PLATFORM='LINUX' ;;
-      *'darwin'*  ) export SHELL_PLATFORM='OSX' ;;
-      *'freebsd'* ) export SHELL_PLATFORM='BSD' ;;
-      *'cygwin'*  ) export SHELL_PLATFORM='CYGWIN' ;;
-      *'msys'*    ) export SHELL_PLATFORM='MSYS' ;;
-    esac
+    if [[ -n $TRAVIS_OS_NAME ]]; then
+        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
+    else
+        case "$OSTYPE" in
+            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
+            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
+            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
+            *'windows'* ) export SHELL_PLATFORM='windows' ;;
+            *           ) export SHELL_PLATFORM='unknown' ;;
+        esac
+    fi
 fi
+
 
 case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
-    LINUX)
+    linux)
         if [[ -f /etc/arch-release ]]; then
             _OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
@@ -113,13 +119,13 @@ case "$SHELL_PLATFORM" in
             fi
         fi
         ;;
-    CYGWIN|MSYS)
+    cygwin|msys|windows)
         _OS='windows'
         ;;
-    OSX)
+    osx)
         _OS='macos'
         ;;
-    BSD)
+    bsd)
         _OS='bsd'
         ;;
 esac
@@ -127,7 +133,14 @@ esac
 _ARCH="$(uname -m)"
 
 function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
+    if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function is_osx() {
+    if [[ $SHELL_PLATFORM == 'osx' ]]; then
         return 0
     fi
     return 1
@@ -1471,9 +1484,9 @@ function setup_pkgs() {
             done < "$pkg"
             filename=$(basename "$pkg")
             status_msg "Installing packages from ${filename%.pkg}"
-            if [[ $_VERBOSE -eq 0 ]]; then
-                cmd="$cmd &>/dev/null"
-            fi
+            # if [[ $_VERBOSE -eq 0 ]]; then
+            #     cmd="$cmd"
+            # fi
             verbose_msg "Using command $cmd"
             if ! eval "$cmd"; then
                 error_msg "Fail to install packages from ${filename%.pkg}"

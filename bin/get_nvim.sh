@@ -79,19 +79,25 @@ reset_color="\033[39m"
 _TMP='/tmp/'
 
 if [ -z "$SHELL_PLATFORM" ]; then
-    SHELL_PLATFORM='UNKNOWN'
-    case "$OSTYPE" in
-      *'linux'*   ) SHELL_PLATFORM='LINUX' ;;
-      *'darwin'*  ) SHELL_PLATFORM='OSX' ;;
-      *'freebsd'* ) SHELL_PLATFORM='BSD' ;;
-      *'cygwin'*  ) SHELL_PLATFORM='CYGWIN' ;;
-      *'msys'*    ) SHELL_PLATFORM='MSYS' ;;
-    esac
+    if [[ -n $TRAVIS_OS_NAME ]]; then
+        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
+    else
+        case "$OSTYPE" in
+            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
+            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
+            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
+            *'windows'* ) export SHELL_PLATFORM='windows' ;;
+            *           ) export SHELL_PLATFORM='unknown' ;;
+        esac
+    fi
 fi
+
 
 case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
-    LINUX)
+    linux)
         if [[ -f /etc/arch-release ]]; then
             _OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
@@ -104,25 +110,34 @@ case "$SHELL_PLATFORM" in
             fi
         fi
         ;;
-    CYGWIN|MSYS)
+    cygwin|msys|windows)
         _OS='windows'
         ;;
-    OSX)
+    osx)
         _OS='macos'
         ;;
-    BSD)
+    bsd)
         _OS='bsd'
         ;;
 esac
 
 # _ARCH="$(uname -m)"
 
-function is_windows() {
-    if [[ $SHELL_PLATFORM == 'MSYS' ]] || [[ $SHELL_PLATFORM == 'CYGWIN' ]]; then
-        return 0
-    fi
-    return 1
-}
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
+            return 0
+        fi
+        return 1
+    }
+
+    function is_osx() {
+        if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
 
 # Warning ! This script delete everything in the work directory before install
 function _show_nvim_libs() {
