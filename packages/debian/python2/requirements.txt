@@ -1,5 +1,5 @@
 # Python development
-jedi>=0.12.1
+jedi<0.15,>=0.14.1
 flake8>=3.5.0
 pyflakes>=2.0.0
 pycodestyle>=2.4.0

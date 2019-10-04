@@ -1,7 +1,5 @@
-# C/C++ development
-
 # Python development
-jedi!=0.14.0,<0.15,>=0.13.2
+jedi<0.15,>=0.14.1
 mypy==0.710
 flake8>=3.5.0
 flake8-mypy>=17.8.0
