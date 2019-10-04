@@ -495,11 +495,17 @@ function verbose_msg() {
 function initlog() {
     if [[ $_NOLOG -eq 0 ]]; then
         rm -f "${_LOG}" 2>/dev/null
-        touch "${_LOG}" &>/dev/null
+        if ! touch "${_LOG}" &>/dev/null; then
+            error_msg "Fail to init log file"
+            _NOLOG=1
+            return 1
+        fi
         if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
             cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
         fi
-        _LOG=$(readlink -e "${_LOG}")
+        if ! is_osx; then
+            _LOG=$(readlink -e "${_LOG}")
+        fi
         verbose_msg "Using log at ${_LOG}"
     fi
     return 0
@@ -1817,7 +1823,7 @@ verbose_msg "Protocol      : ${_PROTOCOL}"
 verbose_msg "User          : ${_GIT_USER}"
 verbose_msg "Host          : ${_GIT_HOST}"
 verbose_msg "Backup Enable : ${_BACKUP}"
-verbose_msg "Log Enable    : ${_NOLOG}"
+verbose_msg "Log Disable   : ${_NOLOG}"
 verbose_msg "Current Shell : ${_CURRENT_SHELL}"
 if is_windows; then
     verbose_msg "Platform      : Windows"
