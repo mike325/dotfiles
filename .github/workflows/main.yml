@@ -14,9 +14,9 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt autoremove
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
+          pip2 install --user --upgrade pip
+          pip3 install --user --upgrade pip
       - name: Basic shellcheck
         run: |
           ./test/basic.sh --verbose
@@ -32,7 +32,7 @@ jobs:
           ./install.sh --verbose --git
       - name: Full force install
         run: |
-          ./install.sh --force --packages
+          sudo ./install.sh --force --packages
 
   linux-build:
     name: Testing install script in ${{ matrix.os }}
@@ -52,9 +52,9 @@ jobs:
       - uses: actions/checkout@v1
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt autoremove
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
+          pip2 install --user --upgrade pip
+          pip3 install --user --upgrade pip
       - name: Basic shellcheck
         run: |
           ./test/basic.sh --verbose

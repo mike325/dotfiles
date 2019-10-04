@@ -1,3 +1,6 @@
+# Extra modules
+wheel>=0.29.0
+
 # Python development
 jedi<0.15,>=0.14.1
 flake8>=3.5.0

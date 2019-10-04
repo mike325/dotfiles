@@ -1,4 +1,5 @@
 # Extra modules
+wheel>=0.29.0
 setuptools==41.2.0
 
 # http querys
