@@ -176,8 +176,6 @@ function is_64bits() {
 }
 
 if is_windows; then
-    # Windows bash does not have pgrep by default
-
     # Windows does not support links we will use cp instead
     _CMD="cp -rf"
     USER="$USERNAME"
@@ -1299,6 +1297,9 @@ function get_portables() {
         if is_windows; then
             _windows_portables
             rst=$?
+        elif is_osx; then
+            warn_msg "mac support is WIP"
+            return 0
         else
             _linux_portables
             rst=$?
@@ -1382,7 +1383,7 @@ function get_cool_fonts() {
 }
 
 function setup_systemd() {
-    if ! is_windows; then
+    if ! is_windows && ! is_osx; then
         if hash systemctl 2> /dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user" ]] && [[ $_FORCE_INSTALL -eq 1 ]]; then
@@ -1466,8 +1467,8 @@ function setup_python() {
 
 function setup_pkgs() {
     local rc=0
-    if is_windows; then
-        warn_msg "Windows support is WIP"
+    if is_windows || is_osx; then
+        warn_msg "OS support outside of linux is still WIP"
     else
         if [[ $EUID -ne 0 ]] && [[ ! $(groups) =~ sudo ]]; then
             error_msg "User: ${USER} is neither root nor belongs to the sudo group"
@@ -1830,6 +1831,8 @@ verbose_msg "Log Disable   : ${_NOLOG}"
 verbose_msg "Current Shell : ${_CURRENT_SHELL}"
 if is_windows; then
     verbose_msg "Platform      : Windows"
+elif is_osx; then
+    verbose_msg "Platform      : macOS"
 else
     verbose_msg "Platform      : Linux"
 fi
