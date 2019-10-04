@@ -116,6 +116,7 @@ elif [[ -d "$NEOVIM_PATH" ]]; then
 fi
 
 [[ -d "$HOME/.local/golang/bin" ]] && export PATH="$HOME/.local/golang/bin:$PATH"
+[[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
 [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
 
 if hash npm 2>/dev/null; then
@@ -287,3 +288,6 @@ if (( __INTERACTIVE == 1 )); then
         cat "$HOME/.config/shell/banner"
     fi
 fi
+
+# added by travis gem
+[ -f /home/mike/.travis/travis.sh ] && source /home/mike/.travis/travis.sh

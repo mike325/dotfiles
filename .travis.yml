@@ -32,7 +32,7 @@ matrix:
 script:
   - ./install.sh --verbose
   - ./install.sh --verbose --force
-  - [[ -n $IS_LINUX ]] && ./install.sh --verbose --packages
+  - if [[ -n $IS_LINUX ]]; then ./install.sh --verbose --packages; fi
 
 notifications:
   email:

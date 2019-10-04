@@ -60,6 +60,11 @@ if ( -d "$HOME/.local/git/bin" ) then
     setenv PATH "$HOME/.local/git/bin:$PATH"
 endif
 
+### Setting the PATH var
+if ( -d "$HOME/.gem/ruby/2.6.0/bin" ) then
+    setenv PATH "$HOME/.gem/ruby/2.6.0/bin:$PATH"
+endif
+
 if ( -d "$HOME/.local/bin/" ) then
     setenv PATH "$HOME/.local/bin/:$PATH"
 endif
