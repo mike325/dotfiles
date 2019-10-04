@@ -195,7 +195,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [[ "$_CURRENT_SHELL" =~ "bash" ]]; then
+if [[ "$_CURRENT_SHELL" =~ bash ]]; then
 
     rm_framework "$HOME/.bash_it"
 
@@ -215,7 +215,7 @@ if [[ "$_CURRENT_SHELL" =~ "bash" ]]; then
     else
         warn_msg "Bash-it is already install"
     fi
-elif [[ "$_CURRENT_SHELL" =~ "zsh" ]]; then
+elif [[ "$_CURRENT_SHELL" =~ zsh ]]; then
 
     rm_framework "$HOME/.oh-my-zsh"
 

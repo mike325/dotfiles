@@ -251,9 +251,9 @@ if (( __INTERACTIVE == 1 )); then
         _kill_alias=(ips usage del down4me)
 
         for i in "${_kill_alias[@]}"; do
-            if [[ "$(command -V "$i")" =~ "function" ]]; then
+            if [[ "$(command -V "$i")" =~ function ]]; then
                 unset -f "$i"
-            elif [[ $(command -V "$i") =~ "alias" ]]; then
+            elif [[ $(command -V "$i") =~ alias ]]; then
                 unalias "$i"
             fi
         done

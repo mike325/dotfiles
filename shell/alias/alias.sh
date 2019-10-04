@@ -413,6 +413,7 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
 
     alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
+    # shellcheck disable=SC2139
     alias update="${pkg} -Syu --aur" && alias updaten="${pkg} -Syu --aur --noconfirm"
 
     alias rmpkg="${pkg} -Rns"
