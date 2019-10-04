@@ -281,7 +281,7 @@ _version="$(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-
 verbose_msg "Shellcheck version: ${_version}"
 
 # shellcheck disable=SC2046
-if [[ $_version =~ 4 ]]; then
+if [[ $_version =~ 0\.[0-5]\.[0-9] ]]; then
     if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
         error_msg 'Fail test'
         exit 2
