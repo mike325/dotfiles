@@ -53,6 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
+          sudo apt install curl python3-pip  python2-pip -y
           pip2 install --user --upgrade pip
           pip3 install --user --upgrade pip
       - name: Basic shellcheck
