@@ -16,8 +16,8 @@ jobs:
         run: |
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
           sudo apt install python3-pip  python-pip -y
-          pip2 install --user --upgrade pip
-          pip3 install --user --upgrade pip
+          sudo pip2 install --upgrade pip
+          sudo pip3 install --upgrade pip
       - name: Basic shellcheck
         run: |
           ./test/basic.sh --verbose
@@ -55,8 +55,8 @@ jobs:
         run: |
           sudo apt install curl git shellcheck python3-setuptools python-setuptools -y
           sudo apt install python3-pip  python-pip -y
-          pip2 install --user --upgrade pip
-          pip3 install --user --upgrade pip
+          sudo pip2 install --upgrade pip
+          sudo pip3 install --upgrade pip
       - name: Basic shellcheck
         run: |
           ./test/basic.sh --verbose
