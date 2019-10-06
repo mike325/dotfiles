@@ -1488,7 +1488,7 @@ function setup_pkgs() {
             while IFS= read -r line; do
                 if [[ -z "$cmd" ]] && [[ "$line" =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
                     cmd="${line##*sudo}"
-                else
+                elif [[ ! "$line" =~ ^#.* ]]; then # if the line starts with "#" then it's a comment
                     cmd="$cmd $line"
                 fi
             done < "$pkg"

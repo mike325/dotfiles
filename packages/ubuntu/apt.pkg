@@ -17,6 +17,6 @@ python-pip
 docker
 shellcheck
 ntfs-3g
-davfs2
+# davfs2
 cryptsetup
 rsync
