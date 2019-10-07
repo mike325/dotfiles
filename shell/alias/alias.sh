@@ -142,6 +142,12 @@ fi
 # Show used ports
 alias ports="netstat -tulpn"
 
+if [[ -f /sys/fs/cgroup/memory/memory.swappiness ]]; then
+    alias swappiness='cat /sys/fs/cgroup/memory/memory.swappiness'
+elif [[ -f /proc/sys/vm/swappiness ]]; then
+    alias swappiness='cat /proc/sys/vm/swappiness'
+fi
+
 # Termux's grep doesn't have color support
 if [[ $(uname --all) =~ Android ]]; then
     unalias grep > /dev/null
@@ -317,7 +323,6 @@ fi
 ################################################################################
 #                               Git shortcut                                   #
 ################################################################################
-
 
 if hash git 2>/dev/null; then
     alias clone="git clone"
