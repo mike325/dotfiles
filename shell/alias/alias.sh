@@ -314,31 +314,6 @@ if hash fzf 2>/dev/null; then
 
 fi
 
-
-################################################################################
-#                               Systemctl                                      #
-################################################################################
-
-if hash systemctl 2>/dev/null; then
-    if [[ $EUID -ne 0 ]]; then
-        alias sysctl="sudo systemctl"
-        alias usysctl="systemctl --user"
-
-        alias ctls="sudo systemctl start"   # Start
-        alias ctlr="sudo systemctl restart" # Restart
-        alias ctlw="sudo systemctl status"  # shoW
-        alias ctlh="sudo systemctl stop"    # Halt
-    else
-        alias sysctl="systemctl"
-        alias usysctl="systemctl --user"
-
-        alias ctls="systemctl start"   # Start
-        alias ctlh="systemctl stop"    # Halt
-        alias ctlr="systemctl restart" # Restart
-        alias ctlw="systemctl status"  # shoW
-    fi
-fi
-
 ################################################################################
 #                               Git shortcut                                   #
 ################################################################################
