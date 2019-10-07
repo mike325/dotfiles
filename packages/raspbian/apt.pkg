@@ -31,3 +31,5 @@ gnupg2
 software-properties-common
 cryptsetup
 rsync
+openssh-server
+net-tools

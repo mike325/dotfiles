@@ -1,4 +1,6 @@
 sudo apt install -y
+ufw
+zsh
 curl
 git
 wget
@@ -14,6 +16,7 @@ vim
 emacs
 unzip
 python-pip
+python3-pip
 docker
 shellcheck
 ntfs-3g
