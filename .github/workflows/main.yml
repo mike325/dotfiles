@@ -35,6 +35,28 @@ jobs:
         run: |
           sudo ./install.sh --force --packages
 
+  linux-standalone:
+    name: Testing standalone script installation
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt install wget curl git shellcheck python3-setuptools python-setuptools -y
+          sudo apt install python3-pip  python-pip -y
+          sudo pip2 install --upgrade pip
+          sudo pip3 install --upgrade pip
+      - name: Fetch script
+        run: |
+          wget https://raw.githubusercontent.com/Mike325/dotfiles/master/install.sh
+          chmod +x ./install.sh
+      - name: Full install
+        run: |
+          ./install.sh --verbose
+
   linux-build:
     name: Testing install script in ${{ matrix.os }}
     runs-on: ${{ matrix.os }}

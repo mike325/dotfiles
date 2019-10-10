@@ -2,6 +2,19 @@ language: shell
 
 matrix:
     include:
+      - name: "Testing stand alone script install"
+        os: linux
+        sudo: true
+        before_install:
+          - sudo apt-get install curl git shellcheck wget -y
+        before_script:
+          - pushd "$HOME"
+          - wget https://raw.githubusercontent.com/Mike325/dotfiles/master/install.sh
+          - chmod +x ./install.sh
+          - ./install.sh --dotfiles --verbose
+          - popd
+        env:
+          - IS_LINUX=1
       - name: "Testing install script with Linux"
         os: linux
         sudo: true

@@ -831,12 +831,12 @@ function get_vim_dotfiles() {
         return 1
     fi
 
-    if ! setup_config "$HOME/.vim/init.vim" "$HOME/.vimrc"; then
+    if [[ ! -f "$HOME/.vim/vimrc" ]] && ! setup_config "$HOME/.vim/init.vim" "$HOME/.vimrc"; then
         error_msg "Vimrc link failed"
         return 1
     fi
 
-    if ! setup_config "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"; then
+    if [[ ! -f "$HOME/.vim/gvimrc" ]] && ! setup_config "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"; then
         error_msg "gvimrc link failed"
         return 1
     fi
@@ -859,15 +859,16 @@ function get_vim_dotfiles() {
             fi
         fi
 
-        if ! setup_config "$HOME/vimfiles/init.vim" "$HOME/_vimrc"; then
+        if [[ ! -f "$HOME/vimfiles/vimrc" ]] && ! setup_config "$HOME/vimfiles/init.vim" "$HOME/_vimrc"; then
             error_msg "Vimrc link failed"
             return 1
         fi
 
-        if ! setup_config "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"; then
+        if [[ ! -f "$HOME/vimfiles/gvimrc" ]] && ! setup_config "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"; then
             error_msg "gvimrc link failed"
             return 1
         fi
+
     fi
 
     # No errors so far
@@ -1349,7 +1350,10 @@ function get_dotfiles() {
 
     [[ ! -d "$HOME/.local/" ]] && mkdir -p "$HOME/.local/"
 
-    clone_repo "$_URL/dotfiles" "$_SCRIPT_PATH" && return 0 || return "$?"
+    if clone_repo "$_URL/dotfiles" "$_SCRIPT_PATH"; then
+        return 0
+    fi
+    return 1
 }
 
 function get_cool_fonts() {
@@ -1640,6 +1644,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -d|--dotfiles)
             _DOTFILES=1
+            _ALL=0
             ;;
         -e|--emacs)
             _EMACS=1
@@ -1795,15 +1800,6 @@ if [[ $_BACKUP -eq 1 ]]; then
     mkdir -p "${_BACKUP_DIR}"
 fi
 
-# If the user request the dotfiles or the script path doesn't have the full files
-# (the command may be executed using `curl`)
-if [[ $_DOTFILES -eq 1 ]] || [[ ! -d "${_SCRIPT_PATH}/shell" ]]; then
-    if get_dotfiles; then
-        error_msg "Could not install dotfiles"
-        exit 1
-    fi
-fi
-
 if [[ -z $_URL ]]; then
     case $_PROTOCOL in
         ssh)
@@ -1838,6 +1834,15 @@ else
 fi
 verbose_msg "OS Name       : ${_OS}"
 verbose_msg "Architecture  : ${_ARCH}"
+
+# If the user request the dotfiles or the script path doesn't have the full files
+# (the command may be executed using `curl`)
+if [[ $_DOTFILES -eq 1 ]] || [[ ! -d "${_SCRIPT_PATH}/shell" ]]; then
+    if ! get_dotfiles; then
+        error_msg "Could not install dotfiles"
+        exit 1
+    fi
+fi
 
 if [[ $_ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
