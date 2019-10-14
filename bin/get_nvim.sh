@@ -298,6 +298,9 @@ function get_portable() {
     if is_windows; then
         local name="nvim.zip"
         local pkg='nvim-win64.zip'
+    elif is_osx; then
+        local name="nvim.tar.gz"
+        local pkg='nvim-macos.tar.gz'
     else
         local name="nvim"
         local pkg='nvim.appimage'
@@ -316,10 +319,18 @@ function get_portable() {
 
     if is_windows; then
         verbose_msg "Unpacking ${name}"
-        if ! unzip -qo "$_TMP/$name" -d "$HOME/AppData/Roaming/" && rm -rf "${_TMP:?}/${name}"; then
+        if ! unzip -qo "$_TMP/$name" -d "$HOME/AppData/Roaming/"; then
             return 1
         fi
         rm -rf "${_TMP:?}/${name}"
+    elif is_osx; then
+        pushd "$_TMP" > /dev/null || { error_msg "Could not get to $_TMP" && exit 1; }
+        if ! tar xzvf "$_TMP/$name" && mv "${_TMP}/nvim-osx64/*" "$HOME/.local/"; then
+            return 1
+        fi
+        popd > /dev/null || { error_msg "Could not get out of $_TMP" && exit 1; }
+        rm -rf "${_TMP:?}/${name}"
+        rm -rf "${_TMP:?}/nvim-osx64"
     else
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi
@@ -512,8 +523,6 @@ if (( GCC_VERSION < 7 )) || [[ $_DEV -eq 0 ]]; then
     git checkout "$( git tag | tail -n 1 )" 2>/dev/null
 elif [[ $_DEV -eq 1 ]]; then
     status_msg "Using master HEAD"
-else
-    warn_msg "GCC version is > 7, using master to compile source code"
 fi
 
 # Always clean the build dir

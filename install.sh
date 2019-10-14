@@ -48,6 +48,7 @@ _NOLOG=0
 _PKGS=0
 _TMP="/tmp/"
 _PKG_FILE=""
+_NEOVIM_DOTFILES=0
 
 _NEOVIM_DEV=0
 
@@ -881,7 +882,7 @@ function get_nvim_dotfiles() {
     status_msg "Setting up neovim"
 
 
-    if [[ $_PORTABLES -eq 0 ]] && [[ $_ALL -eq 0 ]]; then
+    if [[ $_PORTABLES -eq 0 ]] && [[ $_ALL -eq 0 ]] && [[ $_NEOVIM_DOTFILES -eq 0 ]]; then
         local args="--portable"
 
         [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
@@ -894,7 +895,7 @@ function get_nvim_dotfiles() {
                 return 1
             fi
         fi
-    else
+    elif [[ $_NEOVIM_DOTFILES -eq 0 ]]; then
         verbose_msg "Skipping neovim install, already install with defaults or portables"
     fi
 
@@ -1655,12 +1656,14 @@ while [[ $# -gt 0 ]]; do
             _ALL=0
             ;;
         --nvim=*)
-            _result=$(__parse_args "$key" "nvim" '(stable|dev(elop(ment)?)?)')
+            _result=$(__parse_args "$key" "nvim" '(dotfiles|stable|dev(elop(ment)?)?)')
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid neovim build type ${_result##*=}"
                 exit 1
             fi
-            if [[ $_result == 'dev' ]]; then
+            if [[ $_result == 'dotfiles' ]]; then
+                _NEOVIM_DOTFILES=1
+            elif [[ $_result =~ ^dev(elop(ment)?)?$ ]]; then
                 _NEOVIM_DEV=1
             else
                 _NEOVIM_DEV=0
@@ -1673,6 +1676,10 @@ while [[ $# -gt 0 ]]; do
             _ALL=0
             if [[ "$2" =~ ^stable$ ]]; then
                 _NEOVIM_DEV=0
+                shift
+            elif [[ "$2" =~ ^dotfiles$ ]]; then
+                _NEOVIM_DEV=0
+                _NEOVIM_DOTFILES=1
                 shift
             elif [[ "$2" =~ ^dev(elop(ment)?)?$ ]]; then
                 _NEOVIM_DEV=1
