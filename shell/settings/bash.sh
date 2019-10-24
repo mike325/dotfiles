@@ -146,5 +146,5 @@ fi
 if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     source "$BASH_IT/bash_it.sh"
 else
-    PS1='[\n\u at \[\e[0;36m\]\h: \[\e[39m\] \[\e[0;33m\]\w \n\[\e[39m\]→ '
+    PS1="\n${green}\u${reset_color} at ${cyan}\h${reset_color}: ${yellow}\w${reset_color} \n→ "
 fi
