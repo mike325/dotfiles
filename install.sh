@@ -1480,12 +1480,11 @@ function setup_pkgs() {
         fi
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
-            # shellcheck disable=SC2086,SC2207
-            if ! ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg 2>/dev/null; then
+            if ! ls "${_SCRIPT_PATH}/packages/${_OS}"/*.pkg 2>/dev/null; then
                 error_msg "No package file for \"${_OS}\" OS"
                 return 2
             fi
-            local pkgs=($(ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg))
+            declare -a pkgs=( "${_SCRIPT_PATH}/packages/${_OS}"/* )
         else
             local pkgs=("$_PKG_FILE")
         fi
