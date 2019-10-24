@@ -104,6 +104,7 @@ if [ -z "$SHELL_PLATFORM" ]; then
     fi
 fi
 
+_ARCH="$(uname -m)"
 
 case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
@@ -112,8 +113,8 @@ case "$SHELL_PLATFORM" in
             _OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
             _OS='ubuntu'
-        elif [[ -f /etc/debian_version ]]; then
-            if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+        elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
+            if [[ $_ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
                 _OS='raspbian'
             else
                 _OS='debian'
@@ -130,8 +131,6 @@ case "$SHELL_PLATFORM" in
         _OS='bsd'
         ;;
 esac
-
-_ARCH="$(uname -m)"
 
 function is_windows() {
     if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
@@ -1115,7 +1114,7 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! hash shellcheck 2>/dev/null && { [[ $_OS == 'raspbian' ]] || [[ ! $_OS == 'x86_64' ]] ; }; then
+    elif ! hash shellcheck 2>/dev/null && { [[ $_OS == 'raspbian' ]] || [[ ! $_ARCH == 'x86_64' ]] ; }; then
         warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
         rst=2
     else
@@ -1482,6 +1481,10 @@ function setup_pkgs() {
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
             # shellcheck disable=SC2086,SC2207
+            if ! ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg 2>/dev/null; then
+                error_msg "No package file for \"${_OS}\" OS"
+                return 2
+            fi
             local pkgs=($(ls ${_SCRIPT_PATH}/packages/${_OS}/*.pkg))
         else
             local pkgs=("$_PKG_FILE")
@@ -1832,13 +1835,7 @@ verbose_msg "Host          : ${_GIT_HOST}"
 verbose_msg "Backup Enable : ${_BACKUP}"
 verbose_msg "Log Disable   : ${_NOLOG}"
 verbose_msg "Current Shell : ${_CURRENT_SHELL}"
-if is_windows; then
-    verbose_msg "Platform      : Windows"
-elif is_osx; then
-    verbose_msg "Platform      : macOS"
-else
-    verbose_msg "Platform      : Linux"
-fi
+verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "OS Name       : ${_OS}"
 verbose_msg "Architecture  : ${_ARCH}"
 
