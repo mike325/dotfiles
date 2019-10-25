@@ -155,5 +155,6 @@ jobs:
         run: |
           ./install.sh --verbose --force
       - name: Packages install
+        shell: bash
         run: |
           ./install.sh --verbose --packages --only
