@@ -156,4 +156,4 @@ jobs:
           ./install.sh --verbose --force
       - name: Packages install
         run: |
-          sudo ./install.sh --verbose --packages --only
+          ./install.sh --verbose --packages --only

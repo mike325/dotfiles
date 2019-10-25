@@ -45,7 +45,8 @@ matrix:
 script:
   - ./install.sh --verbose
   - ./install.sh --verbose --force
-  - if [[ -z $IS_MACOS ]]; then sudo ./install.sh --verbose --packages --only; fi
+  - if [[ -n $IS_LINUX ]]; then sudo ./install.sh --verbose --packages --only; fi
+  - if [[ -n $IS_WINDOWS ]]; then ./install.sh --verbose --packages --only; fi
 
 notifications:
   email:
