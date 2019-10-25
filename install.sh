@@ -1471,12 +1471,14 @@ function setup_python() {
 
 function setup_pkgs() {
     local rc=0
-    if is_windows || is_osx; then
-        warn_msg "OS support outside of linux is still WIP"
+    if is_osx; then
+        warn_msg "macOS support still WIP"
     else
-        if [[ $EUID -ne 0 ]] && [[ ! $(groups) =~ sudo ]]; then
+        if ! is_windows && [[ $EUID -ne 0 ]] && [[ ! $(groups) =~ sudo ]]; then
             error_msg "User: ${USER} is neither root nor belongs to the sudo group"
             return 1
+        elif is_windows; then
+            warn_msg "Windows package install must be run from privilege Git bash terminal"
         fi
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
@@ -1494,6 +1496,7 @@ function setup_pkgs() {
             local filename=""
             while IFS= read -r line; do
                 if [[ -z "$cmd" ]] && [[ "$line" =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
+                    # remove sudo instruction if root user is running the script
                     cmd="${line##*sudo}"
                 elif [[ ! "$line" =~ ^#.* ]]; then # if the line starts with "#" then it's a comment
                     cmd="$cmd $line"
