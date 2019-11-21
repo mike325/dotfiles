@@ -6,6 +6,7 @@ git
 wget
 gcc
 clang
+clang-tools
 make
 sed
 htop
