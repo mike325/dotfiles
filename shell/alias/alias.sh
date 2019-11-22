@@ -268,32 +268,6 @@ if hash fzf 2>/dev/null; then
     # Options to fzf command
     export FZF_COMPLETION_OPTS='+c -x'
 
-    function cd() {
-        if [[ "$#" != 0 ]]; then
-            builtin cd "$@" || return
-            return
-        fi
-        while true; do
-            # collect dirs
-            # shellcheck disable=SC2155
-            if [[ -n "$(git rev-parse --git-dir 2>/dev/null)" ]]; then
-                local folders=$(git ls-tree -rt HEAD "$(git rev-parse --show-toplevel)" | awk '{if ($2 == "tree") print $4;}')
-            elif hash fd 2>/dev/null; then
-                # shellcheck disable=SC2155
-                local folders="$(fd -t d . .)"
-            else
-                # shellcheck disable=SC2155
-                local folders="$(find . -type d -iname '*')"
-            fi
-
-            # shellcheck disable=SC2155
-            local select=$(printf '%s\n' "${folders[@]}" | fzf)
-
-            [[ ${#select} != 0 ]] || return 0
-            builtin pushd "$select" &>/dev/null && return 0 || return 1
-        done
-    }
-
     # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
     fkill() {
         local pid
