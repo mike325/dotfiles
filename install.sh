@@ -1065,7 +1065,7 @@ function _linux_portables() {
                 fi
 
                 if { ! hash pip3 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python3 2>/dev/null; then
-                    local python=("8" "7" "6" "5" "4")
+                    local python=("9" "8" "7" "6" "5" "4")
 
                     for version in "${python[@]}"; do
                         if hash "python3.${version}" 2>/dev/null; then

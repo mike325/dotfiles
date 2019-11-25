@@ -197,7 +197,7 @@ if is_windows; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    python3=("38" "37" "36" "35" "34")
+    python3=("39" "38" "37" "36" "35" "34")
 
     for version in "${python3[@]}"; do
         if [[ -d "${windows_root}/Python${version}/Scripts" ]]; then
