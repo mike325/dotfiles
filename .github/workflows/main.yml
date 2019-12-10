@@ -100,7 +100,6 @@ jobs:
       matrix:
         os: [
           macOS-latest,
-          macOS-10.14
         ]
 
     env:
