@@ -50,6 +50,8 @@ _NOCOLOR=0
 _VERBOSE=0
 _DEV=0
 
+_NVIM_VERSION="latest"
+
 _OS='unknown'
 
 # colors
@@ -276,6 +278,7 @@ function get_portable() {
     local dir="$HOME/.local/bin"
     local cmd=''
     local version
+    local build
 
     if hash curl 2>/dev/null; then
         local cmd='curl -L'
@@ -288,11 +291,13 @@ function get_portable() {
 
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
-    if [[ $_DEV -eq 0 ]]; then
+    if [[ $_DEV -eq 0 ]] && [[ $_NVIM_VERSION == 'latest' ]]; then
         version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
         status_msg "Downloading version: ${version}"
-    else
+    elif [[ $_DEV -eq 1 ]]; then
         status_msg "Downloading Nightly"
+    else
+        status_msg "Downloading ${_NVIM_VERSION}"
     fi
 
     if is_windows; then
@@ -306,10 +311,14 @@ function get_portable() {
         local pkg='nvim.appimage'
     fi
 
-    local build='stable'
     if [[ $_DEV -eq 1 ]]; then
         build='nightly'
+    elif [[ $_NVIM_VERSION == 'latest' ]]; then
+        build='stable'
+    else
+        build="v${_NVIM_VERSION}"
     fi
+
     verbose_msg "Downloading ${pkg} from $_URL/releases/download/${build}/${pkg} to $_TMP/$name"
 
     if ! eval '${cmd} "$_URL/releases/download/${build}/${pkg}" -o "$_TMP/$name"'; then
@@ -349,14 +358,50 @@ function get_libs() {
     fi
 }
 
+function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
+    fi
+
+    local arg="$1"
+    local name="$2"
+
+    local pattern="^--${name}=[a-zA-Z0-9.:@_/~-]+$"
+
+    if [[ -n "$3" ]]; then
+        local pattern="^--${name}=$3$"
+    fi
+
+    if [[ $arg =~ $pattern ]]; then
+        local left_side="${arg#*=}"
+        echo "${left_side/#\~/$HOME}"
+    else
+        echo "$arg"
+    fi
+}
+
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --nocolor)
             _NOCOLOR=1
             ;;
+        --portable=*)
+            _PORTABLE=1
+            _result=$(__parse_args "$key" "portable" '[0-9]\.[0-9](\.[0-9])?')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            _NVIM_VERSION="$_result"
+            ;;
         --portable)
             _PORTABLE=1
+            if [[ "$2" =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
+                _NVIM_VERSION="$2"
+                shift
+            fi
             ;;
         -f|--force)
             _FORCE_INSTALL=1
