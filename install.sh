@@ -989,10 +989,10 @@ function _windows_portables() {
         local url="${github}/sharkdp/bat"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading bat version: ${version}"
         local os_type='x86_64-pc-windows-msvc'
@@ -1220,10 +1220,10 @@ function _linux_portables() {
         local url="${github}/sharkdp/bat"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading bat version: ${version}"
         local os_type="${_ARCH}-unknown-linux-musl"
