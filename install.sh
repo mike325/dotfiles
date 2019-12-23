@@ -1020,6 +1020,38 @@ function _windows_portables() {
         rst=2
     fi
 
+    if has_fetcher && { ! hash texlab 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
+        status_msg "Getting texlab"
+        local pkg='texlab.zip'
+        local url="${github}/latex-lsp/texlab"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading texlab version: ${version}"
+        local os_type="${_ARCH}-windows"
+        if download_asset "texlab" "${url}/releases/download/${version}/texlab-${os_type}.zip" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}"
+            unzip -o "$_TMP/${pkg}"
+            chmod u+x "$_TMP/texlab.exe"
+            mv "$_TMP/texlab.exe" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download texlab"
+        rst=2
+    else
+        warn_msg "Skipping texlab, already installed"
+        rst=2
+    fi
 
     if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
@@ -1247,7 +1279,42 @@ function _linux_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+    if is_64bits && has_fetcher && { ! hash texlab 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
+        status_msg "Getting texlab"
+        local pkg='texlab.tar.gz'
+        local url="${github}/latex-lsp/texlab"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading texlab version: ${version}"
+        local os_type="${_ARCH}-linux"
+        if download_asset "texlab" "${url}/releases/download/${version}/texlab-${os_type}.tar.gz" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/texlab"
+            mv "$_TMP/texlab" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! is_64bits; then
+        error_msg "Texlab portable is only Available for x86 64 bits"
+        rst=1
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download texlab"
+        rst=2
+    else
+        warn_msg "Skipping texlab, already installed"
+        rst=2
+    fi
+
+    if is_64bits && has_fetcher && { ! hash mc 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
         if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
