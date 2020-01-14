@@ -67,7 +67,8 @@ class Quit(object):
 
 
 q = Quit()
-history_file = os.path.join(os.environ['HOME'], '.pyhistory')
+home = 'HOME' if os.name != 'nt' else 'USERPROFILE'
+history_file = os.path.join(os.environ[home], '.pyhistory')
 
 try:
 
@@ -125,4 +126,4 @@ try:
 except NameError:
     pass
 finally:
-    del os, sys, readline, rlcompleter, atexit, history_file
+    del os, sys, readline, rlcompleter, atexit, history_file, home
