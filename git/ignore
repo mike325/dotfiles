@@ -1,6 +1,6 @@
-# ccls cache
+# C/C++ LSP cache
 .ccls-cache/
-
+.clangd/
 
 # Neomake leftovers
 *@neomake*
