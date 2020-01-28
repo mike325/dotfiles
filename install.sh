@@ -1076,61 +1076,6 @@ function _linux_portables() {
     local rst=0
     local github='https://github.com'
 
-    if hash python 2>/dev/null || hash python2 2>/dev/null || hash python3 2>/dev/null ; then
-        if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash pip3 2>/dev/null || ! hash pip2 2>/dev/null ; then
-            status_msg "Getting python pip"
-
-            if download_asset "PIP" "https://bootstrap.pypa.io/get-pip.py" "$_TMP/get-pip.py"; then
-                chmod u+x "$_TMP/get-pip.py"
-
-                if { ! hash pip2 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python2 2>/dev/null; then
-                    status_msg "Installing pip2"
-                    if [[ $_VERBOSE -eq 1 ]]; then
-                        if ! python2 $_TMP/get-pip.py --user; then
-                            error_msg "Fail to install pip for python2"
-                        fi
-                    else
-                        if ! python2 $_TMP/get-pip.py --user 1>/dev/null; then
-                            error_msg "Fail to install pip for python2"
-                        fi
-                    fi
-                fi
-
-                if { ! hash pip3 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && hash python3 2>/dev/null; then
-                    local python=("9" "8" "7" "6" "5" "4")
-
-                    for version in "${python[@]}"; do
-                        if hash "python3.${version}" 2>/dev/null; then
-                            status_msg "Installing pip3 with python3.${version}"
-                            if [[ $_VERBOSE -eq 1 ]]; then
-                                if "python3.${version}" "$_TMP/get-pip.py" --user; then
-                                    break
-                                else
-                                    error_msg "Fail to install pip for python3.${version}"
-                                fi
-                            else
-                                if "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
-                                    break
-                                else
-                                    error_msg "Fail to install pip for python3.${version}"
-                                fi
-                            fi
-                        fi
-                    done
-                fi
-                verbose_msg "Cleanning up $_TMP/get-pip.py" && rm -rf "$_TMP/get-pip.py"
-            else
-                rst=1
-            fi
-        else
-            warn_msg "Skipping pip, already installed"
-            rst=2
-        fi
-    else
-        warn_msg "Skipping pip, the system doesn't have python"
-        rst=2
-    fi
-
     if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
@@ -1489,46 +1434,100 @@ function setup_systemd() {
     return 0
 }
 
-function setup_python() {
-    if [[ $_PYTHON_VERSION == 'all' ]]; then
-        if ! hash pip3 2>/dev/null && ! hash pip2 2>/dev/null; then
-            error_msg "No pip found"
-            return 1
+function _get_pip() {
+    local version="$1"
+
+    if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash "pip${version}" 2>/dev/null; then
+
+        if [[ ! -f "$_TMP/get-pip.py" ]]; then
+            if ! download_asset "PIP" "https://bootstrap.pypa.io/get-pip.py" "$_TMP/get-pip.py"; then
+                return 1
+            fi
+            chmod u+x "$_TMP/get-pip.py"
         fi
+
+        if [[ $version -eq 3 ]]; then
+            local python=("9" "8" "7" "6" "5" "4")
+            for version in "${python[@]}"; do
+                if hash "python3.${version}" 2>/dev/null; then
+                    status_msg "Installing pip3 with python3.${version}"
+                    if [[ $_VERBOSE -eq 1 ]]; then
+                        if "python3.${version}" "$_TMP/get-pip.py" --user; then
+                            break
+                        else
+                            error_msg "Fail to install pip for python3.${version}"
+                            return 1
+                        fi
+                    else
+                        if "python3.${version}" "$_TMP/get-pip.py" --user 1>/dev/null; then
+                            break
+                        else
+                            error_msg "Fail to install pip for python3.${version}"
+                            return 1
+                        fi
+                    fi
+                fi
+            done
+        else
+            status_msg "Installing pip2"
+            if [[ $_VERBOSE -eq 1 ]]; then
+                if ! python2 $_TMP/get-pip.py --user; then
+                    error_msg "Fail to install pip for python2"
+                    return 1
+                fi
+            else
+                if ! python2 $_TMP/get-pip.py --user 1>/dev/null; then
+                    error_msg "Fail to install pip for python2"
+                    return 1
+                fi
+            fi
+        fi
+    else
+        warn_msg "Skipping pip, already installed"
+    fi
+
+    return 0
+}
+
+function setup_python() {
+
+    if [[ $_PYTHON_VERSION == 'all' ]]; then
         local versions=(2 3)
     else
-        if ! hash "pip${_PYTHON_VERSION}" 2>/dev/null; then
-            error_msg "No pip found"
-            return 1
-        fi
         local versions=("$_PYTHON_VERSION")
     fi
-    for version in "${versions[@]}"; do
-        if hash "pip${version}" 2>/dev/null; then
-            if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
-               warn_msg "Skipping requirements for pip ${version} in OS: ${_OS}"
-           else
-                [[ $_OS == unknown ]] && warn_msg "Unknown OS, trying to install generic pip packages"
-                status_msg "Setting up python ${version} dependencies"
-                verbose_msg "Using ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
 
-                if [[ $_VERBOSE -eq 1 ]]; then
-                    local quiet=""
-                else
-                    # shellcheck disable=SC2034
-                    local quiet="--quiet"
-                fi
-                if [[ -z $VIRTUAL_ENV ]]; then
-                    # shellcheck disable=SC2016
-                    local cmd="pip${version} install ${quiet} --user -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
-                else
-                    # shellcheck disable=SC2016
-                    local cmd="pip${version} install ${quiet} -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
-                fi
-                verbose_msg "Pip command --> ${cmd}"
-                if ! eval "$cmd"; then
-                    error_msg "Fail to install python ${version} dependencies"
-                fi
+    for version in "${versions[@]}"; do
+
+        if [[ $_FORCE_INSTALL -eq 1 ]] || ! hash "pip${version}" 2>/dev/null; then
+            if ! _get_pip "$version"; then
+                continue
+            fi
+        fi
+
+        if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
+            warn_msg "Skipping requirements for pip ${version} in OS: ${_OS}"
+        else
+            [[ $_OS == unknown ]] && warn_msg "Unknown OS, trying to install generic pip packages"
+            status_msg "Setting up python ${version} dependencies"
+            verbose_msg "Using ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+
+            if [[ $_VERBOSE -eq 1 ]]; then
+                local quiet=""
+            else
+                # shellcheck disable=SC2034
+                local quiet="--quiet"
+            fi
+            if [[ -z $VIRTUAL_ENV ]]; then
+                # shellcheck disable=SC2016
+                local cmd="pip${version} install ${quiet} --user -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+            else
+                # shellcheck disable=SC2016
+                local cmd="pip${version} install ${quiet} -r ${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt"
+            fi
+            verbose_msg "Pip command --> ${cmd}"
+            if ! eval "$cmd"; then
+                error_msg "Fail to install python ${version} dependencies"
             fi
         fi
     done
