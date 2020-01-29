@@ -21,4 +21,4 @@ ntfy[telegram,emoji,pid]>=2.7.0
 # Misc
 Pygments>=2.3.1
 PyYAML>=3.13
-requests>=2.21.0
+requests>=2.22
