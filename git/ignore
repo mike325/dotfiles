@@ -1,3 +1,9 @@
+# Syncthing versions
+.stversions/
+
+# Node stuff
+node_modules/
+
 # C/C++ LSP cache
 .ccls-cache/
 .clangd/
