@@ -26,8 +26,10 @@
 ################################################################################
 
 
-function which($name) {
-    Get-Command $name | Select-Object -ExpandProperty Definition
+if ( -Not (Get-Command "which" -ErrorAction SilentlyContinue) ) {
+    function which($name) {
+        Get-Command $name | Select-Object -ExpandProperty Definition
+    }
 }
 
 function q {
