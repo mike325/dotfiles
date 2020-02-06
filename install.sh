@@ -348,13 +348,13 @@ Usage:
 
         -t, --portables
             Install isolated/portable programs into $HOME/.local/bin
-                - Neovim
+                - neovim
                 - shellcheck
-                - ctags (windows only)
+                - texlab
+                - fd
+                - ripgrep
                 - pip2 and pip3 (GNU/Linux only)
-                - FZF (GNU/Linux only)
-                - fd (64 bits GNU/Linux only)
-                - ripgrep (64 bits GNU/Linux only)
+                - fzf (GNU/Linux only)
 
             Default: on
 
@@ -945,40 +945,20 @@ function _windows_portables() {
 
     if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
+        local pkg='shellcheck-latest.zip'
         status_msg "Getting shellcheck"
-        if download_asset "Shellcheck" 'https://storage.googleapis.com/shellcheck/shellcheck-latest.zip' "$_TMP/shellcheck-latest.zip"; then
-            [[ -d "$_TMP/shellcheck-latest.zip" ]] && rm -rf "$_TMP/shellcheck-latest.zip"
-            unzip -o "$_TMP/shellcheck-latest.zip" -d "$_TMP/shellcheck-latest"
+        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/${pkg}" "$_TMP/${pkg}"; then
+            [[ -d "$_TMP/shellcheck-latest" ]] && rm -rf "$_TMP/shellcheck-latest"
+            unzip -o "$_TMP/${pkg}" -d "$_TMP/shellcheck-latest"
             chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
             mv "$_TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/shellcheck-latest" && rm -rf "$_TMP/shellcheck-latest"
         else
             rst=1
         fi
     else
         warn_msg "Skipping shellcheck, already installed"
-        rst=2
-    fi
-
-    if ! hash ctags 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
-        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing ctags install'
-        # TODO: auto detect latest version
-        local major="5"
-        local minor="8"
-        status_msg "Getting ctags"
-        [[ -d "$_TMP/ctags${major}${minor}.zip" ]] && rm -rf "$_TMP/ctags${major}${minor}.zip"
-        if download_asset "Ctags" "https://downloads.sourceforge.net/project/ctags/ctags/${major}.${minor}/ctags${major}${minor}.zip" "$_TMP/ctags${major}${minor}.zip"; then
-            if ! unzip -o "$_TMP/ctags${major}${minor}.zip" -d "$_TMP/ctags${major}${minor}"; then
-                error_msg "An error occurred extracting zip file"
-                rst=1
-            else
-                chmod +x "$_TMP/ctags${major}${minor}/ctags.exe"
-                mv "$_TMP/ctags${major}${minor}/ctags.exe" "$HOME/.local/bin/ctags.exe"
-            fi
-        else
-            rst=2
-        fi
-    else
-        warn_msg "Skipping ctags, already installed"
         rst=2
     fi
 
@@ -1017,6 +997,82 @@ function _windows_portables() {
         rst=1
     else
         warn_msg "Skipping bat, already installed"
+        rst=2
+    fi
+
+    if has_fetcher && { ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
+        status_msg "Getting rg"
+        local pkg='ripgrep.zip'
+        local url="${github}/BurntSushi/ripgrep"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading rg version: ${version}"
+        local os_type="${_ARCH}-pc-windows-gnu"
+        if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}"
+            if ! unzip -o "$_TMP/${pkg}" -d "$_TMP/ripgrep-${version}-${os_type}/"; then
+                error_msg "An error occurred extracting zip file"
+                rst=1
+            else
+                chmod u+x "$_TMP/ripgrep-${version}-${os_type}/rg.exe"
+                mv "$_TMP/ripgrep-${version}-${os_type}/rg.exe" "$HOME/.local/bin/"
+            fi
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/ripgrep-${version}-${os_type}" && rm -rf "$_TMP/ripgrep-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download ripgrep"
+        rst=2
+    else
+        warn_msg "Skipping rg, already installed"
+        rst=2
+    fi
+
+    if has_fetcher && { ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
+        status_msg "Getting fd"
+        local pkg='fd.zip'
+        local url="${github}/sharkdp/fd"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading fd version: ${version}"
+        local os_type="${_ARCH}-pc-windows-gnu"
+        if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}"
+            if ! unzip -o "$_TMP/${pkg}" -d "$_TMP/fd-${version}-${os_type}/"; then
+                error_msg "An error occurred extracting zip file"
+                rst=1
+            else
+                chmod u+x "$_TMP/fd-${version}-${os_type}/fd.exe"
+                mv "$_TMP/fd-${version}-${os_type}/fd.exe" "$HOME/.local/bin/"
+            fi
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download fd"
+        rst=2
+    else
+        warn_msg "Skipping fd, already installed"
         rst=2
     fi
 
@@ -1149,7 +1205,7 @@ function _linux_portables() {
             rst=1
         fi
     elif ! has_fetcher; then
-        error_msg "No curl neither wget to download Bat"
+        error_msg "No curl neither wget to download fd"
         rst=2
     else
         warn_msg "Skipping fd, already installed"
@@ -1183,10 +1239,10 @@ function _linux_portables() {
             rst=1
         fi
     elif ! has_fetcher; then
-        error_msg "No curl neither wget to download Bat"
+        error_msg "No curl neither wget to download ripgrep"
         rst=2
     else
-        warn_msg "Skipping rg, already installed"
+        warn_msg "Skipping ripgrep, already installed"
         rst=2
     fi
 
