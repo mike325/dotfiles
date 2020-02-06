@@ -3,7 +3,6 @@ vim
 neovim
 llvm
 mingw
-ruby
 rust
 golang
 shellcheck
@@ -17,6 +16,9 @@ texstudio
 vlc
 gimp
 firefox
-spotify
 curl
+wget
 python
+ripgrep
+ag
+fd
