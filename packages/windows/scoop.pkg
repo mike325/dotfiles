@@ -1,4 +1,5 @@
 scoop install
+sudo
 7zip
 curl
 wget
