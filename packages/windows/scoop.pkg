@@ -20,3 +20,4 @@ grep
 ripgrep
 fd
 bat
+fzf
