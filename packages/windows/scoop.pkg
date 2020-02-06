@@ -1,4 +1,4 @@
-choco install -y
+scoop install
 7zip
 curl
 wget
@@ -6,19 +6,17 @@ openssh
 vim
 neovim
 llvm
-mingw
+gcc
 rust
-golang
+go
 shellcheck
-putty
 git
-svn
-tortoisesvn
 ctags
-texstudio
-vlc
-firefox
+latex
+which
+unzip
 python
+grep
 ripgrep
 fd
 bat
