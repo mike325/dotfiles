@@ -1622,7 +1622,12 @@ function setup_pkgs() {
         for pkg in "${pkgs[@]}"; do
             verbose_msg "Package file $pkg"
             local cmd=""
-            local filename=""
+            local filename=$(basename "$pkg")
+            local cmdname="${filename%.pkg}"
+            if ! hash "${cmdname}"; then
+                warn_msg "Skipping pacakges from ${filename}, ${cmdname} is not install or missing in the PATH"
+                continue
+            fi
             while IFS= read -r line; do
                 if [[ -z "$cmd" ]] && [[ "$line" =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
                     # remove sudo instruction if root user is running the script
@@ -1631,14 +1636,13 @@ function setup_pkgs() {
                     cmd="$cmd $line"
                 fi
             done < "$pkg"
-            filename=$(basename "$pkg")
-            status_msg "Installing packages from ${filename%.pkg}"
+            status_msg "Installing packages from ${cmdname}"
             # if [[ $_VERBOSE -eq 0 ]]; then
             #     cmd="$cmd"
             # fi
             verbose_msg "Using command $cmd"
             if ! eval "$cmd"; then
-                error_msg "Fail to install packages from ${filename%.pkg}"
+                error_msg "Fail to install packages from ${cmdname}"
                 rc=1
             fi
         done
