@@ -141,6 +141,8 @@ jobs:
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
+          $env:PATH = "$env:APPDATA\Neovim\bin;$env:PATH"
       - name: Install dependencies
         shell: bash
         run: |

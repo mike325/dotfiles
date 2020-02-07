@@ -50,29 +50,29 @@ function ln ($target, $link) {
 }
 
 # Path settings
-if ( Test-Path "$HOME\.local\bin" ) {
-    $env:path = "$HOME\.local\bin;$env:path"
+if ( Test-Path "$env:USERPROFILE\.local\bin" ) {
+    $env:path = "$env:USERPROFILE\.local\bin;$env:path"
 }
 
 # Path settings
-if ( Test-Path "$HOME\AppData\Roaming\Neovim\bin" ) {
-    $env:path = "$HOME\AppData\Roaming\Neovim\bin;$env:path"
+if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
+    $env:path = "$env:APPDATA\Neovim\bin;$env:path"
 }
 
 # $pythonscripts
 
-if (Test-Path "$HOME\AppData\Roaming\Python\Python27\Scripts") {
-    $env:path = "$HOME\AppData\Roaming\Python\Python27\Scripts;$env:path"
+if (Test-Path "$env:APPDATA\Python\Python27\Scripts") {
+    $env:path = "$env:APPDATA\Python\Python27\Scripts;$env:path"
 }
 
-$python_versions = @('8', '7', '6', '5', '4', '3')
+$python_versions = @('9' '8', '7', '6', '5', '4', '3')
 foreach($version in $python_versions) {
-    if (Test-Path "$HOME\AppData\Roaming\Python\Python3$version\Scripts") {
-        $env:path = "$HOME\AppData\Roaming\Python\Python3$version\Scripts;$env:path"
+    if (Test-Path "$env:APPDATA\Python\Python3$version\Scripts") {
+        $env:path = "$env:APPDATA\Python\Python3$version\Scripts;$env:path"
     }
 }
 
-if ( Test-Path "$HOME\.local\lib\pythonstartup.py") {
+if ( Test-Path "$env:USERPROFILE\.local\lib\pythonstartup.py") {
     $env:PYTHONSTARTUP = "$env:USERPROFILE\.local\lib\pythonstartup.py"
 }
 
@@ -118,7 +118,7 @@ function prompt {
     return "$ "
 }
 
-$powersource = "$HOME\.config\shell\host\proxy.ps1"
+$powersource = "$env:USERPROFILE\.config\shell\host\proxy.ps1"
 if (Test-Path($powersource)) {
     . $powersource
     function toggleProxy {
@@ -131,28 +131,28 @@ if (Test-Path($powersource)) {
             Write-Host " Proxy disable"
         }
         else {
-            . "$HOME\.config\shell\host\proxy.ps1"
+            . "$env:USERPROFILE\.config\shell\host\proxy.ps1"
             Write-Host " Proxy enable"
         }
     }
 }
 
-$powersource = "$HOME\.config\shell\alias\alias.ps1"
+$powersource = "$env:USERPROFILE\.config\shell\alias\alias.ps1"
 if (Test-Path($powersource)) {
     . $powersource
 }
 
-$powersource = "$HOME\.config\shell\host\env.ps1"
+$powersource = "$env:USERPROFILE\.config\shell\host\env.ps1"
 if (Test-Path($powersource)) {
     . $powersource
 }
 
-$powersource = "$HOME\.config\shell\host\alias.ps1"
+$powersource = "$env:USERPROFILE\.config\shell\host\alias.ps1"
 if (Test-Path($powersource)) {
     . $powersource
 }
 
-$powersource = "$HOME\.config\shell\host\settings.ps1"
+$powersource = "$env:USERPROFILE\.config\shell\host\settings.ps1"
 if (Test-Path($powersource)) {
     . $powersource
 }

@@ -1548,7 +1548,9 @@ function _get_pip() {
 function setup_python() {
 
     if [[ $_PYTHON_VERSION == 'all' ]]; then
-        local versions=(2 3)
+        # Start to setup just python3 by default since python2 is officially deprecated
+        # Python2 can be set with --python=2
+        local versions=(3)
     else
         local versions=("$_PYTHON_VERSION")
     fi
@@ -1559,6 +1561,11 @@ function setup_python() {
             if ! _get_pip "$version"; then
                 continue
             fi
+        fi
+
+        if ! hash "pip${version}" 2>/dev/null; then
+            error_msg "Failed to locate pip${version} executable in the path"
+            continue
         fi
 
         if [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/python${version}/requirements.txt" ]]; then
