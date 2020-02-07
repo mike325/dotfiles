@@ -17,6 +17,7 @@ latex
 which
 unzip
 python
+jq
 grep
 ripgrep
 fd
