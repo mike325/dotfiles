@@ -1616,8 +1616,10 @@ function setup_pkgs() {
                 return 2
             fi
             declare -a pkgs=( "${_SCRIPT_PATH}/packages/${_OS}"/* )
+        elif [[ -f "$_PKG_FILE" ]]; then
+            local pkgs=( "$_PKG_FILE" )
         else
-            local pkgs=("$_PKG_FILE")
+            local pkgs=( "${_SCRIPT_PATH}/packages/${_OS}/${_PKG_FILE}.pkg" )
         fi
         for pkg in "${pkgs[@]}"; do
             verbose_msg "Package file $pkg"
@@ -1878,7 +1880,7 @@ while [[ $# -gt 0 ]]; do
             elif [[ ! -f "$_result" ]]; then
                 error_msg "Package file $_result does not exists"
                 exit 1
-            elif [[ ! "$_result" =~ \.pkg$ ]]; then
+            elif [[ ! "$_result" =~ \.pkg$ ]] || [[ ! -f "${_SCRIPT_PATH}/packages/${_OS}/${_result}.pkg" ]]; then
                 error_msg "$_result is not a valid package file, the file must have .pkg extention"
                 exit 1
             fi
@@ -1891,9 +1893,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --pkgs|--packages)
             _PKGS=1
-            if [[ ! "$2" =~ ^-(-)?.*$ ]] && [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]]; then
-                _PKG_FILE="$2"
-                shift
+            if [[ ! "$2" =~ ^-(-)?.*$ ]] ; then
+                if [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]] ; then
+                    _PKG_FILE="$2"
+                    shift
+                elif [[ -f "${_SCRIPT_PATH}/packages/${_OS}/${2}.pkg" ]]; then
+                    _PKG_FILE="$2"
+                    shift
+                fi
             fi
 
             if [[ "$2" =~ ^--only$ ]]; then
