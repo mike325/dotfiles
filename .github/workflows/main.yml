@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   parameter-checks-build:
-    name: Testing install with parameters in ${{ matrix.os }}
+    name: Testing install with parameters in Ubuntu
     runs-on: ubuntu-latest
 
     env:

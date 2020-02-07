@@ -1622,7 +1622,8 @@ function setup_pkgs() {
         for pkg in "${pkgs[@]}"; do
             verbose_msg "Package file $pkg"
             local cmd=""
-            local filename=$(basename "$pkg")
+            local filename
+            filename=$(basename "$pkg")
             local cmdname="${filename%.pkg}"
             if ! hash "${cmdname}"; then
                 warn_msg "Skipping pacakges from ${filename}, ${cmdname} is not install or missing in the PATH"
