@@ -158,4 +158,4 @@ jobs:
       - name: Packages install
         shell: bash
         run: |
-          ./install.sh --verbose --packages --only
+          ./install.sh --verbose --packages choco --only

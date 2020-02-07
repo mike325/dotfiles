@@ -33,6 +33,7 @@ matrix:
           - bash -c "./test/basic.sh --verbose"
         env:
           - PATH="/Users/travis/Library/Python/3.7/bin:$PATH"
+          - PATH="/Users/travis/Library/Python/3.8/bin:$PATH"
           - IS_MACOS=1
       - name: "Testing install script with Windows"
         os: windows
@@ -40,13 +41,14 @@ matrix:
           - choco install python git curl -y
         env:
           - PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+          - PATH="/c/Python38:/c/Python38/Scripts:$PATH"
           - IS_WINDOWS=1
 
 script:
   - ./install.sh --verbose
   - ./install.sh --verbose --force
   - if [[ -n $IS_LINUX ]]; then sudo ./install.sh --verbose --packages --only; fi
-  - if [[ -n $IS_WINDOWS ]]; then ./install.sh --verbose --packages --only; fi
+  - if [[ -n $IS_WINDOWS ]]; then ./install.sh --verbose --packages choco --only; fi
 
 notifications:
   email:
