@@ -28,7 +28,7 @@ matrix:
         os: osx
         osx_image: xcode11
         before_install:
-          - brew install git shellcheck
+          - brew install shellcheck
         before_script:
           - bash -c "./test/basic.sh --verbose"
         env:
