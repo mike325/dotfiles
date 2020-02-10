@@ -8,6 +8,7 @@ vim
 neovim
 llvm
 gcc
+cmake
 rust
 go
 shellcheck
@@ -23,3 +24,4 @@ ripgrep
 fd
 bat
 fzf
+ffmpeg
