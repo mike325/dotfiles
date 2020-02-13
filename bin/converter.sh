@@ -373,7 +373,7 @@ function get_cmd() {
     local args
 
     if [[ "$name" == 'fd' ]]; then
-        args=" --absolute-path --regex 'C[0-9]+\.MP4$' "
+        args=" -t f -e mp4 --absolute-path --regex 'C[0-9]+' "
     else
         args=" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' "
     fi
@@ -423,12 +423,12 @@ function convert_files() {
     verbose_msg "Video codec: $vcodec"
     verbose_msg "Audio codec: $acodec"
 
-    if [[ "$vcodec" == h265 ]] && [[ "$acodec" == aac ]]; then
+    if [[ "$vcodec" == hevc ]] && [[ "$acodec" == aac ]]; then
         warn_msg "Skipping $filename, already h265 with aac"
         return 1
     fi
 
-    if [[ "$vcodec" == h265 ]]; then
+    if [[ "$vcodec" == hevc ]]; then
         vcmd="$vcopy"
     fi
 
@@ -471,7 +471,7 @@ function media_archive() {
     fi
 
     if hash fd 2>/dev/null; then
-        file_list="$(fd --regex 'C[0-9]+\.MP4$' -t f "${_ARCHIVE}" | wc -l)"
+        file_list="$(fd -t f -e mp4 --regex 'C[0-9]+' "${_ARCHIVE}" | wc -l)"
     else
         file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' | wc -l)"
     fi
