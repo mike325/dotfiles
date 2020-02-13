@@ -1331,6 +1331,42 @@ function _linux_portables() {
         rst=2
     fi
 
+    if has_fetcher && { ! hash jq 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; } && [[ ! $_OS == 'raspbian' ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing jq install'
+        status_msg "Getting jq"
+        local pkg='jq'
+        local url="${github}/stedolan/jq"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$( curl -Ls ${url}/tags | grep -oE 'jq-[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$( wget -qO- ${url}/tags | grep -oE 'jq-[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+        fi
+        status_msg "Downloading jq version: ${version}"
+        local os_type="linux32"
+        if is_64bits; then
+            os_type="linux64"
+        fi
+        if download_asset "jq" "${url}/releases/download/${version}/jq-${os_type}" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            chmod u+x "$_TMP/${pkg}"
+            mv "$_TMP/${pkg}" "$HOME/.local/bin/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download jq"
+        rst=2
+    elif ! hash jq 2>/dev/null  && [[ $_OS == 'raspbian' ]]; then
+        warn_msg "jq does not have prebuild binaries for non x86 architectures"
+        rst=2
+    else
+        warn_msg "Skipping jq, already installed"
+        rst=2
+    fi
+
     return $rst
 }
 
