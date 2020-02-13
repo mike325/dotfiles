@@ -450,8 +450,8 @@ function media_archive() {
 
     if [[ -f "${file_dir}/${file_basename}M01.XML" ]]; then
         status_msg "Backing up sidecard file: ${file_basename}M01.XML"
-        verbose_msg "Using -> mv --backup=numbered ${file_dir}/${file_basename}M01.XML ${_ARCHIVE}/C${file_list}M01.XML"
-        if ! mv --backup=numbered "${file_dir}/${file_basename}M01.XML" "${_ARCHIVE}/C${file_list}M01.XML"; then
+        verbose_msg "Using -> cp --backup=numbered ${file_dir}/${file_basename}M01.XML ${_ARCHIVE}/C${file_list}M01.XML"
+        if ! cp --backup=numbered "${file_dir}/${file_basename}M01.XML" "${_ARCHIVE}/C${file_list}M01.XML"; then
             error_msg "Failed to backup sidecard file ${file_dir}/${file_basename}M01.XML"
             return 1
         fi

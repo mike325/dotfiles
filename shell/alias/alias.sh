@@ -225,7 +225,7 @@ if hash cleanswap 2>/dev/null; then
     alias cw="cleanswap"
 fi
 
-# laod kernel module for virtualbox
+# load kernel module for virtualbox
 if [[ $EUID -ne 0 ]]; then
     alias vbk="sudo modprobe vboxdrv"
 else
@@ -820,3 +820,9 @@ if hash emacs 2>/dev/null; then
         emacsclient -e "(kill-emacs)"
     }
 fi
+
+#######################################################################
+#                          Global Variables                           #
+#######################################################################
+
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
