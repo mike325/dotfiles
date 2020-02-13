@@ -36,7 +36,7 @@ if [[ -z "$_MEDIA_PATH" ]]; then
 fi
 
 if [[ -z "$_ARCHIVE" ]]; then
-    _ARCHIVE="/media/video"
+    _ARCHIVE="/media/video/archive"
 fi
 
 _SCRIPT_PATH="$0"
@@ -371,9 +371,9 @@ function get_cmd() {
     local args
 
     if [[ "$name" == 'fd' ]]; then
-        args=" --absolute-path --regex 'C[0-9]+\.mp4$' "
+        args=" --absolute-path --regex 'C[0-9]+\.MP4$' "
     else
-        args=" -regextype posix-extended -iregex '.*/C[0-9]+\.mp4$' "
+        args=" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' "
     fi
 
     if [[ "$name" == 'fd' ]]; then
@@ -392,7 +392,7 @@ function convert_files() {
     local file_basename
 
     filename=$(basename "$file_path")
-    file_basename=$(basename -s .mp4 "$file_path")
+    file_basename=$(basename -s .MP4 "$file_path")
 
     local converter="ffmpeg "
     local vconverter="-c:v libx265 -preset slow"
@@ -404,15 +404,15 @@ function convert_files() {
 
     status_msg "Converting ${filename}"
 
-    verbose_msg "Converting video -> ${converter} -i ${file_path} ${vconverter} ${acopy} ${file_dir}/${file_basename}.265.mp4"
-    if ! eval '${converter} -i "${file_path}" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.mp4"'; then
+    verbose_msg "Converting video -> ${converter} -i ${file_path} ${vconverter} ${acopy} ${file_dir}/${file_basename}.265.MP4"
+    if ! eval '${converter} -i "${file_path}" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.MP4"'; then
         error_msg "Failed to convert video from ${filename}"
         return 1
     fi
 
-    verbose_msg "Converting audio -> ${converter} -i ${file_dir}/${file_basename}.265.mp4 ${vcopy} ${aconverter} ${file_dir}/${file_basename}.265.aac.mp4"
-    if ! eval '${converter} -i "${file_dir}/${file_basename}.265.mp4" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.aac.mp4"'; then
-        error_msg "Failed to convert audio from ${file_dir}/${file_basename}.265.mp4"
+    verbose_msg "Converting audio -> ${converter} -i ${file_dir}/${file_basename}.265.MP4 ${vcopy} ${aconverter} ${file_dir}/${file_basename}.265.aac.MP4"
+    if ! eval '${converter} -i "${file_dir}/${file_basename}.265.MP4" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.aac.MP4"'; then
+        error_msg "Failed to convert audio from ${file_dir}/${file_basename}.265.MP4"
         return 1
     fi
     return 0
@@ -427,7 +427,7 @@ function media_archive() {
     # local file_number
 
     filename=$(basename "$file_path")
-    file_basename=$(basename -s .mp4 "$file_path")
+    file_basename=$(basename -s .MP4 "$file_path")
 
     if [[ ! -d "${_ARCHIVE}" ]]; then
         verbose_msg "Creating archive ${_ARCHIVE}"
@@ -435,17 +435,26 @@ function media_archive() {
     fi
 
     if hash fd 2>/dev/null; then
-        file_list="$(fd --regex 'C[0-9]+\.mp4$'  -t f "${_ARCHIVE}" | wc -l)"
+        file_list="$(fd --regex 'C[0-9]+\.MP4$' -t f "${_ARCHIVE}" | wc -l)"
     else
-        file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*/C[0-9]+\.mp4$' | wc -l)"
+        file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' | wc -l)"
     fi
 
     status_msg "Backing up original file ${filename}"
-    verbose_msg "Using -> mv --backup=numbered ${file_path} ${_ARCHIVE}/C${file_list}.mp4"
+    verbose_msg "Using -> mv --backup=numbered ${file_path} ${_ARCHIVE}/C${file_list}.MP4"
 
-    if ! mv --backup=numbered "${file_path}" "${_ARCHIVE}/C${file_list}.mp4"; then
+    if ! mv --backup=numbered "${file_path}" "${_ARCHIVE}/C${file_list}.MP4"; then
         error_msg "Failed to backup ${filename}"
         return 1
+    fi
+
+    if [[ -f "${file_dir}/${file_basename}M01.XML" ]]; then
+        status_msg "Backing up sidecard file: ${file_basename}M01.XML"
+        verbose_msg "Using -> mv --backup=numbered ${file_dir}/${file_basename}M01.XML ${_ARCHIVE}/C${file_list}M01.XML"
+        if ! mv --backup=numbered "${file_dir}/${file_basename}M01.XML" "${_ARCHIVE}/C${file_list}M01.XML"; then
+            error_msg "Failed to backup sidecard file ${file_dir}/${file_basename}M01.XML"
+            return 1
+        fi
     fi
 
     return 0
