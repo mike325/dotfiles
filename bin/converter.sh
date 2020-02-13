@@ -26,6 +26,7 @@ _NOCOLOR=0
 _NOLOG=0
 _WARN_COUNT=0
 _ERR_COUNT=0
+_CURRENT=''
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -45,6 +46,7 @@ _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 _OS='unknown'
 
 trap '{ exit_append; }' EXIT
+trap '{ clean_up; }' SIGTERM SIGINT
 
 if hash realpath 2>/dev/null; then
     _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
@@ -394,27 +396,61 @@ function convert_files() {
     filename=$(basename "$file_path")
     file_basename=$(basename -s .MP4 "$file_path")
 
-    local converter="ffmpeg "
+    local converter="ffmpeg -hide_banner "
     local vconverter="-c:v libx265 -preset slow"
     local aconverter="-c:a aac -b:a 320k"
     local vcopy="-c:v copy"
     local acopy="-c:a copy"
+    local vcodec
+    local acodec
+
+    local vcmd="$vconverter"
+    local acmd="$aconverter"
+
+    if [[ $_VERBOSE -eq 0 ]]; then
+        converter="$converter -v quiet "
+    fi
 
     # local metadata=" --metadata authr=$_AUTHOR"
 
+    verbose_msg "Getting video info"
+
+    if hash ffprobe 2>/dev/null && hash jq 2>/dev/null; then
+        vcodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_path}" |  jq .streams[0].codec_name | cut -f2 -d'"')"
+        acodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_path}" |  jq .streams[1].codec_name | cut -f2 -d'"')"
+    fi
+
+    verbose_msg "Video codec: $vcodec"
+    verbose_msg "Audio codec: $acodec"
+
+    if [[ "$vcodec" == h265 ]] && [[ "$acodec" == aac ]]; then
+        warn_msg "Skipping $filename, already h265 with aac"
+        return 1
+    fi
+
+    if [[ "$vcodec" == h265 ]]; then
+        vcmd="$vcopy"
+    fi
+
+    if [[ "$acodec" == aac ]]; then
+        acmd="$aconverter"
+    fi
+
     status_msg "Converting ${filename}"
 
-    verbose_msg "Converting video -> ${converter} -i ${file_path} ${vconverter} ${acopy} ${file_dir}/${file_basename}.265.MP4"
-    if ! eval '${converter} -i "${file_path}" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.MP4"'; then
+    _CURRENT="${file_dir}/${file_basename}.265.MP4"
+
+    verbose_msg "Converting Video -> ${converter} -i ${file_path} ${vcmd} ${acmd} ${file_dir}/${file_basename}.265.MP4"
+    if ! eval '${converter} -i "${file_path}" ${vcmd} ${acmd} "${file_dir}/${file_basename}.265.MP4"'; then
         error_msg "Failed to convert video from ${filename}"
+        verbose_msg "Cleaning failed file"
+        rm -f "${file_dir}/${file_basename}.265.MP4"
+        _CURRENT=''
         return 1
     fi
 
-    verbose_msg "Converting audio -> ${converter} -i ${file_dir}/${file_basename}.265.MP4 ${vcopy} ${aconverter} ${file_dir}/${file_basename}.265.aac.MP4"
-    if ! eval '${converter} -i "${file_dir}/${file_basename}.265.MP4" ${vconverter} ${acopy} "${file_dir}/${file_basename}.265.aac.MP4"'; then
-        error_msg "Failed to convert audio from ${file_dir}/${file_basename}.265.MP4"
-        return 1
-    fi
+    _CURRENT=''
+
     return 0
 }
 
@@ -488,6 +524,15 @@ function get_files() {
         fi
     done
 
+}
+
+function clean_up() {
+    verbose_msg "Cleaning up by interrupt"
+    if [[ -f "$_CURRENT" ]]; then
+        verbose_msg "Cleanning incomplete video $_CURRENT" && rm -f "${_CURRENT}" 2>/dev/null
+    fi
+    exit_append
+    exit 1
 }
 
 verbose_msg "Using media path at ${_MEDIA_PATH}"
