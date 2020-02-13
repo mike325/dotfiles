@@ -38,3 +38,5 @@ ntfs-3g
 thunderbird
 cryptsetup
 rsync
+jq
+ffmpeg
