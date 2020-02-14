@@ -208,7 +208,7 @@ if hash ntfy 2>/dev/null; then
         # Typos
         export AUTO_NTFY_DONE_IGNORE="bim cim im bi ci nvi vnim gti got gut gi guck fukc gukc please fuvk $AUTO_NTFY_DONE_IGNORE"
         # alias
-        export AUTO_NTFY_DONE_IGNORE="py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
+        export AUTO_NTFY_DONE_IGNORE="tma tmn tms py py3 py2 cl nvi del usage vimv extract ports searchpkg fe fkill fssh $AUTO_NTFY_DONE_IGNORE"
         # GUI
         export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
         # Misc
