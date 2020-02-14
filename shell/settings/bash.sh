@@ -41,6 +41,7 @@ shopt -s autocd
 shopt -s globstar
 shopt -s cdspell
 shopt -s direxpand dirspell
+shopt -s nocaseglob
 
 # HISTCONTROL=ignoreboth
 HISTCONTROL='erasedups:ignoreboth'
@@ -118,11 +119,7 @@ export TODO="t"
 
 # Set vcprompt executable path for scm advance info in prompt (demula theme)
 # https://github.com/djl/vcprompt
-#export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
-
-# Case insesitive globes
-shopt -s nocaseglob
-
+# export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
 
 # pip bash completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
