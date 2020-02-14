@@ -730,11 +730,11 @@ function setup_shell() {
     for script in "${_SCRIPT_PATH}"/dotconfigs/*; do
         local scriptname="${script##*/}"
 
-        local file_basename="${scriptname%%.*}"
+        # local file_basename="${scriptname%%.*}"
         # local file_extention="${scriptname##*.}"
 
-        verbose_msg "Setup $script into $HOME/.${file_basename}"
-        setup_config "$script" "$HOME/.${file_basename}"
+        verbose_msg "Setup $script into $HOME/.${scriptname}"
+        setup_config "$script" "$HOME/.${scriptname}"
     done
 
     local sh_shells=(bash zsh)
