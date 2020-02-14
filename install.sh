@@ -274,6 +274,7 @@ Usage:
         --shell_scripts
             Install some bash/zsh shell scripts like:
                 - z.sh
+                - screenfetch
             Current shell:   $_CURRENT_SHELL
 
             Default: on
@@ -768,8 +769,9 @@ function setup_shell() {
 }
 
 function setup_shell_scripts {
+    local rst=0
+
     if [[ $_CURRENT_SHELL =~ (ba|z)?sh ]]; then
-        local rst=0
         local github='https://raw.githubusercontent.com'
         [[ ! -d "$HOME/.config/shell/scripts/" ]] && mkdir -p "$HOME/.config/shell/scripts/"
 
@@ -780,17 +782,40 @@ function setup_shell_scripts {
                 mv "$_TMP/z.sh" "$HOME/.config/shell/scripts/z.sh"
                 [[ ! -f "$HOME/.z" ]] && touch "$HOME/.z"
             else
+                error_msg 'Failed to download Z script'
                 rst=1
             fi
         else
             warn_msg "Z script already install"
+            rst=1
         fi
 
-        return $rst
     else
         error_msg "Not compatible shell ${_CURRENT_SHELL}"
+        rst=1
     fi
-    return 1
+
+    if has_fetcher && { ! hash screenfetch 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing screenfetch install'
+        status_msg 'Getting screenfetch'
+        local pkg='screenfetch'
+        local url="https://git.io/vaHfR"
+        if  download_asset "screenfetch script" "${url}" "$_TMP/${pkg}"; then
+            mv "$_TMP/${pkg}" "$HOME/.local/bin/"
+            chmod u+x "$HOME/.local/bin/${pkg}"
+        else
+            error_msg 'Failed to download screenfetch script'
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download screenfetch"
+        rst=2
+    else
+        warn_msg "Skipping screenfetch, already installed"
+        rst=2
+    fi
+
+    return $rst
 }
 
 function setup_git() {
@@ -944,7 +969,7 @@ function _windows_portables() {
     local rst=0
     local github='https://github.com'
 
-    if ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; } ; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         local pkg='shellcheck-latest.zip'
         status_msg "Getting shellcheck"
@@ -1133,7 +1158,7 @@ function _linux_portables() {
     local rst=0
     local github='https://github.com'
 
-    if { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
+    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck.tar.xz'
@@ -1648,11 +1673,11 @@ function setup_pkgs() {
         fi
         local cmd=""
         if [[ -z "$_PKG_FILE" ]]; then
-            if ! ls "${_SCRIPT_PATH}/packages/${_OS}"/*.pkg 2>/dev/null; then
+            if ! ls "${_SCRIPT_PATH}/packages/${_OS}"/*.pkg > /dev/null; then
                 error_msg "No package file for \"${_OS}\" OS"
                 return 2
             fi
-            declare -a pkgs=( "${_SCRIPT_PATH}/packages/${_OS}"/* )
+            declare -a pkgs=( "${_SCRIPT_PATH}/packages/${_OS}"/*.pkg )
         elif [[ -f "$_PKG_FILE" ]]; then
             local pkgs=( "$_PKG_FILE" )
         else
