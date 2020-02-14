@@ -724,6 +724,9 @@ function setup_bin() {
 
 function setup_shell() {
 
+    local github="https://github.com"
+    local rst=0
+
     status_msg "Getting python startup script"
     setup_config "${_SCRIPT_PATH}/scripts/pythonstartup.py" "$HOME/.local/lib/pythonstartup.py"
 
@@ -763,9 +766,23 @@ function setup_shell() {
         fi
     done
 
-    setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || return 1
+    setup_config "${_SCRIPT_PATH}/shell/" "$HOME/.config/shell" || rst=1
 
-    return 0
+    if hash tmux 2>/dev/null; then
+        status_msg "Setting Tmux plugins"
+
+        [[ ! -d "$HOME/.tmux/plugins/tpm" ]] && mkdir -p "$HOME/.tmux/plugins/"
+
+        if ! clone_repo "$github/tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"; then
+            error_msg "Failed to clone tmux plugin manager"
+            rst=1
+        fi
+
+    else
+        warn_msg "Skipping tmux configs, tmux is not installed"
+    fi
+
+    return $rst
 }
 
 function setup_shell_scripts {
