@@ -36,3 +36,7 @@ set prompt="%B %n%b@%m at %B[%~]%b -> "
 if ( -d "$HOME/.fzf/bin/" ) then
     setenv PATH "$HOME/.fzf/bin/:${PATH}"
 endif
+
+if ( `where tmux` != "" ) then
+    bindkey -c ^a "tmux a"
+endif
