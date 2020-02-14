@@ -34,3 +34,6 @@ cryptsetup
 rsync
 openssh-server
 net-tools
+jq
+ffmpeg
+tmux

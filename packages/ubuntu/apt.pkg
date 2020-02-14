@@ -23,3 +23,6 @@ ntfs-3g
 # davfs2
 cryptsetup
 rsync
+jq
+ffmpeg
+tmux

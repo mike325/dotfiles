@@ -40,3 +40,4 @@ cryptsetup
 rsync
 jq
 ffmpeg
+tmux
