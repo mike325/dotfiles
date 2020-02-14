@@ -145,3 +145,7 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
 else
     PS1="\n${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color} \n→ "
 fi
+
+if hash tmux 2>/dev/null; then
+    bind '"\C-a":"tmux a\n"'
+fi
