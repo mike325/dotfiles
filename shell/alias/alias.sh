@@ -821,6 +821,12 @@ if hash emacs 2>/dev/null; then
     }
 fi
 
+if hash tmux 2>/dev/null; then
+    alias tma='tmux a'
+    alias tms='tmux new -s main'
+    alias tmn='tmux new '
+fi
+
 #######################################################################
 #                          Global Variables                           #
 #######################################################################

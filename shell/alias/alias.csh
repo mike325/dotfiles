@@ -156,3 +156,10 @@ if ( `where fzf` != "" ) then
     # Options to fzf command
     setenv FZF_COMPLETION_OPTS '+c -x'
 endif
+
+
+if ( `where tmux` != "" ) then
+    alias tma "tmux a"
+    alias tms "tmux new -s main"
+    alias tmn "tmux new "
+endif
