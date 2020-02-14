@@ -353,8 +353,9 @@ Usage:
                 - texlab
                 - fd
                 - ripgrep
-                - pip2 and pip3 (GNU/Linux only)
+                - pip2 and pip3
                 - fzf (GNU/Linux only)
+                - jq (GNU/Linux only)
 
             Default: on
 
