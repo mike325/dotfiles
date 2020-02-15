@@ -827,6 +827,18 @@ if hash tmux 2>/dev/null; then
     alias tmn='tmux new '
 fi
 
+if hash ffprobe 2>/dev/null; then
+    function media_info() {
+        local filename="$1"
+
+        if [[ -n "$2" ]]; then
+            ffprobe -v quiet -show_format -show_streams -hide_banner -print_format "$2" -i "$filename"
+        else
+            ffprobe -v quiet -show_format -show_streams -hide_banner -i "$filename"
+        fi
+    }
+fi
+
 #######################################################################
 #                          Global Variables                           #
 #######################################################################
