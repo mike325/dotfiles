@@ -38,5 +38,5 @@ if ( -d "$HOME/.fzf/bin/" ) then
 endif
 
 if ( `where tmux` != "" ) then
-    bindkey -c ^a "tmux a"
+    bindkey -c ^a "tmux a || tmux new -s main"
 endif

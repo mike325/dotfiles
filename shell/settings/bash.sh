@@ -147,5 +147,5 @@ else
 fi
 
 if hash tmux 2>/dev/null; then
-    bind '"\C-a":"tmux a\n"'
+    bind '"\C-a":"tmux a || tmux new -s main\n"'
 fi

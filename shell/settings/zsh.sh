@@ -145,6 +145,8 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
 
+bindkey '^a' 'tmux a || tmux new -s main'
+
 KEYTIMEOUT=1
 
 if hash fzf 2>/dev/null; then
