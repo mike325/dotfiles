@@ -396,11 +396,11 @@ function convert_files() {
     filename=$(basename "$file_path")
     file_basename=$(basename -s .MP4 "$file_path")
 
-    local converter="ffmpeg -hide_banner "
-    local vconverter="-c:v libx265 -preset slow"
+    local converter="ffmpeg -hwaccel auto -hide_banner"
+    local vconverter="-c:v libx265 -crf 16 -preset slow -x265-params lossless"
     local aconverter="-c:a aac -b:a 320k"
     local vcopy="-c:v copy"
-    local acopy="-c:a copy"
+    # local acopy="-c:a copy"
     local vcodec
     local acodec
 
@@ -497,7 +497,6 @@ function media_archive() {
 }
 
 function get_files() {
-    declare -a file_archive
     local _cmd='find'
 
     if hash fd 2>/dev/null; then
@@ -514,13 +513,9 @@ function get_files() {
 
     for i in "${_files[@]}"; do
         if convert_files "${i}"; then
-            file_archive+=("${i}")
-        fi
-    done
-
-    for i in "${file_archive[@]}"; do
-        if ! media_archive "${i}"; then
-            error_msg "Failed to archive ${i}"
+            if ! media_archive "${i}"; then
+                error_msg "Failed to archive ${i}"
+            fi
         fi
     done
 
