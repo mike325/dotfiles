@@ -423,7 +423,7 @@ function convert_files() {
     verbose_msg "Video codec: $vcodec"
     verbose_msg "Audio codec: $acodec"
 
-    if [[ "$vcodec" == hevc ]] && [[ "$acodec" == aac ]]; then
+    if [[ "$vcodec" == hevc ]] && { [[ "$acodec" == aac ]] || [[ "$acodec" == null ]] ; }; then
         warn_msg "Skipping $filename, already h265 with aac"
         return 1
     fi
@@ -432,7 +432,7 @@ function convert_files() {
         vcmd="$vcopy"
     fi
 
-    if [[ "$acodec" == aac ]]; then
+    if [[ "$acodec" == aac ]] || [[ "$acodec" == null ]]; then
         acmd="$acopy"
     fi
 
