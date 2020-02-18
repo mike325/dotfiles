@@ -400,7 +400,7 @@ function convert_files() {
     local vconverter="-c:v libx265 -crf 16 -preset slow -x265-params lossless"
     local aconverter="-c:a aac -b:a 320k"
     local vcopy="-c:v copy"
-    # local acopy="-c:a copy"
+    local acopy="-c:a copy"
     local vcodec
     local acodec
 
@@ -433,7 +433,7 @@ function convert_files() {
     fi
 
     if [[ "$acodec" == aac ]]; then
-        acmd="$aconverter"
+        acmd="$acopy"
     fi
 
     status_msg "Converting ${filename}"
