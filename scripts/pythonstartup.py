@@ -17,12 +17,13 @@ import sys
 import rlcompleter
 
 try:
-    import readline
+    import pyreadline as readline
 except ImportError:
     try:
-        import pyreadline as readline
+        import readline
     except ImportError:
         print("Error importing readline and pyreadline modules")
+        readline = None
 
 __header__ = """
                                -'
@@ -70,7 +71,7 @@ q = Quit()
 home = 'HOME' if os.name != 'nt' else 'USERPROFILE'
 history_file = os.path.join(os.environ[home], '.pyhistory')
 
-try:
+if readline is not None:
 
     def rl_autoindent():
         """
@@ -81,19 +82,18 @@ try:
         try:
             import readline
         except ImportError:
-            try:
-                import pyreadline as readline
-            except ImportError:
-                return
+            return
+
         hist_len = readline.get_current_history_length()
         last_input = readline.get_history_item(hist_len)
         indent = ''
+
         try:
             last_indent_index = last_input.rindex("    ")
+            last_indent = int(last_indent_index / 4) + 1
         except Exception:
             last_indent = 0
-        else:
-            last_indent = int(last_indent_index / 4) + 1
+
         if len(last_input.strip()) > 1:
             if last_input.count("(") > last_input.count(")"):
                 indent = ''.join(["    " for n in range(last_indent + 2)])
@@ -115,15 +115,15 @@ try:
 
     try:
         readline.read_history_file(history_file)
+        readline.set_pre_input_hook(rl_autoindent)
+        readline.parse_and_bind("tab: complete")
+        readline.set_history_length(1000)
+        atexit.register(readline.write_history_file, history_file)
     except IOError:
+        print('Could not open {}'.format(history_file))
+    except AttributeError:
+        # Pyreadline is old and not longer mainteined so It doesn't have most
+        # of the functions readline module does, sooo we just silently fail here
         pass
 
-    readline.set_pre_input_hook(rl_autoindent)
-    readline.parse_and_bind("tab: complete")
-    readline.set_history_length(1000)
-    atexit.register(readline.write_history_file, history_file)
-
-except NameError:
-    pass
-finally:
-    del os, sys, readline, rlcompleter, atexit, history_file, home
+del os, sys, readline, rlcompleter, atexit, history_file, home
