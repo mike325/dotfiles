@@ -27,6 +27,8 @@ _NOLOG=0
 _WARN_COUNT=0
 _ERR_COUNT=0
 _CURRENT=''
+_FILES=()
+_AUTO_LOCATE=1
 
 _NAME="$0"
 _NAME="${_NAME##*/}"
@@ -343,6 +345,25 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
+        -f|--file)
+            if [[ -z "$2" ]]; then
+                error_msg "No file was provided for $key flag"
+                exit 1
+            elif [[ ! -f "$2" ]]; then
+                error_msg "Not a valid file $2"
+                exit 1
+            fi
+            _AUTO_LOCATE=0
+            _FILES+=("$2")
+            shift
+            ;;
+        -)
+            while read -r from_stdin; do
+                _AUTO_LOCATE=0
+                _FILES+=("$from_stdin")
+            done
+            break
+            ;;
         *)
             initlog
             error_msg "Unknown argument $key"
@@ -388,13 +409,16 @@ function get_cmd() {
 }
 
 function convert_files() {
-    local file_path="$1"
-    local file_dir="${file_path%/*}"
+    # local file_path="$1"
+    local file_dir
+    local file_abspath
     local filename
     local file_basename
 
-    filename=$(basename "$file_path")
-    file_basename=$(basename -s .MP4 "$file_path")
+    file_abspath="$(readlink -f "$1")"
+    file_dir="${file_abspath%/*}"
+    filename=$(basename "$file_abspath")
+    file_basename=$(basename "${file_abspath%.*}")
 
     local converter="ffmpeg -hwaccel auto -hide_banner"
     local vconverter="-c:v libx265 -crf 16 -preset slow -x265-params lossless"
@@ -416,8 +440,8 @@ function convert_files() {
     verbose_msg "Getting video info"
 
     if hash ffprobe 2>/dev/null && hash jq 2>/dev/null; then
-        vcodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_path}" |  jq .streams[0].codec_name | cut -f2 -d'"')"
-        acodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_path}" |  jq .streams[1].codec_name | cut -f2 -d'"')"
+        vcodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_abspath}" |  jq .streams[0].codec_name | cut -f2 -d'"')"
+        acodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_abspath}" |  jq .streams[1].codec_name | cut -f2 -d'"')"
     fi
 
     verbose_msg "Video codec: $vcodec"
@@ -438,13 +462,13 @@ function convert_files() {
 
     status_msg "Converting ${filename}"
 
-    _CURRENT="${file_dir}/${file_basename}.265.MP4"
+    _CURRENT="${file_dir}/${file_basename}.265.mp4"
 
-    verbose_msg "Converting Video -> ${converter} -i ${file_path} ${vcmd} ${acmd} ${file_dir}/${file_basename}.265.MP4"
-    if ! eval '${converter} -i "${file_path}" ${vcmd} ${acmd} "${file_dir}/${file_basename}.265.MP4"'; then
+    verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${file_dir}/${file_basename}.265.mp4"
+    if ! eval '${converter} -i "${file_abspath}" ${vcmd} ${acmd} "${file_dir}/${file_basename}.265.mp4"'; then
         error_msg "Failed to convert video from ${filename}"
         verbose_msg "Cleaning failed file"
-        rm -f "${file_dir}/${file_basename}.265.MP4"
+        rm -f "${file_dir}/${file_basename}.265.mp4"
         _CURRENT=''
         return 1
     fi
@@ -455,15 +479,16 @@ function convert_files() {
 }
 
 function media_archive() {
-    local file_path="$1"
-    local file_dir="${file_path%/*}"
+    # local file_path="$1"
+    local file_dir
+    local file_abspath
     local filename
     local file_basename
-    local file_list
-    # local file_number
 
-    filename=$(basename "$file_path")
-    file_basename=$(basename -s .MP4 "$file_path")
+    file_abspath="$(readlink -f "$1")"
+    file_dir="${file_abspath%/*}"
+    filename=$(basename "$file_abspath")
+    file_basename=$(basename "${file_abspath%.*}")
 
     if [[ ! -d "${_ARCHIVE}" ]]; then
         verbose_msg "Creating archive ${_ARCHIVE}"
@@ -496,22 +521,26 @@ function media_archive() {
     return 0
 }
 
-function get_files() {
+function start_convertion() {
     local _cmd='find'
 
     if hash fd 2>/dev/null; then
         _cmd='fd'
     fi
 
-    verbose_msg "Using ${_cmd}"
+    if [[ $_AUTO_LOCATE -eq 1 ]]; then
+        verbose_msg "Using ${_cmd}"
+        _CMD="$(get_cmd "$_cmd" "$_MEDIA_PATH")"
+        verbose_msg "Getting files with -> ${_CMD}"
+        mapfile -t _FILES < <(eval "$_CMD")
+    else
+        verbose_msg "Converting input files:"
+        for i in "${_FILES[@]}"; do
+            printf "\t%s\n" "$i" | tee -a "${_LOG}"
+        done
+    fi
 
-    _CMD="$(get_cmd "$_cmd" "$_MEDIA_PATH")"
-
-    verbose_msg "Getting files with -> ${_CMD}"
-
-    mapfile -t _files < <(eval "$_CMD")
-
-    for i in "${_files[@]}"; do
+    for i in "${_FILES[@]}"; do
         if convert_files "${i}"; then
             if ! media_archive "${i}"; then
                 error_msg "Failed to archive ${i}"
@@ -533,7 +562,7 @@ function clean_up() {
 verbose_msg "Using media path at ${_MEDIA_PATH}"
 verbose_msg "Using archive path at ${_ARCHIVE}"
 
-get_files
+start_convertion
 
 if [[ $_ERR_COUNT -gt 0 ]]; then
     exit 1
