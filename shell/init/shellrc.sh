@@ -148,7 +148,14 @@ if [ -z "$SHELL_PLATFORM" ]; then
 fi
 
 function is_windows() {
-    if [[ $SHELL_PLATFORM == 'msys' ]] || [[ $SHELL_PLATFORM == 'cygwin' ]] || [[ $SHELL_PLATFORM == 'windows' ]]; then
+    if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function is_wls() {
+    if [[ "$(uname -r)" =~ Microsoft ]] ; then
         return 0
     fi
     return 1

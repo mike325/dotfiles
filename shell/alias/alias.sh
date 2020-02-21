@@ -13,7 +13,7 @@
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
-        if is_windows; then
+        if is_windows && ! is_wls; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
