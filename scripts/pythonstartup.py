@@ -115,7 +115,7 @@ if readline is not None:
 
     try:
         readline.read_history_file(history_file)
-        readline.set_pre_input_hook(rl_autoindent)
+        # readline.set_pre_input_hook(rl_autoindent)
         readline.parse_and_bind("tab: complete")
         readline.set_history_length(1000)
         atexit.register(readline.write_history_file, history_file)
