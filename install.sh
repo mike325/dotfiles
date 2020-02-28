@@ -280,6 +280,7 @@ Usage:
 
         --shell_scripts
             Install some bash/zsh shell scripts like:
+                - tmux tpm
                 - z.sh
                 - screenfetch
             Current shell:   $_CURRENT_SHELL
