@@ -26,6 +26,9 @@
 ################################################################################
 
 
+$PSDefaultParameterValues["Out-File:Encoding"] = "utf8"
+$MaximumHistoryCount = 10000;
+
 if ( -Not (Get-Command "which" -ErrorAction SilentlyContinue) ) {
     function which($name) {
         Get-Command $name | Select-Object -ExpandProperty Definition
@@ -65,7 +68,7 @@ if (Test-Path "$env:APPDATA\Python\Python27\Scripts") {
     $env:path = "$env:APPDATA\Python\Python27\Scripts;$env:path"
 }
 
-$python_versions = @('9' '8', '7', '6', '5', '4', '3')
+$python_versions = @('9', '8', '7', '6', '5', '4', '3')
 foreach($version in $python_versions) {
     if (Test-Path "$env:APPDATA\Python\Python3$version\Scripts") {
         $env:path = "$env:APPDATA\Python\Python3$version\Scripts;$env:path"
@@ -182,6 +185,8 @@ Write-Host "
              '++:.                           '-/+/
              .'   github.com/mike325/dotfiles   '/
 "
+
+Import-Module PSReadLine -ErrorAction SilentlyContinue
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
