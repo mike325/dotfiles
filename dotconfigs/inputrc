@@ -14,9 +14,16 @@ set mark-symlinked-directories on
 # vi settings
 $if mode=vi
     # normal mode
-    # set keymap vi-command
-    # "G": end-of-history
+    set keymap vi-command
+    # arrow up
+    "k": history-search-backward
+    # arrow down
+    "j": history-search-forward
     # insert mode
     set keymap vi-insert
     "jj": vi-movement-mode # remap escape
+    # arrow up
+    "\e[A": history-search-backward
+    # arrow down
+    "\e[B": history-search-forward
 $endif
