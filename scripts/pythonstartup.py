@@ -58,13 +58,10 @@ class Quit(object):
         super(Quit, self).__init__()
 
     def __repr__(self):
-        exit(0)
+        exit()
 
     def __str__(self):
         return 'Quit object to quick quit current prompt'
-
-    def __call__(self):
-        exit(0)
 
 
 q = Quit()
@@ -123,7 +120,8 @@ if readline is not None:
         print('Could not open {}'.format(history_file))
     except AttributeError:
         # Pyreadline is old and not longer mainteined so It doesn't have most
-        # of the functions readline module does, sooo we just silently fail here
+        # of the functions readline module does, sooo we just silently fail
+        # here
         pass
 
 del os, sys, readline, rlcompleter, atexit, history_file, home
