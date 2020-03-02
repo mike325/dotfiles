@@ -30,6 +30,16 @@
 # Remove terminal sounds
 unsetopt beep
 
+autoload -Uz history-search-end
+autoload -Uz compinit
+
+# Set vi key mode
+bindkey -v
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey '^w' backward-kill-word
+bindkey '^r' history-incremental-search-backward
+
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
@@ -44,31 +54,23 @@ if [[ -d "$HOME/.oh-my-zsh" ]]; then
 fi
 
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-    plugins=(go git python)
+
+    plugins=(
+        go
+        git
+        python
+        history-substring-search
+    )
+
     # Set name of the theme to load. Optionally, if you set this to "random"
     # it'll load a random theme each time that oh-my-zsh is loaded.
     # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-    [[ -z $ZSH_THEME ]] && ZSH_THEME="agnoster"
+    [[ -z $ZSH_THEME ]] && ZSH_THEME="amuse"
 
     # CASE_SENSITIVE="true"
 
-    # Uncomment the following line to use hyphen-insensitive completion. Case
-    # sensitive completion must be off. _ and - will be interchangeable.
-    # HYPHEN_INSENSITIVE="true"
-
-    # Uncomment the following line to disable bi-weekly auto-update checks.
-    # DISABLE_AUTO_UPDATE="true"
-
-    # Uncomment the following line to change how often to auto-update (in days).
-    # export UPDATE_ZSH_DAYS=13
-
-    # Uncomment the following line to disable colors in ls.
-    # DISABLE_LS_COLORS="true"
-
     # Uncomment the following line to disable auto-setting terminal title.
     # DISABLE_AUTO_TITLE="true"
-
-    # [[ -z $ENABLE_CORRECTION ]] && ENABLE_CORRECTION="true"
 
     # Uncomment the following line to display red dots whilst waiting for completion.
     # COMPLETION_WAITING_DOTS="true"
@@ -78,22 +80,28 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     # much, much faster.
     # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
-    # Uncomment the following line if you want to change the command execution time
-    # stamp shown in the history command output.
-    # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-    # HIST_STAMPS="mm/dd/yyyy"
-
     # Set Xterm/screen/Tmux title with only a short hostname.
     # Uncomment this (or set SHORT_HOSTNAME to something else),
     # Will otherwise fall back on $HOSTNAME.
     [[ -z $SHORT_HOSTNAME ]] && export SHORT_HOSTNAME=$(hostname -s)
 
+    if source "$ZSH/oh-my-zsh.sh"; then
+        # bind UP and DOWN arrow keys (compatibility fallback
+        # for Ubuntu 12.04, Fedora 21, and MacOSX 10.9 users)
+        bindkey '^[[A' history-substring-search-up
+        bindkey '^[[B' history-substring-search-down
+        bindkey '^p' history-substring-search-up
+        bindkey '^n' history-substring-search-down
 
-    source "$ZSH/oh-my-zsh.sh"
+        # bind k and j for VI mode
+        bindkey -M vicmd 'k' history-substring-search-up
+        bindkey -M vicmd 'j' history-substring-search-down
+    fi
+
 else
     # Case insesitive tab completion
     zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
-    autoload -U colors && colors
+    autoload -Uz colors
     # autoload -U promptinit && promptinit
     # prompt -p redhat
     # prompt -s redhat
@@ -117,6 +125,8 @@ if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
 fi
 # pip zsh completion end
 
+KEYTIMEOUT=20
+
 HISTFILE="$HOME/.zsh/history"
 HISTSIZE=2048
 SAVEHIST=2048
@@ -136,20 +146,10 @@ setopt hist_reduce_blanks
 # Don't ask for rm * confirmation
 setopt rmstarsilent
 
-# Set vi key mode
-bindkey -v
-bindkey '^P' up-history
-bindkey '^N' down-history
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
-bindkey '^w' backward-kill-word
-bindkey '^r' history-incremental-search-backward
-
 bindkey '^a' 'tmux a || tmux new -s main'
-
-KEYTIMEOUT=1
+bindkey 'jj' vi-cmd-mode
+bindkey -M viins 'jj' vi-cmd-mode
 
 if hash fzf 2>/dev/null; then
     [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
 fi
-

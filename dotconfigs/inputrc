@@ -21,7 +21,7 @@ $if mode=vi
     "j": history-search-forward
     # insert mode
     set keymap vi-insert
-    "jj": vi-movement-mode # remap escape
+    "jj": vi-movement-mode
     # arrow up
     "\e[A": history-search-backward
     # arrow down
