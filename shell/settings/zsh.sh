@@ -53,6 +53,10 @@ if [[ -d "$HOME/.oh-my-zsh" ]]; then
     export ZSH="$HOME/.oh-my-zsh"
 fi
 
+if [[ -z $SHEL ]]; then
+    SHELL='/bin/zsh'
+fi
+
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
 
     plugins=(
@@ -146,7 +150,7 @@ setopt hist_reduce_blanks
 # Don't ask for rm * confirmation
 setopt rmstarsilent
 
-bindkey '^a' 'tmux a || tmux new -s main'
+bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
 bindkey 'jj' vi-cmd-mode
 bindkey -M viins 'jj' vi-cmd-mode
 
