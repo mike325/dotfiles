@@ -5,6 +5,7 @@ curl
 git
 wget
 gcc
+gcc-c++
 clang
 clang-devel
 llvm-devel
@@ -15,3 +16,10 @@ cmake
 ctags
 sl
 neovim
+ninja-build
+libtool
+autoconf
+automake
+pkgconfig
+unzip
+patch

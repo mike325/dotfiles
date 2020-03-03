@@ -26,3 +26,10 @@ rsync
 jq
 ffmpeg
 tmux
+ninja-build
+gettext
+libtool
+libtool-bin
+autoconf
+automake
+pkg-config

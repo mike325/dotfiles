@@ -41,3 +41,4 @@ rsync
 jq
 ffmpeg
 tmux
+ninja
