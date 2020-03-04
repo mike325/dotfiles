@@ -52,8 +52,8 @@ if ! hash is_windows 2>/dev/null; then
     }
 fi
 
-if ! hash is_wls 2>/dev/null; then
-    function is_wls() {
+if ! hash is_wsl 2>/dev/null; then
+    function is_wsl() {
         if [[ "$(uname -r)" =~ Microsoft ]] ; then
             return 0
         fi

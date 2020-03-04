@@ -154,7 +154,7 @@ function is_windows() {
     return 1
 }
 
-function is_wls() {
+function is_wsl() {
     if [[ "$(uname -r)" =~ Microsoft ]] ; then
         return 0
     fi
@@ -163,6 +163,13 @@ function is_wls() {
 
 function is_osx() {
     if [[ $SHELL_PLATFORM == 'osx' ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function is_linux() {
+    if ! is_windows && ! is_wsl && ! is_osx; then
         return 0
     fi
     return 1

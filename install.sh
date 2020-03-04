@@ -139,7 +139,7 @@ function is_windows() {
     return 1
 }
 
-function is_wls() {
+function is_wsl() {
     if [[ "$(uname -r)" =~ Microsoft ]] ; then
         return 0
     fi
