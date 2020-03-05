@@ -50,7 +50,7 @@ bindkey '^r' history-incremental-search-backward
 
 # Path to your oh-my-zsh installation.
 if [[ -d "$HOME/.oh-my-zsh" ]]; then
-    export ZSH="$HOME/.oh-my-zsh"
+    ZSH="$HOME/.oh-my-zsh"
 fi
 
 if [[ -z $SHEL ]]; then
