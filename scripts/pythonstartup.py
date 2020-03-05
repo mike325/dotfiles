@@ -14,7 +14,7 @@ from __future__ import division
 import atexit
 import os
 import sys
-import rlcompleter
+# import rlcompleter
 
 try:
     import pyreadline as readline
@@ -124,4 +124,4 @@ if readline is not None:
         # here
         pass
 
-del os, sys, readline, rlcompleter, atexit, history_file, home
+del os, sys, readline, atexit, history_file, home

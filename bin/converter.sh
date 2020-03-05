@@ -511,9 +511,9 @@ function media_archive() {
     fi
 
     status_msg "Backing up original file ${filename}"
-    verbose_msg "Using -> mv --backup=numbered ${file_path} ${_ARCHIVE}/C${file_list}.MP4"
+    verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${_ARCHIVE}/C${file_list}.MP4"
 
-    if ! mv --backup=numbered "${file_path}" "${_ARCHIVE}/C${file_list}.MP4"; then
+    if ! mv --backup=numbered "${file_abspath}" "${_ARCHIVE}/C${file_list}.MP4"; then
         error_msg "Failed to backup ${filename}"
         return 1
     fi
