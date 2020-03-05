@@ -48,7 +48,7 @@ script:
   - ./install.sh --verbose
   - ./install.sh --verbose --force
   - if [[ -n $IS_LINUX ]]; then sudo ./install.sh --verbose --packages --only; fi
-  - if [[ -n $IS_WINDOWS ]]; then ./install.sh --verbose --packages choco --only; fi
+  # - if [[ -n $IS_WINDOWS ]]; then ./install.sh --verbose --packages choco --only; fi
 
 notifications:
   email:
