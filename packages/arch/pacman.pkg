@@ -42,3 +42,4 @@ jq
 ffmpeg
 tmux
 ninja
+luarocks

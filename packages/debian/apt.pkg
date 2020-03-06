@@ -45,3 +45,4 @@ libtool-bin
 autoconf
 automake
 pkg-config
+luarocks
