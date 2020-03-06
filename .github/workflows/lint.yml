@@ -1,0 +1,21 @@
+name: lint
+
+on: [push, pull_request]
+
+jobs:
+  lint-source-code:
+    name: Lint source code
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: |
+          sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
+          sudo apt install -y python3-pip
+          sudo pip3 install --upgrade pip
+          sudo pip3 install 'mypy==0.710' 'flake8>=3.5.0' 'flake8-mypy>=17.8.0' 'pyflakes>=2.0.0' 'yapf>=0.22.0' 'mccabe>=0.6.1'
+      - name: Basic linting
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          ./test/lint.sh --verbose

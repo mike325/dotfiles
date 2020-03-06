@@ -287,7 +287,7 @@ if ! hash shellcheck 2>/dev/null; then
     exit 1
 fi
 
-status_msg 'Starting basic shell check test'
+status_msg 'Starting shellcheck test'
 _version="$(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
 verbose_msg "Shellcheck version: ${_version}"
 
@@ -296,14 +296,22 @@ if [[ $_version =~ 0\.[2-3]\.[0-9] ]]; then
     warn_msg "Shellcheck is too old, skipping"
 elif [[ $_version =~ 0\.[4-5]\.[0-9] ]]; then
     if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
-        error_msg 'Fail test'
+        error_msg 'Fail shellcheck test'
         exit 2
     fi
 else
     if ! shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
-        error_msg 'Fail test'
+        error_msg 'Fail shellcheck test'
         exit 2
     fi
+fi
+
+status_msg 'Starting python lint test'
+verbose_msg "Flake version: $(flake8 --version)"
+
+if ! flake8 --max-line-length=120 --max-complexity=18; then
+    error_msg "Failed python lint test"
+    exit 3
 fi
 
 exit 0

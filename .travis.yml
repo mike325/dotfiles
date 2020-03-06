@@ -30,7 +30,7 @@ matrix:
         before_install:
           - sudo apt-get install curl git shellcheck -y
         before_script:
-          - bash -c "./test/basic.sh --verbose"
+          - bash -c "./test/lint.sh --verbose"
         env:
           - IS_LINUX=1
       - name: "Testing install script with macOS"
@@ -39,7 +39,7 @@ matrix:
         before_install:
           - brew install shellcheck
         before_script:
-          - bash -c "./test/basic.sh --verbose"
+          - bash -c "./test/lint.sh --verbose"
         env:
           - PATH="/Users/travis/Library/Python/3.7/bin:$PATH"
           - PATH="/Users/travis/Library/Python/3.8/bin:$PATH"
