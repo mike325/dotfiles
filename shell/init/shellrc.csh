@@ -56,22 +56,24 @@ if ( -f "$HOME/.local/lib/pythonstartup.py" ) then
 endif
 
 ### Setting the PATH var
-if ( -d "$HOME/.local/git/bin" ) then
-    setenv PATH "$HOME/.local/git/bin:$PATH"
-endif
-
-### Setting the PATH var
-if ( -d "$HOME/.gem/ruby/2.6.0/bin" ) then
-    setenv PATH "$HOME/.gem/ruby/2.6.0/bin:$PATH"
+if ( -d "$HOME/.config/git/bin" ) then
+    setenv PATH "$HOME/.config/git/bin:$PATH"
 endif
 
 if ( -d "$HOME/.local/bin/" ) then
     setenv PATH "$HOME/.local/bin/:$PATH"
 endif
 
-# If Neovim is installed in a different path, you could set it in env file
 if ( -d "$HOME/.local/neovim/bin" ) then
     setenv PATH "$HOME/.local/neovim/bin:$PATH"
+endif
+
+if ( -d "$HOME/.fzf/bin/" ) then
+    setenv PATH "$HOME/.fzf/bin/:$PATH"
+endif
+
+if ( -d "$HOME/.luarocks/bin" ) then
+    setenv PATH "$HOME/.luarocks/bin:$PATH"
 endif
 
 if ( -d "$HOME/.local/golang/bin" ) then
@@ -80,6 +82,10 @@ endif
 
 if ( -d "$HOME/.local/golang/src" ) then
     setenv GOPATH "$HOME/.local/golang/src"
+endif
+
+if ( -d "$HOME/.gem/ruby/2.6.0/bin" ) then
+    setenv PATH "$HOME/.gem/ruby/2.6.0/bin:$PATH"
 endif
 
 ################################################################################

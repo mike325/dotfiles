@@ -93,6 +93,7 @@ fi
 [[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
 [[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
+[[ -d "$HOME/.luarocks/bin" ]] && export PATH="$HOME/.luarocks/bin/:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
@@ -116,8 +117,8 @@ elif [[ -d "$NEOVIM_PATH" ]]; then
 fi
 
 [[ -d "$HOME/.local/golang/bin" ]] && export PATH="$HOME/.local/golang/bin:$PATH"
-[[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
 [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
+[[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
 
 if hash npm 2>/dev/null; then
     [[ ! -d "$HOME/.npm-global/" ]] && mkdir -p "$HOME/.npm-global"
