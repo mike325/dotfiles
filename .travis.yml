@@ -38,7 +38,7 @@ matrix:
       - name: "Testing install script with Windows"
         os: windows
         before_install:
-          - choco install python git curl -y
+          - choco install python git -y
         env:
           - PATH="/c/Python37:/c/Python37/Scripts:$PATH"
           - PATH="/c/Python38:/c/Python38/Scripts:$PATH"
