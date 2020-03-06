@@ -9,6 +9,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - name: OS Info
+        run: |
+          sudo apt install wget
+          wget -O screenfetch-dev https://git.io/vaHfR
+          chmod +x screenfetch-dev
+          ./screenfetch-dev
       - name: Install dependencies
         run: |
           sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
