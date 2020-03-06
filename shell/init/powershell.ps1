@@ -57,12 +57,13 @@ if ( Test-Path "$env:USERPROFILE\.local\bin" ) {
     $env:path = "$env:USERPROFILE\.local\bin;$env:path"
 }
 
-# Path settings
 if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
     $env:path = "$env:APPDATA\Neovim\bin;$env:path"
 }
 
-# $pythonscripts
+if ( Test-Path "$env:USERPROFILE\scoop\persist\nodejs\bin" ) {
+    $env:path = "$env:USERPROFILE\scoop\persist\nodejs\bin;$env:path"
+}
 
 if (Test-Path "$env:APPDATA\Python\Python27\Scripts") {
     $env:path = "$env:APPDATA\Python\Python27\Scripts;$env:path"
