@@ -337,7 +337,7 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
     # 'Install' package maybe in the PATH
 
     if hash yay 2>/dev/null; then
-        pkg="yay"
+        pkg="yay --repo"
     elif hash yaourt 2>/dev/null; then
         pkg="yaourt"
     elif hash pacman 2>/dev/null; then
@@ -367,17 +367,32 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
 
     alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
-    # shellcheck disable=SC2139
-    alias update="${pkg} -Syu --aur" && alias updaten="${pkg} -Syu --aur --noconfirm"
-
     alias rmpkg="${pkg} -Rns"
 
-    if [[ $EUID -ne 0 ]] && ! hash yaourt 2>/dev/null; then
+    if hash yay 2>/dev/null || hash yaourt 2>/dev/null; then
+        function update() {
+            if hash yay 2>/dev/null; then
+                local pkg="yay"
+            elif hash yaourt 2>/dev/null; then
+                local pkg="yaourt"
+            fi
+
+            if [[ -z "$1" ]]; then
+                 sh -c "${pkg} -Syu --repo --noconfirm"
+             else
+                 sh -c "${pkg} -Syu $@"
+            fi
+        }
+        # shellcheck disable=SC2139
+        # alias update="${pkg} -Syu" && alias updaten="${pkg} -Syu --noconfirm"
+    fi
+
+    if [[ $EUID -ne 0 ]] && { ! hash yaourt 2>/dev/null && ! hash yay 2>/dev/null; }; then
         unalias getpkg && alias getpkg="sudo ${pkg} -S"
         unalias getpkgn && alias getpkgn="sudo ${pkg} -S --noconfirm"
 
-        unalias update && alias update="sudo ${pkg} -Syu --aur"
-        unalias updaten && alias updaten="sudo ${pkg} -Syu --aur --noconfirm"
+        alias update="sudo ${pkg} -Syu"
+        alias updaten="sudo ${pkg} -Syu --noconfirm"
 
         unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
 
