@@ -380,10 +380,9 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
             if [[ -z "$1" ]]; then
                  sh -c "${pkg} -Syu --repo --noconfirm"
              else
-                 sh -c "${pkg} -Syu $@"
+                 sh -c "${pkg} -Syu $*"
             fi
         }
-        # shellcheck disable=SC2139
         # alias update="${pkg} -Syu" && alias updaten="${pkg} -Syu --noconfirm"
     fi
 

@@ -15,7 +15,13 @@ matrix:
         os: linux
         sudo: true
         before_install:
-          - sudo apt-get install curl git shellcheck wget -y
+          - sudo apt-get install curl git wget -y
+          - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+          - tar xf shellcheck-latest.linux.x86_64.tar.xz
+          - chmod u+x shellcheck-latest/shellcheck
+          - mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
+          - rm -rf shellcheck-latest*
+          - bash -c "./test/lint.sh --verbose"
         before_script:
           - pushd "$HOME"
           - wget https://raw.githubusercontent.com/Mike325/dotfiles/master/install.sh
@@ -28,7 +34,12 @@ matrix:
         os: linux
         sudo: true
         before_install:
-          - sudo apt-get install curl git shellcheck -y
+          - sudo apt-get install curl git -y
+          - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+          - tar xf shellcheck-latest.linux.x86_64.tar.xz
+          - chmod u+x shellcheck-latest/shellcheck
+          - mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
+          - rm -rf shellcheck-latest*
         before_script:
           - bash -c "./test/lint.sh --verbose"
         env:

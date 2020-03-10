@@ -17,10 +17,18 @@ jobs:
           ./screenfetch-dev
       - name: Install dependencies
         run: |
-          sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
+          # Install basic packages
+          sudo apt install -y curl git python3-setuptools python-setuptools
+          # Setting up pip
           sudo apt install -y python3-pip
           sudo pip3 install --upgrade pip
           sudo pip3 install 'mypy==0.710' 'flake8>=3.5.0' 'flake8-mypy>=17.8.0' 'pyflakes>=2.0.0' 'yapf>=0.22.0' 'mccabe>=0.6.1'
+          # Getting latest shellcheck
+          wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+          tar xf shellcheck-latest.linux.x86_64.tar.xz
+          chmod u+x shellcheck-latest/shellcheck
+          mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
+          rm -rf shellcheck-latest*
       - name: Basic linting
         run: |
           export PATH="$HOME/.local/bin:$PATH"
