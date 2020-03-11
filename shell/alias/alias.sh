@@ -13,6 +13,9 @@
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
+
+        [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
+
         if is_windows && ! is_wsl; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
@@ -46,8 +49,10 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
         else
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
-            # NOTE: This is set inside Neovim settings
-            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
+
+            if [[ ! -e  "$HOME/.cache/nvim/socket" ]] || ! hash nvr 2>/dev/null; then
+                alias nvim="$(which nvim) --listen $HOME/.cache/nvim/socket"
+
                 export MANPAGER="nvim --cmd 'let g:minimal=1' +Man!"
                 export EDITOR="nvim"
                 alias vi="nvim --cmd 'let g:minimal=1'"
@@ -55,15 +60,17 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 # Fucking typos
                 alias nvi="nvim"
                 alias vnim="nvim"
-            else
-                export MANPAGER="nvr -c 'Man!' --remote-tab -"
-                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
-                export EDITOR="nvr --remote-tab-wait"
-                alias vi="nvr --remote-silent"
-                alias vim="nvr --remote-silent"
-                alias nvi="nvr --remote-silent"
-                alias nvim="nvr --remote-silent"
-                alias vnim="nvr --remote-silent"
+            elif hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
+                # export MANPAGER="nvr --servername $HOME/.cache/nvim/socket -c 'Man!' --remote-tab -"
+                # export GIT_PAGER="nvr --servername $HOME/.cache/nvim/socket -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
+                export EDITOR="nvr --servername $HOME/.cache/nvim/socket --remote-tab-wait"
+
+                alias nvim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+                alias vi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+                alias vim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+
+                alias nvi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+                alias vnim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
             fi
         fi
     else
