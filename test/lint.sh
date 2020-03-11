@@ -129,6 +129,7 @@ reset_color="\033[39m"
 function help_user() {
     cat<<EOF
 Description
+    Lint project source code
 
 Usage:
     $_NAME [OPTIONAL]
@@ -281,6 +282,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 initlog
+
+# Make sure path have local bin
+# shellcheck disable=SC2034
+PATH="$HOME/.local/bin/:$PATH"
 
 if ! hash shellcheck 2>/dev/null; then
     error_msg 'Missing shellcheck, aborting basic test'

@@ -19,7 +19,7 @@ matrix:
           - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
           - tar xf shellcheck-latest.linux.x86_64.tar.xz
           - chmod u+x shellcheck-latest/shellcheck
-          - mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
+          - mkdir -p "$HOME/.local/bin/" && mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
           - rm -rf shellcheck-latest*
           - bash -c "./test/lint.sh --verbose"
         before_script:
@@ -38,7 +38,7 @@ matrix:
           - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
           - tar xf shellcheck-latest.linux.x86_64.tar.xz
           - chmod u+x shellcheck-latest/shellcheck
-          - mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
+          - mkdir -p "$HOME/.local/bin/" && mv shellcheck-latest/shellcheck "$HOME/.local/bin/"
           - rm -rf shellcheck-latest*
         before_script:
           - bash -c "./test/lint.sh --verbose"
