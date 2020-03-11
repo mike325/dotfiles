@@ -1,0 +1,7 @@
+# Linting modules
+mypy==0.710
+flake8>=3.5.0
+flake8-mypy>=17.8.0
+pyflakes>=2.0.0
+yapf>=0.22.0
+mccabe>=0.6.1

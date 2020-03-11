@@ -15,7 +15,10 @@ matrix:
         os: linux
         sudo: true
         before_install:
-          - sudo apt-get install curl git wget -y
+          - sudo apt install -y curl git python3-setuptools python-setuptools
+          - sudo apt install -y python3-pip
+          - sudo pip3 install --upgrade pip
+          - sudo pip3 install -r ./test/requirements.txt
           - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
           - tar xf shellcheck-latest.linux.x86_64.tar.xz
           - chmod u+x shellcheck-latest/shellcheck
@@ -34,7 +37,10 @@ matrix:
         os: linux
         sudo: true
         before_install:
-          - sudo apt-get install curl git -y
+          - sudo apt install -y curl git python3-setuptools python-setuptools
+          - sudo apt install -y python3-pip
+          - sudo pip3 install --upgrade pip
+          - sudo pip3 install -r ./test/requirements.txt
           - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
           - tar xf shellcheck-latest.linux.x86_64.tar.xz
           - chmod u+x shellcheck-latest/shellcheck
@@ -49,6 +55,9 @@ matrix:
         osx_image: xcode11
         before_install:
           - brew install shellcheck
+          - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          - python3 get-pip.py --user
+          - $HOME/.local/bin/pip3 install -r ./test/requirements.txt
         before_script:
           - bash -c "./test/lint.sh --verbose"
         env:

@@ -22,7 +22,7 @@ jobs:
           # Setting up pip
           sudo apt install -y python3-pip
           sudo pip3 install --upgrade pip
-          sudo pip3 install 'mypy==0.710' 'flake8>=3.5.0' 'flake8-mypy>=17.8.0' 'pyflakes>=2.0.0' 'yapf>=0.22.0' 'mccabe>=0.6.1'
+          sudo pip3 install -r ./test/requirements.txt
           # Getting latest shellcheck
           wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
           tar xf shellcheck-latest.linux.x86_64.tar.xz
