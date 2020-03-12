@@ -62,7 +62,26 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
 
             function nvim() {
                 if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
-                    nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "$@"
+                    local args=()
+                    local avoid=0
+                    for arg in "$@"; do
+                        case "$arg" in
+                            -*|+*)
+                                if [[ "$arg" == '--cmd' ]]; then
+                                    local avoid=1
+                                else
+                                    local avoid=0
+                                fi
+                                ;;
+                            *)
+                                if [[ $avoid -eq 0 ]]; then
+                                    args+=("$arg")
+                                fi
+                                [[ $avoid -eq 1 ]] && local avoid=0
+                                ;;
+                        esac
+                    done
+                    nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "${args[@]}"
                 else
                     $_nvim --listen "$HOME/.cache/nvim/socket" "$@"
                 fi
