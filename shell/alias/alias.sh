@@ -229,7 +229,7 @@ if hash ntfy 2>/dev/null; then
         # GUI
         export AUTO_NTFY_DONE_IGNORE="nautilus gonvim firefox vlc $AUTO_NTFY_DONE_IGNORE"
         # Misc
-        export AUTO_NTFY_DONE_IGNORE="dmesg tmux screen meld htop top ssh fg cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
+        export AUTO_NTFY_DONE_IGNORE="dmesg rshell tmux screen meld htop top ssh fg cd fzf clear ctags fuck $AUTO_NTFY_DONE_IGNORE"
         eval "$(ntfy shell-integration)"
     fi
 
