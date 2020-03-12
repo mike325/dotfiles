@@ -15,6 +15,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
 
         [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
+        export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket"
 
         if is_windows && ! is_wsl; then
             alias cdvi="cd ~/.vim"
@@ -50,28 +51,37 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
 
-            if [[ ! -e  "$HOME/.cache/nvim/socket" ]] || ! hash nvr 2>/dev/null; then
-                alias nvim="$(which nvim) --listen $HOME/.cache/nvim/socket"
+            _nvim="$(which nvim)"
 
-                export MANPAGER="nvim --cmd 'let g:minimal=1' +Man!"
-                export EDITOR="nvim"
-                alias vi="nvim --cmd 'let g:minimal=1'"
-                alias viu="nvim -u NONE"
-                # Fucking typos
-                alias nvi="nvim"
-                alias vnim="nvim"
-            elif hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
-                # export MANPAGER="nvr --servername $HOME/.cache/nvim/socket -c 'Man!' --remote-tab -"
-                # export GIT_PAGER="nvr --servername $HOME/.cache/nvim/socket -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote-tab -"
-                export EDITOR="nvr --servername $HOME/.cache/nvim/socket --remote-tab-wait"
+            export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
+            export EDITOR="nvim"
 
-                alias nvim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
-                alias vi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
-                alias vim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+            # Fucking typos
+            alias nvi="nvim"
+            alias vnim="nvim"
 
-                alias nvi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
-                alias vnim="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+            function nvim() {
+                if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
+                    nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "$@"
+                else
+                    $_nvim --listen "$HOME/.cache/nvim/socket" "$@"
+                fi
+            }
+
+            if hash rshell 2>/dev/null; then
+                if hash nvr 2>/dev/null; then
+                    export RSHELL_EDITOR="nvr --servername $HOME/.cache/nvim/socket --remote-wait"
+                else
+                    export RSHELL_EDITOR="$EDITOR"
+                fi
             fi
+
+            if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
+                alias vi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+            else
+                alias vi="nvim --cmd 'let g:minimal=1'"
+            fi
+
         fi
     else
         alias cdvim="cd ~/.vim"
