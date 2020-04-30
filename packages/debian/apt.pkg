@@ -46,3 +46,8 @@ autoconf
 automake
 pkg-config
 luarocks
+apparmor-utils
+avahi-daemon
+dbus
+network-manager
+socat
