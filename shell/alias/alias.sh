@@ -209,6 +209,11 @@ alias las="ls -A --sort=size"
 alias lls="ls -l --sort=size"
 alias llas="ls -lA --sort=size"
 
+# default fd package in debian is fd-find, so we add a small alias to us fd
+if hash fdfind 2>/dev/null && ! hash fd 2>/dev/null; then
+    alias fd=fdfind
+fi
+
 # We only want sudo alias when user =! root
 [[ $EUID -ne 0 ]] && alias sudo='sudo '
 

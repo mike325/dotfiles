@@ -67,6 +67,11 @@ else
     alias im "vim"
 endif
 
+# default fd package in debian is fd-find, so we add a small alias to us fd
+if ( `where fdfind` != "" ) then
+    alias fd "fdfind"
+endif
+
 alias bi "vi"
 alias ci "vi"
 
