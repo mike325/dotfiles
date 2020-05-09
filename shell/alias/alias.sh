@@ -531,14 +531,6 @@ fi
 unset pkg
 
 ################################################################################
-#                              Some miscellaneous                              #
-################################################################################
-
-if is_windows; then
-    export CYGWIN=winsymlinks:native
-fi
-
-################################################################################
 #               Functions to move around dirs and other simple stuff           #
 ################################################################################
 
@@ -901,3 +893,12 @@ fi
 #######################################################################
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+if hash mqttwarn 2>/dev/null && [[ -f  "$HOME/.config/mqttwarn/mqttwarn.ini" ]] && [[ -z $MQTTWARNINI ]] ; then
+    export MQTTWARNINI="$HOME/.config/mqttwarn/mqttwarn.ini"
+fi
+
+if is_windows; then
+    export CYGWIN=winsymlinks:native
+fi
+
