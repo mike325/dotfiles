@@ -86,7 +86,7 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-if is_windows || is_wsl; then
+if is_windows || is_wsl || ! is_64bits ; then
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
@@ -120,6 +120,17 @@ export TODO="t"
 # Set vcprompt executable path for scm advance info in prompt (demula theme)
 # https://github.com/djl/vcprompt
 # export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
 
 # pip bash completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then

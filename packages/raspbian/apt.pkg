@@ -1,4 +1,6 @@
 sudo apt install -y
+ripgrep
+fd-find
 ufw
 zsh
 curl

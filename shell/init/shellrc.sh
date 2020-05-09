@@ -176,6 +176,14 @@ function is_linux() {
     return 1
 }
 
+# TODO: This should work with ARM 64bits
+function is_64bits() {
+    if [[ "$(uname -m)" =~ (x86_64) ]]; then
+        return 0
+    fi
+    return 1
+}
+
 if [[ -n "$ZSH_NAME" ]]; then
     _CURRENT_SHELL="zsh"
 elif [[ -n "$BASH" ]]; then

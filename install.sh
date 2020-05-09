@@ -932,7 +932,7 @@ function get_nvim_dotfiles() {
     status_msg "Setting up neovim"
 
 
-    if [[ $_PORTABLES -eq 0 ]] && [[ $_ALL -eq 0 ]] && [[ $_NEOVIM_DOTFILES -eq 0 ]]; then
+    if [[ $_PORTABLES -eq 0 ]] && [[ $_ALL -eq 0 ]] && [[ $_NEOVIM_DOTFILES -eq 0 ]] && ! [[ "$_ARCH" =~ ^arm ]]; then
         local args="--portable"
 
         [[ $_FORCE_INSTALL -eq 1 ]] && args=" --force $args"
@@ -945,6 +945,8 @@ function get_nvim_dotfiles() {
                 return 1
             fi
         fi
+    elif [[ "$_ARCH" =~ ^arm ]]; then
+        warn_msg "Skipping neovim install, Portable not available for ARM systemas"
     elif [[ $_NEOVIM_DOTFILES -eq 0 ]]; then
         verbose_msg "Skipping neovim install, already install with defaults or portables"
     fi
@@ -1183,29 +1185,6 @@ function _linux_portables() {
     local rst=0
     local github='https://github.com'
 
-    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ ! $_OS == 'raspbian' ]] && [[ $_ARCH == 'x86_64' ]]; then
-        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
-        status_msg "Getting shellcheck"
-        local pkg='shellcheck.tar.xz'
-        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz" "$_TMP/${pkg}"; then
-            pushd "$_TMP" 1> /dev/null || return 1
-            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-            chmod u+x "$_TMP/shellcheck-latest/shellcheck"
-            mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
-            popd 1> /dev/null || return 1
-        else
-            rst=1
-        fi
-    elif ! hash shellcheck 2>/dev/null && { [[ $_OS == 'raspbian' ]] || [[ ! $_ARCH == 'x86_64' ]] ; }; then
-        warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
-        rst=2
-    else
-        warn_msg "Skipping shellcheck, already installed"
-        rst=2
-    fi
-
     if ! hash fzf 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing FZF install'
         status_msg "Getting FZF"
@@ -1229,37 +1208,45 @@ function _linux_portables() {
         rst=2
     fi
 
-    if has_fetcher && { ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
-        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
-        status_msg "Getting fd"
-        local pkg='fd.tar.xz'
-        local url="${github}/sharkdp/fd"
+    if [[ "$_ARCH" =~ ^armv6 ]]; then
+        warn_msg "Skipping no ARMv6 compatible portables"
+        return 2
+    fi
+
+    if has_fetcher && { ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
+        status_msg "Getting bat"
+        local pkg='bat.tar.xz'
+        local url="${github}/sharkdp/bat"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
-        status_msg "Downloading fd version: ${version}"
-        local os_type="${_ARCH}-unknown-linux-musl"
-        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-        if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
+        status_msg "Downloading bat version: ${version}"
+        if [[ "$_ARCH" =~ ^arm ]]; then
+            local os_type='arm-unknown-linux-gnueabihf'
+        else
+            local os_type="${_ARCH}-unknown-linux-musl"
+        fi
+        if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-            chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
-            mv "$_TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
+            chmod u+x "$_TMP/bat-${version}-${os_type}/bat"
+            mv "$_TMP/bat-${version}-${os_type}/bat" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
+            verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
             popd 1> /dev/null || return 1
         else
             rst=1
         fi
     elif ! has_fetcher; then
-        error_msg "No curl neither wget to download fd"
+        error_msg "No curl neither wget to download Bat"
         rst=2
     else
-        warn_msg "Skipping fd, already installed"
+        warn_msg "Skipping bat, already installed"
         rst=2
     fi
 
@@ -1270,14 +1257,17 @@ function _linux_portables() {
         local url="${github}/BurntSushi/ripgrep"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
         fi
         status_msg "Downloading rg version: ${version}"
-        local os_type="${_ARCH}-unknown-linux-musl"
-        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
+        if [[ "$_ARCH" =~ ^arm ]]; then
+            local os_type='arm-unknown-linux-gnueabihf'
+        else
+            local os_type="${_ARCH}-unknown-linux-musl"
+        fi
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
@@ -1297,37 +1287,68 @@ function _linux_portables() {
         rst=2
     fi
 
-    if has_fetcher && { ! hash bat 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
-        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
-        status_msg "Getting bat"
-        local pkg='bat.tar.xz'
-        local url="${github}/sharkdp/bat"
+    if has_fetcher && { ! hash fd 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
+        status_msg "Getting fd"
+        local pkg='fd.tar.xz'
+        local url="${github}/sharkdp/fd"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | tail -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | tail -n 1)"
         fi
-        status_msg "Downloading bat version: ${version}"
-        local os_type="${_ARCH}-unknown-linux-musl"
-        [[ $_OS == 'raspbian' ]] && os_type='arm-unknown-linux-gnueabihf'
-        if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
+        status_msg "Downloading fd version: ${version}"
+        if [[ "$_ARCH" =~ ^arm ]]; then
+            local os_type='arm-unknown-linux-gnueabihf'
+        else
+            local os_type="${_ARCH}-unknown-linux-musl"
+        fi
+        if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
-            chmod u+x "$_TMP/bat-${version}-${os_type}/bat"
-            mv "$_TMP/bat-${version}-${os_type}/bat" "$HOME/.local/bin/"
+            chmod u+x "$_TMP/fd-${version}-${os_type}/fd"
+            mv "$_TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $_TMP/bat-${version}-${os_type}" && rm -rf "$_TMP/bat-${version}-${os_type}/"
+            verbose_msg "Cleanning up data $_TMP/fd-${version}-${os_type}" && rm -rf "$_TMP/fd-${version}-${os_type}/"
             popd 1> /dev/null || return 1
         else
             rst=1
         fi
     elif ! has_fetcher; then
-        error_msg "No curl neither wget to download Bat"
+        error_msg "No curl neither wget to download fd"
         rst=2
     else
-        warn_msg "Skipping bat, already installed"
+        warn_msg "Skipping fd, already installed"
+        rst=2
+    fi
+
+    if [[ "$_ARCH" =~ ^arm ]]; then
+        warn_msg "Skipping no ARM compatible portables"
+        return 2
+    fi
+
+    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ $_ARCH == 'x86_64' ]]; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
+        status_msg "Getting shellcheck"
+        local pkg='shellcheck.tar.xz'
+        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/shellcheck-latest/shellcheck"
+            mv "$_TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/shellcheck-latest/" && rm -rf "$_TMP/shellcheck-latest/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! hash shellcheck 2>/dev/null && [[ ! $_ARCH == 'x86_64' ]] ; then
+        warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
+        rst=2
+    else
+        warn_msg "Skipping shellcheck, already installed"
         rst=2
     fi
 
@@ -1382,7 +1403,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if has_fetcher && { ! hash jq 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; } && [[ ! $_OS == 'raspbian' ]]; then
+    if has_fetcher && { ! hash jq 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing jq install'
         status_msg "Getting jq"
         local pkg='jq'
@@ -1410,9 +1431,6 @@ function _linux_portables() {
     elif ! has_fetcher; then
         error_msg "No curl neither wget to download jq"
         rst=2
-    elif ! hash jq 2>/dev/null  && [[ $_OS == 'raspbian' ]]; then
-        warn_msg "jq does not have prebuild binaries for non x86 architectures"
-        rst=2
     else
         warn_msg "Skipping jq, already installed"
         rst=2
@@ -1428,7 +1446,7 @@ function get_portables() {
 
     local github='https://github.com'
 
-    if ! hash nvim 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; then
+    if ! [[ "$_ARCH" =~ ^arm ]] && { ! hash nvim 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
         status_msg "Getting Neovim"
 
@@ -1443,6 +1461,8 @@ function get_portables() {
             error_msg "Fail to install Neovim"
             rst=1
         fi
+    elif [[ "$_ARCH" =~ ^arm ]]; then
+        warn_msg "Skipping neovim install, Portable not available for ARM systemas"
     else
         warn_msg "Skipping Neovim, already installed"
         rst=2
