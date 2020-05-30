@@ -60,7 +60,7 @@ fi
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
 
     plugins=(
-        go
+        golang
         git
         python
         history-substring-search
