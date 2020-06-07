@@ -81,6 +81,9 @@
     followTags = true
     default = tracking
 
+[pull]
+    rebase = true
+
 [help]
     autocorrect = 1
 
