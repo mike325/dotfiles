@@ -403,9 +403,9 @@ function get_cmd() {
     local args
 
     if [[ "$name" == 'fd' ]]; then
-        args=" -t f -e mp4 --absolute-path --regex 'C[0-9]+' "
+        args=" -t f -e mp4 --absolute-path . "
     else
-        args=" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' "
+        args=" -regextype posix-extended -iregex '.*\.mp4$' "
     fi
 
     if [[ "$name" == 'fd' ]]; then
@@ -437,9 +437,6 @@ function convert_files() {
     local vcodec
     local acodec
 
-    local vcmd="$vconverter"
-    local acmd="$aconverter"
-
     if [[ $_VERBOSE -eq 0 ]]; then
         converter="$converter -v quiet "
     fi
@@ -460,6 +457,9 @@ function convert_files() {
         warn_msg "Skipping $filename, already h265 with aac"
         return 1
     fi
+
+    local vcmd="$vconverter"
+    local acmd="$aconverter"
 
     if [[ "$vcodec" == hevc ]]; then
         vcmd="$vcopy"
@@ -505,15 +505,15 @@ function media_archive() {
     fi
 
     if hash fd 2>/dev/null; then
-        file_list="$(fd -t f -e mp4 --regex 'C[0-9]+' "${_ARCHIVE}" | wc -l)"
+        file_list="$(fd -t f -e mp4 . "${_ARCHIVE}" | wc -l)"
     else
-        file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*/C[0-9]+\.MP4$' | wc -l)"
+        file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*\.mp4$' | wc -l)"
     fi
 
     status_msg "Backing up original file ${filename}"
-    verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${_ARCHIVE}/C${file_list}.MP4"
+    verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${_ARCHIVE}/"
 
-    if ! mv --backup=numbered "${file_abspath}" "${_ARCHIVE}/C${file_list}.MP4"; then
+    if ! mv --backup=numbered "${file_abspath}" "${_ARCHIVE}/"; then
         error_msg "Failed to backup ${filename}"
         return 1
     fi

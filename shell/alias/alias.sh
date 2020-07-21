@@ -380,7 +380,7 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
     # 'Install' package maybe in the PATH
 
     if hash yay 2>/dev/null; then
-        pkg="yay --repo"
+        pkg="yay"
     elif hash yaourt 2>/dev/null; then
         pkg="yaourt"
     elif hash pacman 2>/dev/null; then
@@ -408,11 +408,20 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
 
     alias cleanpkg="${pkg} -Sc"
 
-    alias getpkg="${pkg} -S" && alias getpkgn="${pkg} -S --noconfirm"
 
     alias rmpkg="${pkg} -Rns"
 
     if hash yay 2>/dev/null || hash yaourt 2>/dev/null; then
+        function getpkg() {
+            if hash yay 2>/dev/null; then
+                local pkg="yay"
+            elif hash yaourt 2>/dev/null; then
+                local pkg="yaourt"
+            fi
+
+            sh -c "${pkg} -S $@"
+        }
+
         function update() {
             if hash yay 2>/dev/null; then
                 local pkg="yay"
@@ -435,6 +444,8 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
 
         alias update="sudo ${pkg} -Syu"
         alias updaten="sudo ${pkg} -Syu --noconfirm"
+        alias getpkg="sudo ${pkg} -S"
+        alias getpkgn="${pkg} -S --noconfirm"
 
         unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
 

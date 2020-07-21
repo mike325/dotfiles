@@ -1,9 +1,15 @@
 sudo pacman -S --noconfirm
+autoconf
+automake
+bash
+bash-completion
 zsh
+device-mapper
 grub
 curl
 git
 wget
+cppcheck
 gcc
 clang
 llvm
@@ -22,8 +28,10 @@ python-pip
 python2-pip
 docker
 jdk8-openjdk
+python-pip
 the_silver_searcher
 ripgrep
+grep
 shellcheck
 vlc
 gimp
@@ -41,5 +49,10 @@ rsync
 jq
 ffmpeg
 tmux
+ufw
 ninja
 luarocks
+gzip
+sudo
+tar
+xclip

@@ -27,7 +27,7 @@
 
 _ALL=1
 _COOL_FONTS=0
-_SHELL=0
+_DOTCONFIGS=0
 _VIM=0
 _NVIM=0
 _BIN=0
@@ -72,7 +72,6 @@ _WARN_COUNT=0
 _ERR_COUNT=0
 
 _SCRIPT_PATH="$0"
-
 _SCRIPT_PATH="${_SCRIPT_PATH%/*}"
 
 _OS='unknown'
@@ -730,7 +729,7 @@ function setup_bin() {
     return 0
 }
 
-function setup_shell() {
+function setup_dotconfigs() {
 
     local github="https://github.com"
     local rst=0
@@ -1862,11 +1861,11 @@ while [[ $# -gt 0 ]]; do
             _CMD="cp -rf"
             ;;
         -s|--shell)
-            _SHELL=1
+            _DOTCONFIGS=1
             _ALL=0
             ;;
         --shell_scripts)
-            _SHELL=1
+            _DOTCONFIGS=1
             _SHELL_SCRIPTS=1
             _ALL=0
             ;;
@@ -2101,7 +2100,7 @@ fi
 if [[ $_ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
     setup_bin
-    setup_shell
+    setup_dotconfigs
     setup_shell_scripts
     setup_shell_framework
     setup_git
@@ -2114,7 +2113,7 @@ if [[ $_ALL -eq 1 ]]; then
     setup_python
 else
     [[ $_BIN -eq 1 ]] && setup_bin
-    [[ $_SHELL -eq 1 ]] && setup_shell
+    [[ $_DOTCONFIGS -eq 1 ]] && setup_dotconfigs
     [[ $_SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
     [[ $_SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $_GIT -eq 1 ]] && setup_git
