@@ -10,6 +10,7 @@ g++
 build-essential
 clang
 clang-tools
+clangd
 make
 sed
 htop
