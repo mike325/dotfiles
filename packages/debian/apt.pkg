@@ -1,4 +1,5 @@
 sudo apt install -y
+preload
 ufw
 zsh
 curl
@@ -33,21 +34,11 @@ gnupg2
 software-properties-common
 cryptsetup
 rsync
-openssh-server
-net-tools
 jq
 ffmpeg
 tmux
 ninja-build
-gettext
-libtool
-libtool-bin
 autoconf
 automake
 pkg-config
 luarocks
-apparmor-utils
-avahi-daemon
-dbus
-network-manager
-socat

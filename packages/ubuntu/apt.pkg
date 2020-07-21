@@ -1,11 +1,15 @@
 sudo apt install -y
+preload
 ufw
 zsh
 curl
 git
 wget
 gcc
+g++
+build-essential
 clang
+clang-tools
 make
 sed
 htop
@@ -13,11 +17,10 @@ cmake
 exuberant-ctags
 sl
 vim
-emacs
+# emacs
 unzip
-python-pip
-python3-pip
-docker
+# python-pip
+# python3-pip
 shellcheck
 ntfs-3g
 # davfs2
@@ -27,15 +30,7 @@ jq
 ffmpeg
 tmux
 ninja-build
-gettext
-libtool
-libtool-bin
 autoconf
 automake
 pkg-config
 luarocks
-apparmor-utils
-avahi-daemon
-dbus
-network-manager
-socat
