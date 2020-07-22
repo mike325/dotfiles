@@ -153,7 +153,7 @@ function is_osx() {
 }
 
 function has_fetcher() {
-    if hash curl 2>/dev/null || hash wget 2>/ddv/null; then
+    if hash curl 2>/dev/null || hash wget 2>/dev/null; then
         return 0
     fi
     return 1

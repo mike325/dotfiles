@@ -1,5 +1,4 @@
 sudo apt install -y
-preload
 ufw
 zsh
 curl
