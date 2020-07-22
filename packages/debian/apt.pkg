@@ -27,6 +27,7 @@ libssl-dev
 btrfs-tools
 exfat-fuse
 exfat-utils
+nfs-common
 apt-transport-https
 ca-certificates
 gnupg2
@@ -41,3 +42,4 @@ autoconf
 automake
 pkg-config
 luarocks
+smartmontools
