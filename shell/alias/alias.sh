@@ -363,14 +363,13 @@ fi
 ################################################################################
 # TODO Make a small function to install system basics
 
-if hash docker 2>/dev/null; then
-    if [[ $EUID -ne 0 ]] && [[ ! "$(groups)" =~ .*docker.* ]]; then
-        alias docker="sudo docker"
-        alias docker-compose="sudo docker-compose"
-    fi
-
-    alias dkpa="docker ps -a"
-fi
+# if hash docker 2>/dev/null; then
+#     if [[ $EUID -ne 0 ]] && [[ ! "$(groups)" =~ .*docker.* ]]; then
+#         alias docker="sudo docker"
+#         alias docker-compose="sudo docker-compose"
+#     fi
+#     alias dkpa="docker ps -a"
+# fi
 
 # Yeah I'm too lazy to remember each command in every distro soooooo
 # I added this alias
