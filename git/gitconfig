@@ -47,8 +47,14 @@
 [url "git@github.com:"]
     insteadOf = sgh:
 
-# [credential]
-#     helper = cache --timeout=28800
+[pull]
+    rebase = false
+
+[credential]
+    helper = cache --timeout=28800
+    # helper = manager
+[credential "helperselector"]
+    selected = store
 
 [color]
     ui          = auto
