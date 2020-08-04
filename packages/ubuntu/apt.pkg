@@ -10,7 +10,8 @@ g++
 build-essential
 clang
 clang-tools
-clangd
+# clangd pkg seems broken in ubuntu, as it may need to be install with snapd
+# clangd
 make
 sed
 htop
