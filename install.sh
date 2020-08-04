@@ -997,9 +997,10 @@ function _windows_portables() {
 
     if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; } ; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
-        local pkg='shellcheck-latest.zip'
         status_msg "Getting shellcheck"
-        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/${pkg}" "$_TMP/${pkg}"; then
+        local pkg='shellcheck-latest.zip'
+        local url="${github}/koalaman/shellcheck"
+        if download_asset "Shellcheck" "${url}/releases/download/latest/${pkg}" "$_TMP/${pkg}"; then
             [[ -d "$_TMP/shellcheck-latest" ]] && rm -rf "$_TMP/shellcheck-latest"
             unzip -o "$_TMP/${pkg}" -d "$_TMP/shellcheck-latest"
             chmod +x "$_TMP/shellcheck-latest/shellcheck-latest.exe"
@@ -1331,8 +1332,9 @@ function _linux_portables() {
     if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]]; } && [[ $_ARCH == 'x86_64' ]]; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
-        local pkg='shellcheck.tar.xz'
-        if download_asset "Shellcheck" "https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz" "$_TMP/${pkg}"; then
+        local pkg='shellcheck-latest.linux.x86_64.tar.xz'
+        local url="${github}/koalaman/shellcheck"
+        if download_asset "Shellcheck" "${url}/releases/download/latest/${pkg}" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
             chmod u+x "$_TMP/shellcheck-latest/shellcheck"
