@@ -7,6 +7,7 @@ curl
 git
 wget
 gcc
+g++
 clang
 clang-tools
 make
@@ -28,6 +29,7 @@ libssl-dev
 btrfs-tools
 exfat-fuse
 exfat-utils
+nfs-common
 apt-transport-https
 ca-certificates
 gnupg2
@@ -40,15 +42,10 @@ jq
 ffmpeg
 tmux
 ninja-build
-gettext
-libtool
-libtool-bin
+fio
 autoconf
 automake
 pkg-config
 luarocks
+smartmontools
 apparmor-utils
-avahi-daemon
-dbus
-network-manager
-socat

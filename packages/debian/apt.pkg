@@ -1,4 +1,6 @@
 sudo apt install -y
+ripgrep
+fd-find
 ufw
 zsh
 curl
@@ -19,7 +21,7 @@ neovim
 unzip
 python-pip
 python3-pip
-docker
+# docker
 shellcheck
 ntfs-3g
 davfs2
@@ -34,10 +36,13 @@ gnupg2
 software-properties-common
 cryptsetup
 rsync
+openssh-server
+net-tools
 jq
 ffmpeg
 tmux
 ninja-build
+fio
 autoconf
 automake
 pkg-config
