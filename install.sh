@@ -1866,7 +1866,7 @@ while [[ $# -gt 0 ]]; do
             _DOTCONFIGS=1
             _ALL=0
             ;;
-        --shell_scripts)
+        --scripts|--shell_scripts)
             _DOTCONFIGS=1
             _SHELL_SCRIPTS=1
             _ALL=0
