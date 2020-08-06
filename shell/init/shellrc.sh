@@ -176,6 +176,20 @@ function is_linux() {
     return 1
 }
 
+function is_root() {
+    if ! is_windows && [[ $EUID -eq 0 ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function has_sudo() {
+    if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # TODO: This should work with ARM 64bits
 function is_64bits() {
     if [[ "$(uname -m)" =~ (x86_64) ]]; then
