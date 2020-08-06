@@ -407,19 +407,20 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
 
     alias cleanpkg="${pkg} -Sc"
 
-
     alias rmpkg="${pkg} -Rns"
 
     if hash yay 2>/dev/null || hash yaourt 2>/dev/null; then
-        function getpkg() {
-            if hash yay 2>/dev/null; then
-                local pkg="yay"
-            elif hash yaourt 2>/dev/null; then
-                local pkg="yaourt"
-            fi
+        if ! hash getpkg 2>/dev/null; then
+            function getpkg() {
+                if hash yay 2>/dev/null; then
+                    local pkg="yay"
+                elif hash yaourt 2>/dev/null; then
+                    local pkg="yaourt"
+                fi
 
-            sh -c "${pkg} -S $@"
-        }
+                sh -c "${pkg} -S $*"
+            }
+        fi
 
         function update() {
             if hash yay 2>/dev/null; then
@@ -438,13 +439,16 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
     fi
 
     if [[ $EUID -ne 0 ]] && { ! hash yaourt 2>/dev/null && ! hash yay 2>/dev/null; }; then
-        unalias getpkg && alias getpkg="sudo ${pkg} -S"
-        unalias getpkgn && alias getpkgn="sudo ${pkg} -S --noconfirm"
+        unalias getpkg 2>/dev/null
+        unalias getpkgn 2>/dev/null
 
         alias update="sudo ${pkg} -Syu"
         alias updaten="sudo ${pkg} -Syu --noconfirm"
-        alias getpkg="sudo ${pkg} -S"
         alias getpkgn="${pkg} -S --noconfirm"
+
+        if ! hash getpkg 2>/dev/null; then
+            alias getpkg="sudo ${pkg} -S"
+        fi
 
         unalias rmpkg && alias rmpkg="sudo ${pkg} -Rns"
 
@@ -477,7 +481,9 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
     fi
 
     if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo ${pkg} install"
+        if ! hash getpkg 2>/dev/null; then
+            alias getpkg="sudo ${pkg} install"
+        fi
         alias getpkgn="sudo ${pkg} install -y"
 
         alias update="sudo ${pkg} update && sudo ${pkg} upgrade"
@@ -485,7 +491,9 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
 
         alias rmpkg="sudo ${pkg} remove"
     else
-        alias getpkg="${pkg} install"
+        if ! hash getpkg 2>/dev/null; then
+            alias getpkg="${pkg} install"
+        fi
         alias getpkgn="${pkg} install -y"
 
         alias update="${pkg} update && ${pkg} upgrade"
@@ -520,7 +528,9 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
     fi
 
     if [[ $EUID -ne 0 ]]; then
-        alias getpkg="sudo ${pkg} install"
+        if ! hash getpkg 2>/dev/null; then
+            alias getpkg="sudo ${pkg} install"
+        fi
         alias getpkgn="sudo ${pkg} -y install"
 
         alias update="sudo ${pkg} update"
@@ -528,7 +538,9 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
 
         alias rmpkg="sudo ${pkg} remove"
     else
-        alias getpkg="${pkg} install"
+        if ! hash getpkg 2>/dev/null; then
+            alias getpkg="${pkg} install"
+        fi
         alias getpkgn="${pkg} -y install"
 
         alias update="${pkg} update"
