@@ -47,14 +47,11 @@
 [url "git@github.com:"]
     insteadOf = sgh:
 
-[pull]
-    rebase = false
-
 [credential]
     helper = cache --timeout=28800
     # helper = manager
-[credential "helperselector"]
-    selected = store
+# [credential "helperselector"]
+#     selected = store
 
 [color]
     ui          = auto
@@ -88,7 +85,7 @@
     default = tracking
 
 [pull]
-    rebase = true
+    rebase = false
 
 [help]
     autocorrect = 1
