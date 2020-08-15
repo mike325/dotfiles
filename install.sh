@@ -780,9 +780,13 @@ function setup_dotconfigs() {
 
         [[ ! -d "$HOME/.tmux/plugins/tpm" ]] && mkdir -p "$HOME/.tmux/plugins/"
 
-        if ! clone_repo "$github/tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"; then
-            error_msg "Failed to clone tmux plugin manager"
-            rst=1
+        if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+            if ! clone_repo "$github/tmux-plugins/tpm" "$HOME/.tmux/plugins/tpm"; then
+                error_msg "Failed to clone tmux plugin manager"
+                rst=1
+            fi
+        else
+            warn_msg "Skipping TPM, already install in $HOME/.tmux/plugins/tpm"
         fi
 
     else
