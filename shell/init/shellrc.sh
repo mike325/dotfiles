@@ -1,32 +1,5 @@
 #!/usr/bin/env bash
 
-################################################################################
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Small shell configs                                           #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
-
 [[ $- == *i* ]] && __INTERACTIVE=1 || __INTERACTIVE=0
 
 # Use <C-s> in terminal vim
@@ -67,7 +40,7 @@ fi
 # Load all proxy settings
 if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     # We already checked the file exists so its "safe"
-    # shellcheck disable=SC1090
+    # shellcheck disable=SC1090,SC1091
     source "$HOME/.config/shell/host/proxy.sh"
     function toggleProxy() {
         # shellcheck disable=SC2154
@@ -79,7 +52,7 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
             unset "no_proxy"
             echo "Proxy disable"
         else
-            # shellcheck disable=SC1090
+            # shellcheck disable=SC1090,SC1091
             source "$HOME/.config/shell/host/proxy.sh"
             echo "Proxy enable"
         fi
@@ -88,7 +61,7 @@ fi
 
 # Load all ENV variables
 # We already checked the file exists so its "safe"
-# shellcheck disable=SC1090
+# shellcheck disable=SC1090,SC1091
 [[ -f "$HOME/.config/shell/host/env.sh"  ]] && source "$HOME/.config/shell/host/env.sh"
 [[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
@@ -274,14 +247,14 @@ if (( __INTERACTIVE == 1 )); then
     # Load custom shell framework settings (override default shell framework settings)
     if [[ -f  "$HOME/.config/shell/host/framework.sh" ]]; then
         # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/host/framework.sh"
     fi
 
     # Configure shell framework and specific shell settings
     if [[ -f  "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh" ]]; then
         # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh"
 
         # I prefer the cool sl and the bins in my path
@@ -300,24 +273,24 @@ if (( __INTERACTIVE == 1 )); then
     # Load alias after bash-it to give them higher priority
     if [[ -f "$HOME/.config/shell/alias/alias.sh"  ]]; then
         # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/alias/alias.sh"
     fi
 
     # Load host settings (override general alias and funtions)
     if [[ -f  "$HOME/.config/shell/host/settings.sh" ]]; then
         # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/host/settings.sh"
     fi
 
     if [[ -f "$HOME/.config/shell/scripts/z.sh" ]]; then
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/scripts/z.sh"
     fi
 
     if [[ -n "$VIRTUAL_ENV" ]]; then
-        # shellcheck disable=SC1090
+        # shellcheck disable=SC1090,SC1091
         source "$VIRTUAL_ENV/bin/activate"
     fi
 

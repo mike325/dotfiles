@@ -633,6 +633,7 @@ function venv() {
 
     for i in "${_name[@]}"; do
         if [[ -f "$i/bin/activate" ]]; then
+            # shellcheck disable=SC1091
             source "$i/bin/activate"
             _success=1
             break

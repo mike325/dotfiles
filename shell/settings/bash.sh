@@ -1,33 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2139,SC1090,SC1117
 
-################################################################################
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Extra bash settings                                           #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
-
 # Set vi keys
 set -o vi
 
@@ -121,14 +94,23 @@ export TODO="t"
 # https://github.com/djl/vcprompt
 # export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
 
-# enable programmable completion features (you don't need to enable
+# Enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
+
+# INFO: Use enviroment variables to avoid shellcheck errors in bash_completion file
 if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
+
+    COMPLETIONS="/usr/share/bash-completion"
+    if [ -f "$COMPLETIONS/bash_completion" ]; then
+        # shellcheck disable=SC1091
+        source "$COMPLETIONS/bash_completion"
+    fi
+
+    COMPLETIONS="/etc"
+    if [ -f "$COMPLETIONS/bash_completion" ]; then
+        # shellcheck disable=SC1091
+        source "$COMPLETIONS/bash_completion"
     fi
 fi
 
@@ -148,10 +130,12 @@ fi
 # pip bash completion end
 
 if hash fzf 2>/dev/null; then
+    # shellcheck disable=SC1091
     [[ -f "$HOME/.fzf.bash" ]] && source "$HOME/.fzf.bash"
 fi
 
 if [[ -f "$BASH_IT/bash_it.sh" ]]; then
+    # shellcheck disable=SC1091
     source "$BASH_IT/bash_it.sh"
 else
     PS1="\n${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color} \n→ "
