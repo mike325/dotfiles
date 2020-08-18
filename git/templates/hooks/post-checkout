@@ -1,8 +1,14 @@
 #!/bin/bash
 
 dir="$( git rev-parse --git-dir )"
+top="$( git rev-parse --show-toplevel )"
+
 if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
-    "${dir}"../../hooks/ctags >/dev/null 2>&1 &
+    if [[ -f "${dir}../../hooks/ctags" ]]; then
+        "${dir}../../hooks/ctags" >/dev/null 2>&1 &
+    else
+        "${top}/.git/hooks/ctags" >/dev/null 2>&1 &
+    fi
 else
-    .git/hooks/ctags >/dev/null 2>&1 &
+    "${top}/.git/hooks/ctags" >/dev/null 2>&1 &
 fi

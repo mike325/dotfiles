@@ -3,14 +3,12 @@
 set -e
 dir="$( git rev-parse --git-dir )"
 top="$( git rev-parse --show-toplevel )"
-trap 'rm -f "$dir/tags.$$"' EXIT INT TERM
-trap 'rm -f "$top/tags.$$"' EXIT INT TERM
-# git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
+trap 'rm -f "$dir/tags.$$" "$top/tags.$$"' EXIT INT TERM
 
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
 git ls-files --exclude-standard --cached | ctags --tag-relative -L - -f"$dir/tags.$$"
 
-if [[ "$SHELL_PLATFORM" =~ "linux" ]]; then
+if [[ -n "$SHELL_PLATFORM" ]] && [[ "$SHELL_PLATFORM" =~ "linux" ]]; then
     mv "$dir/tags.$$" "$dir/tags"
 else
     mv "$dir/tags.$$" "$top/tags"

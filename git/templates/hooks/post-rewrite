@@ -3,10 +3,16 @@
 case "$1" in
     rebase)
         dir="$( git rev-parse --git-dir )"
+        top="$( git rev-parse --show-toplevel )"
+
         if [[ $(git rev-parse --is-inside-work-tree) == true ]]; then
-            exec "${dir}"/../../hooks/post-merge
+            if [[ -f "${dir}/../../hooks/post-merge" ]]; then
+                exec "${dir}/../../hooks/post-merge"
+            else
+                exec "${top}/.git/hooks/post-merge"
+            fi
         else
-            exec .git/hooks/post-merge
+            exec "${top}/.git/hooks/post-merge"
         fi
         ;;
 esac
