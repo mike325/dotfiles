@@ -426,20 +426,20 @@ function __parse_args() {
         exit 1
     fi
 
-    local arg="$1"
-    local name="$2"
+    local flag="$2"
+    local value="$1"
 
-    local pattern="^--${name}=[a-zA-Z0-9.:@_/~-]+$"
+    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
 
     if [[ -n "$3" ]]; then
-        local pattern="^--${name}=$3$"
+        local pattern="^--${flag}=$3$"
     fi
 
-    if [[ $arg =~ $pattern ]]; then
-        local left_side="${arg#*=}"
+    if [[ $value =~ $pattern ]]; then
+        local left_side="${value#*=}"
         echo "${left_side/#\~/$HOME}"
     else
-        echo "$arg"
+        echo "$value"
     fi
 }
 
@@ -1816,7 +1816,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --host=*)
-            _result=$(__parse_args "$key" "githost")
+            _result=$(__parse_args "$key" "host")
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid host $_result"
                 exit 1
@@ -1828,7 +1828,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --user=*)
-            _result=$(__parse_args "$key" "gituser")
+            _result=$(__parse_args "$key" "user")
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid gituser $_result"
                 exit 1
