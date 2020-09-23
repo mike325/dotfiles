@@ -113,7 +113,9 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     fi
 fi
 
-if hash bat 2>/dev/null; then
+if hash delta 2>/dev/null; then
+    export GIT_PAGER="delta --dark --24-bit-color auto"
+elif hash bat 2>/dev/null; then
     export GIT_PAGER="bat"
 fi
 

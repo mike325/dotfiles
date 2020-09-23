@@ -132,6 +132,10 @@ if (Get-Command "bat" -ErrorAction SilentlyContinue) {
     $env:GIT_PAGER = "bat.exe";
 }
 
+if (Get-Command "delta" -ErrorAction SilentlyContinue) {
+    $env:GIT_PAGER = 'delta --dark --24-bit-color always';
+}
+
 if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
     if ( Get-Command "git.exe" -ErrorAction SilentlyContinue ) {
         if ( Get-Command "fd.exe" -ErrorAction SilentlyContinue ) {

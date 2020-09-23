@@ -111,7 +111,7 @@ function prompt {
         Write-Host ") " -NoNewline -ForegroundColor DarkGray
     }
 
-    Write-Host " in " -NoNewline -ForegroundColor DarkGray
+    Write-Host ": " -NoNewline -ForegroundColor DarkGray
     Write-Host $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -NoNewline -ForegroundColor Yellow
     # Write-Host " : " -NoNewline -ForegroundColor DarkGray
     # Write-Host (Get-Date -Format G) -NoNewline -ForegroundColor DarkMagenta
