@@ -1057,6 +1057,44 @@ function _windows_portables() {
         rst=2
     fi
 
+    if has_fetcher && { ! hash delta 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
+        status_msg "Getting delta"
+        local pkg='delta.zip'
+        local url="${github}/dandavison/delta"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -uhr | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -uhr | head -n 1)"
+        fi
+        status_msg "Downloading delta version: ${version}"
+        local os_type='x86_64-pc-windows-msvc'
+        if download_asset "delta" "${url}/releases/download/${version}/delta-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}"
+            if ! unzip -o "$_TMP/${pkg}"; then
+                error_msg "An error occurred extracting zip file"
+                rst=1
+            else
+                chmod u+x "$_TMP/delta-${version}-${os_type}/delta.exe"
+                mv "$_TMP/delta-${version}-${os_type}/delta.exe" "$HOME/.local/bin/"
+            fi
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/delta-${version}-${os_type}" && rm -rf "$_TMP/delta-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download delta"
+        rst=1
+    else
+        warn_msg "Skipping delta, already installed"
+        rst=2
+    fi
+
     if has_fetcher && { ! hash rg 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
@@ -1074,7 +1112,7 @@ function _windows_portables() {
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.zip" "$_TMP/${pkg}"; then
             pushd "$_TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $_TMP/${pkg}"
-            if ! unzip -o "$_TMP/${pkg}" -d "$_TMP/ripgrep-${version}-${os_type}/"; then
+            if ! unzip -o "$_TMP/${pkg}"; then
                 error_msg "An error occurred extracting zip file"
                 rst=1
             else
@@ -1251,6 +1289,43 @@ function _linux_portables() {
         rst=2
     else
         warn_msg "Skipping bat, already installed"
+        rst=2
+    fi
+
+    if has_fetcher && { ! hash delta 2>/dev/null || [[ $_FORCE_INSTALL -eq 1 ]] ; }; then
+        [[ $_FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
+        status_msg "Getting delta"
+        local pkg='delta.tar.gz'
+        local url="${github}/dandavison/delta"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -ruh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -ruh | head -n 1)"
+        fi
+        status_msg "Downloading delta version: ${version}"
+        if [[ "$_ARCH" =~ ^arm ]]; then
+            local os_type='arm-unknown-linux-gnueabihf'
+        else
+            local os_type="${_ARCH}-unknown-linux-musl"
+        fi
+        if download_asset "delta" "${url}/releases/download/${version}/delta-${version}-${os_type}.tar.gz" "$_TMP/${pkg}"; then
+            pushd "$_TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $_TMP/${pkg}" && tar xf "$_TMP/${pkg}"
+            chmod u+x "$_TMP/delta-${version}-${os_type}/delta"
+            mv "$_TMP/delta-${version}-${os_type}/delta" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${_TMP}/${pkg}" && rm -rf "${_TMP:?}/${pkg}"
+            verbose_msg "Cleanning up data $_TMP/delta-${version}-${os_type}" && rm -rf "$_TMP/delta-${version}-${os_type}/"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! has_fetcher; then
+        error_msg "No curl neither wget to download delta"
+        rst=2
+    else
+        warn_msg "Skipping delta, already installed"
         rst=2
     fi
 
