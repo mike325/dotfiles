@@ -27,6 +27,27 @@
 	; excludesfile = ~/.config/git/templates/gitignore
 	autocrlf = input
 	symlinks = true
+	; pager = bat --style full
+	; pager = delta --24-bit-color always
+
+[delta]
+	; plus-color = "#012800"
+	; minus-color = "#340001"
+	features = side-by-side line-numbers decorations
+	whitespace-error-style = 22 reverse
+	line-numbers = true
+	side-by-side = true
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-style = bold yellow ul
+	file-decoration-style = none
+
+[interactive]
+	diffFilter = delta --color-only
+
+[diff]
+	colorMoved = default
 
 [user]
 	name  = Mike
