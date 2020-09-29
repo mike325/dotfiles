@@ -9,9 +9,8 @@ gcc
 g++
 build-essential
 clang
-clang-tools
-# clangd pkg seems broken in ubuntu, as it may need to be install with snapd
-# clangd
+# clang-tools
+clang-tools-10
 make
 sed
 htop
@@ -19,13 +18,9 @@ cmake
 exuberant-ctags
 sl
 vim
-# emacs
 unzip
-# python-pip
-# python3-pip
 shellcheck
 ntfs-3g
-# davfs2
 cryptsetup
 rsync
 net-tools
@@ -37,3 +32,8 @@ autoconf
 automake
 pkg-config
 luarocks
+# emacs
+# python-pip
+# python3-pip
+# davfs2
+# clangd # pkg seems broken in ubuntu, as it may need to be install without snapd

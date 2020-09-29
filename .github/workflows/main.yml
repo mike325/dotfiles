@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   parameter-checks-build:
-    name: Testing install with parameters in Ubuntu
+    name: Testing install with parameters in Ubuntu latest
     runs-on: ubuntu-latest
 
     env:
@@ -15,9 +15,7 @@ jobs:
       - name: OS Info
         run: |
           sudo apt install -y wget
-          wget -O screenfetch-dev https://git.io/vaHfR
-          chmod +x screenfetch-dev
-          ./screenfetch-dev
+          wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
       - name: Install dependencies
         run: |
           sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
@@ -37,13 +35,17 @@ jobs:
           sudo ./install.sh --force --packages
 
   linux-standalone:
-    name: Testing standalone script installation
+    name: Testing standalone script installation in Ubuntu latest
     runs-on: ubuntu-latest
 
     env:
       GITHUB: true
 
     steps:
+      - name: OS Info
+        run: |
+          sudo apt install -y wget
+          wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
       - name: Install dependencies
         run: |
           sudo apt install -y wget curl git shellcheck python3-setuptools python-setuptools
@@ -74,6 +76,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - name: OS Info
+        run: |
+          sudo apt install -y wget
+          wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
       - name: Install dependencies
         run: |
           sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
