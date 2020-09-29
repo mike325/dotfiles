@@ -71,7 +71,7 @@
 [credential "helperselector"]
 	selected = <
 [credential]
-	helper = manager
+	helper = cache --timeout=28800
 
 [color]
 	ui          = auto
