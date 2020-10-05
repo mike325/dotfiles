@@ -107,6 +107,9 @@ cscope
 *.svn/
 /.svn/
 
+# Git
+.git/
+
 # KDE
 .directory
 
