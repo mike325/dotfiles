@@ -53,6 +53,9 @@
 	name  = Mike
 	email = mickiller.25@gmail.com
 
+[credential "https://git.prodeveloper.me"]
+    username = mike
+
 [credential "https://github.com"]
 	username = mike325
 

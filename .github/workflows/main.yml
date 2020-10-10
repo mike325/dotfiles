@@ -12,6 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - name: OS update
+        run: |
+          sudo apt update --fix-missing
+          sudo apt upgrade -y
       - name: OS Info
         run: |
           sudo apt install -y wget
@@ -21,6 +25,7 @@ jobs:
           sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
           sudo apt install -y python3-pip
           sudo pip3 install --upgrade pip
+          pip3 --version
       - name: Full install
         run: |
           ./install.sh --verbose --portables
@@ -46,11 +51,16 @@ jobs:
         run: |
           sudo apt install -y wget
           wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
+      - name: OS update
+        run: |
+          sudo apt update --fix-missing
+          sudo apt upgrade -y
       - name: Install dependencies
         run: |
           sudo apt install -y wget curl git shellcheck python3-setuptools python-setuptools
           sudo apt install -y python3-pip
           sudo pip3 install --upgrade pip
+          pip3 --version
       - name: Fetch script
         run: |
           wget https://raw.githubusercontent.com/Mike325/dotfiles/master/install.sh
@@ -80,11 +90,16 @@ jobs:
         run: |
           sudo apt install -y wget
           wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
+      - name: OS update
+        run: |
+          sudo apt update --fix-missing
+          sudo apt upgrade -y
       - name: Install dependencies
         run: |
           sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
           sudo apt install -y python3-pip
           sudo pip3 install --upgrade pip
+          pip3 --version
       - name: Full install
         run: |
           ./install.sh --verbose

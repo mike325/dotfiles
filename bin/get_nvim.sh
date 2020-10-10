@@ -345,6 +345,7 @@ function get_portable() {
         rm -rf "${_TMP:?}/${name}"
     elif is_osx; then
         pushd "$_TMP" > /dev/null || { error_msg "Could not get to $_TMP" && exit 1; }
+        verbose_msg "Unpacking ${name}"
         if ! tar xzvf "$_TMP/$name" && mv "${_TMP}/nvim-osx64/*" "$HOME/.local/"; then
             return 1
         fi
@@ -352,6 +353,7 @@ function get_portable() {
         rm -rf "${_TMP:?}/${name}"
         rm -rf "${_TMP:?}/nvim-osx64"
     else
+        verbose_msg "Installing into $dir/$name"
         chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
     fi
 
