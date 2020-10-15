@@ -168,6 +168,7 @@
 	ba  = !git --no-pager branch --all  ; Show all local and remote branches
 	bd  = !git --no-pager branch -d     ; Delete a merged branch
 	bdd = !git --no-pager branch -D     ; Force branch deletion
+	bdr = !git push origin --delete     ; Delete remote branch
 	br  = !git --no-pager branch -m     ; Rename a branch
 
 ;###############################################################################
