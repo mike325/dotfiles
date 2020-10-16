@@ -49,3 +49,4 @@ pkg-config
 luarocks
 smartmontools
 apparmor-utils
+network-manager

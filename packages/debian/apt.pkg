@@ -48,3 +48,4 @@ automake
 pkg-config
 luarocks
 smartmontools
+network-manager
