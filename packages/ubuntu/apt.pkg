@@ -37,8 +37,9 @@ apt-transport-https
 ca-certificates
 gnupg-agent
 software-properties-common
+python3-pip
+python3-dev
 # emacs
 # python-pip
-# python3-pip
 # davfs2
 # clangd # pkg seems broken in ubuntu, as it may need to be install without snapd
