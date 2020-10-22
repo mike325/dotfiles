@@ -39,6 +39,8 @@ gnupg-agent
 software-properties-common
 python3-pip
 python3-dev
+network-manager
+avahi-daemon
 # emacs
 # python-pip
 # davfs2
