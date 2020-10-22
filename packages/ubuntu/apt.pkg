@@ -1,4 +1,5 @@
 sudo apt install -y
+neovim
 preload
 ufw
 zsh
@@ -32,6 +33,10 @@ autoconf
 automake
 pkg-config
 luarocks
+apt-transport-https
+ca-certificates
+gnupg-agent
+software-properties-common
 # emacs
 # python-pip
 # python3-pip
