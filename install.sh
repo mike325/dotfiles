@@ -420,29 +420,6 @@ Usage:
 EOF
 }
 
-function __parse_args() {
-    if [[ $# -lt 2 ]]; then
-        error_msg "Internal error in __parse_args function trying to parse $1"
-        exit 1
-    fi
-
-    local flag="$2"
-    local value="$1"
-
-    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
-
-    if [[ -n "$3" ]]; then
-        local pattern="^--${flag}=$3$"
-    fi
-
-    if [[ $value =~ $pattern ]]; then
-        local left_side="${value#*=}"
-        echo "${left_side/#\~/$HOME}"
-    else
-        echo "$value"
-    fi
-}
-
 function warn_msg() {
     local warn_message="$1"
     if [[ $_NOCOLOR -eq 0 ]]; then
@@ -466,7 +443,7 @@ function error_msg() {
     fi
     _ERR_COUNT=$(( _ERR_COUNT + 1 ))
     if [[ $_NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${_LOG}"
+        printf "[X] Error:\t %s\n" "$error_message" >> "${_LOG}"
     fi
     return 0
 }
@@ -499,6 +476,29 @@ function verbose_msg() {
     return 0
 }
 
+function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
+    fi
+
+    local flag="$2"
+    local value="$1"
+
+    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
+
+    if [[ -n "$3" ]]; then
+        local pattern="^--${flag}=$3$"
+    fi
+
+    if [[ $value =~ $pattern ]]; then
+        local left_side="${value#*=}"
+        echo "${left_side/#\~/$HOME}"
+    else
+        echo "$value"
+    fi
+}
+
 function initlog() {
     if [[ $_NOLOG -eq 0 ]]; then
         rm -f "${_LOG}" 2>/dev/null
@@ -529,7 +529,7 @@ function exit_append() {
             printf "[*] Warnings:\t%s\n" "$_WARN_COUNT" >> "${_LOG}"
         fi
         if [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
+            printf "[*] Errors:\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
         fi
     fi
     return 0

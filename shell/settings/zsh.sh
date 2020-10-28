@@ -57,6 +57,51 @@ if [[ -z $SHEL ]]; then
     SHELL='/bin/zsh'
 fi
 
+# pip zsh completion start
+if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
+    function _pip_completion {
+        local words cword
+        read -Ac words
+        read -cn cword
+        reply=( $( COMP_WORDS="$words[*]" \
+                    COMP_CWORD=$(( cword-1 )) \
+                    PIP_AUTO_COMPLETE=1 $words[1] ) )
+    }
+    hash pip 2>/dev/null && compctl -K _pip_completion pip
+    hash pip2 2>/dev/null && compctl -K _pip_completion pip2
+    hash pip3 2>/dev/null && compctl -K _pip_completion pip3
+fi
+# pip zsh completion end
+
+KEYTIMEOUT=20
+
+HISTFILE="$HOME/.zsh/history"
+HISTSIZE=2048
+SAVEHIST=2048
+
+setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
+setopt share_history          # Share history between all sessions.
+setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
+setopt hist_ignore_dups       # Do not record an entry that was just recorded again.
+setopt hist_ignore_all_dups   # Delete old recorded entry if new entry is a duplicate.
+setopt hist_find_no_dups      # Do not display a line previously found.
+setopt hist_ignore_space      # Do not record an entry starting with a space.
+setopt hist_save_no_dups      # Do not write duplicate entries in the history file.
+setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
+setopt hist_verify            # Do not execute immediately upon history expansion.
+setopt hist_reduce_blanks
+
+# Don't ask for rm * confirmation
+setopt rmstarsilent
+
+bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
+bindkey 'jj' vi-cmd-mode
+bindkey -M viins 'jj' vi-cmd-mode
+
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+fi
+
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
 
     plugins=(
@@ -112,49 +157,4 @@ else
     # prompt -s redhat
 
     PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
-fi
-
-# pip zsh completion start
-if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
-    function _pip_completion {
-        local words cword
-        read -Ac words
-        read -cn cword
-        reply=( $( COMP_WORDS="$words[*]" \
-                    COMP_CWORD=$(( cword-1 )) \
-                    PIP_AUTO_COMPLETE=1 $words[1] ) )
-    }
-    hash pip 2>/dev/null && compctl -K _pip_completion pip
-    hash pip2 2>/dev/null && compctl -K _pip_completion pip2
-    hash pip3 2>/dev/null && compctl -K _pip_completion pip3
-fi
-# pip zsh completion end
-
-KEYTIMEOUT=20
-
-HISTFILE="$HOME/.zsh/history"
-HISTSIZE=2048
-SAVEHIST=2048
-
-setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
-setopt share_history          # Share history between all sessions.
-setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
-setopt hist_ignore_dups       # Do not record an entry that was just recorded again.
-setopt hist_ignore_all_dups   # Delete old recorded entry if new entry is a duplicate.
-setopt hist_find_no_dups      # Do not display a line previously found.
-setopt hist_ignore_space      # Do not record an entry starting with a space.
-setopt hist_save_no_dups      # Do not write duplicate entries in the history file.
-setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
-setopt hist_verify            # Do not execute immediately upon history expansion.
-setopt hist_reduce_blanks
-
-# Don't ask for rm * confirmation
-setopt rmstarsilent
-
-bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
-bindkey 'jj' vi-cmd-mode
-bindkey -M viins 'jj' vi-cmd-mode
-
-if hash fzf 2>/dev/null; then
-    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
 fi

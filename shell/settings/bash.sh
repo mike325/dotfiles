@@ -138,7 +138,12 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     # shellcheck disable=SC1091
     source "$BASH_IT/bash_it.sh"
 else
-    PS1="\n${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color} \n→ "
+    __schroot_name(){
+        if [[ -n ${SCHROOT_CHROOT_NAME} ]]; then
+            echo -e "${red}(${SCHROOT_CHROOT_NAME})${reset_color} "
+        fi
+    }
+    PS1="\n$(__schroot_name)${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color} \n→ "
 fi
 
 if hash tmux 2>/dev/null; then
