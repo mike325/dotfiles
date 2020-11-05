@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
 
-#   Author: Mike 8a
-#   Description: Kind of unnecessary complicated script that attempts to
-#                install the necessary dependencies, get and build Neovim
-#                from the Git repo (github) and get the python and/or ruby libs
-#
-#   Usage:
-#       $ get_nvim              # Leave all defaults,
-#                               # - Doesn't clone (assume the repo is already cloned)
-#                               # - Doesn't get libs or build deps,
-#                               # - Installation dir is the current dir
-#       $ get_nvim -d stuff_dir # Change the installation dir
-#       $ get_nvim -c           # Clone the repo, leave everything else by default
-#       $ get_nvim -p -r        # Get the python (-p) and ruby (-r) libs after install
-#       $ get_nvim -b           # Get the build dependencies on some systems
-#       $ get_nvim -h           # Show help, kind of
 #
 #                                     -`
 #                     ...            .o+`
@@ -36,23 +21,25 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_LOCATION="$(pwd)"
-_URL="https://github.com/neovim/neovim"
-_PYTHON_LIBS=0
-_RUBY_LIBS=0
-_BUILD_LIBS=0
-_CLONE=0
-_FORCE_INSTALL=0
-_PORTABLE=0
-_NOCOLOR=0
-_VERBOSE=0
-_DEV=0
+NAME="$0"
+NAME="${NAME##*/}"
+LOCATION="$(pwd)"
+URL="https://github.com/neovim/neovim"
+PYTHON_LIBS=0
+RUBY_LIBS=0
+BUILD_LIBS=0
+CLONE=0
+FORCE_INSTALL=0
+PORTABLE=0
+NOCOLOR=0
+VERBOSE=0
+DEV=0
 
-_NVIM_VERSION="latest"
+NVIM_VERSION="latest"
 
-_OS='unknown'
+OS='unknown'
+
+TMP='/tmp/'
 
 # colors
 # shellcheck disable=SC2034
@@ -78,8 +65,6 @@ normal="\033[0m"
 # shellcheck disable=SC2034
 reset_color="\033[39m"
 
-_TMP='/tmp/'
-
 if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
@@ -101,25 +86,25 @@ case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
     linux)
         if [[ -f /etc/arch-release ]]; then
-            _OS='arch'
+            OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
-            _OS='ubuntu'
+            OS='ubuntu'
         elif [[ -f /etc/debian_version ]]; then
             if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
-                _OS='raspbian'
+                OS='raspbian'
             else
-                _OS='debian'
+                OS='debian'
             fi
         fi
         ;;
     cygwin|msys|windows)
-        _OS='windows'
+        OS='windows'
         ;;
     osx)
-        _OS='macos'
+        OS='macos'
         ;;
     bsd)
-        _OS='bsd'
+        OS='bsd'
         ;;
 esac
 
@@ -188,7 +173,7 @@ Simple script to build and install Neovim directly from the source
 with some pretty basic options.
 
 Usage:
-    $_NAME [OPTIONS]
+    $NAME [OPTIONS]
 
     Optional Flags
         --portable
@@ -232,7 +217,7 @@ EOF
 
 function warn_msg() {
     local warn_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
     else
         printf "[!] Warning:\t %s \n" "$warn_message"
@@ -242,7 +227,7 @@ function warn_msg() {
 
 function error_msg() {
     local error_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
     else
         printf "[X] Error:\t %s \n" "$error_message" 1>&2
@@ -252,7 +237,7 @@ function error_msg() {
 
 function status_msg() {
     local status_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
     else
         printf "[*] Info:\t %s \n" "$status_message"
@@ -261,9 +246,9 @@ function status_msg() {
 }
 
 function verbose_msg() {
-    if [[ $_VERBOSE -eq 1 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
         local debug_message="$1"
-        if [[ $_NOCOLOR -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
         else
             printf "[+] Debug:\t %s \n" "$debug_message"
@@ -273,7 +258,7 @@ function verbose_msg() {
 }
 
 function get_portable() {
-    if [[ $_OS == 'raspbian' ]]; then
+    if [[ $OS == 'raspbian' ]]; then
         error_msg "There's no neovim portable version for ARM devices"
         return 1
     fi
@@ -293,7 +278,7 @@ function get_portable() {
 
     if hash curl 2>/dev/null; then
         local cmd='curl -L'
-        [[ $_VERBOSE -eq 0 ]] && local cmd="${cmd} -s"
+        [[ $VERBOSE -eq 0 ]] && local cmd="${cmd} -s"
     else
         local cmd='wget -q0-'
     fi
@@ -302,13 +287,13 @@ function get_portable() {
 
     [[ ! -d "$dir" ]] && mkdir -p "$dir"
 
-    if [[ $_DEV -eq 0 ]] && [[ $_NVIM_VERSION == 'latest' ]]; then
-        version=$( eval "${cmd} ${_URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
+    if [[ $DEV -eq 0 ]] && [[ $NVIM_VERSION == 'latest' ]]; then
+        version=$( eval "${cmd} ${URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
         status_msg "Downloading version: ${version}"
-    elif [[ $_DEV -eq 1 ]]; then
+    elif [[ $DEV -eq 1 ]]; then
         status_msg "Downloading Nightly"
     else
-        status_msg "Downloading ${_NVIM_VERSION}"
+        status_msg "Downloading ${NVIM_VERSION}"
     fi
 
     if is_windows; then
@@ -322,51 +307,51 @@ function get_portable() {
         local pkg='nvim.appimage'
     fi
 
-    if [[ $_DEV -eq 1 ]]; then
+    if [[ $DEV -eq 1 ]]; then
         build='nightly'
-    elif [[ $_NVIM_VERSION == 'latest' ]]; then
+    elif [[ $NVIM_VERSION == 'latest' ]]; then
         build='stable'
     else
-        build="v${_NVIM_VERSION}"
+        build="v${NVIM_VERSION}"
     fi
 
-    verbose_msg "Downloading ${pkg} from $_URL/releases/download/${build}/${pkg} to $_TMP/$name"
+    verbose_msg "Downloading ${pkg} from $URL/releases/download/${build}/${pkg} to $TMP/$name"
 
-    if ! eval '${cmd} "$_URL/releases/download/${build}/${pkg}" -o "$_TMP/$name"'; then
+    if ! eval '${cmd} "$URL/releases/download/${build}/${pkg}" -o "$TMP/$name"'; then
         error_msg "Fail to download neovim"
         return 1
     fi
 
     if is_windows; then
         verbose_msg "Unpacking ${name}"
-        if ! unzip -qo "$_TMP/$name" -d "$HOME/AppData/Roaming/"; then
+        if ! unzip -qo "$TMP/$name" -d "$HOME/AppData/Roaming/"; then
             return 1
         fi
-        rm -rf "${_TMP:?}/${name}"
+        rm -rf "${TMP:?}/${name}"
     elif is_osx; then
-        pushd "$_TMP" > /dev/null || { error_msg "Could not get to $_TMP" && exit 1; }
+        pushd "$TMP" > /dev/null || { error_msg "Could not get to $TMP" && exit 1; }
         verbose_msg "Unpacking ${name}"
-        if ! tar xzvf "$_TMP/$name" && mv "${_TMP}/nvim-osx64/*" "$HOME/.local/"; then
+        if ! tar xzvf "$TMP/$name" && mv "${TMP}/nvim-osx64/*" "$HOME/.local/"; then
             return 1
         fi
-        popd > /dev/null || { error_msg "Could not get out of $_TMP" && exit 1; }
-        rm -rf "${_TMP:?}/${name}"
-        rm -rf "${_TMP:?}/nvim-osx64"
+        popd > /dev/null || { error_msg "Could not get out of $TMP" && exit 1; }
+        rm -rf "${TMP:?}/${name}"
+        rm -rf "${TMP:?}/nvim-osx64"
     else
         verbose_msg "Installing into $dir/$name"
-        chmod u+x "$_TMP/$name" && mv "$_TMP/$name" "$dir/$name"
+        chmod u+x "$TMP/$name" && mv "$TMP/$name" "$dir/$name"
     fi
 
     return 0
 }
 
 function get_libs() {
-    if [[ $_PYTHON_LIBS -eq 1 ]]; then
+    if [[ $PYTHON_LIBS -eq 1 ]]; then
         hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --upgrade --user pynvim; }
         hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --upgrade --user pynvim; }
     fi
 
-    if [[ $_RUBY_LIBS -eq 1 ]]; then
+    if [[ $RUBY_LIBS -eq 1 ]]; then
         hash gem 2> /dev/null && { status_msg "Installing ruby libs" && gem install --user-install neovim; }
     fi
 }
@@ -398,48 +383,48 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --nocolor)
-            _NOCOLOR=1
+            NOCOLOR=1
             ;;
         --portable=*)
-            _PORTABLE=1
+            PORTABLE=1
             _result=$(__parse_args "$key" "portable" '[0-9]\.[0-9](\.[0-9])?')
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid version ${_result##*=}"
                 exit 1
             fi
-            _NVIM_VERSION="$_result"
+            NVIM_VERSION="$_result"
             ;;
         --portable)
-            _PORTABLE=1
+            PORTABLE=1
             if [[ "$2" =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
-                _NVIM_VERSION="$2"
+                NVIM_VERSION="$2"
                 shift
             fi
             ;;
         -f|--force)
-            _FORCE_INSTALL=1
+            FORCE_INSTALL=1
             ;;
         -c|--clone)
-            _CLONE=1
+            CLONE=1
             ;;
         -d|--dir)
-            _LOCATION="$2"
+            LOCATION="$2"
             shift
             ;;
         -p|--python)
-            _PYTHON_LIBS=1
+            PYTHON_LIBS=1
             ;;
         -r|--ruby)
-            _RUBY_LIBS=1
+            RUBY_LIBS=1
             ;;
         -b|--build)
-            _BUILD_LIBS=1
+            BUILD_LIBS=1
             ;;
         -v|--verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         --dev)
-            _DEV=1
+            DEV=1
             ;;
         -h|--help)
             show_help
@@ -454,7 +439,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [[ $_PORTABLE -eq 1 ]]; then
+if [[ $PORTABLE -eq 1 ]]; then
     if get_portable; then
         if get_libs; then
             exit 0
@@ -470,27 +455,27 @@ if is_windows; then
     exit 1
 fi
 
-if [[ "$_CLONE" -eq 1 ]] && [[ ! -d "$_LOCATION/neovim" ]]; then
-    _LOCATION="$_LOCATION/neovim"
-    git clone --quiet --recursive "$_URL" "$_LOCATION" || exit 1
+if [[ "$CLONE" -eq 1 ]] && [[ ! -d "$LOCATION/neovim" ]]; then
+    LOCATION="$LOCATION/neovim"
+    git clone --quiet --recursive "$URL" "$LOCATION" || exit 1
 
-elif [[ -d "$_LOCATION/neovim" ]]; then
-    warn_msg "$_LOCATION/neovim already exists, skipping cloning"
-    _LOCATION="$_LOCATION/neovim"
+elif [[ -d "$LOCATION/neovim" ]]; then
+    warn_msg "$LOCATION/neovim already exists, skipping cloning"
+    LOCATION="$LOCATION/neovim"
 fi
 
-if [[ -f "$_LOCATION/bin/nvim" ]] && [[ $_FORCE_INSTALL -eq 0 ]]; then
+if [[ -f "$LOCATION/bin/nvim" ]] && [[ $FORCE_INSTALL -eq 0 ]]; then
     status_msg "Neovim is already compiled, aborting"
     exit 0
-elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+elif [[ $FORCE_INSTALL -eq 1 ]]; then
     warn_msg "Neovim is already compiled, but fuck it, you want to recompile"
 fi
 
 
-if [[ -d "$_LOCATION" ]]; then
-    pushd "$_LOCATION" > /dev/null || { error_msg "Could not get to $_LOCATION" && exit 1; }
+if [[ -d "$LOCATION" ]]; then
+    pushd "$LOCATION" > /dev/null || { error_msg "Could not get to $LOCATION" && exit 1; }
 else
-    error_msg "$_LOCATION doesn't exist"
+    error_msg "$LOCATION doesn't exist"
     exit 1
 fi
 
@@ -509,7 +494,7 @@ rm -fr build/
 git checkout master
 git pull origin master
 
-if [[ "$_BUILD_LIBS" -eq 1 ]]; then
+if [[ "$BUILD_LIBS" -eq 1 ]]; then
     status_msg "Looking for system dependencies"
 
     if hash apt-get 2> /dev/null; then
@@ -576,10 +561,10 @@ fi
 GCC_VERSION="$(gcc --version | head -1 | awk '{print $3}')"
 GCC_VERSION="${GCC_VERSION%%.*}"
 # Checkout to the latest stable version
-if (( GCC_VERSION < 7 )) || [[ $_DEV -eq 0 ]]; then
+if (( GCC_VERSION < 7 )) || [[ $DEV -eq 0 ]]; then
     status_msg "Using latest stable version $( git tag | tail -n 1 )"
     git checkout "$( git tag | tail -n 1 )" 2>/dev/null
-elif [[ $_DEV -eq 1 ]]; then
+elif [[ $DEV -eq 1 ]]; then
     status_msg "Using master HEAD"
 fi
 

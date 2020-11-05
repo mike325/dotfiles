@@ -23,17 +23,17 @@
 #            `++:.                           `-/+/
 #            .`                                 `/
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
+NAME="$0"
+NAME="${NAME##*/}"
 
-_SCRIPT_PATH="$0"
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+SCRIPT_PATH="$0"
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
-    _SCRIPT_PATH="$(pwd -P)"
+    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    SCRIPT_PATH="$(pwd -P)"
     popd 1> /dev/null || exit 1
 fi
 
@@ -65,17 +65,17 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
-_CURRENT_SHELL="bash"
+CURRENT_SHELL="bash"
 
 # shellcheck disable=SC2009,SC2046
-_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
+CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+CURRENT_SHELL="${CURRENT_SHELL##*/}"
 
 if ! is_windows; then
     # Hack when using sudo
     # TODO: Must fix this
-    if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
-        _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
+    if [[ $CURRENT_SHELL == "sudo" ]] || [[ $CURRENT_SHELL == "su" ]]; then
+        CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
     fi
 fi
 
@@ -86,7 +86,7 @@ Description:
     Clean (Neo)vim swap files
 
 Usage:
-    $_NAME [OPTIONAL]
+    $NAME [OPTIONAL]
 
     Optional Flags
 

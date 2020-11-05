@@ -21,40 +21,40 @@
 #            `++:.                           `-/+/
 #            .`                                 `/
 
-_VERBOSE=0
-_NOCOLOR=0
-_NOLOG=0
-_WARN_COUNT=0
-_ERR_COUNT=0
-_CURRENT=''
-_FILES=()
-_AUTO_LOCATE=1
+VERBOSE=0
+NOCOLOR=0
+NOLOG=0
+WARN_COUNT=0
+ERR_COUNT=0
+CURRENT=''
+FILES=()
+AUTO_LOCATE=1
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_LOG="${_NAME%%.*}.log"
+NAME="$0"
+NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
 
-if [[ -z "$_MEDIA_PATH" ]]; then
-    _MEDIA_PATH="$(pwd)"
+if [[ -z "$MEDIA_PATH" ]]; then
+    MEDIA_PATH="$(pwd)"
 fi
 
-if [[ -z "$_ARCHIVE" ]]; then
-    _ARCHIVE="/media/video/archive"
+if [[ -z "$ARCHIVE" ]]; then
+    ARCHIVE="/media/video/archive"
 fi
 
-_SCRIPT_PATH="$0"
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+SCRIPT_PATH="$0"
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
-_OS='unknown'
+OS='unknown'
 
 trap '{ exit_append; }' EXIT
 trap '{ clean_up; }' SIGTERM SIGINT
 
 if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
-    _SCRIPT_PATH="$(pwd -P)"
+    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    SCRIPT_PATH="$(pwd -P)"
     popd 1> /dev/null || exit 1
 fi
 
@@ -74,31 +74,31 @@ if [ -z "$SHELL_PLATFORM" ]; then
     fi
 fi
 
-_ARCH="$(uname -m)"
+ARCH="$(uname -m)"
 
 case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
     linux)
         if [[ -f /etc/arch-release ]]; then
-            _OS='arch'
+            OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
-            _OS='ubuntu'
+            OS='ubuntu'
         elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
-            if [[ $_ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
-                _OS='raspbian'
+            if [[ $ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+                OS='raspbian'
             else
-                _OS='debian'
+                OS='debian'
             fi
         fi
         ;;
     cygwin|msys|windows)
-        _OS='windows'
+        OS='windows'
         ;;
     osx)
-        _OS='macos'
+        OS='macos'
         ;;
     bsd)
-        _OS='bsd'
+        OS'bsd'
         ;;
 esac
 
@@ -130,23 +130,23 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 if [[ -n "$ZSH_NAME" ]]; then
-    _CURRENT_SHELL="zsh"
+    CURRENT_SHELL="zsh"
 elif [[ -n "$BASH" ]]; then
-    _CURRENT_SHELL="bash"
+    CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    # _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-    # _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    # _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
-    if [[ -z "$_CURRENT_SHELL" ]]; then
-        _CURRENT_SHELL="${SHELL##*/}"
+    # CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+    # CURRENT_SHELL="${CURRENT_SHELL##*/}"
+    # CURRENT_SHELL="${CURRENT_SHELL##*:}"
+    if [[ -z "$CURRENT_SHELL" ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
 
 if ! hash is_64bits 2>/dev/null; then
     # TODO: This should work with ARM 64bits
     function is_64bits() {
-        if [[ $_ARCH == 'x86_64' ]]; then
+        if [[ $ARCH == 'x86_64' ]]; then
             return 0
         fi
         return 1
@@ -182,7 +182,7 @@ function help_user() {
 Script to automate video convertion to h265 with 320k aac
 
 Usage:
-    $_NAME [OPTIONAL]
+    $NAME [OPTIONAL]
 
     Optional Flags
 
@@ -197,11 +197,11 @@ Usage:
 
         -a PATH , --archive PATH
             Set archive path
-                - Default: ${_ARCHIVE}
+                - Default: ${ARCHIVE}
 
         -m PATH , --media PATH
             Set media path
-                - Default: ${_MEDIA_PATH}
+                - Default: ${MEDIA_PATH}
 
         -h, --help
             Display help, if you are seeing this, that means that you already know it (nice)
@@ -233,90 +233,90 @@ function __parse_args() {
 
 function warn_msg() {
     local warn_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
     else
         printf "[!] Warning:\t %s\n" "$warn_message"
     fi
-    _WARN_COUNT=$(( _WARN_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >> "${_LOG}"
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$warn_message" >> "${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
     local error_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
     else
         printf "[X] Error:\t %s\n" "$error_message" 1>&2
     fi
-    _ERR_COUNT=$(( _ERR_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${_LOG}"
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t\t %s\n" "$error_message" >> "${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
     local status_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
     else
         printf "[*] Info:\t %s\n" "$status_message"
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$status_message" >> "${LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
     local debug_message="$1"
-    if [[ $_VERBOSE -eq 1 ]]; then
-        if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
         else
             printf "[+] Debug:\t %s\n" "$debug_message"
         fi
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${LOG}"
     fi
     return 0
 }
 
 function initlog() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        rm -f "${_LOG}" 2>/dev/null
-        if ! touch "${_LOG}" &>/dev/null; then
+    if [[ $NOLOG -eq 0 ]]; then
+        rm -f "${LOG}" 2>/dev/null
+        if ! touch "${LOG}" &>/dev/null; then
             error_msg "Fail to init log file"
-            _NOLOG=1
+            NOLOG=1
             return 1
         fi
-        if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
+        if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
         fi
         if ! is_osx; then
-            _LOG=$(readlink -e "${_LOG}")
+            LOG=$(readlink -e "${LOG}")
         fi
-        verbose_msg "Using log at ${_LOG}"
+        verbose_msg "Using log at ${LOG}"
     fi
     return 0
 }
 
 function exit_append() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        if [[ $_WARN_COUNT -gt 0 ]] || [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >> "${LOG}"
         fi
 
-        if [[ $_WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$_WARN_COUNT" >> "${_LOG}"
+        if [[ $WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
         fi
-        if [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
+        if [[ $ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >> "${LOG}"
         fi
     fi
     return 0
@@ -326,20 +326,20 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --nolog)
-            _NOLOG=1
+            NOLOG=1
             ;;
         --nocolor)
-            _NOCOLOR=1
+            NOCOLOR=1
             ;;
         -v|--verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         -m|--media)
             if [[ -z "${2}" ]]; then
                 error_msg "No path for media path"
                 exit 1
             fi
-            _MEDIA_PATH="${2}"
+            MEDIA_PATH="${2}"
             shift
             ;;
         -a|--archive)
@@ -347,7 +347,7 @@ while [[ $# -gt 0 ]]; do
                 error_msg "No path for archive"
                 exit 1
             fi
-            _ARCHIVE="${2}"
+            ARCHIVE"${2}"
             shift
             ;;
         -h|--help)
@@ -362,14 +362,14 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Not a valid file $2"
                 exit 1
             fi
-            _AUTO_LOCATE=0
-            _FILES+=("$2")
+            AUTO_LOCATE=0
+            FILES+=("$2")
             shift
             ;;
         -)
             while read -r from_stdin; do
-                _AUTO_LOCATE=0
-                _FILES+=("$from_stdin")
+                AUTO_LOCATE=0
+                FILES=("$from_stdin")
             done
             break
             ;;
@@ -385,11 +385,11 @@ done
 
 initlog
 
-verbose_msg "Log Disable   : ${_NOLOG}"
-verbose_msg "Current Shell : ${_CURRENT_SHELL}"
+verbose_msg "Log Disable   : ${NOLOG}"
+verbose_msg "Current Shell : ${CURRENT_SHELL}"
 verbose_msg "Platform      : ${SHELL_PLATFORM}"
-verbose_msg "OS Name       : ${_OS}"
-verbose_msg "Architecture  : ${_ARCH}"
+verbose_msg "OS Name       : ${OS}"
+verbose_msg "Architecture  : ${ARCH}"
 
 if ! hash ffmpeg 2>/dev/null; then
     error_msg "Failed to locate ffmpeg"
@@ -437,7 +437,7 @@ function convert_files() {
     local vcodec
     local acodec
 
-    if [[ $_VERBOSE -eq 0 ]]; then
+    if [[ $VERBOSE -eq 0 ]]; then
         converter="$converter -v quiet "
     fi
 
@@ -471,18 +471,18 @@ function convert_files() {
 
     status_msg "Converting ${filename}"
 
-    _CURRENT="${file_dir}/${file_basename}.265.mp4"
+    CURRENT="${file_dir}/${file_basename}.265.mp4"
 
     verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${file_dir}/${file_basename}.265.mp4"
     if ! eval '${converter} -i "${file_abspath}" ${vcmd} ${acmd} "${file_dir}/${file_basename}.265.mp4"'; then
         error_msg "Failed to convert video from ${filename}"
         verbose_msg "Cleaning failed file"
         rm -f "${file_dir}/${file_basename}.265.mp4"
-        _CURRENT=''
+        CURRENT=''
         return 1
     fi
 
-    _CURRENT=''
+    CURRENT=''
 
     return 0
 }
@@ -499,29 +499,29 @@ function media_archive() {
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
 
-    if [[ ! -d "${_ARCHIVE}" ]]; then
-        verbose_msg "Creating archive ${_ARCHIVE}"
-        mkdir -p "${_ARCHIVE}"
+    if [[ ! -d "${ARCHIVE}" ]]; then
+        verbose_msg "Creating archive ${ARCHIVE}"
+        mkdir -p "${ARCHIVE}"
     fi
 
     if hash fd 2>/dev/null; then
-        file_list="$(fd -t f -e mp4 . "${_ARCHIVE}" | wc -l)"
+        file_list="$(fd -t f -e mp4 . "${ARCHIVE}" | wc -l)"
     else
-        file_list="$(find "${_ARCHIVE}" -regextype posix-extended -iregex '.*\.mp4$' | wc -l)"
+        file_list="$(find "${ARCHIVE}" -regextype posix-extended -iregex '.*\.mp4$' | wc -l)"
     fi
 
     status_msg "Backing up original file ${filename}"
-    verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${_ARCHIVE}/"
+    verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${ARCHIVE}/"
 
-    if ! mv --backup=numbered "${file_abspath}" "${_ARCHIVE}/"; then
+    if ! mv --backup=numbered "${file_abspath}" "${ARCHIVE}/"; then
         error_msg "Failed to backup ${filename}"
         return 1
     fi
 
     if [[ -f "${file_dir}/${file_basename}M01.XML" ]]; then
         status_msg "Backing up sidecard file: ${file_basename}M01.XML"
-        verbose_msg "Using -> cp --backup=numbered ${file_dir}/${file_basename}M01.XML ${_ARCHIVE}/C${file_list}M01.XML"
-        if ! cp --backup=numbered "${file_dir}/${file_basename}M01.XML" "${_ARCHIVE}/C${file_list}M01.XML"; then
+        verbose_msg "Using -> cp --backup=numbered ${file_dir}/${file_basename}M01.XML ${ARCHIVE}/C${file_list}M01.XML"
+        if ! cp --backup=numbered "${file_dir}/${file_basename}M01.XML" "${ARCHIVE}/C${file_list}M01.XML"; then
             error_msg "Failed to backup sidecard file ${file_dir}/${file_basename}M01.XML"
             return 1
         fi
@@ -537,19 +537,19 @@ function start_convertion() {
         _cmd='fd'
     fi
 
-    if [[ $_AUTO_LOCATE -eq 1 ]]; then
+    if [[ $AUTO_LOCATE -eq 1 ]]; then
         verbose_msg "Using ${_cmd}"
-        _CMD="$(get_cmd "$_cmd" "$_MEDIA_PATH")"
-        verbose_msg "Getting files with -> ${_CMD}"
-        mapfile -t _FILES < <(eval "$_CMD")
+        CMD="$(get_cmd "$_cmd" "$MEDIA_PATH")"
+        verbose_msg "Getting files with -> ${CMD}"
+        mapfile -t FILES < <(eval "$CMD")
     else
         verbose_msg "Converting input files:"
-        for i in "${_FILES[@]}"; do
-            printf "\t%s\n" "$i" | tee -a "${_LOG}"
+        for i in "${FILES[@]}"; do
+            printf "\t%s\n" "$i" | tee -a "${LOG}"
         done
     fi
 
-    for i in "${_FILES[@]}"; do
+    for i in "${FILES[@]}"; do
         if convert_files "${i}"; then
             if ! media_archive "${i}"; then
                 error_msg "Failed to archive ${i}"
@@ -561,19 +561,19 @@ function start_convertion() {
 
 function clean_up() {
     verbose_msg "Cleaning up by interrupt"
-    if [[ -f "$_CURRENT" ]]; then
-        verbose_msg "Cleanning incomplete video $_CURRENT" && rm -f "${_CURRENT}" 2>/dev/null
+    if [[ -f "$CURRENT" ]]; then
+        verbose_msg "Cleanning incomplete video $CURRENT" && rm -f "${CURRENT}" 2>/dev/null
     fi
     exit_append
     exit 1
 }
 
-verbose_msg "Using media path at ${_MEDIA_PATH}"
-verbose_msg "Using archive path at ${_ARCHIVE}"
+verbose_msg "Using media path at ${MEDIA_PATH}"
+verbose_msg "Using archive path at ${ARCHIVE}"
 
 start_convertion
 
-if [[ $_ERR_COUNT -gt 0 ]]; then
+if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
 fi
 

@@ -53,57 +53,57 @@ normal="\033[0m"
 # shellcheck disable=SC2034
 reset_color="\033[39m"
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_LOG="${_NAME%%.*}.log"
-_NOLOG=1
-_NOCOLOR=0
+NAME="$0"
+NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
+NOLOG=1
+NOCOLOR=0
 
-_WARN_COUNT=0
-_ERR_COUNT=0
+WARN_COUNT=0
+ERR_COUNT=0
 
-_SCRIPT_PATH="$0"
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+SCRIPT_PATH="$0"
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 trap '{ exit_append; }' EXIT
 
 function warn_msg() {
     local warn_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
     else
         printf "[!] Warning:\t %s\n" "$warn_message"
     fi
-    _WARN_COUNT=$(( _WARN_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >> "${_LOG}"
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$warn_message" >> "${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
     local error_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
     else
         printf "[X] Error:\t %s\n" "$error_message" 1>&2
     fi
-    _ERR_COUNT=$(( _ERR_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${_LOG}"
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t\t %s\n" "$error_message" >> "${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
     local status_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
     else
         printf "[*] Info:\t %s\n" "$status_message"
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$status_message" >> "${LOG}"
     fi
     return 0
 }
@@ -111,49 +111,49 @@ function status_msg() {
 function verbose_msg() {
     local debug_message="$1"
     if [[ $_VERBOSE -eq 1 ]]; then
-        if [[ $_NOCOLOR -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
         else
             printf "[+] Debug:\t %s\n" "$debug_message"
         fi
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${LOG}"
     fi
     return 0
 }
 
 function initlog() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        rm -f "${_LOG}" 2>/dev/null
-        if ! touch "${_LOG}" &>/dev/null; then
+    if [[ $NOLOG -eq 0 ]]; then
+        rm -f "${LOG}" 2>/dev/null
+        if ! touch "${LOG}" &>/dev/null; then
             error_msg "Fail to init log file"
-            _NOLOG=1
+            NOLOG=1
             return 1
         fi
-        if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
+        if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
         fi
         if ! is_osx; then
-            _LOG=$(readlink -e "${_LOG}")
+            LOG=$(readlink -e "${LOG}")
         fi
-        verbose_msg "Using log at ${_LOG}"
+        verbose_msg "Using log at ${LOG}"
     fi
     return 0
 }
 
 
 function exit_append() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        if [[ $_WARN_COUNT -gt 0 ]] || [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >> "${LOG}"
         fi
 
-        if [[ $_WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$_WARN_COUNT" >> "${_LOG}"
+        if [[ $WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
         fi
-        if [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
+        if [[ $ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >> "${LOG}"
         fi
     fi
     return 0
@@ -162,24 +162,26 @@ function exit_append() {
 #
 # Modified by Vivek Gite to suit my needs
 #
-shrink () {
+shrink() {
+
     status_msg "Shrinking PDF size"
-    gs                                     \
-      -q -dNOPAUSE -dBATCH -dSAFER         \
-      -sDEVICE=pdfwrite                    \
-      -dCompatibilityLevel=1.3             \
-      -dPDFSETTINGS=/screen                \
-      -dEmbedAllFonts=true                 \
-      -dSubsetFonts=true                   \
-      -dAutoRotatePages=/None              \
-      -dColorImageDownsampleType=/Bicubic  \
-      -dColorImageResolution="$3"          \
-      -dGrayImageDownsampleType=/Bicubic   \
-      -dGrayImageResolution="$3"           \
-      -dMonoImageDownsampleType=/Subsample \
-      -dMonoImageResolution="$3"           \
-      -sOutputFile="$2"                    \
-      "$1"
+
+    gs                                       \
+        -q -dNOPAUSE -dBATCH -dSAFER         \
+        -sDEVICE=pdfwrite                    \
+        -dCompatibilityLevel=1.3             \
+        -dPDFSETTINGS=/screen                \
+        -dEmbedAllFonts=true                 \
+        -dSubsetFonts=true                   \
+        -dAutoRotatePages=/None              \
+        -dColorImageDownsampleType=/Bicubic  \
+        -dColorImageResolution="$3"          \
+        -dGrayImageDownsampleType=/Bicubic   \
+        -dGrayImageResolution= "$3"          \
+        -dMonoImageDownsampleType=/Subsample \
+        -dMonoImageResolution= "$3"          \
+        -sOutputFile= "$2"                   \
+        "$1"
 }
 
 check_smaller () {
@@ -188,8 +190,8 @@ check_smaller () {
     if [[ ! -f "$1" ]] || [[ ! -f "$2" ]]; then
         return 0;
     fi
-    ISIZE="$(wc -c "$1" | cut -f1 -d\ )"
-    OSIZE="$(wc -c "$2" | cut -f1 -d\ )"
+    ISIZE=$(wc -c "$1" | cut -f1 -d\ )
+    OSIZE=$(wc -c "$2" | cut -f1 -d\ )
     if [ "$ISIZE" -lt "$OSIZE" ]; then
         status_msg "Input smaller than output, doing straight copy" >&2
         cp "$1" "$2"
@@ -200,7 +202,7 @@ usage () {
     cat<<EOF
     Reduces PDF filesize by lossy recompressing with Ghostscript.
     Not guaranteed to succeed, but usually works.
-      Usage: $_NAME infile [outfile] [resolution_in_dpi]
+      Usage: $NAME infile [outfile] [resolution_in_dpi]
 EOF
 }
 

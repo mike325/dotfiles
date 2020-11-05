@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-[[ $- == *i* ]] && __INTERACTIVE=1 || __INTERACTIVE=0
-
 # Use <C-s> in terminal vim
-(( __INTERACTIVE == 1 )) && stty -ixon
+[[ $- == *i* ]] && stty -ixon
 
 ################################################################################
 #                         Make some dir that I normally use                    #
@@ -103,8 +101,6 @@ fi
 #                       Load the settings, alias and framework                 #
 ################################################################################
 
-# We don't need this stuff if we are in a non __INTERACTIVE session
-
 if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
@@ -172,16 +168,16 @@ function is_64bits() {
 }
 
 if [[ -n "$ZSH_NAME" ]]; then
-    _CURRENT_SHELL="zsh"
+    CURRENT_SHELL="zsh"
 elif [[ -n "$BASH" ]]; then
-    _CURRENT_SHELL="bash"
+    CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    # _CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-    # _CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-    # _CURRENT_SHELL="${_CURRENT_SHELL##*:}"
-    if [[ -z "$_CURRENT_SHELL" ]]; then
-        _CURRENT_SHELL="${SHELL##*/}"
+    # CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+    # CURRENT_SHELL="${CURRENT_SHELL##*/}"
+    # CURRENT_SHELL="${CURRENT_SHELL##*:}"
+    if [[ -z "$CURRENT_SHELL" ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
 
@@ -234,7 +230,7 @@ if hash gtags 2>/dev/null; then
     export GTAGSLABEL=pygments
 fi
 
-if (( __INTERACTIVE == 1 )); then
+if [[ $- == *i* ]]; then
 
     # Set terminal colors
     if [[  -n "$DISPLAY" ]] && [[ "$TERM" == "xterm" ]]; then
@@ -252,10 +248,10 @@ if (( __INTERACTIVE == 1 )); then
     fi
 
     # Configure shell framework and specific shell settings
-    if [[ -f  "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh" ]]; then
+    if [[ -f  "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/settings/${_CURRENT_SHELL}.sh"
+        source "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh"
 
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage del down4me)

@@ -21,32 +21,39 @@
 #            `++:.                           `-/+/
 #            .`                                 `/
 
-_VERBOSE=0
-_NOCOLOR=0
-_NOLOG=0
-_WARN_COUNT=0
-_ERR_COUNT=0
+VERBOSE=0
+NOCOLOR=0
+NOLOG=0
+WARN_COUNT=0
+ERR_COUNT=0
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_LOG="${_NAME%%.*}.log"
+NAME="$0"
+NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
 
-_SCRIPT_PATH="$0"
-
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+SCRIPT_PATH="$0"
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 trap '{ exit_append; }' EXIT
 
 if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
-    _SCRIPT_PATH="$(pwd -P)"
+    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    SCRIPT_PATH="$(pwd -P)"
     popd 1> /dev/null || exit 1
 fi
 
-# _DEFAULT_SHELL="${SHELL##*/}"
-_CURRENT_SHELL="bash"
+if [[ -n "$ZSH_NAME" ]]; then
+    CURRENT_SHELL="zsh"
+elif [[ -n "$BASH" ]]; then
+    CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    if [[ -z "$CURRENT_SHELL" ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
 
 if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
@@ -91,17 +98,6 @@ if ! hash is_osx 2>/dev/null; then
     }
 fi
 
-# shellcheck disable=SC2009,SC2046
-_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
-if ! is_windows; then
-    # Hack when using sudo
-    if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
-        _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
-    fi
-fi
-
 # colors
 # shellcheck disable=SC2034
 black="\033[0;30m"
@@ -132,7 +128,7 @@ Description
     Lint project source code
 
 Usage:
-    $_NAME [OPTIONAL]
+    $NAME [OPTIONAL]
 
     Optional Flags
 
@@ -174,82 +170,90 @@ function __parse_args() {
 
 function warn_msg() {
     local warn_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
     else
         printf "[!] Warning:\t %s\n" "$warn_message"
     fi
-    _WARN_COUNT=$(( _WARN_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >> "${_LOG}"
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$warn_message" >> "${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
     local error_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
     else
         printf "[X] Error:\t %s\n" "$error_message" 1>&2
     fi
-    _ERR_COUNT=$(( _ERR_COUNT + 1 ))
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${_LOG}"
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t\t %s\n" "$error_message" >> "${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
     local status_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
     else
         printf "[*] Info:\t %s\n" "$status_message"
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$status_message" >> "${LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
     local debug_message="$1"
-    if [[ $_VERBOSE -eq 1 ]]; then
-        if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
         else
             printf "[+] Debug:\t %s\n" "$debug_message"
         fi
     fi
-    if [[ $_NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${LOG}"
     fi
     return 0
 }
 
 function initlog() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        rm -f "${_LOG}" 2>/dev/null
-        touch "${_LOG}" &>/dev/null
-        if [[ -f "${_SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${_SCRIPT_PATH}/shell/banner" > "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        [[ -n $LOG ]] && rm -f "${LOG}" 2>/dev/null
+        if ! touch "${LOG}" &>/dev/null; then
+            error_msg "Fail to init log file"
+            NOLOG=1
+            return 1
         fi
+        if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
+        fi
+        if ! is_osx; then
+            LOG=$(readlink -e "${LOG}")
+        fi
+        verbose_msg "Using log at ${LOG}"
     fi
     return 0
 }
 
 function exit_append() {
-    if [[ $_NOLOG -eq 0 ]]; then
-        if [[ $_WARN_COUNT -gt 0 ]] || [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${_LOG}"
+    if [[ $NOLOG -eq 0 ]]; then
+        if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >> "${LOG}"
         fi
 
-        if [[ $_WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$_WARN_COUNT" >> "${_LOG}"
+        if [[ $WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
         fi
-        if [[ $_ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$_ERR_COUNT" >> "${_LOG}"
+        if [[ $ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >> "${LOG}"
         fi
     fi
     return 0
@@ -259,13 +263,13 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --nolog)
-            _NOLOG=1
+            NOLOG=1
             ;;
         --nocolor)
-            _NOCOLOR=1
+            NOCOLOR=1
             ;;
         -v|--verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         -h|--help)
             help_user
@@ -293,13 +297,13 @@ if ! hash shellcheck 2>/dev/null; then
 fi
 
 status_msg 'Starting shellcheck test'
-_version="$(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
-verbose_msg "Shellcheck version: ${_version}"
+version="$(shellcheck --version | grep 'version:' | grep -oE '[0-9]\.[0-9]\.[0-9]')"
+verbose_msg "Shellcheck version: ${version}"
 
 # shellcheck disable=SC2046
-if [[ $_version =~ 0\.[2-3]\.[0-9] ]]; then
+if [[ $version =~ 0\.[0-3]\.[0-9] ]]; then
     warn_msg "Shellcheck is too old, skipping"
-elif [[ $_version =~ 0\.[4-5]\.[0-9] ]]; then
+elif [[ $version =~ 0\.[4-5]\.[0-9] ]]; then
     if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
         error_msg 'Fail shellcheck test'
         exit 2

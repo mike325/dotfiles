@@ -71,10 +71,10 @@
 [url "git@github.com:"]
 	insteadOf = sgh:
 
-[credential "helperselector"]
-	selected = <
+; [credential "helperselector"]
+; 	selected = <
 [credential]
-	helper = cache --timeout=28800
+	helper = cache --timeout=57600
 
 [color]
 	ui          = auto

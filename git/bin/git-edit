@@ -21,25 +21,25 @@
 #            `++:.                           `-/+/
 #            .`                                 `/
 
-_VERBOSE=0
+VERBOSE=0
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_NAME="${_NAME##*-}"
+NAME="$0"
+NAME="${NAME##*/}"
+NAME="${NAME##*-}"
 
-_EDITOR="${EDITOR:-vim}"
-_CACHED=""
+EDITOR="${EDITOR:-vim}"
+CACHED=""
 
-_SCRIPT_PATH="$0"
-_WORKTREE=""
+SCRIPT_PATH="$0"
+WORKTREE=""
 
-_SCRIPT_PATH="${_SCRIPT_PATH%/*}"
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 if hash realpath 2>/dev/null; then
-    _SCRIPT_PATH=$(realpath "$_SCRIPT_PATH")
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$_SCRIPT_PATH" 1> /dev/null || exit 1
-    _SCRIPT_PATH="$(pwd -P)"
+    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    SCRIPT_PATH="$(pwd -P)"
     popd 1> /dev/null || exit 1
 fi
 
@@ -71,18 +71,18 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
-_CURRENT_SHELL="bash"
+CURRENT_SHELL="bash"
 
 # shellcheck disable=SC2009,SC2046
-_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+CURRENT_SHELL="${CURRENT_SHELL##*/}"
+CURRENT_SHELL="${CURRENT_SHELL##*:}"
 
 if ! is_windows; then
     # Hack when using sudo
     # TODO: Must fix this
-    if [[ $_CURRENT_SHELL == "sudo" ]] || [[ $_CURRENT_SHELL == "su" ]]; then
-        _CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
+    if [[ $CURRENT_SHELL == "sudo" ]] || [[ $CURRENT_SHELL == "su" ]]; then
+        CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
     fi
 fi
 
@@ -93,12 +93,12 @@ Description:
     Quick edit modified files in a git repo
 
 Usage:
-    $_NAME [OPTIONAL]
+    $NAME [OPTIONAL]
 
         Ex.
-        $ git $_NAME
-        $ git $_NAME -c    # just the staged files
-        $ git $_NAME -e ed # uses ed editor
+        $ git $NAME
+        $ git $NAME -c    # just the staged files
+        $ git $NAME -e ed # uses ed editor
 
     Optional Flags
         -c, --cached
@@ -151,7 +151,7 @@ function status_msg() {
 }
 
 function verbose_msg() {
-    if [[ $_VERBOSE -eq 1 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
         local debug_message="$1"
         printf "[+]     ---- Debug!!!   %s \n" "$debug_message"
     fi
@@ -161,7 +161,7 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         -h|--help)
             help_user
@@ -175,11 +175,11 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Not a valid editor $2"
                 exit 1
             fi
-            _EDITOR="$2"
+            EDITOR="$2"
             shift
             ;;
         -c|--cached)
-            _CACHED="--cached"
+            CACHED="--cached"
             ;;
         *)
             error_msg "Unknown argument $key"
@@ -193,26 +193,26 @@ done
 # _GITDIR="$(git rev-parse --git-dir)"
 worklist=($(git worktree list | awk '{print $1}'))
 for i in ${worklist[*]}; do
-    [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && _WORKTREE="$i"
+    [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && WORKTREE="$i"
 done
 
-if [[ -n "$_CACHED" ]]; then
-    if [[ -n "$_WORKTREE" ]]; then
-        _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
+if [[ -n "$CACHED" ]]; then
+    if [[ -n "$WORKTREE" ]]; then
+        FILES=($(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}'))
     else
-        _FILES=($(git --no-pager status --short | awk '{print $2}'))
+        FILES=($(git --no-pager status --short | awk '{print $2}'))
     fi
 else
-    if [[ -n "$_WORKTREE" ]]; then
-        _FILES=($(git --no-pager --work-tree="$_WORKTREE" status --short | awk '{print $2}'))
+    if [[ -n "$WORKTREE" ]]; then
+        FILES=($(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}'))
     else
-        _FILES=($(git --no-pager status --short | awk '{print $2}'))
+        FILES=($(git --no-pager status --short | awk '{print $2}'))
     fi
 fi
 
 
-if [[ -n $_FILES ]]; then
-    "$_EDITOR" "${_FILES[@]}"
+if [[ -n $FILES ]]; then
+    "$EDITOR" "${FILES[@]}"
 else
     warn_msg "No files to edit"
 fi

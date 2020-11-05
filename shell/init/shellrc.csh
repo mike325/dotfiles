@@ -93,7 +93,7 @@ endif
 ################################################################################
 
 if ($?prompt) then
-    setenv _CURRENT_SHELL `echo $shell | sed 's/.*\///g'`
+    setenv CURRENT_SHELL `echo $shell | sed 's/.*\///g'`
 
     # Make less colorful
     setenv LESS ' -R '
@@ -107,8 +107,8 @@ if ($?prompt) then
 #     #
     # Configure shell framework and specific shell settings (Just bash and zsh)
     # are supported
-    if ( -f  "$HOME/.config/shell/settings/${_CURRENT_SHELL}.csh" ) then
-        source "$HOME/.config/shell/settings/${_CURRENT_SHELL}.csh"
+    if ( -f  "$HOME/.config/shell/settings/${CURRENT_SHELL}.csh" ) then
+        source "$HOME/.config/shell/settings/${CURRENT_SHELL}.csh"
 
         # # I prefer the cool sl and the bins in my path
         # set _kill_alias = ( ips usage myip del down4me sl )

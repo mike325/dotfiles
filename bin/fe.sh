@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-_VERBOSE=0
+VERBOSE=0
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_EDITOR="${EDITOR:-vim}"
+NAME="$0"
+NAME="${NAME##*/}"
+EDITOR="${EDITOR:-vim}"
 
 function help_user() {
     cat<<EOF
@@ -14,11 +14,11 @@ Description
 
 Usage:
 
-    $_NAME [OPTIONAL]
+    $NAME [OPTIONAL]
 
         Ex.
-        $ $_NAME
-        $ $_NAME -e ed # uses ed editor
+        $NAME
+        $NAME -e ed # uses ed editor
 
     Optional Flags
 
@@ -48,7 +48,7 @@ function status_msg() {
 }
 
 function verbose_msg() {
-    if [[ $_VERBOSE -eq 1 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
         local debug_message="$1"
         printf "[+]     ---- Debug!!!   %s \n" "$debug_message"
     fi
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         -e|--editor)
             if [[ -z "$2" ]]; then
@@ -68,7 +68,7 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Not a valid editor $2"
                 exit 1
             fi
-            _EDITOR="$2"
+            EDITOR="$2"
             shift
             ;;
         -h|--help)
@@ -93,7 +93,7 @@ fe() {
         IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
     fi
     # shellcheck disable=SC2128
-    [[ -n "$files" ]] && ${_EDITOR} "${files[@]}"
+    [[ -n "$files" ]] && ${EDITOR} "${files[@]}"
 }
 
 if hash fzf 2>/dev/null; then

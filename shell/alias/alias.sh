@@ -37,7 +37,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias nvi="nvim"
                 alias vnim="nvim"
             else
-                export MANPAGER="nvr -c 'Man!' --remote -"
+                # export MANPAGER="nvr -c 'Man!' --remote -"
                 export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote -"
                 export EDITOR="nvr --remote-wait"
                 alias vi="nvr --remote-silent"
@@ -53,7 +53,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
 
             _nvim="$(which nvim)"
 
-            export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
+            # export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
             export EDITOR="nvim"
 
             # Fucking typos
@@ -105,7 +105,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     else
         alias cdvim="cd ~/.vim"
         alias cdvi="cd ~/.vim"
-        export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+        # export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
         export EDITOR="vim"
 
         alias vi="vim --cmd 'let g:minimal=1'"
@@ -130,6 +130,8 @@ alias gi="git"
 
 if hash bat 2>/dev/null; then
     alias cat="bat"
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
 fi
 
 if is_windows; then

@@ -25,19 +25,19 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
-_NOCOLOR=0
+NAME="$0"
+NAME="${NAME##*/}"
+NOCOLOR=0
 
 # _DEFAULT_SHELL="${SHELL##*/}"
-_FORCE_INSTALL=0
-_BACKUP=0
-_VERBOSE=0
+FORCE_INSTALL=0
+BACKUP=0
+VERBOSE=0
 
 # shellcheck disable=SC2009,SC2046
-_CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-_CURRENT_SHELL="${_CURRENT_SHELL##*/}"
-_CURRENT_SHELL="${_CURRENT_SHELL##*:}"
+CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
+CURRENT_SHELL="${CURRENT_SHELL##*/}"
+CURRENT_SHELL="${CURRENT_SHELL##*:}"
 
 # colors
 # shellcheck disable=SC2034
@@ -70,7 +70,7 @@ Description:
     Small script to install bash-it or oh-my-zsh shell frameworks
 
 Usage:
-    $_NAME [OPTIONS]
+    $NAME [OPTIONS]
         Ex.
         $ get_shell
         $ get_shell -s bash
@@ -101,7 +101,7 @@ EOF
 
 function warn_msg() {
     local warn_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
     else
         printf "[!] Warning:\t %s \n" "$warn_message"
@@ -111,7 +111,7 @@ function warn_msg() {
 
 function error_msg() {
     local error_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
     else
         printf "[X] Error:\t %s \n" "$error_message" 1>&2
@@ -121,7 +121,7 @@ function error_msg() {
 
 function status_msg() {
     local status_message="$1"
-    if [[ $_NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
     else
         printf "[*] Info:\t %s \n" "$status_message"
@@ -130,9 +130,9 @@ function status_msg() {
 }
 
 function verbose_msg() {
-    if [[ $_VERBOSE -eq 1 ]]; then
+    if [[ $VERBOSE -eq 1 ]]; then
         local debug_message="$1"
-        if [[ $_NOCOLOR -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
         else
             printf "[+] Debug:\t %s \n" "$debug_message"
@@ -143,9 +143,9 @@ function verbose_msg() {
 
 function rm_framework() {
     local framework_dir="$1"
-    if [[ $_BACKUP -eq 1 ]]; then
+    if [[ $BACKUP -eq 1 ]]; then
         mv --backup=numbered "$framework_dir" "$HOME/.local/backup"
-    elif [[ $_FORCE_INSTALL -eq 1 ]]; then
+    elif [[ $FORCE_INSTALL -eq 1 ]]; then
         rm -rf "$framework_dir"
     fi
 }
@@ -154,19 +154,19 @@ while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
         --nocolor)
-            _NOCOLOR=1
+            NOCOLOR=1
             ;;
         --verbose)
-            _VERBOSE=1
+            VERBOSE=1
             ;;
         -s|--shell)
             if [[ -n "$2" ]]; then
                 case $2 in
                     bash|bash_it|bash-it)
-                        _CURRENT_SHELL="bash"
+                        CURRENT_SHELL="bash"
                         ;;
                     zsh|oh-my-zsh|oh_my_zsh)
-                        _CURRENT_SHELL="zsh"
+                        CURRENT_SHELL="zsh"
                         ;;
                     *)
                         error_msg "Unsupported shell $2"
@@ -177,10 +177,10 @@ while [[ $# -gt 0 ]]; do
             fi
             ;;
         --backup)
-            _BACKUP=1
+            BACKUP=1
             ;;
         -f|--force)
-            _FORCE_INSTALL=1
+            FORCE_INSTALL=1
             ;;
         -h|--help)
             help_user
@@ -195,13 +195,13 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [[ "$_CURRENT_SHELL" =~ bash ]]; then
+if [[ "$CURRENT_SHELL" =~ bash ]]; then
 
     rm_framework "$HOME/.bash_it"
 
     if [[ ! -d "$HOME/.bash_it" ]]; then
         status_msg "Cloning bash-it"
-        if [[ $_VERBOSE -eq 1 ]]; then
+        if [[ $VERBOSE -eq 1 ]]; then
             if ! git clone --recursive https://github.com/bash-it/bash-it "$HOME/.bash_it"; then
                 error_msg "Fail to clone bash-it"
                 exit 1
@@ -215,13 +215,13 @@ if [[ "$_CURRENT_SHELL" =~ bash ]]; then
     else
         warn_msg "Bash-it is already install"
     fi
-elif [[ "$_CURRENT_SHELL" =~ zsh ]]; then
+elif [[ "$CURRENT_SHELL" =~ zsh ]]; then
 
     rm_framework "$HOME/.oh-my-zsh"
 
     if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
         status_msg "Cloning oh-my-zsh"
-        if [[ $_VERBOSE -eq 1 ]]; then
+        if [[ $VERBOSE -eq 1 ]]; then
             if ! git clone --recursive https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"; then
                 error_msg "Fail to clone oh-my-zsh"
                 exit 1

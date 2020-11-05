@@ -23,8 +23,8 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
-_NAME="$0"
-_NAME="${_NAME##*/}"
+NAME="$0"
+NAME="${NAME##*/}"
 
 function help_user() {
     cat << EOF
@@ -33,9 +33,9 @@ Description:
     Extract any given number of compressed files
 
 Usage:
-    $_NAME FILE(S) [OPTIONAL]
+    $NAME FILE(S) [OPTIONAL]
         Ex.
-        $ $_NAME file.zip stuff.tar foo.rar
+        $NAME file.zip stuff.tar foo.rar
 
 Optional Flags
     -h, --help
