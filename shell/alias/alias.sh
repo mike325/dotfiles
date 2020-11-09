@@ -287,25 +287,25 @@ fi
 if hash fzf 2>/dev/null; then
     if hash git 2>/dev/null; then
         if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . ) 2> /dev/null'
-            export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
+            export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || fd --ignore-file ~/.config/git/ignore --type f --hidden --follow --color always -E '*.spl' -E '*.aux' -E '*.out' -E '*.o' -E '*.pyc' -E '*.gz' -E '*.pdf' -E '*.sw' -E '*.swp' -E '*.swap' -E '*.com' -E '*.exe' -E '*.so' -E '*/cache/*' -E '*/__pycache__/*' -E '*/tmp/*' -E '.git/*' -E '.svn/*' -E '.xml' -E '*.bin' -E '*.7z' -E '*.dmg' -E '*.gz' -E '*.iso' -E '*.jar' -E '*.rar' -E '*.tar' -E '*.zip' -E 'TAGS' -E 'tags' -E 'GTAGS' -E 'COMMIT_EDITMSG' . . ) 2> /dev/null"
+            export FZF_ALT_C_COMMAND="fd --ignore-file ~/.config/git/ignore --color always -t d . $HOME 2>/dev/null"
         elif hash rg 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files . ) 2> /dev/null'
         elif hash ag 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g "" ) 2> /dev/null'
         else
-            export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || find . -iname "*") 2> /dev/null'
+            export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf/|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \)) 2> /dev/null"
         fi
     else
         if hash fd 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --color always -E "*.spl" -E "*.aux" -E "*.out" -E "*.o" -E "*.pyc" -E "*.gz" -E "*.pdf" -E "*.sw" -E "*.swp" -E "*.swap" -E "*.com" -E "*.exe" -E "*.so" -E "*/cache/*" -E "*/__pycache__/*" -E "*/tmp/*" -E ".git/*" -E ".svn/*" -E ".xml" -E "*.bin" -E "*.7z" -E "*.dmg" -E "*.gz" -E "*.iso" -E "*.jar" -E "*.rar" -E "*.tar" -E "*.zip" -E "TAGS" -E "tags" -E "GTAGS" -E "COMMIT_EDITMSG" . . 2> /dev/null'
-            export FZF_ALT_C_COMMAND="fd --color always -t d . $HOME"
+            export FZF_DEFAULT_COMMAND="fd --ignore-file ~/.config/git/ignore --type f --hidden --follow --color always -E '*.spl' -E '*.aux' -E '*.out' -E '*.o' -E '*.pyc' -E '*.gz' -E '*.pdf' -E '*.sw' -E '*.swp' -E '*.swap' -E '*.com' -E '*.exe' -E '*.so' -E '*/cache/*' -E '*/__pycache__/*' -E '*/tmp/*' -E '.git/*' -E '.svn/*' -E '.xml' -E '*.bin' -E '*.7z' -E '*.dmg' -E '*.gz' -E '*.iso' -E '*.jar' -E '*.rar' -E '*.tar' -E '*.zip' -E 'TAGS' -E 'tags' -E 'GTAGS' -E 'COMMIT_EDITMSG' . . 2> /dev/null"
+            export FZF_ALT_C_COMMAND="fd --ignore-file ~/.config/git/ignore --color always -t d . $HOME"
         elif hash rg 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files . 2> /dev/null'
         elif hash ag 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='ag -l --follow --color --nogroup --hidden -g "" 2> /dev/null'
         else
-            export FZF_DEFAULT_COMMAND='find . -iname "*" 2> /dev/null'
+            export FZF_DEFAULT_COMMAND="find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf/|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \) 2>/dev/ull"
         fi
     fi
 
@@ -330,13 +330,13 @@ if hash fzf 2>/dev/null; then
     fkill() {
         local pid
         if [ "$UID" != "0" ]; then
-            pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+            pid=$(ps -f -u $UID | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
         else
-            pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+            pid=$(ps -ef | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
         fi
 
         if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs kill "-${1:-7}"
+            echo "$pid" | xargs kill "${1:-7}"
         fi
     }
 

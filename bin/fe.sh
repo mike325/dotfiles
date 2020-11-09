@@ -87,7 +87,7 @@ done
 fe() {
     local files
     # shellcheck disable=SC2207
-    if hash bat 2>/dev/null && [[ ! "$(uname -r)" =~ 4\.(4\.0-142|15.0-44) ]]; then
+    if [[ ! "$(uname -r)" =~ 4\.(4\.0-142|15.0-44) ]]; then
         IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview-window 'right:60%' --preview '(bat --color=always {} || cat {}) 2> /dev/null'))
     else
         IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
