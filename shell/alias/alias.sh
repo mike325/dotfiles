@@ -294,7 +294,7 @@ if hash fzf 2>/dev/null; then
         elif hash ag 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g "" ) 2> /dev/null'
         else
-            export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf/|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \)) 2> /dev/null"
+            export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \)) 2> /dev/null"
         fi
     else
         if hash fd 2>/dev/null; then
@@ -305,7 +305,7 @@ if hash fzf 2>/dev/null; then
         elif hash ag 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='ag -l --follow --color --nogroup --hidden -g "" 2> /dev/null'
         else
-            export FZF_DEFAULT_COMMAND="find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf/|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \) 2>/dev/ull"
+            export FZF_DEFAULT_COMMAND="find . -regextype egrep -type f -iname '*' ! \( -iregex '.*\.(pyc|o|out|spl|gz|sw|swo|swp|pdf|tar|zip)' -or -path '*/.git/*' -or -path '*/__pycache__/*' \) 2>/dev/ull"
         fi
     fi
 
