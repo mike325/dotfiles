@@ -15,16 +15,20 @@ set mark-symlinked-directories on
 $if mode=vi
     # normal mode
     set keymap vi-command
-
     "k": history-search-backward
     "j": history-search-forward
+    "\C-l": clear-screen
 
     # insert mode
     set keymap vi-insert
-
     "jj": vi-movement-mode
     "\e[A": history-search-backward
     "\e[B": history-search-forward
     "\C-p": history-search-backward
     "\C-n": history-search-forward
+    "\C-l": clear-screen
+$else
+    "\C-p": history-search-backward
+    "\C-n": history-search-forward
+    "\C-l": clear-screen
 $endif
