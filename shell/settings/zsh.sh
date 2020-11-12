@@ -1,32 +1,5 @@
 #!/usr/bin/env zsh
 
-################################################################################
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Extra zsh settings                                            #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
-
 # Remove terminal sounds
 unsetopt beep
 
@@ -40,22 +13,14 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
 
-# Compilation flags
 # export ARCHFLAGS="-arch x86_64"
-
-# ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 [[ ! -d "$HOME/.zsh/" ]] && mkdir -p "$HOME/.zsh/"
 
 # Path to your oh-my-zsh installation.
-if [[ -d "$HOME/.oh-my-zsh" ]]; then
-    ZSH="$HOME/.oh-my-zsh"
-fi
-
-if [[ -z $SHEL ]]; then
-    SHELL='/bin/zsh'
-fi
+[[ -d "$HOME/.oh-my-zsh" ]] && ZSH="$HOME/.oh-my-zsh"
+[[ -z $SHELL ]] && SHELL='/bin/zsh'
 
 # pip zsh completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2139,SC1090,SC1117
 
+! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
+! hash is_64bits 2>/dev/null && is_64bits() { return 0; }
+! hash is_windows 2>/dev/null && is_windows() { return 0; }
+
 # Set vi keys
 set -o vi
 
@@ -13,7 +17,8 @@ shopt -s checkwinsize
 shopt -s autocd
 shopt -s globstar
 shopt -s cdspell
-shopt -s direxpand dirspell
+shopt -s direxpand
+shopt -s dirspell
 shopt -s nocaseglob
 
 # HISTCONTROL=ignoreboth
@@ -64,7 +69,6 @@ if is_windows || is_wsl || ! is_64bits ; then
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
 fi
-
 
 # (Advanced): Change this to the name of your remote repo if you
 # cloned bash-it with a remote other than origin such as `bash-it`.

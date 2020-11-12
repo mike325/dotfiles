@@ -9,7 +9,8 @@
 #                          Set the default text editor                         #
 ################################################################################
 
-# Set vi to start as a minimal setup with just settings, mappings and autocmd; 0 plugins
+! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
+! hash is_windows 2>/dev/null && is_windows() { return 0; }
 
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
