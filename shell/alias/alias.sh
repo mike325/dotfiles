@@ -933,6 +933,9 @@ fi
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
+[[ -z $GIT_USER ]] && export GIT_USER='Mike'
+[[ -z $GIT_MAIL ]] && export GIT_MAIL='mickiller.25@gmail.com'
+
 if hash mqttwarn 2>/dev/null && [[ -f  "$HOME/.config/mqttwarn/mqttwarn.ini" ]] && [[ -z $MQTTWARNINI ]] ; then
     export MQTTWARNINI="$HOME/.config/mqttwarn/mqttwarn.ini"
 fi
@@ -940,4 +943,3 @@ fi
 if is_windows; then
     export CYGWIN=winsymlinks:native
 fi
-

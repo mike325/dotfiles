@@ -50,7 +50,7 @@
 	colorMoved = default
 
 [user]
-	name  = Mike
+	name = Mike
 	email = mickiller.25@gmail.com
 
 [credential "https://git.prodeveloper.me"]
