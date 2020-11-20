@@ -25,6 +25,10 @@
 #            .`   github.com/mike325/dotfiles   `/
 
 
+# TODO: create a install.ps1 to install
+# - scoop and aditional buckets versions, extras and nerd-fonts
+# - chocolatey
+
 ALL=1
 COOL_FONTS=0
 DOTCONFIGS=0
@@ -763,6 +767,15 @@ function setup_dotconfigs() {
             setup_config "${SCRIPT_PATH}/shell/init/shellrc.csh" "$HOME/.${shell}rc.$USER"
         fi
     done
+
+    if is_windows; then
+        # TODO: check this with the proper env variable
+        status_msg "Setting up Windows profile"
+        if [[ ! -f "$HOME/Documents/WindowsPowerShell/profile.ps1" ]]; then
+            [[ ! -d "$HOME/Documents/WindowsPowerShell/" ]] && mkdir -p "$HOME/Documents/WindowsPowerShell/"
+            setup_config "${SCRIPT_PATH}/shell/init/powershell.ps1" "$HOME/Documents/WindowsPowerShell/profile.ps1"
+        fi
+    fi
 
     setup_config "${SCRIPT_PATH}/shell/" "$HOME/.config/shell" || rst=1
 

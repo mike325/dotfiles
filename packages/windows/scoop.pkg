@@ -3,21 +3,9 @@ sudo
 7zip
 curl
 wget
-openssh
-vim
-neovim
-llvm
-gcc
-cmake
-rust
-go
-shellcheck
-git
-ctags
-latex
+# openssh
 which
 unzip
-python
 jq
 grep
 ripgrep
@@ -25,3 +13,16 @@ fd
 bat
 fzf
 ffmpeg
+vim
+neovim
+# Languages and tools
+shellcheck
+git
+ctags
+python
+rust
+llvm
+gcc
+cmake
+go
+latex

@@ -73,12 +73,7 @@ elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
     export PYTHONSTARTUP="$PYTHONSTARTUP_SCRIPT"
 fi
 
-# if hash gem 2> /dev/null; then
-#     _GEM_USER_PATH=$(gem environment | grep -i 'user install' | awk '{print $5}')
-#     if [[ -d "${_GEM_USER_PATH}/bin" ]]; then
-#         export PATH="${_GEM_USER_PATH}/bin:$PATH"
-#     fi
-# fi
+# TODO: Add a path check function to avoid duplicates
 
 # If Neovim is installed in a different path, you could set it in "env" file
 if [[ -d "$HOME/.local/neovim/bin" ]]; then
@@ -86,6 +81,13 @@ if [[ -d "$HOME/.local/neovim/bin" ]]; then
 elif [[ -d "$NEOVIM_PATH" ]]; then
     export PATH="$NEOVIM_PATH:$PATH"
 fi
+
+# if hash gem 2> /dev/null; then
+#     _GEM_USER_PATH=$(gem environment | grep -i 'user install' | awk '{print $5}')
+#     if [[ -d "${_GEM_USER_PATH}/bin" ]]; then
+#         export PATH="${_GEM_USER_PATH}/bin:$PATH"
+#     fi
+# fi
 
 [[ -d "$HOME/.local/golang/bin" ]] && export PATH="$HOME/.local/golang/bin:$PATH"
 [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
@@ -285,12 +287,8 @@ if [[ $- == *i* ]]; then
         source "$HOME/.config/shell/scripts/z.sh"
     fi
 
-    if [[ -n "$VIRTUAL_ENV" ]]; then
-        # shellcheck disable=SC1090,SC1091
-        source "$VIRTUAL_ENV/bin/activate"
-    fi
+    # shellcheck disable=SC1090,SC1091
+    [[ -n "$VIRTUAL_ENV" ]] && source "$VIRTUAL_ENV/bin/activate"
+    [[ -f "$HOME/.config/shell/banner" ]] && cat "$HOME/.config/shell/banner"
 
-    if [[ -f "$HOME/.config/shell/banner" ]]; then
-        cat "$HOME/.config/shell/banner"
-    fi
 fi
