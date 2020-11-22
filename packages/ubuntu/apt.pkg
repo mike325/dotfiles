@@ -41,6 +41,8 @@ python3-pip
 python3-dev
 network-manager
 avahi-daemon
+fd-find
+ripgrep
 # emacs
 # python-pip
 # davfs2

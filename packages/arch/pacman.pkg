@@ -32,6 +32,7 @@ python-pip
 the_silver_searcher
 ripgrep
 grep
+fd
 shellcheck
 vlc
 gimp
