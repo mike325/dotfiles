@@ -2,6 +2,7 @@
   "test/*"                      : { "type": "Test" },
   "bin/*"                       : { "type": "Bins" },
   "dotconfigs/*"                : { "type": "Dotconfigs" },
+  "config/*"                    : { "type": "Config" },
   "install.sh"                  : { "type": "Install" },
   "systemd/user/*.service"      : { "type": "UserServices", "alternate"   : "systemd/user/{}.timer" },
   "systemd/user/*.timer"        : { "type": "Timers", "alternate"         : "systemd/user/{}.service" },

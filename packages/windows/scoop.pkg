@@ -15,7 +15,7 @@ fzf
 ffmpeg
 vim
 neovim
-# Languages and tools
+nssm
 shellcheck
 git
 ctags

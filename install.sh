@@ -1044,8 +1044,8 @@ function _windows_portables() {
                 error_msg "An error occurred extracting zip file"
                 rst=1
             else
-                chmod u+x "$TMP/bat-${version}-${os_type}/bat.exe"
-                mv "$TMP/bat-${version}-${os_type}/bat.exe" "$HOME/.local/bin/"
+                chmod u+x "$TMP/bat-${version}-${os_type}/bat-${version}-${os_type}/bat.exe"
+                mv "$TMP/bat-${version}-${os_type}/bat-${version}-${os_type}/bat.exe" "$HOME/.local/bin/"
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
