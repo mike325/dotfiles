@@ -16,9 +16,13 @@ ffmpeg
 vim
 neovim
 nssm
+# Development tools
 shellcheck
+delta
 git
 ctags
+global
+cscope
 python
 rust
 llvm

@@ -14,7 +14,7 @@
   // To learn more about global settings, visit https://aka.ms/terminal-global-settings
 
   // If enabled, selections are automatically copied to your clipboard.
-  "copyOnSelect": false,
+  "copyOnSelect": true,
 
   // If enabled, formatted data is also copied to your clipboard
   "copyFormatting": false,
@@ -70,21 +70,53 @@
   // Add custom actions and keybindings to this array.
   // To unbind a key combination from your defaults.json, set the command to "unbound".
   // To learn more about actions and keybindings, visit https://aka.ms/terminal-keybindings
-  "actions":
+  "keybindings":
   [
     // Copy and paste are bound to Ctrl+Shift+C and Ctrl+Shift+V in your defaults.json.
     // These two lines additionally bind them to Ctrl+C and Ctrl+V.
     // To learn more about selection, visit https://aka.ms/terminal-selection
-    { "command": "copy", "keys": "ctrl+shift+c" },
-    { "command": "paste", "keys": "ctrl+shift+v" },
+
+    // { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+c" },
+    // { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+shift+c" },
+    { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+insert" },
+
+    // { "command": "paste", "keys": "ctrl+v" },
+    // { "command": "paste", "keys": "ctrl+shift+v" },
+    { "command": "paste", "keys": "shift+insert" },
 
     // Press Ctrl+Shift+F to open the search box
-    { "command": "find", "keys": "ctrl+shift+f" },
+    { "command": "find", "keys": "ctrl+shift+/" },
 
-    // Press Alt+Shift+D to open a new pane.
-    // - "split": "auto" makes this pane open in the direction that provides the most surface area.
-    // - "splitMode": "duplicate" makes the new pane use the focused pane's profile.
-    // To learn more about panes, visit https://aka.ms/terminal-panes
-    { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" }
+    { "command": "closePane", "keys": "ctrl+shift+x" },
+
+    { "command": { "action": "moveFocus", "direction": "down" }, "keys": "alt+down" },
+    { "command": { "action": "moveFocus", "direction": "left" }, "keys": "alt+left" },
+    { "command": { "action": "moveFocus", "direction": "right" }, "keys": "alt+right" },
+    { "command": { "action": "moveFocus", "direction": "up" }, "keys": "alt+up" },
+
+    // { "command": "openNewTabDropdown", "keys": "ctrl+shift+space" },
+
+    { "command": "togglePaneZoom", "keys": "ctrl+shift+z" },
+
+    // // Press Alt+Shift+D to open a new pane.
+    // // - "split": "auto" makes this pane open in the direction that provides the most surface area.
+    // // - "splitMode": "duplicate" makes the new pane use the focused pane's profile.
+    // // To learn more about panes, visit https://aka.ms/terminal-panes
+    // { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" },
+    // { "command": { "action": "splitPane", "split": "horizontal"}, "keys": "alt+shift+s" },
+    // { "command": { "action": "splitPane", "split": "vertical"}, "keys": "alt+shift+v" },
+
+    { "command": "newTab", "keys": "ctrl+shift+t" }
+
+    // { "command": { "action": "newTab", "index": 0 }, "keys": "ctrl+shift+1" },
+    // { "command": { "action": "newTab", "index": 1 }, "keys": "ctrl+shift+2" },
+    // { "command": { "action": "newTab", "index": 2 }, "keys": "ctrl+shift+3" },
+    // { "command": { "action": "newTab", "index": 3 }, "keys": "ctrl+shift+4" },
+    // { "command": { "action": "newTab", "index": 4 }, "keys": "ctrl+shift+5" },
+    // { "command": { "action": "newTab", "index": 5 }, "keys": "ctrl+shift+6" },
+    // { "command": { "action": "newTab", "index": 6 }, "keys": "ctrl+shift+7" },
+    // { "command": { "action": "newTab", "index": 7 }, "keys": "ctrl+shift+8" },
+    // { "command": { "action": "newTab", "index": 8 }, "keys": "ctrl+shift+9" }
+
   ]
 }
