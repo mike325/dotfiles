@@ -160,7 +160,7 @@ alias py3="python3"
 #                        Some useful shortcuts                                 #
 ################################################################################
 
-alias sshkey='ssh-keygen -t rsa -b 4096 -C "${MAIL:-mickiller.25@gmail.com}"'
+alias sshkey='ssh-keygen -t rsa -b 4096 -C "${EMAIL:-mickiller.25@gmail.com}"'
 
 alias user="whoami"
 alias j="jobs"
