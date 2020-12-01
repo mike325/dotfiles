@@ -1617,8 +1617,9 @@ Function DeBloatAll {
         "*Facebook*",
         # "SpotifyAB.SpotifyMusic",
         # "*Spotify*",
-        # "*Netflix*",
         # "*Plex*",
+        "4DF9E0F8.Netflix*",
+        "*Dropbox*",
         "*GAMELOFT*",
         "*Royal Revolt*",
         "*Sway*",
@@ -1636,16 +1637,19 @@ Function DeBloatAll {
         "WinZipComputing.WinZipUniversal",
         "XINGAG.XING",
         "*FarmVille2CountryEscape*",
-        "*CyberLinkMediaSuiteEssentials*",
+        "*CyberLink*",
+        "*RandomSaladGames*",
+        # "*CyberLinkMediaSuiteEssentials*",
         "Drawboard.DrawboardPDF",
         "flaregamesGmbH.RoyalRevolt2",
         "KeeperSecurityInc.Keeper",
         "king.com.BubbleWitch3Saga",
         "king.com.CandyCrushSodaSaga",
+        "*Evernote*",
         "PandoraMediaInc.29680B314EFC2"
     )
 
-    $Bloatware = @(
+    $MSBloatware = @(
 
         # Unnecessary Windows 10 AppX Apps
         "Microsoft.3DBuilder",
@@ -1685,6 +1689,7 @@ Function DeBloatAll {
         # "Microsoft.CommsPhone",
         # "Microsoft.ConnectivityStore",
         "Microsoft.Wallet"
+
         # # Optional: Typically not removed but you can if you need to for some reason
         # "*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
         # "*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
@@ -1761,12 +1766,12 @@ function InstallBloat {
         "Microsoft.Wallet",
 
         # Optional: Typically not removed but you can if you need to for some reason
-        "*Microsoft.BingWeather*"
-        "*Microsoft.MSPaint*"
-        "*Microsoft.MicrosoftStickyNotes*"
-        "*Microsoft.Windows.Photos*"
-        "*Microsoft.WindowsCalculator*"
-        "*Microsoft.WindowsStore*"
+        # "*Microsoft.BingWeather*"
+        # "*Microsoft.MSPaint*"
+        # "*Microsoft.MicrosoftStickyNotes*"
+        # "*Microsoft.Windows.Photos*"
+        # "*Microsoft.WindowsCalculator*"
+        # "*Microsoft.WindowsStore*"
 
     )
 
