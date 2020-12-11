@@ -43,6 +43,8 @@ network-manager
 avahi-daemon
 fd-find
 ripgrep
+samba
+pv
 # emacs
 # python-pip
 # davfs2

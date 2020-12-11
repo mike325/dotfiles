@@ -49,3 +49,5 @@ pkg-config
 luarocks
 smartmontools
 network-manager
+samba
+pv
