@@ -337,7 +337,7 @@ if hash fzf 2>/dev/null; then
         fi
 
         if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs kill "${1:-7}"
+            echo "$pid" | xargs kill "-${1:-7}"
         fi
     }
 

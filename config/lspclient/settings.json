@@ -1,0 +1,84 @@
+{
+  "servers": {
+    "bibtex": {
+      "use": "latex",
+      "highlightingModeRegex": "^BibTeX$"
+    },
+    "c": {
+      "command": ["clangd", "-log=error", "--index", "--background-index", "--suggest-missing-includes", "--clang-tidy", "--header-insertion=iwyu", "--function-arg-placeholders"],
+      "commandDebug": ["clangd", "-log=verbose", "--index", "--background-index", "--suggest-missing-includes", "--clang-tidy", "--header-insertion=iwyu", "--function-arg-placeholders"],
+      "url": "https://clang.llvm.org/extra/clangd/",
+      "highlightingModeRegex": "^(C|ANSI C89|Objective-C)$"
+    },
+    "cpp": {
+      "use": "c",
+      "highlightingModeRegex": "^(C\\+\\+|ISO C\\+\\+|Objective-C\\+\\+)$"
+    },
+    "viml": {
+      "command": ["vim-language-server"],
+      "highlightingModeRegex": "^VimL$"
+    },
+    "d": {
+      "command": ["serve-d"],
+      "rootIndicationFileNames": ["dub.json"],
+      "url": "https://github.com/Pure-D/serve-d",
+      "highlightingModeRegex": "^D$"
+    },
+    "fortran": {
+      "command": ["fortls"],
+      "rootIndicationFileNames": [".fortls"],
+      "url": "https://github.com/hansec/fortran-language-server",
+      "highlightingModeRegex": "^Fortran.*$"
+    },
+    "go": {
+      "command": ["go-langserver"],
+      "commandDebug": ["go-langserver", "-trace"],
+      "url": "https://github.com/sourcegraph/go-langserver",
+      "highlightingModeRegex": "^Go$"
+    },
+    "haskell": {
+      "command": ["hie-wrapper"],
+      "rootIndicationFileNames": ["*.cabal", "stack.yaml", "cabal.project", "package.yaml"],
+      "url": "https://github.com/haskell/haskell-ide-engine",
+      "highlightingModeRegex": "^Haskell$"
+    },
+    "javascript": {
+      "command": ["javascript-typescript-stdio"],
+      "commandDebug": ["javascript-typescript-stdio", "-t"],
+      "rootIndicationFileNames": ["package.json", "package-lock.json"],
+      "url": "https://github.com/sourcegraph/vscode-javascript-typescript",
+      "highlightingModeRegex": "^JavaScript.*$"
+    },
+    "latex": {
+      "command": ["texlab"],
+      "url": "https://texlab.netlify.com/",
+      "highlightingModeRegex": "^LaTeX$"
+    },
+    "ocaml": {
+      "command": ["ocamllsp"],
+      "url": "https://github.com/ocaml/ocaml-lsp",
+      "highlightingModeRegex": "^Objective Caml.*$"
+    },
+    "perl": {
+      "command": ["perl", "-MPerl::LanguageServer", "-e", "Perl::LanguageServer::run", "--"],
+      "commandDebug": ["perl", "-MPerl::LanguageServer", "-e", "Perl::LanguageServer::run", "--", "--debug"],
+      "url": "https://github.com/richterger/Perl-LanguageServer",
+      "highlightingModeRegex": "^Perl$"
+    },
+    "python": {
+      "command": ["pyls", "--check-parent-process"],
+      "url": "https://github.com/palantir/python-language-server",
+      "highlightingModeRegex": "^Python$"
+    },
+    "rust": {
+      "command": ["rls"],
+      "rootIndicationFileNames": ["Cargo.lock", "Cargo.toml"],
+      "url": "https://github.com/rust-lang/rls",
+      "highlightingModeRegex": "^Rust$"
+    },
+    "typescript": {
+      "use": "javascript",
+      "highlightingModeRegex": "^TypeScript.*$"
+    }
+  }
+}
