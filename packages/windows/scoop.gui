@@ -1,0 +1,10 @@
+# Syncthing is inside the main buckets
+syncthing   # This is not GUI app but I prefer to separate it
+
+# This tools are in the extras bucket
+vlc
+firefox
+chromium
+darktable
+qt-creator
+lazygit     # This is not GUI app but I prefer to separate it
