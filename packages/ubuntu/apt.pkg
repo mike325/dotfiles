@@ -41,10 +41,10 @@ python3-pip
 python3-dev
 network-manager
 avahi-daemon
-fd-find
-ripgrep
 samba
 pv
+# fd-find  # available on ubuntu 20.04 onwards
+# ripgrep  # available on ubuntu 20.04 onwards
 # emacs
 # python-pip
 # davfs2
