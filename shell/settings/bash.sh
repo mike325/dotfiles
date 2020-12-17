@@ -64,7 +64,7 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-if is_windows || is_wsl || ! is_64bits ; then
+if is_windows || ! is_64bits ; then
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
@@ -75,19 +75,19 @@ fi
 # export BASH_IT_REMOTE='bash-it'
 
 # Your place for hosting Git repos. I use this for private repos.
-[[ -z $GIT_HOSTING ]] &&  export GIT_HOSTING='git@git.domain.com'
+# [[ -z $GIT_HOSTING ]] &&  export GIT_HOSTING='git@git.domain.com'
 
 # Don't check mail when opening terminal.
 unset MAILCHECK
 
 # Change this to your console based IRC client of choice.
-export IRC_CLIENT='irssi'
+# export IRC_CLIENT='irssi'
 
 # Set this to the command you use for todo.txt-cli
-export TODO="t"
+# export TODO="t"
 
 # Set this to false to turn off version control status checking within the prompt for all themes
-[[ -z $SCM_CHECK ]] && export SCM_CHECK=true
+# [[ -z $SCM_CHECK ]] && export SCM_CHECK=true
 
 # Set Xterm/screen/Tmux title with only a short hostname.
 # Uncomment this (or set SHORT_HOSTNAME to something else),

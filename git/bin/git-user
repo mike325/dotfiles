@@ -366,6 +366,9 @@ elif ! git rev-parse --git-dir &>/dev/null && ! [[ $GLOBAL -eq 1 ]]; then
     exit 1
 fi
 
+verbose_msg "Using User: $USER"
+verbose_msg "Using Mail: $EMAIL"
+
 if [[ $GLOBAL -eq 0 ]]; then
     git config user.name "$USER"
     git config user.email "$EMAIL"
@@ -379,4 +382,3 @@ if [[ $ERR_COUNT -gt 0 ]]; then
 fi
 
 exit 0
-

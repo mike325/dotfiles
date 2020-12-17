@@ -34,6 +34,30 @@ LOCAL=1
 ALL=0
 REAL=0
 
+# colors
+# shellcheck disable=SC2034
+black="\033[0;30m"
+# shellcheck disable=SC2034
+red="\033[0;31m"
+# shellcheck disable=SC2034
+green="\033[0;32m"
+# shellcheck disable=SC2034
+yellow="\033[0;33m"
+# shellcheck disable=SC2034
+blue="\033[0;34m"
+# shellcheck disable=SC2034
+purple="\033[0;35m"
+# shellcheck disable=SC2034
+cyan="\033[0;36m"
+# shellcheck disable=SC2034
+white="\033[0;37;1m"
+# shellcheck disable=SC2034
+orange="\033[0;91m"
+# shellcheck disable=SC2034
+normal="\033[0m"
+# shellcheck disable=SC2034
+reset_color="\033[39m"
+
 function help_user() {
     cat << EOF
 
@@ -64,32 +88,94 @@ Usage:
 EOF
 }
 
-function error_msg() {
-    ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+function warn_msg() {
+    local warn_message="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
+    else
+        printf "[!] Warning:\t %s\n" "$warn_message"
+    fi
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    return 0
 }
 
-
-function local_ips() {
-    echo ""
-    echo -e "Local IPs"
-    if command -v ifconfig &>/dev/null; then
-        ifconfig | awk '/inet /{ print $2 }'
-    elif command -v ip &>/dev/null; then
-        ip addr | grep -oP 'inet \K[\d.]+'
+function error_msg() {
+    local error_message="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
     else
-        error_msg "You don't have ifconfig or ip command installed!"
-        return 1
+        printf "[X] Error:\t %s\n" "$error_message" 1>&2
+    fi
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    return 0
+}
+
+function status_msg() {
+    local status_message="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
+    else
+        printf "[*] Info:\t %s\n" "$status_message"
     fi
     return 0
 }
 
+function verbose_msg() {
+    local debug_message="$1"
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
+        else
+            printf "[+] Debug:\t %s\n" "$debug_message"
+        fi
+    fi
+    return 0
+}
+
+function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
+    fi
+
+    local flag="$2"
+    local value="$1"
+
+    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
+
+    if [[ -n "$3" ]]; then
+        local pattern="^--${flag}=$3$"
+    fi
+
+    if [[ $value =~ $pattern ]]; then
+        local left_side="${value#*=}"
+        echo "${left_side/#\~/$HOME}"
+    else
+        echo "$value"
+    fi
+}
+
+function local_ips() {
+
+    printf "\n${green}Local IPs${reset_color}%s\n" ":"
+
+    if command -v ip &>/dev/null; then
+        ip -br -c addr
+    elif command -v ifconfig &>/dev/null; then
+        ifconfig | awk '/inet /{ print $2 }'
+    else
+        error_msg "You don't have ifconfig or ip command installed!"
+        return 1
+    fi
+
+    return 0
+}
+
 function real_ip() {
-    echo ""
     local res
+    printf "\n${green}Real IPs${reset_color}%s\n" ":"
     res="$(curl -s ifconfig.me)"
-    echo -e "Public IP"
-    echo -e "$res"
+    printf "${purple}%s${reset_color}\n" "${res}"
 }
 
 while [[ $# -gt 0 ]]; do

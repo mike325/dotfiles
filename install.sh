@@ -1809,13 +1809,15 @@ function setup_python() {
                 # shellcheck disable=SC2034
                 local quiet="--quiet"
             fi
-            if [[ -z $VIRTUAL_ENV ]]; then
-                # shellcheck disable=SC2016
-                local cmd="pip${version} install ${quiet} --user -r ${SCRIPT_PATH}/packages/${OS}/python${version}/requirements.txt"
-            else
-                # shellcheck disable=SC2016
-                local cmd="pip${version} install ${quiet} -r ${SCRIPT_PATH}/packages/${OS}/python${version}/requirements.txt"
-            fi
+
+            # if [[ -z $VIRTUAL_ENV ]]; then
+            #     # shellcheck disable=SC2016
+            #     local cmd="pip${version} install ${quiet} --user -r ${SCRIPT_PATH}/packages/${OS}/python${version}/requirements.txt"
+            # else
+            #     # shellcheck disable=SC2016
+            #     local cmd="pip${version} install ${quiet} -r ${SCRIPT_PATH}/packages/${OS}/python${version}/requirements.txt"
+            # fi
+
             verbose_msg "Pip command --> ${cmd}"
             if ! eval "$cmd"; then
                 error_msg "Fail to install python ${version} dependencies"
@@ -2024,7 +2026,7 @@ while [[ $# -gt 0 ]]; do
             VIM=1
             ALL=0
             ;;
-        --nvim=*)
+        --neovim=*)
             _result=$(__parse_args "$key" "nvim" '(dotfiles|stable|dev(elop(ment)?)?)')
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid neovim build type ${_result##*=}"

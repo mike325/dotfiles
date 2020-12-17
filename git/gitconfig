@@ -23,10 +23,9 @@
 
 [core]
 	editor = $EDITOR
-	; Changed to the standar location $HOME/.config/git/ignore
-	; excludesfile = ~/.config/git/templates/gitignore
 	autocrlf = input
 	symlinks = true
+	; excludesFile = $HOME/.config/git/ignore
 	; pager = bat --style full
 	; pager = delta --24-bit-color always
 
