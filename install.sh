@@ -2027,7 +2027,7 @@ while [[ $# -gt 0 ]]; do
             ALL=0
             ;;
         --neovim=*)
-            _result=$(__parse_args "$key" "nvim" '(dotfiles|stable|dev(elop(ment)?)?)')
+            _result=$(__parse_args "$key" "neovim" '(dotfiles|stable|dev(elop(ment)?)?)')
             if [[ "$_result" == "$key" ]]; then
                 error_msg "Not a valid neovim build type ${_result##*=}"
                 exit 1
@@ -2128,7 +2128,7 @@ while [[ $# -gt 0 ]]; do
                     PKG_FILE="$2"
                     shift
                 elif [[ -f "${SCRIPT_PATH}/packages/${OS}/${2}.pkg" ]]; then
-                    PKG_FILE"$2"
+                    PKG_FILE="$2"
                     shift
                 fi
             fi
