@@ -23,14 +23,6 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvim="cd ~/AppData/Local/nvim/"
             # NOTE: This is set inside Neovim settings
             if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
-                function nvim() {
-                    # NOTE: This is set inside Neovim settings
-                    if [[ -z "$NVIM_LISTEN_ADDRESS" ]]; then
-                        nvim-qt "$@" &
-                    else
-                        nvim "$@"
-                    fi
-                }
                 export EDITOR="vim"
                 alias vi="vim --cmd 'let g:minimal=1'"
                 alias viu="vim -u NONE"

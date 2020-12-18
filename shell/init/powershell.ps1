@@ -56,14 +56,14 @@ function ln ($target, $link) {
     New-Item -Target $target -ItemType SymbolicLink -Path $link
 }
 
-# # Path settings
-# if ( Test-Path "$env:USERPROFILE\scoop\shims" ) {
-#     $env:path = "$env:USERPROFILE\scoop\shims;$env:path"
-# }
-
 # Path settings
 if ( Test-Path "$env:USERPROFILE\.local\bin" ) {
     $env:path = "$env:USERPROFILE\.local\bin;$env:path"
+}
+
+# Path settings
+if ( Test-Path "$env:USERPROFILE\scoop\shims" ) {
+    $env:path = "$env:USERPROFILE\scoop\shims;$env:path"
 }
 
 if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
