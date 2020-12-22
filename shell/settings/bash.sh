@@ -34,6 +34,7 @@ if [[ -d "$HOME/.bash-it" ]]; then
 elif [[ -d "$HOME/.bash_it" ]]; then
     export BASH_IT="$HOME/.bash_it"
 else
+
     export black="\[\e[0;30m\]"
     export red="\[\e[0;31m\]"
     export green="\[\e[0;32m\]"
@@ -43,7 +44,6 @@ else
     export cyan="\[\e[0;36m\]"
     export white="\[\e[0;37m\]"
     export orange="\[\e[0;91m\]"
-
     export normal="\[\e[0m\]"
     export reset_color="\[\e[39m\]"
 
@@ -57,9 +57,9 @@ else
     export echo_cyan="\033[0;36m"
     export echo_white="\033[0;37;1m"
     export echo_orange="\033[0;91m"
-
     export echo_normal="\033[0m"
     export echo_reset_color="\033[39m"
+
 fi
 
 # location ~/.bash_it/themes/
@@ -142,12 +142,24 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     # shellcheck disable=SC1091
     source "$BASH_IT/bash_it.sh"
 else
+
     __schroot_name(){
         if [[ -n ${SCHROOT_CHROOT_NAME} ]]; then
-            echo -e "${red}(${SCHROOT_CHROOT_NAME})${reset_color} "
+            echo -e "${echo_red}(${SCHROOT_CHROOT_NAME})${echo_reset_color} "
         fi
     }
-    PS1="\n$(__schroot_name)${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color} \n→ "
+
+    __git_branch(){
+        if hash git 2>/dev/null; then
+            local branch
+            branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
+            if [[ -n $branch ]]; then
+                echo -e " ${echo_blue}| ${branch} |${echo_reset_color} "
+            fi
+        fi
+    }
+
+    PS1="\n$(__schroot_name)${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color}\$(__git_branch) \n→ "
 fi
 
 if hash tmux 2>/dev/null; then
