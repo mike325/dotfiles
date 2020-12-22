@@ -159,7 +159,7 @@ else
         fi
     }
 
-    PS1="\n$(__schroot_name)${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${green}\w${reset_color}\$(__git_branch) \n→ "
+    PS1="\n$(__schroot_name)${purple}\u${reset_color} at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__git_branch) \n→ "
 fi
 
 if hash tmux 2>/dev/null; then
