@@ -173,7 +173,10 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
 
     if ( Get-Command "nvim.exe" -ErrorAction SilentlyContinue ) {
         function fe {
-            fzf --height 70% --query="$1" --multi --select-1 --exit-0 | % { nvim $_  };
+            $files = @(fzf --height 70% --query="$1" --multi --select-1 --exit-0);
+            if ($files.Length -gt 0) {
+                nvim $files;
+            }
         }
     }
 
