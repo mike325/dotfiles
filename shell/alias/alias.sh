@@ -53,32 +53,33 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias nvi="nvim"
             alias vnim="nvim"
 
-            function nvim() {
-                if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
-                    local args=()
-                    local avoid=0
-                    for arg in "$@"; do
-                        case "$arg" in
-                            -*|+*)
-                                if [[ "$arg" == '--cmd' ]]; then
-                                    local avoid=1
-                                else
-                                    local avoid=0
-                                fi
-                                ;;
-                            *)
-                                if [[ $avoid -eq 0 ]]; then
-                                    args+=("$arg")
-                                fi
-                                [[ $avoid -eq 1 ]] && local avoid=0
-                                ;;
-                        esac
-                    done
-                    nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "${args[@]}"
-                else
-                    $_nvim --listen "$HOME/.cache/nvim/socket" "$@"
-                fi
-            }
+            # # TODO:  Need to improve this to make it tmux pane aware
+            # function nvim() {
+            #     if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
+            #         local args=()
+            #         local avoid=0
+            #         for arg in "$@"; do
+            #             case "$arg" in
+            #                 -*|+*)
+            #                     if [[ "$arg" == '--cmd' ]]; then
+            #                         local avoid=1
+            #                     else
+            #                         local avoid=0
+            #                     fi
+            #                     ;;
+            #                 *)
+            #                     if [[ $avoid -eq 0 ]]; then
+            #                         args+=("$arg")
+            #                     fi
+            #                     [[ $avoid -eq 1 ]] && local avoid=0
+            #                     ;;
+            #             esac
+            #         done
+            #         nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "${args[@]}"
+            #     else
+            #         $_nvim --listen "$HOME/.cache/nvim/socket" $@
+            #     fi
+            # }
 
             if hash rshell 2>/dev/null; then
                 if hash nvr 2>/dev/null; then
@@ -924,6 +925,7 @@ fi
 #######################################################################
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+export EMAIL='mickiller.25@gmail.com'
 
 [[ -z $GIT_USER ]] && export GIT_USER='Mike'
 [[ -z $GIT_MAIL ]] && export GIT_MAIL='mickiller.25@gmail.com'
