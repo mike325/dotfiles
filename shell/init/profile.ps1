@@ -91,6 +91,13 @@ function Test-Administrator {
     (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 }
 
+function Write-Git-Branch {
+    Invoke-Expression "git symbolic-ref --short HEAD" 2> $null | Tee-Object -Variable branch | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host " | $branch | " -NoNewline -ForegroundColor blue
+    }
+}
+
 function prompt {
     $realLASTEXITCODE = $LASTEXITCODE
 
@@ -115,13 +122,13 @@ function prompt {
 
     Write-Host ": " -NoNewline -ForegroundColor DarkGray
     Write-Host $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -NoNewline -ForegroundColor Yellow
-    # Write-Host " : " -NoNewline -ForegroundColor DarkGray
-    # Write-Host (Get-Date -Format G) -NoNewline -ForegroundColor DarkMagenta
-    # Write-Host " : " -NoNewline -ForegroundColor DarkGray
+
+
+    if (Get-Command "git" -ErrorAction SilentlyContinue) {
+        Write-Git-Branch
+    }
 
     $global:LASTEXITCODE = $realLASTEXITCODE
-
-    # Write-VcsStatus
 
     Write-Host ""
 

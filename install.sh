@@ -773,7 +773,7 @@ function setup_dotconfigs() {
         status_msg "Setting up Windows profile"
         if [[ ! -f "$HOME/Documents/WindowsPowerShell/profile.ps1" ]]; then
             [[ ! -d "$HOME/Documents/WindowsPowerShell/" ]] && mkdir -p "$HOME/Documents/WindowsPowerShell/"
-            setup_config "${SCRIPT_PATH}/shell/init/powershell.ps1" "$HOME/Documents/WindowsPowerShell/profile.ps1"
+            setup_config "${SCRIPT_PATH}/shell/init/profile.ps1" "$HOME/Documents/WindowsPowerShell/profile.ps1"
         fi
     fi
 
