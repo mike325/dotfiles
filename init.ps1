@@ -1763,7 +1763,7 @@ function InstallBloat {
         "Microsoft.WindowsPhone",
         "Microsoft.CommsPhone",
         "Microsoft.ConnectivityStore",
-        "Microsoft.Wallet",
+        "Microsoft.Wallet"
 
         # Optional: Typically not removed but you can if you need to for some reason
         # "*Microsoft.BingWeather*"
