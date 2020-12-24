@@ -170,6 +170,10 @@ else
     PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__git_branch) \n→ "
 fi
 
+if hash kitty 2>/dev/null; then
+    source <(kitty + complete setup bash)
+fi
+
 if hash tmux 2>/dev/null; then
     bind '"\C-a":"tmux a || tmux new -s main\n"'
 fi

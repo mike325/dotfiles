@@ -5,6 +5,7 @@ unsetopt beep
 
 autoload -Uz history-search-end
 autoload -Uz compinit
+compinit
 
 # Set vi key mode
 bindkey -v
@@ -122,4 +123,9 @@ else
     # prompt -s redhat
 
     PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
+fi
+
+if hash kitty 2>/dev/null; then
+    # Completion for kitty
+    kitty + complete setup zsh | source /dev/stdin
 fi
