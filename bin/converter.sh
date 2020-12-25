@@ -439,6 +439,8 @@ function convert_files() {
 
     if [[ $VERBOSE -eq 0 ]]; then
         converter="$converter -v quiet "
+    else
+        converter="$converter -v verbose "
     fi
 
     # local metadata=" --metadata authr=$_AUTHOR"
