@@ -200,7 +200,17 @@ Write-Host "
              .'   github.com/mike325/dotfiles   '/
 "
 
+Remove-Item Env:\TERM -ErrorAction SilentlyContinue
+
+Import-Module posh-git -ErrorAction SilentlyContinue
 Import-Module PSReadLine -ErrorAction SilentlyContinue
+
+# Shows navigable menu of all options when hitting Tab
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete -ErrorAction SilentlyContinue
+
+# Autocompletion for arrow keys
+Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward -ErrorAction SilentlyContinue
+Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward -ErrorAction SilentlyContinue
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"

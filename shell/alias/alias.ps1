@@ -126,6 +126,7 @@ else {
     }
 }
 
+New-Alias -Name open -Value 'ii'
 
 if (Get-Command "bat" -ErrorAction SilentlyContinue) {
     New-Alias -Name cat -Value 'bat' -ErrorAction SilentlyContinue;
