@@ -117,7 +117,7 @@
 ;                 Just a status                                                #
 ;###############################################################################
 
-	s = status
+	s = status --show-stash --renames --branch
 
 ;###############################################################################
 ;                 Get the tag of the current commit                            #
@@ -193,6 +193,7 @@
 	d   = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto
 	dc  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --cached
 	dk  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --check
+	ds  = diff --find-copies-harder --shortstat
 
 ;###############################################################################
 ;                 Grep something in the current repo                           #

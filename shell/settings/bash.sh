@@ -151,10 +151,13 @@ else
 
     __git_branch(){
         if hash git 2>/dev/null; then
-            local branch
+            local branch changes
             branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
-                echo -e " ${echo_blue}| ${branch} |${echo_reset_color} "
+                changes="$(git diff --shortstat | awk '{
+                    printf " %s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
+                }')"
+                echo -e " ${echo_blue}| ${branch}${changes} |${echo_reset_color} "
             fi
         fi
     }
