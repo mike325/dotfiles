@@ -149,15 +149,27 @@ else
         fi
     }
 
-    __git_branch(){
+    __git_info(){
         if hash git 2>/dev/null; then
-            local branch changes
+            local branch changes stash info
             branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
+                branch="${echo_blue}$branch"
                 changes="$(git diff --shortstat | awk '{
-                    printf " %s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
+                    printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
-                echo -e " ${echo_blue}| ${branch}${changes} |${echo_reset_color} "
+                stash="$(git stash list | wc -l)"
+                if [[ $stash -ne 0 ]]; then
+                    stash="${echo_yellow}{$stash}"
+                else
+                    stash=''
+                fi
+                info=" ${echo_blue}|"
+                [[ -n $branch ]] && info="$info ${echo_reset_color}$branch${echo_reset_color}"
+                [[ -n $changes ]] && info="$info ${echo_reset_color}$changes${echo_reset_color}"
+                [[ -n $stash ]] && info="$info ${echo_reset_color}$stash${echo_reset_color}"
+                info="$info ${echo_blue}|${echo_reset_color} "
+                echo -e " $info "
             fi
         fi
     }
@@ -170,7 +182,7 @@ else
         fi
     }
 
-    PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__git_branch) \n→ "
+    PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__git_info) \n→ "
 fi
 
 if hash kitty 2>/dev/null; then
