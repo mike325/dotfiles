@@ -52,3 +52,4 @@ apparmor-utils
 network-manager
 samba
 pv
+zram-tools

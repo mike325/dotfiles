@@ -43,6 +43,7 @@ network-manager
 avahi-daemon
 samba
 pv
+zram-tools
 # fd-find  # available on ubuntu 20.04 onwards
 # ripgrep  # available on ubuntu 20.04 onwards
 # emacs

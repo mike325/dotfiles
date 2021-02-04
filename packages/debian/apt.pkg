@@ -51,3 +51,4 @@ smartmontools
 network-manager
 samba
 pv
+zram-tools

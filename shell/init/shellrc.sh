@@ -65,6 +65,7 @@ fi
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
 [[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
 [[ -d "$HOME/.luarocks/bin" ]] && export PATH="$HOME/.luarocks/bin/:$PATH"
+[[ -d "/usr/sbin/" ]] && export PATH="/usr/sbin/:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
