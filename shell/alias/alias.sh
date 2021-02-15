@@ -15,8 +15,16 @@
 if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
 
+        if [[ -n "$TMUX_PANE" ]]; then
+            TMUX_WINDOW="$(tmux display-message -p '#I')"
+            export TMUX_WINDOW
+        else
+            # TODO: Use shell TTY to separete socket sessions
+            export TMUX_WINDOW=""
+        fi
+
         [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
-        export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket"
+        export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket$TMUX_WINDOW"
 
         if is_windows && ! is_wsl; then
             alias cdvi="cd ~/.vim"
@@ -53,44 +61,43 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias nvi="nvim"
             alias vnim="nvim"
 
-            # # TODO:  Need to improve this to make it tmux pane aware
-            # function nvim() {
-            #     if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
-            #         local args=()
-            #         local avoid=0
-            #         for arg in "$@"; do
-            #             case "$arg" in
-            #                 -*|+*)
-            #                     if [[ "$arg" == '--cmd' ]]; then
-            #                         local avoid=1
-            #                     else
-            #                         local avoid=0
-            #                     fi
-            #                     ;;
-            #                 *)
-            #                     if [[ $avoid -eq 0 ]]; then
-            #                         args+=("$arg")
-            #                     fi
-            #                     [[ $avoid -eq 1 ]] && local avoid=0
-            #                     ;;
-            #             esac
-            #         done
-            #         nvr --servername "$HOME/.cache/nvim/socket" --remote-silent "${args[@]}"
-            #     else
-            #         $_nvim --listen "$HOME/.cache/nvim/socket" $@
-            #     fi
-            # }
+            function nvim() {
+                if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
+                    local args=()
+                    local avoid=0
+                    for arg in "$@"; do
+                        case "$arg" in
+                            -*|+*)
+                                if [[ "$arg" == '--cmd' ]]; then
+                                    local avoid=1
+                                else
+                                    local avoid=0
+                                fi
+                                ;;
+                            *)
+                                if [[ $avoid -eq 0 ]]; then
+                                    args+=("$arg")
+                                fi
+                                [[ $avoid -eq 1 ]] && local avoid=0
+                                ;;
+                        esac
+                    done
+                    nvr --servername "$HOME/.cache/nvim/socket$TMUX_WINDOW" --remote-silent "${args[@]}"
+                else
+                    $_nvim --listen "$HOME/.cache/nvim/socket$TMUX_WINDOW" $@
+                fi
+            }
 
             if hash rshell 2>/dev/null; then
                 if hash nvr 2>/dev/null; then
-                    export RSHELL_EDITOR="nvr --servername $HOME/.cache/nvim/socket --remote-wait"
+                    export RSHELL_EDITOR="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-wait"
                 else
                     export RSHELL_EDITOR="$EDITOR"
                 fi
             fi
 
-            if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket" ]]; then
-                alias vi="nvr --servername $HOME/.cache/nvim/socket --remote-silent"
+            if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
+                alias vi="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-silent"
             else
                 alias vi="nvim --cmd 'let g:minimal=1'"
             fi
