@@ -19,7 +19,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             TMUX_WINDOW="$(tmux display-message -p '#I')"
             export TMUX_WINDOW
         else
-            # TODO: Use shell TTY to separete socket sessions
+            # TODO: Use shell TTY to separete neovim's socket sessions
             export TMUX_WINDOW=""
         fi
 
@@ -38,7 +38,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias nvi="nvim"
                 alias vnim="nvim"
             else
-                # export MANPAGER="nvr -c 'Man!' --remote -"
+                export MANPAGER="nvr +'Man!' --remote -"
                 export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote -"
                 export EDITOR="nvr --remote-wait"
                 alias vi="nvr --remote-silent"
@@ -53,9 +53,6 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvim="cd ~/.config/nvim"
 
             _nvim="$(which nvim)"
-
-            # export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
-            export EDITOR="nvim"
 
             # Fucking typos
             alias nvi="nvim"
@@ -102,6 +99,13 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 alias vi="nvim --cmd 'let g:minimal=1'"
             fi
 
+            if hash nvr 2>/dev/null && [[ -n $VIMRUNTIME ]]; then
+                export MANPAGER="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW +'Man!' --remote-silent -"
+            else
+                export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
+            fi
+            export EDITOR="nvim"
+
         fi
     else
         alias cdvim="cd ~/.vim"
@@ -129,7 +133,7 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
-if hash bat 2>/dev/null; then
+if hash bat 2>/dev/null && [[ -z $MANPAGER ]]; then
     alias cat="bat"
     export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
