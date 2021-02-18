@@ -133,10 +133,9 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
-if hash bat 2>/dev/null && [[ -z $MANPAGER ]]; then
+if hash bat 2>/dev/null; then
     alias cat="bat"
-    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-
+    [[ -z $MANPAGER ]] && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
 
 if is_windows; then
