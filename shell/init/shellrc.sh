@@ -61,11 +61,11 @@ fi
 # We already checked the file exists so its "safe"
 # shellcheck disable=SC1090,SC1091
 [[ -f "$HOME/.config/shell/host/env.sh"  ]] && source "$HOME/.config/shell/host/env.sh"
+[[ -d "/usr/sbin/" ]] && export PATH="/usr/sbin/:$PATH"
 [[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
 [[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
 [[ -d "$HOME/.luarocks/bin" ]] && export PATH="$HOME/.luarocks/bin/:$PATH"
-[[ -d "/usr/sbin/" ]] && export PATH="/usr/sbin/:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
