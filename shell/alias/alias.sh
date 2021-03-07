@@ -96,7 +96,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
                 alias vi="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-silent"
             else
-                alias vi="nvim --cmd 'let g:minimal=1'"
+                alias vi="$_nvim --cmd 'let g:minimal=1'"
             fi
 
             if hash nvr 2>/dev/null && [[ -n $VIMRUNTIME ]]; then
