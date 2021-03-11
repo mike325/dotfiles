@@ -155,10 +155,10 @@ else
             branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
                 branch="${echo_blue}$branch"
-                changes="$(git diff --shortstat | awk '{
+                changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
-                stash="$(git stash list | wc -l)"
+                stash="$(git stash list 2>/dev/null | wc -l)"
                 if [[ $stash -ne 0 ]]; then
                     stash="${echo_yellow}{$stash}"
                 else
@@ -182,7 +182,16 @@ else
         fi
     }
 
-    PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__git_info) \n→ "
+    __jobs(){
+        # local j
+        # j=$(jobs | wc -l)
+        # if [[ $j -gt 1 ]]; then
+        #     echo -e " ${echo_red}(${j})${echo_reset_color}"
+        # fi
+        :
+    }
+
+    PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__jobs)\$(__git_info) \n→ "
 fi
 
 if hash kitty 2>/dev/null; then
