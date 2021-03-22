@@ -14,7 +14,9 @@ make
 sed
 htop
 cmake
-ctags
+universal-ctags
+global
+cscope
 sl
 vim-nox
 neovim

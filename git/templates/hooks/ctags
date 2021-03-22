@@ -6,7 +6,42 @@ top="$( git rev-parse --show-toplevel )"
 trap 'rm -f "$dir/tags.$$" "$top/tags.$$"' EXIT INT TERM
 
 # git grep --cached -Il '' | ctags --tag-relative -L - -f$dir/tags.$$
-git ls-files --exclude-standard --cached | ctags --tag-relative -L - -f"$dir/tags.$$"
+git ls-files --exclude-standard --cached | ctags \
+    --append \
+    --c-kinds=+p \
+    --c++-kinds=+pl \
+    --python-kinds=+l \
+    --recurse=yes \
+    --fields=+i \
+    --fields=+a \
+    --fields=+m \
+    --fields=+S \
+    --fields=+l \
+    --fields=+n \
+    --fields=+t \
+    --exclude=.svn \
+    --exclude=.hg \
+    --exclude=.git \
+    --exclude=dist \
+    --exclude=user-data \
+    --exclude=venv \
+    --exclude=virtualenv \
+    --exclude=static-cache \
+    --exclude=closure-library \
+    --exclude=.ropeproject/* \
+    --exclude=__pycache__/* \
+    --exclude=_build/* \
+    --exclude=build/* \
+    --exclude=cache/* \
+    --exclude=node_modules/* \
+    --exclude=lib/* \
+    --exclude=log/* \
+    --exclude=tmp/* \
+    --exclude=*.xml \
+    --extras=+q \
+    --tags-relative=yes \
+    -L \
+    - -f"$dir/tags.$$"
 
 if [[ -n "$SHELL_PLATFORM" ]] && [[ "$SHELL_PLATFORM" =~ "linux" ]]; then
     mv "$dir/tags.$$" "$dir/tags"
