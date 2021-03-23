@@ -3,7 +3,6 @@
 # github.com/mike325/dotfiles
 
 New-Alias -Name cl -Value 'cls' -ErrorAction SilentlyContinue;
-New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue;
 New-Alias -Name unset -Value 'Remove-Item' -ErrorAction SilentlyContinue;
 Set-Alias trash Remove-ItemSafely;
 set-alias unzip expand-archive;
@@ -131,6 +130,51 @@ New-Alias -Name open -Value 'ii'
 if (Get-Command "bat" -ErrorAction SilentlyContinue) {
     New-Alias -Name cat -Value 'bat' -ErrorAction SilentlyContinue;
     $env:GIT_PAGER = "bat.exe";
+}
+
+if (Get-Command "coreutils" -ErrorAction SilentlyContinue) {
+    $cmd_alias = @(
+        'pwd',
+        # This are read-only alias, may need "sudo" to remove them
+        # 'sleep',
+        # 'sort',
+        # 'tee',
+        'ls',
+        'cp',
+        'mv',
+        'rm'
+    )
+    $cmd_alias | foreach {
+        if (Test-Path Alias:$_) {Remove-Item Alias:$_}
+    }
+
+    if (-not (Get-Command basename -ErrorAction SilentlyContinue)) { function basename() { coreutils basename $args;}}
+    if (-not (Get-Command cp       -ErrorAction SilentlyContinue)) { function cp() { coreutils cp $args;}}
+    if (-not (Get-Command cut      -ErrorAction SilentlyContinue)) { function cut() { coreutils cut $args;}}
+    if (-not (Get-Command df       -ErrorAction SilentlyContinue)) { function df() { coreutils df $args;}}
+    if (-not (Get-Command head     -ErrorAction SilentlyContinue)) { function head() { coreutils head $args;}}
+    if (-not (Get-Command ln       -ErrorAction SilentlyContinue)) { function ln() { coreutils ln $args;}}
+    if (-not (Get-Command ls       -ErrorAction SilentlyContinue)) { function ls() { coreutils ls $args;}}
+    if (-not (Get-Command la       -ErrorAction SilentlyContinue)) { function la() { coreutils ls -A $args;}}
+    if (-not (Get-Command ll       -ErrorAction SilentlyContinue)) { function ll() { coreutils ls -lhA $args;}}
+    if (-not (Get-Command mkdir    -ErrorAction SilentlyContinue)) { function mkdir() { coreutils mkdir $args;}}
+    if (-not (Get-Command more     -ErrorAction SilentlyContinue)) { function more() { coreutils more $args;}}
+    if (-not (Get-Command mv       -ErrorAction SilentlyContinue)) { function mv() { coreutils mv $args;}}
+    if (-not (Get-Command pwd      -ErrorAction SilentlyContinue)) { function pwd() { coreutils pwd $args;}}
+    if (-not (Get-Command readlink -ErrorAction SilentlyContinue)) { function readlink() { coreutils readlink $args;}}
+    if (-not (Get-Command realpath -ErrorAction SilentlyContinue)) { function realpath() { coreutils realpath $args;}}
+    if (-not (Get-Command rm       -ErrorAction SilentlyContinue)) { function rm() { coreutils rm $args;}}
+    if (-not (Get-Command tail     -ErrorAction SilentlyContinue)) { function tail() { coreutils tail $args;}}
+    if (-not (Get-Command tr       -ErrorAction SilentlyContinue)) { function tr() { coreutils tr $args;}}
+    if (-not (Get-Command uniq     -ErrorAction SilentlyContinue)) { function uniq() { coreutils uniq $args;}}
+    if (-not (Get-Command wc       -ErrorAction SilentlyContinue)) { function wc() { coreutils wc $args;}}
+
+    # if (-not (Get-Command tee      -ErrorAction SilentlyContinue)) {function tee() { coreutils tee $args;}}
+    # if (-not (Get-Command sleep    -ErrorAction SilentlyContinue)) {function sleep() { coreutils sleep $args;}}
+    # if (-not (Get-Command sort     -ErrorAction SilentlyContinue)) {function sort() { coreutils sort $args;}}
+}
+else {
+    New-Alias -Name ll -Value 'ls' -ErrorAction SilentlyContinue;
 }
 
 if (Get-Command "delta" -ErrorAction SilentlyContinue) {
