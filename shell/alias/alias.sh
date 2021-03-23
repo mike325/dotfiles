@@ -93,7 +93,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
                 fi
             fi
 
-            if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
+            if hash nvr 2>/dev/null && [[ -e "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
                 alias vi="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-silent"
             else
                 alias vi="$_nvim --cmd 'let g:minimal=1'"
