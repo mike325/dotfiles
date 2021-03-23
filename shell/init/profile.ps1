@@ -57,21 +57,24 @@ function ln ($target, $link) {
 }
 
 # Path settings
+if (Test-Path "$env:APPDATA\Python\Python27\Scripts") {
+    $env:path = "$env:APPDATA\Python\Python27\Scripts;$env:path"
+}
+
 if ( Test-Path "$env:USERPROFILE\.local\bin" ) {
     $env:path = "$env:USERPROFILE\.local\bin;$env:path"
 }
 
-# Path settings
 if ( Test-Path "$env:USERPROFILE\scoop\shims" ) {
     $env:path = "$env:USERPROFILE\scoop\shims;$env:path"
 }
 
-if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
-    $env:path = "$env:APPDATA\Neovim\bin;$env:path"
+if ( Test-Path "$env:USERPROFILE\.cargo\bin" ) {
+    $env:path = "$env:USERPROFILE\.cargo\bin;$env:path"
 }
 
-if (Test-Path "$env:APPDATA\Python\Python27\Scripts") {
-    $env:path = "$env:APPDATA\Python\Python27\Scripts;$env:path"
+if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
+    $env:path = "$env:APPDATA\Neovim\bin;$env:path"
 }
 
 # NOTE: It's better to install python with scoop and use versions to manage it
@@ -91,10 +94,13 @@ function Test-Administrator {
     (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 }
 
-function Write-Git-Branch {
+function Write-Git-Info {
     Invoke-Expression "git symbolic-ref --short HEAD" 2> $null | Tee-Object -Variable branch | Out-Null
     if ($LASTEXITCODE -eq 0) {
-        Write-Host " | $branch | " -NoNewline -ForegroundColor blue
+        $git_info  = " | "
+        $git_info += $branch
+        $git_info += " | "
+        Write-Host $git_info -NoNewline -ForegroundColor blue
     }
 }
 
@@ -125,7 +131,7 @@ function prompt {
 
 
     if (Get-Command "git" -ErrorAction SilentlyContinue) {
-        Write-Git-Branch
+        Write-Git-Info
     }
 
     $global:LASTEXITCODE = $realLASTEXITCODE
