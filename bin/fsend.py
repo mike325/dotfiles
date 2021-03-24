@@ -39,6 +39,8 @@ _log.setLevel(logging.DEBUG)
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _SCRIPTNAME = os.path.basename(__file__)
 _log_file = os.path.splitext(_SCRIPTNAME)[0] + '.log'
+_path_json = os.path.expanduser('~/.config/remotes/paths.json')
+_configs = {}
 
 
 def _createLogger(
@@ -279,30 +281,24 @@ def convert_path(path: str, send: bool):
     :returns: TODO
 
     """
+    global _configs
+
     remote_path = './'
     path = os.path.realpath(os.path.expanduser(path))
     # _log.debug(f'Realpath: {path}')
 
-    configs = {}
-    path_json = os.path.expanduser('~/.config/remotes/paths.json')
-    if os.path.isfile(path_json):
-        _log.debug('Parsing remote paths')
-        with open(path_json) as remotes:
-            configs = json.load(remotes)
-    else:
-        _log.warning(f'Missing remote json config "{path_json}"')
-
+    paths = {}
     project = 'mike'
     projects = {}
-    if 'projects' in configs:
-        projects = configs['projects']
+
+    if 'projects' in _configs:
+        projects = _configs['projects']
         if 'default' in projects:
             project = projects['default']
             del projects['default']
 
-    paths = {}
-    if 'paths' in configs:
-        paths = configs['paths']
+    if 'paths' in _configs:
+        paths = _configs['paths']
 
     project_regex = re.compile(r'projects/(\w+)', re.IGNORECASE)
     project_match = project_regex.match(path)
@@ -360,6 +356,7 @@ def main():
     :returns: TODO
 
     """
+    global _configs
     args = _parseArgs()
 
     if args.show_version:
@@ -386,6 +383,14 @@ def main():
     try:
         hosts = _parse_ssh_config()
         _log.debug(f'SSH hosts: {hosts}')
+
+        if os.path.isfile(_path_json):
+            _log.debug('Parsing remote paths')
+            with open(_path_json) as remotes:
+                _configs = json.load(remotes)
+        else:
+            _log.warning(f'Missing remote json config "{_path_json}"')
+
         for filename in args.files:
             if not os.path.isfile(filename) and not os.path.isdir(filename) and not args.get_file:
                 _log.warning(f'Skipping {filename}, not a file/dir')
@@ -394,9 +399,10 @@ def main():
             for hostname in args.hosts:
                 rcmd = remote_cmd(filename, rmtpath, hostname, not args.get_file)
                 _log.debug(f'Remote cmd: {rcmd}')
+                get = args.get_file
                 action = 'Dry-run - ' if args.dry else ''
-                action += 'Getting {file} from {host}' if args.get_file else 'Sending {file} to {host}'
-                _log.info(action.format(file=filename, host=hostname))
+                action += 'Getting {file} from {host}:{rmtpath}' if get else 'Sending {file} to {host}:{rmtpath}'
+                _log.info(action.format(file=filename, host=hostname, rmtpath=rmtpath))
                 if not args.dry:
                     errors += _execute(rcmd, hostname in hosts)
     except (Exception, KeyboardInterrupt) as e:
