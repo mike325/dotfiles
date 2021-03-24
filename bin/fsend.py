@@ -265,6 +265,8 @@ def _execute(cmd: list, background: bool):
     stderr = sys.stderr if not background else PIPE
     cmd_obj = Popen(cmd, stdout=stdout, stderr=stderr, text=True)
     out, err = cmd_obj.communicate()
+    if out is not None and len(out) > 0:
+        _log.debug(out)
     if cmd_obj.returncode != 0:
         rc = 1
         _log.error(f'Command exited with {cmd_obj.returncode}')
@@ -398,11 +400,11 @@ def main():
             rmtpath = convert_path(filename, not args.get_file)
             for hostname in args.hosts:
                 rcmd = remote_cmd(filename, rmtpath, hostname, not args.get_file)
-                _log.debug(f'Remote cmd: {rcmd}')
                 get = args.get_file
                 action = 'Dry-run - ' if args.dry else ''
                 action += 'Getting {file} from {host}:{rmtpath}' if get else 'Sending {file} to {host}:{rmtpath}'
                 _log.info(action.format(file=filename, host=hostname, rmtpath=rmtpath))
+                _log.debug(f'Remote cmd: {rcmd}')
                 if not args.dry:
                     errors += _execute(rcmd, hostname in hosts)
     except (Exception, KeyboardInterrupt) as e:
