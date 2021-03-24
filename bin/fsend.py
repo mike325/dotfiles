@@ -211,6 +211,15 @@ def _parseArgs():
         help='Hostname to send/get file'
     )
 
+    parser.add_argument(
+        '--dry',
+        '--dry-run',
+        dest='dry',
+        action='store_true',
+        default=False,
+        help="Just print the messages but doesn't send/get them",
+    )
+
     return parser.parse_args()
 
 
@@ -272,7 +281,7 @@ def convert_path(path: str, send: bool):
     """
     remote_path = './'
     path = os.path.realpath(os.path.expanduser(path))
-    _log.debug(f'Realpath: {path}')
+    # _log.debug(f'Realpath: {path}')
 
     configs = {}
     path_json = os.path.expanduser('~/.config/remotes/paths.json')
@@ -280,6 +289,8 @@ def convert_path(path: str, send: bool):
         _log.debug('Parsing remote paths')
         with open(path_json) as remotes:
             configs = json.load(remotes)
+    else:
+        _log.warning(f'Missing remote json config "{path_json}"')
 
     project = 'mike'
     projects = {}
@@ -312,7 +323,7 @@ def convert_path(path: str, send: bool):
         if loc.find('%PROJECT'):
             loc = loc.replace('%PROJECT', project)
         loc = os.path.expanduser(loc)
-        _log.debug(f'Local path check {loc}')
+        # _log.debug(f'Local path check {loc}')
         # location_regex = re.compile(f'^{path}')
         if path.find(loc) != -1:
             tail = path.replace(loc, '')
@@ -376,16 +387,18 @@ def main():
         hosts = _parse_ssh_config()
         _log.debug(f'SSH hosts: {hosts}')
         for filename in args.files:
-            if not os.path.isfile(filename) and not args.get_file:
-                _log.warning(f'Skipping {filename}, not a file')
+            if not os.path.isfile(filename) and not os.path.isdir(filename) and not args.get_file:
+                _log.warning(f'Skipping {filename}, not a file/dir')
                 continue
             rmtpath = convert_path(filename, not args.get_file)
             for hostname in args.hosts:
                 rcmd = remote_cmd(filename, rmtpath, hostname, not args.get_file)
                 _log.debug(f'Remote cmd: {rcmd}')
-                action = 'Getting {file} from {host}' if args.get_file else 'Sending {file} to {host}'
+                action = 'Dry-run - ' if args.dry else ''
+                action += 'Getting {file} from {host}' if args.get_file else 'Sending {file} to {host}'
                 _log.info(action.format(file=filename, host=hostname))
-                errors += _execute(rcmd, hostname in hosts)
+                if not args.dry:
+                    errors += _execute(rcmd, hostname in hosts)
     except (Exception, KeyboardInterrupt) as e:
         _log.exception(f'Halting due to {str(e.__class__.__name__)} exception')
         errors = 1
