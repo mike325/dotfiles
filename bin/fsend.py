@@ -256,13 +256,14 @@ def _parse_ssh_config():
 def _execute(cmd: list, background: bool):
     """ Execute a synchronous command
 
-    :cmd: TODO
-    :returns: TODO
+    :cmd: list: command to execute
+    :returns: Popen obj: command object after execution
 
     """
     rc = 0
     stdout = sys.stdout if not background else PIPE
     stderr = sys.stderr if not background else PIPE
+    _log.debug(f'Executing cmd: {cmd}')
     cmd_obj = Popen(cmd, stdout=stdout, stderr=stderr, text=True)
     out, err = cmd_obj.communicate()
     if out is not None and len(out) > 0:
@@ -404,7 +405,6 @@ def main():
                 action = 'Dry-run - ' if args.dry else ''
                 action += 'Getting {file} from {host}:{rmtpath}' if get else 'Sending {file} to {host}:{rmtpath}'
                 _log.info(action.format(file=filename, host=hostname, rmtpath=rmtpath))
-                _log.debug(f'Remote cmd: {rcmd}')
                 if not args.dry:
                     errors += _execute(rcmd, hostname in hosts)
     except (Exception, KeyboardInterrupt) as e:
