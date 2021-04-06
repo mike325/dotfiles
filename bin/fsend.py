@@ -6,6 +6,7 @@ import os
 import sys
 import re
 import json
+# from copy import deepcopy
 from subprocess import Popen, PIPE
 
 _header = """
@@ -284,8 +285,6 @@ def convert_path(path: str, send: bool):
     :returns: TODO
 
     """
-    global _configs
-
     remote_path = './'
     path = os.path.realpath(os.path.expanduser(path))
     # _log.debug(f'Realpath: {path}')
@@ -295,13 +294,17 @@ def convert_path(path: str, send: bool):
     projects = {}
 
     if 'projects' in _configs:
-        projects = _configs['projects']
+        projects = _configs['projects'].copy()
         if 'default' in projects:
             project = projects['default']
             del projects['default']
 
     if 'paths' in _configs:
         paths = _configs['paths']
+
+    # _log.debug(f"Default Project: {project}")
+    # _log.debug(f"Projects: {projects}")
+    # _log.debug(f"Paths: {paths}")
 
     project_regex = re.compile(r'projects/(\w+)', re.IGNORECASE)
     project_match = project_regex.match(path)
@@ -318,12 +321,13 @@ def convert_path(path: str, send: bool):
         if short_match is not None and short_match.group(1) not in projects:
             _log.warn(f'Unknown project {short_match.group(1)} using {project}')
 
+    _log.debug(f"Current Project: {project}")
+
     for loc, remote in paths.items():
         if loc.find('%PROJECT'):
             loc = loc.replace('%PROJECT', project)
         loc = os.path.expanduser(loc)
         # _log.debug(f'Local path check {loc}')
-        # location_regex = re.compile(f'^{path}')
         if path.find(loc) != -1:
             tail = path.replace(loc, '')
             if remote.find('%PROJECT'):
@@ -391,6 +395,8 @@ def main():
             _log.debug('Parsing remote paths')
             with open(_path_json) as remotes:
                 _configs = json.load(remotes)
+
+            # _log.debug(f'Configs: {_configs}')
         else:
             _log.warning(f'Missing remote json config "{_path_json}"')
 
