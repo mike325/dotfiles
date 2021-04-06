@@ -18,6 +18,8 @@ sed
 htop
 cmake
 ctags
+global
+cscope
 sl
 vim
 neovim
