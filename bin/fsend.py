@@ -400,19 +400,21 @@ def main():
         else:
             _log.warning(f'Missing remote json config "{_path_json}"')
 
-        for filename in args.files:
-            if not os.path.isfile(filename) and not os.path.isdir(filename) and not args.get_file:
-                _log.warning(f'Skipping {filename}, not a file/dir')
-                continue
-            rmtpath = convert_path(filename, not args.get_file)
-            for hostname in args.hosts:
+        get = args.get_file
+
+        for hostname in args.hosts:
+            action = 'Dry-run - ' if args.dry else ''
+            action += 'Getting {file} from {host}:{rmtpath}' if get else 'Sending {file} to {host}:{rmtpath}'
+            for filename in args.files:
+                if not os.path.isfile(filename) and not os.path.isdir(filename) and not args.get_file:
+                    _log.warning(f'Skipping {filename}, not a file/dir')
+                    continue
+                rmtpath = convert_path(filename, not args.get_file)
                 rcmd = remote_cmd(filename, rmtpath, hostname, not args.get_file)
-                get = args.get_file
-                action = 'Dry-run - ' if args.dry else ''
-                action += 'Getting {file} from {host}:{rmtpath}' if get else 'Sending {file} to {host}:{rmtpath}'
                 _log.info(action.format(file=filename, host=hostname, rmtpath=rmtpath))
                 if not args.dry:
                     errors += _execute(rcmd, hostname in hosts)
+
     except (Exception, KeyboardInterrupt) as e:
         _log.exception(f'Halting due to {str(e.__class__.__name__)} exception')
         errors = 1
