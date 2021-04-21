@@ -233,6 +233,12 @@ if hash gtags 2>/dev/null; then
     export GTAGSLABEL=pygments
 fi
 
+if hash gpgconf 2>/dev/null; then
+    GPG_TTY="$(tty)"
+    export GPG_TTY
+    gpgconf --launch gpg-agent
+fi
+
 if [[ $- == *i* ]]; then
 
     # Set terminal colors

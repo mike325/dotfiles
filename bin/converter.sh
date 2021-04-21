@@ -423,14 +423,24 @@ function convert_files() {
     local file_abspath
     local filename
     local file_basename
+    local has_hwaccel=false
+    local converter
+    local vconverter
 
     file_abspath="$(readlink -f "$1")"
     file_dir="${file_abspath%/*}"
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
 
-    local converter="ffmpeg -hwaccel auto -hide_banner"
-    local vconverter="-c:v libx265 -crf 16 -preset slow -x265-params lossless"
+
+    if hash vainfo 2>/dev/null && { vainfo 2>/dev/null | grep -qi hevc; }; then
+        converter="ffmpeg -hwaccel vaapi -hwaccel_output_format vaapi -init_hw_device vaapi=encoder:/dev/dri/renderD128 -filter_hw_device encoder -hide_banner"
+        vconverter="-c:v hevc_vaapi -rc_mode 1 -crf 0 -qp 25 -profile:v main -tier high -level 186 "
+    else
+        converter="ffmpeg -hwaccel auto -hide_banner "
+        vconverter="-c:v hevc -crf 0 -preset slow"
+    fi
+
     local aconverter="-c:a aac -b:a 320k"
     local vcopy="-c:v copy"
     local acopy="-c:a copy"
