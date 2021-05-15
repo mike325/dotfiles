@@ -29,7 +29,6 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
         if is_windows && ! is_wsl; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
-            # NOTE: This is set inside Neovim settings
             if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
                 export EDITOR="vim"
                 alias vi="vim --cmd 'let g:minimal=1'"
@@ -181,6 +180,10 @@ fi
 
 if hash clenaswap 2>/dev/null; then
     alias cw="clenaswap"
+fi
+
+if hash nvim 2>/dev/null; then
+    alias clskt="[[ -d ~/.cache/nvim ]] && rm -rf ~/.cache/nvim/socket*"
 fi
 
 # Show used ports

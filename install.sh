@@ -186,7 +186,7 @@ if is_windows; then
     CMD="cp -rf"
     USER="$USERNAME"
 else
-    # Hack when using sudo
+    # HACK: when using sudo
     # TODO: Must fix this
     if [[ $CURRENT_SHELL == "sudo" ]] || [[ $CURRENT_SHELL == "su" ]]; then
         CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
@@ -769,7 +769,6 @@ function setup_dotconfigs() {
     done
 
     if is_windows; then
-        # TODO: check this with the proper env variable
         status_msg "Setting up Windows profile"
         if [[ ! -f "$HOME/Documents/WindowsPowerShell/profile.ps1" ]]; then
             [[ ! -d "$HOME/Documents/WindowsPowerShell/" ]] && mkdir -p "$HOME/Documents/WindowsPowerShell/"
@@ -899,10 +898,8 @@ function get_vim_dotfiles() {
         return 1
     fi
 
-    # Windows stuff
     if is_windows; then
 
-        # If we couldn't clone our repo, return
         if [[ -d "$HOME/.vim" ]] && [[ ! -d "$HOME/vimfiles" ]]; then
             status_msg "Copying vim dir into in $HOME/vimfiles"
             if ! setup_config "$HOME/.vim" "$HOME/vimfiles"; then
@@ -929,15 +926,11 @@ function get_vim_dotfiles() {
 
     fi
 
-    # No errors so far
     return 0
 }
 
-# TODO: As portable note says, create flag `compile` to force compilation or jut get the pre compiled binaries
 function get_nvim_dotfiles() {
-    # Windows stuff
     status_msg "Setting up neovim"
-
 
     if [[ $PORTABLES -eq 0 ]] && [[ $ALL -eq 0 ]] && [[ $NEOVIM_DOTFILES -eq 0 ]] && ! [[ "$ARCH" =~ ^arm ]]; then
         local args="--portable"
@@ -995,7 +988,6 @@ function get_nvim_dotfiles() {
         fi
     fi
 
-    # No errors so far
     return 0
 }
 

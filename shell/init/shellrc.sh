@@ -79,7 +79,7 @@ fi
 # If Neovim is installed in a different path, you could set it in "env" file
 if [[ -d "$HOME/.local/neovim/bin" ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
-elif [[ -d "$NEOVIM_PATH" ]]; then
+elif [[ -n $NEOVIM_PATH ]] && [[ -d "$NEOVIM_PATH" ]]; then
     export PATH="$NEOVIM_PATH:$PATH"
 fi
 
