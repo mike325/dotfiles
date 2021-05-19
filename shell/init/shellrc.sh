@@ -241,7 +241,7 @@ fi
 if [[ $- == *i* ]]; then
 
     # Set terminal colors
-    if [[  -n "$DISPLAY" ]] && [[ "$TERM" == "xterm" ]]; then
+    if [[ -z "$TMUX" ]] && { [[ -z "$TERM" ]] || [[ $TERM =~ ^xterm-.* ]];}; then
         export TERM=xterm-256color
     fi
 
