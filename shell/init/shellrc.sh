@@ -75,7 +75,6 @@ elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
 fi
 
 # TODO: Add a path check function to avoid duplicates
-
 # If Neovim is installed in a different path, you could set it in "env" file
 if [[ -d "$HOME/.local/neovim/bin" ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
@@ -90,7 +89,7 @@ fi
 #     fi
 # fi
 
-[[ -d "$HOME/.local/golang/bin" ]] && export PATH="$HOME/.local/golang/bin:$PATH"
+[[ -d "$HOME/.local/golang/src/bin" ]] && export PATH="$HOME/.local/golang/src/bin:$PATH"
 [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
 [[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
 
