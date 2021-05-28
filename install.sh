@@ -995,7 +995,12 @@ function _windows_portables() {
     local rst=0
     local github='https://github.com'
 
-    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; } ; then
+    if ! has_fetcher ; then
+        error_msg "Missing curl and wget, aborting portables installation"
+        return 3
+    fi
+
+    if ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck-latest.zip'
@@ -1015,7 +1020,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if has_fetcher && { ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.zip'
@@ -1045,15 +1050,12 @@ function _windows_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download Bat"
-        rst=1
     else
         warn_msg "Skipping bat, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
         status_msg "Getting delta"
         local pkg='delta.zip'
@@ -1083,15 +1085,12 @@ function _windows_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download delta"
-        rst=1
     else
         warn_msg "Skipping delta, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
         local pkg='ripgrep.zip'
@@ -1121,15 +1120,12 @@ function _windows_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download ripgrep"
-        rst=2
     else
         warn_msg "Skipping rg, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
         local pkg='fd.zip'
@@ -1159,15 +1155,12 @@ function _windows_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download fd"
-        rst=2
     else
         warn_msg "Skipping fd, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
         status_msg "Getting texlab"
         local pkg='texlab.zip'
@@ -1192,9 +1185,6 @@ function _windows_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download texlab"
-        rst=2
     else
         warn_msg "Skipping texlab, already installed"
         rst=2
@@ -1251,7 +1241,12 @@ function _linux_portables() {
         return 2
     fi
 
-    if has_fetcher && { ! hash lazygit 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! has_fetcher ; then
+        error_msg "Missing curl and wget, aborting portables installation"
+        return 3
+    fi
+
+    if ! hash lazygit 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing lazygit install'
         status_msg "Getting lazygit"
         local pkg='lazygit.tar.gz'
@@ -1281,15 +1276,12 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download lazygit"
-        rst=2
     else
         warn_msg "Skipping lazygit, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.tar.xz'
@@ -1318,15 +1310,12 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download Bat"
-        rst=2
     else
         warn_msg "Skipping bat, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
         status_msg "Getting delta"
         local pkg='delta.tar.gz'
@@ -1355,15 +1344,12 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download delta"
-        rst=2
     else
         warn_msg "Skipping delta, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
         local pkg='rg.tar.xz'
@@ -1375,12 +1361,15 @@ function _linux_portables() {
             # shellcheck disable=SC2155
             local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
         fi
+
         status_msg "Downloading rg version: ${version}"
+
         if [[ "$ARCH" =~ ^arm ]]; then
             local os_type='arm-unknown-linux-gnueabihf'
         else
             local os_type="${ARCH}-unknown-linux-musl"
         fi
+
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1> /dev/null || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
@@ -1392,15 +1381,12 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download ripgrep"
-        rst=2
     else
         warn_msg "Skipping ripgrep, already installed"
         rst=2
     fi
 
-    if has_fetcher && { ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
         local pkg='fd.tar.xz'
@@ -1429,9 +1415,6 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download fd"
-        rst=2
     else
         warn_msg "Skipping fd, already installed"
         rst=2
@@ -1442,7 +1425,7 @@ function _linux_portables() {
         return 2
     fi
 
-    if has_fetcher && { ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; } && [[ $ARCH == 'x86_64' ]]; then
+    if [[ $ARCH == 'x86_64' ]] && { ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; } ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck-latest.linux.x86_64.tar.xz'
@@ -1466,7 +1449,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if is_64bits && has_fetcher && { ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if is_64bits && { ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; } ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
         status_msg "Getting texlab"
         local pkg='texlab.tar.gz'
@@ -1493,15 +1476,12 @@ function _linux_portables() {
     elif ! is_64bits; then
         error_msg "Texlab portable is only Available for x86 64 bits"
         rst=1
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download texlab"
-        rst=2
     else
         warn_msg "Skipping texlab, already installed"
         rst=2
     fi
 
-    if is_64bits && has_fetcher && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
         [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
         if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
@@ -1517,7 +1497,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if has_fetcher && { ! hash jq 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! hash jq 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing jq install'
         status_msg "Getting jq"
         local pkg='jq'
@@ -1542,9 +1522,6 @@ function _linux_portables() {
         else
             rst=1
         fi
-    elif ! has_fetcher; then
-        error_msg "No curl neither wget to download jq"
-        rst=2
     else
         warn_msg "Skipping jq, already installed"
         rst=2

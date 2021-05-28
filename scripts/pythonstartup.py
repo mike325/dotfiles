@@ -6,11 +6,6 @@
 # to it:  export PYTHONSTARTUP="$HOME/path/to/the/file" in your ${SHELL}rc
 # Normally .bashrc or .zshrc
 
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import with_statement
-from __future__ import division
-
 import atexit
 import os
 import sys
@@ -93,21 +88,21 @@ if readline is not None:
 
         if len(last_input.strip()) > 1:
             if last_input.count("(") > last_input.count(")"):
-                indent = ''.join(["    " for n in range(last_indent + 2)])
+                indent = ''.join(["    " for _ in range(last_indent + 2)])
             elif last_input.count(")") > last_input.count("("):
-                indent = ''.join(["    " for n in range(last_indent - 1)])
+                indent = ''.join(["    " for _ in range(last_indent - 1)])
             elif last_input.count("[") > last_input.count("]"):
-                indent = ''.join(["    " for n in range(last_indent + 2)])
+                indent = ''.join(["    " for _ in range(last_indent + 2)])
             elif last_input.count("]") > last_input.count("["):
-                indent = ''.join(["    " for n in range(last_indent - 1)])
+                indent = ''.join(["    " for _ in range(last_indent - 1)])
             elif last_input.count("{") > last_input.count("}"):
-                indent = ''.join(["    " for n in range(last_indent + 2)])
+                indent = ''.join(["    " for _ in range(last_indent + 2)])
             elif last_input.count("}") > last_input.count("{"):
-                indent = ''.join(["    " for n in range(last_indent - 1)])
+                indent = ''.join(["    " for _ in range(last_indent - 1)])
             elif last_input[-1] == ":":
-                indent = ''.join(["    " for n in range(last_indent + 1)])
+                indent = ''.join(["    " for _ in range(last_indent + 1)])
             else:
-                indent = ''.join(["    " for n in range(last_indent)])
+                indent = ''.join(["    " for _ in range(last_indent)])
         readline.insert_text(indent)
 
     try:
