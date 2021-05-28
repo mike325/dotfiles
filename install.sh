@@ -358,6 +358,7 @@ Usage:
                 - fd
                 - ripgrep
                 - pip2 and pip3
+                - efm-langserver
                 - fzf (GNU/Linux only)
                 - jq (GNU/Linux only)
 
@@ -1206,6 +1207,36 @@ function _windows_portables() {
         rst=2
     fi
 
+    if ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
+        status_msg "Getting efm-langserver"
+        local pkg='efm-langserver.zip'
+        local url="${github}/mattn/efm-langserver"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading efm-langserver version: ${version}"
+        local os_type="windows_amd64"
+        if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.zip" "$TMP/${pkg}"; then
+            pushd "$TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $TMP/${pkg}"
+            unzip -o "$TMP/${pkg}"
+            chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe"
+            mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping efm-langserver, already installed"
+        rst=2
+    fi
+
     return $rst
 }
 
@@ -1526,6 +1557,39 @@ function _linux_portables() {
         warn_msg "Skipping jq, already installed"
         rst=2
     fi
+
+    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; } ; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
+        status_msg "Getting efm-langserver"
+        local pkg='efm-langserver.tar.gz'
+        local url="${github}/mattn/efm-langserver"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading efm-langserver version: ${version}"
+        local os_type="linux_amd64"
+        if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
+            pushd "$TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
+            chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver"
+            mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    elif ! [[ $ARCH == 'x86_64' ]]; then
+        error_msg "efm-langserver portable is only Available for x86 64 bits"
+        rst=1
+    else
+        warn_msg "Skipping efm-langserver, already installed"
+        rst=2
+    fi
+
 
     return $rst
 }
