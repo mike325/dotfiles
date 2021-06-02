@@ -600,7 +600,7 @@ function q() {
     if hash deactivate 2> /dev/null || [[ -n $VIRTUAL_ENV ]]; then
         deactivate
     else
-        exit
+        exit 0
     fi
 }
 
