@@ -191,7 +191,15 @@ else
         :
     }
 
-    PS1="\n$(__schroot_name)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__jobs)\$(__git_info) \n→ "
+    __exit_code(){
+        local rc=$?
+        # NOTE: ignore send to background and <CTRL-c> exit codes
+        if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
+            echo -e " ${echo_red}×${echo_reset_color} "
+        fi
+    }
+
+    PS1="\n$(__schroot_name)\$(__exit_code)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__jobs)\$(__git_info) \n→ "
 fi
 
 if hash kitty 2>/dev/null; then
@@ -200,4 +208,21 @@ fi
 
 if hash tmux 2>/dev/null; then
     bind '"\C-a":"tmux a || tmux new -s main\n"'
+fi
+
+#######################################################################
+#                          Bash Completion                            #
+#######################################################################
+
+completion_dir=''
+if [[ -d /usr/share/bash-completion/completions ]]; then
+    completion_dir=/usr/share/bash-completion/completions
+elif [[ -d /etc/bash_completion.d/ ]]; then
+    completion_dir=/etc/bash_completion.d/
+fi
+
+if [[ -n $completion_dir ]]; then
+    for c in "$completion_dir"/*; do
+        source "$c" 2>/dev/null
+    done
 fi
