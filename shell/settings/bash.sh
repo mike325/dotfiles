@@ -214,15 +214,23 @@ fi
 #                          Bash Completion                            #
 #######################################################################
 
-completion_dir=''
-if [[ -d /usr/share/bash-completion/completions ]]; then
-    completion_dir=/usr/share/bash-completion/completions
-elif [[ -d /etc/bash_completion.d/ ]]; then
-    completion_dir=/etc/bash_completion.d/
-fi
+if [[ -f /etc/bash_completion ]]; then
+    source /etc/bash_completion
+elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    source /usr/share/bash-completion/bash_completion
+else
+    completion_dir=''
 
-if [[ -n $completion_dir ]]; then
-    for c in "$completion_dir"/*; do
-        source "$c" 2>/dev/null
-    done
+    if [[ -d /usr/share/bash-completion/completions ]]; then
+        completion_dir=/usr/share/bash-completion/completions
+    elif [[ -d /etc/bash_completion.d/ ]]; then
+        completion_dir=/etc/bash_completion.d/
+    fi
+
+    if [[ -n $completion_dir ]]; then
+        for c in "$completion_dir"/*; do
+            source "$c" 2>/dev/null
+        done
+    fi
+    unset completion_dir
 fi

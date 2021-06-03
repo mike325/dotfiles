@@ -1207,7 +1207,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ;} ; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
         status_msg "Getting efm-langserver"
         local pkg='efm-langserver.zip'
@@ -1232,6 +1232,9 @@ function _windows_portables() {
         else
             rst=1
         fi
+    elif ! [[ $ARCH == 'x86_64' ]]; then
+        error_msg "efm-langserver portable is only Available for x86 64 bits"
+        rst=1
     else
         warn_msg "Skipping efm-langserver, already installed"
         rst=2
@@ -1589,7 +1592,6 @@ function _linux_portables() {
         warn_msg "Skipping efm-langserver, already installed"
         rst=2
     fi
-
 
     return $rst
 }
