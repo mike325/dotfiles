@@ -277,7 +277,7 @@ def _execute(cmd: list, background: bool):
     return rc
 
 
-def convert_path(path: str, send: bool):
+def convert_path(path: str, send: bool, hostname: str):
     """TODO: Docstring for convert_path.
 
     :path: TODO
@@ -285,13 +285,19 @@ def convert_path(path: str, send: bool):
     :returns: TODO
 
     """
+    global _configs
+
     remote_path = './'
     path = os.path.realpath(os.path.expanduser(path))
     # _log.debug(f'Realpath: {path}')
 
     paths = {}
+    hosts = {}
     project = 'mike'
     projects = {}
+
+    if 'hosts' in _configs:
+        hosts = _configs['hosts']
 
     if 'projects' in _configs:
         projects = _configs['projects'].copy()
@@ -299,7 +305,9 @@ def convert_path(path: str, send: bool):
             project = projects['default']
             del projects['default']
 
-    if 'paths' in _configs:
+    if hostname in hosts:
+        paths = hosts[hostname]
+    elif 'paths' in _configs:
         paths = _configs['paths']
 
     # _log.debug(f"Default Project: {project}")
@@ -409,7 +417,7 @@ def main():
                 if not os.path.isfile(filename) and not os.path.isdir(filename) and not args.get_file:
                     _log.warning(f'Skipping {filename}, not a file/dir')
                     continue
-                rmtpath = convert_path(filename, not args.get_file)
+                rmtpath = convert_path(filename, not args.get_file, hostname)
                 rcmd = remote_cmd(filename, rmtpath, hostname, not args.get_file)
                 _log.info(action.format(file=filename, host=hostname, rmtpath=rmtpath))
                 if not args.dry:

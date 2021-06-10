@@ -282,7 +282,7 @@ Usage:
 
             Default: on
 
-        -w, --shell_frameworks, --SHELL_PLATFORM=SHELL
+        -w, --shell_frameworks, --shell_frameworks=SHELL
             Install shell frameworks, bash-it or oh-my-zsh according to the current shell
             Current shell:   $CURRENT_SHELL
             If SHELL is given then force install SHELL framework (bash or zsh)
