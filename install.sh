@@ -1593,6 +1593,44 @@ function _linux_portables() {
         rst=2
     fi
 
+    if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
+        status_msg "Getting gh"
+        local pkg='gh.tar.gz'
+        local url="${github}/cli/cli"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2 )"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2 )"
+        fi
+        status_msg "Downloading github cli version: ${version}"
+        local os_type
+        if [[ $ARCH == 'x86_64' ]]; then
+            os_type="linux_amd64"
+        elif [[ $ARCH == 'x86' ]]; then
+            os_type="linux_386"
+        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]] ; then
+            os_type="linux_arm64"
+        else
+            os_type="linux_arm6"
+        fi
+        if download_asset "gh" "${url}/releases/download/v${version}/gh_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
+            pushd "$TMP" 1> /dev/null || return 1
+            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
+            chmod u+x "$TMP/gh_${version}_${os_type}/bin/gh"
+            mv "$TMP/gh_${version}_${os_type}/bin/gh" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1> /dev/null || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping gh, already installed"
+        rst=2
+    fi
+
     return $rst
 }
 
