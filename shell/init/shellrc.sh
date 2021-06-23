@@ -243,6 +243,10 @@ if hash gpgconf 2>/dev/null; then
     gpgconf --launch gpg-agent
 fi
 
+if hash gh 2>/dev/null; then
+    eval "$(gh completion --shell ${SHELL##*/})"
+fi
+
 if [[ $- == *i* ]]; then
 
     # Set terminal colors
