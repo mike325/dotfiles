@@ -29,6 +29,8 @@ ERR_COUNT=0
 CURRENT=''
 FILES=()
 AUTO_LOCATE=1
+NO_ARCHIVE=1
+OUTPUT_DIR=""
 
 NAME="$0"
 NAME="${NAME##*/}"
@@ -39,7 +41,7 @@ if [[ -z "$MEDIA_PATH" ]]; then
 fi
 
 if [[ -z "$ARCHIVE" ]]; then
-    ARCHIVE="/media/video/archive"
+    ARCHIVE="$(pwd)/archive"
 fi
 
 SCRIPT_PATH="$0"
@@ -48,7 +50,7 @@ SCRIPT_PATH="${SCRIPT_PATH%/*}"
 OS='unknown'
 
 trap '{ exit_append; }' EXIT
-trap '{ clean_up; }' SIGTERM SIGINT
+trap '{ clean_up && exit_append && exit 1; }' SIGTERM SIGINT
 
 if hash realpath 2>/dev/null; then
     SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
@@ -195,6 +197,10 @@ Usage:
         -v, --verbose
             Enable debug messages
 
+        -o PATH , --output PATH
+            Set output path
+                - Default: Same as the origina file
+
         -a PATH , --archive PATH
             Set archive path
                 - Default: ${ARCHIVE}
@@ -334,6 +340,14 @@ while [[ $# -gt 0 ]]; do
         -v|--verbose)
             VERBOSE=1
             ;;
+        -o|--output)
+            if [[ -z "${2}" ]]; then
+                error_msg "No path for output media path"
+                exit 1
+            fi
+            OUTPUT_DIR="${2}"
+            shift
+            ;;
         -m|--media)
             if [[ -z "${2}" ]]; then
                 error_msg "No path for media path"
@@ -347,7 +361,8 @@ while [[ $# -gt 0 ]]; do
                 error_msg "No path for archive"
                 exit 1
             fi
-            ARCHIVE"${2}"
+            ARCHIVE="${2}"
+            NO_ARCHIVE=0
             shift
             ;;
         -h|--help)
@@ -403,18 +418,42 @@ function get_cmd() {
     local args
 
     if [[ "$name" == 'fd' ]]; then
-        args=" -t f -e mp4 --absolute-path . "
+        args=" -uu -t f -e m4a -e mp4 --absolute-path . "
     else
-        args=" -regextype posix-extended -iregex '.*\.mp4$' "
+        args=" -regextype posix-extended -iregex '.*\.(mp4|m4a)$' "
     fi
 
     if [[ "$name" == 'fd' ]]; then
-        cmd="$name $args $path"
+        cmd="$name $args \"$path\""
     else
-        cmd="$name $path $args"
+        cmd="$name \"$path\" $args"
     fi
 
     echo "$cmd"
+}
+
+function check_sizes() {
+    local old_size new_size location
+    old_size=$(du "$1" | awk '{print $1}')
+    new_size=$(du "$2" | awk '{print $1}')
+    location="$3"
+
+    if [[ $old_size -lt $new_size ]]; then
+        warn_msg "Old file $1 is smaller"
+        clean_up
+        # if [[ ! -f "${location}/$1" ]]; then
+        #     status_msg "Copying old file"
+        #     verbose_msg "Using -> cp '$1' '${location}'"
+        #     if ! cp "$1" "${location}/"; then
+        #         error_msg "Failed to move old file '$1' to new location"
+        #         return 1
+        #     fi
+        # else
+        #     status_msg "Skipping $1, already exits in ${location}"
+        # fi
+    fi
+
+    return 0
 }
 
 function convert_files() {
@@ -423,15 +462,17 @@ function convert_files() {
     local file_abspath
     local filename
     local file_basename
-    local has_hwaccel=false
+    # local has_hwaccel=false
     local converter
     local vconverter
+    local file_dir file_abspath filename file_basename
+    local converter vconverter
+    local output="$OUTPUT_DIR"
 
     file_abspath="$(readlink -f "$1")"
     file_dir="${file_abspath%/*}"
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
-
 
     if hash vainfo 2>/dev/null && { vainfo 2>/dev/null | grep -qi hevc; }; then
         converter="ffmpeg -hwaccel vaapi -hwaccel_output_format vaapi -init_hw_device vaapi=encoder:/dev/dri/renderD128 -filter_hw_device encoder -hide_banner"
@@ -483,16 +524,27 @@ function convert_files() {
 
     status_msg "Converting ${filename}"
 
-    CURRENT="${file_dir}/${file_basename}.265.mp4"
+    if [[ -z $output ]]; then
+        output="${file_dir}"
+    fi
 
-    verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${file_dir}/${file_basename}.265.mp4"
-    if ! eval '${converter} -i "${file_abspath}" ${vcmd} ${acmd} "${file_dir}/${file_basename}.265.mp4"'; then
+    CURRENT="${output}/${file_basename}.265.mp4"
+
+    if [[ -f "$CURRENT" ]]; then
+        warn_msg "Skipping $CURRENT, already exists in $output"
+        return 0
+    fi
+
+    verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${CURRENT}"
+    if ! eval '${converter} -i "${file_abspath}" ${vcmd} ${acmd} "${CURRENT}"'; then
         error_msg "Failed to convert video from ${filename}"
         verbose_msg "Cleaning failed file"
-        rm -f "${file_dir}/${file_basename}.265.mp4"
+        rm -f "${CURRENT}"
         CURRENT=''
         return 1
     fi
+
+    check_sizes "${file_abspath}" "${CURRENT}" "${output}"
 
     CURRENT=''
 
@@ -516,12 +568,6 @@ function media_archive() {
         mkdir -p "${ARCHIVE}"
     fi
 
-    if hash fd 2>/dev/null; then
-        file_list="$(fd -t f -e mp4 . "${ARCHIVE}" | wc -l)"
-    else
-        file_list="$(find "${ARCHIVE}" -regextype posix-extended -iregex '.*\.mp4$' | wc -l)"
-    fi
-
     status_msg "Backing up original file ${filename}"
     verbose_msg "Using -> mv --backup=numbered ${file_abspath} ${ARCHIVE}/"
 
@@ -532,8 +578,8 @@ function media_archive() {
 
     if [[ -f "${file_dir}/${file_basename}M01.XML" ]]; then
         status_msg "Backing up sidecard file: ${file_basename}M01.XML"
-        verbose_msg "Using -> cp --backup=numbered ${file_dir}/${file_basename}M01.XML ${ARCHIVE}/C${file_list}M01.XML"
-        if ! cp --backup=numbered "${file_dir}/${file_basename}M01.XML" "${ARCHIVE}/C${file_list}M01.XML"; then
+        verbose_msg "Using -> cp --backup=numbered ${file_dir}/${file_basename}M01.XML ${ARCHIVE}/"
+        if ! cp --backup=numbered "${file_dir}/${file_basename}M01.XML" "${ARCHIVE}/"; then
             error_msg "Failed to backup sidecard file ${file_dir}/${file_basename}M01.XML"
             return 1
         fi
@@ -563,8 +609,12 @@ function start_convertion() {
 
     for i in "${FILES[@]}"; do
         if convert_files "${i}"; then
-            if ! media_archive "${i}"; then
-                error_msg "Failed to archive ${i}"
+            if [[ $NO_ARCHIVE -eq 0 ]]; then
+                if ! media_archive "${i}"; then
+                    # TODO
+                    error_msg "TODO"
+                    exit 1
+                fi
             fi
         fi
     done
@@ -572,12 +622,10 @@ function start_convertion() {
 }
 
 function clean_up() {
-    verbose_msg "Cleaning up by interrupt"
     if [[ -f "$CURRENT" ]]; then
-        verbose_msg "Cleanning incomplete video $CURRENT" && rm -f "${CURRENT}" 2>/dev/null
+        verbose_msg "Cleaning up last transcoded file $CURRENT"
+        rm -f "${CURRENT}" 2>/dev/null
     fi
-    exit_append
-    exit 1
 }
 
 verbose_msg "Using media path at ${MEDIA_PATH}"
