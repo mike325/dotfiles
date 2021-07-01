@@ -9,10 +9,42 @@ compinit
 
 # Set vi key mode
 bindkey -v
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
-bindkey '^w' backward-kill-word
+# bindkey '^?' backward-delete-char
+# bindkey '^h' backward-delete-char
+bindkey '^[[3~' delete-char                                     # Delete key
+bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
 bindkey '^r' history-incremental-search-backward
+
+bindkey '^[[7~' beginning-of-line                               # Home key
+bindkey '^[[H' beginning-of-line                                # Home key
+if [[ "${terminfo[khome]}" != "" ]]; then
+  bindkey "${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
+fi
+bindkey '^[[8~' end-of-line                                     # End key
+bindkey '^[[F' end-of-line                                      # End key
+if [[ "${terminfo[kend]}" != "" ]]; then
+  bindkey "${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
+fi
+bindkey '^[[2~' overwrite-mode                                  # Insert key
+bindkey '^[[C'  forward-char                                    # Right key
+bindkey '^[[D'  backward-char                                   # Left key
+bindkey '^p' history-beginning-search-backward
+bindkey '^n' history-beginning-search-forward
+
+# Navigate words with ctrl+arrow keys
+bindkey '^[Oc' forward-word                                     #
+bindkey '^[Od' backward-word                                    #
+bindkey '^[[1;5D' backward-word                                 #
+bindkey '^[[1;5C' forward-word                                  #
+bindkey '^[[Z' undo                                             # Shift+tab undo last action
+
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-beginning-search-backward
+bindkey -M vicmd 'j' history-substring-search-down
+
+bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
+bindkey 'jj' vi-cmd-mode
+bindkey -M viins 'jj' vi-cmd-mode
 
 # export ARCHFLAGS="-arch x86_64"
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
@@ -41,10 +73,21 @@ fi
 
 KEYTIMEOUT=20
 
-HISTFILE="$HOME/.zsh/history"
-HISTSIZE=2048
-SAVEHIST=2048
+# HISTFILE=~/.zhistory
+HISTFILE=~/.zsh/history
+HISTSIZE=10000
+SAVEHIST=10000
 
+setopt correct                # Auto correct mistakes
+setopt extendedglob           # Extended globbing. Allows using regular expressions with *
+setopt nocaseglob             # Case insensitive globbing
+setopt rcexpandparam          # Array expension with parameters
+setopt nocheckjobs            # Don't warn about running processes when exiting
+setopt numericglobsort        # Sort filenames numerically when it makes sense
+setopt nobeep                 # No beep
+setopt appendhistory          # Immediately append history instead of overwriting
+setopt histignorealldups      # If a new command is a duplicate, remove the older one
+setopt autocd                 # if only directory path is entered, cd there.
 setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
 setopt share_history          # Share history between all sessions.
 setopt hist_expire_dups_first # Expire duplicate entries first when trimming history.
@@ -60,9 +103,15 @@ setopt hist_reduce_blanks
 # Don't ask for rm * confirmation
 setopt rmstarsilent
 
-bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
-bindkey 'jj' vi-cmd-mode
-bindkey -M viins 'jj' vi-cmd-mode
+# Color man pages
+export LESS_TERMCAP_mb=$'\E[01;32m'
+export LESS_TERMCAP_md=$'\E[01;32m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;47;34m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;36m'
+export LESS=-R
 
 if hash fzf 2>/dev/null; then
     [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
@@ -100,29 +149,34 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
     # Uncomment this (or set SHORT_HOSTNAME to something else),
     # Will otherwise fall back on $HOSTNAME.
     [[ -z $SHORT_HOSTNAME ]] && export SHORT_HOSTNAME=$(hostname -s)
-
-    if source "$ZSH/oh-my-zsh.sh"; then
-        # bind UP and DOWN arrow keys (compatibility fallback
-        # for Ubuntu 12.04, Fedora 21, and MacOSX 10.9 users)
-        bindkey '^[[A' history-substring-search-up
-        bindkey '^[[B' history-substring-search-down
-        bindkey '^p' history-substring-search-up
-        bindkey '^n' history-substring-search-down
-
-        # bind k and j for VI mode
-        bindkey -M vicmd 'k' history-substring-search-up
-        bindkey -M vicmd 'j' history-substring-search-down
-    fi
-
 else
+    USE_POWERLINE="true"
+
     # Case insesitive tab completion
-    zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
-    autoload -Uz colors
+    zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'       # Case insensitive tab completion
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"         # Colored completion (different colors for dirs/files/etc)
+    zstyle ':completion:*' rehash true                              # automatically find new executables in path
+
+    # Speed up completions
+    zstyle ':completion:*' accept-exact '*(N)'
+    zstyle ':completion:*' use-cache on
+    zstyle ':completion:*' cache-path ~/.zsh/cache
+
+    autoload -U compinit colors zcalc
+    compinit -d
+    colors
+
     # autoload -U promptinit && promptinit
     # prompt -p redhat
     # prompt -s redhat
 
-    PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
+    # Use manjaro zsh prompt
+    if [[ -e /usr/share/zsh/manjaro-zsh-prompt ]]; then
+        source /usr/share/zsh/manjaro-zsh-prompt
+    else
+        PROMPT="%F%{$fg[red]%}%n%f%{$reset_color%}@%F%{$fg[cyan]%}%m%f %F%{$fg[yellow]%}%~%f %#%{$reset_color%}"$'\n'"→ "
+    fi
+
 fi
 
 if hash kitty 2>/dev/null; then
