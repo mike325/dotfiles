@@ -192,12 +192,14 @@ else
 
     __venv(){
         if [[ -n "$VIRTUAL_ENV" ]]; then
-            local version="$(python --version | awk '{print $2}')"
+            local version
+            version="$(python --version | awk '{print $2}')"
             echo -e " ${echo_white}(${VIRTUAL_ENV##*/} 🐍 ${version})${echo_reset_color}"
         fi
     }
 
     __proxy(){
+        # shellcheck disable=SC2154
         if [[ -n "$http_proxy" ]]; then
             echo -e " ${echo_green}🌐${echo_reset_color}"
         fi
@@ -219,8 +221,10 @@ fi
 #######################################################################
 
 if [[ -f /etc/bash_completion ]]; then
+    # shellcheck disable=SC1091
     source /etc/bash_completion
 elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    # shellcheck disable=SC1091
     source /usr/share/bash-completion/bash_completion
 else
     completion_dir=''

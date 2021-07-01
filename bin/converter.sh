@@ -433,10 +433,10 @@ function get_cmd() {
 }
 
 function check_sizes() {
-    local old_size new_size location
+    local old_size new_size
     old_size=$(du "$1" | awk '{print $1}')
     new_size=$(du "$2" | awk '{print $1}')
-    location="$3"
+    # local location="$3"
 
     if [[ $old_size -lt $new_size ]]; then
         warn_msg "Old file $1 is smaller"

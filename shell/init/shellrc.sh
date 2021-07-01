@@ -242,7 +242,7 @@ if hash gpgconf 2>/dev/null; then
 fi
 
 if hash gh 2>/dev/null; then
-    eval "$(gh completion --shell ${SHELL##*/})"
+    eval "$(gh completion --shell "${SHELL##*/}")"
 fi
 
 if [[ $- == *i* ]]; then
