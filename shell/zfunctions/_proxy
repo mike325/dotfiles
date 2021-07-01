@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+if [[ -n "$http_proxy" ]]; then
+    echo " %F{green}🌐%f"
+fi

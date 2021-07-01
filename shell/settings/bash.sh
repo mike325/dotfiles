@@ -120,16 +120,9 @@ fi
 
 # pip bash completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
-    function _pip_completion()
-    {
-        # shellcheck disable=SC2207
-        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                    COMP_CWORD=$COMP_CWORD \
-                    PIP_AUTO_COMPLETE=1 $1 ) )
-    }
-    hash pip 2>/dev/null && complete -o default -F _pip_completion pip
-    hash pip2 2>/dev/null && complete -o default -F _pip_completion pip2
-    hash pip3 2>/dev/null && complete -o default -F _pip_completion pip3
+    hash pip 2>/dev/null && eval "$(pip completion --bash)"
+    hash pip2 2>/dev/null && eval "$(pip2 completion --bash)"
+    hash pip3 2>/dev/null && eval "$(pip3 completion --bash)"
 fi
 # pip bash completion end
 
@@ -154,7 +147,7 @@ else
             local branch changes stash info
             branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
-                branch="${echo_blue}$branch"
+                branch="${echo_white}${echo_blue}${branch}"
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
@@ -176,9 +169,7 @@ else
 
     __user(){
         if [[ $EUID -eq 0 ]]; then
-            echo -e "${echo_red}$USER${echo_reset_color}"
-        else
-            echo -e "${echo_purple}$USER${echo_reset_color}"
+            echo -e "${echo_red}$USER${echo_reset_color} at "
         fi
     }
 
@@ -195,11 +186,24 @@ else
         local rc=$?
         # NOTE: ignore send to background and <CTRL-c> exit codes
         if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
-            echo -e " ${echo_red}×${echo_reset_color} "
+            echo -e " ${echo_red}✘${echo_reset_color} "
         fi
     }
 
-    PS1="\n$(__schroot_name)\$(__exit_code)$(__user) at ${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__jobs)\$(__git_info) \n→ "
+    __venv(){
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+            local version="$(python --version | awk '{print $2}')"
+            echo -e " ${echo_white}(${VIRTUAL_ENV##*/} 🐍 ${version})${echo_reset_color}"
+        fi
+    }
+
+    __proxy(){
+        if [[ -n "$http_proxy" ]]; then
+            echo -e " ${echo_green}🌐${echo_reset_color}"
+        fi
+    }
+
+    PS1="\n$(__schroot_name)\$(__exit_code)$(__user)${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__proxy)\$(__venv)\$(__git_info) \n→ "
 fi
 
 if hash kitty 2>/dev/null; then

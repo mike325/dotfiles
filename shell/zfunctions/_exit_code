@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+rc=$?
+# NOTE: ignore send to background and <CTRL-c> exit codes
+if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
+    echo "%F{red}✘%f"
+fi

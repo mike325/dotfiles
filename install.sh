@@ -185,12 +185,6 @@ if is_windows; then
     # Windows does not support links we will use cp instead
     CMD="cp -rf"
     USER="$USERNAME"
-else
-    # HACK: when using sudo
-    # TODO: Must fix this
-    if [[ $CURRENT_SHELL == "sudo" ]] || [[ $CURRENT_SHELL == "su" ]]; then
-        CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
-    fi
 fi
 
 # colors
@@ -758,6 +752,9 @@ function setup_dotconfigs() {
             setup_config "${SCRIPT_PATH}/shell/init/shellrc.sh" "$HOME/.${shell}rc.$USER"
         fi
     done
+
+    setup_config "${SCRIPT_PATH}/shell/init/profile" "$HOME/.profile"
+    # setup_config "${SCRIPT_PATH}/shell/init/profile" "$HOME/.zprofile"
 
     for shell in "${csh_shells[@]}"; do
         status_msg "Setting up ${shell}rc"

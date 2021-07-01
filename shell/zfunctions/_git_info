@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+if hash git 2>/dev/null; then
+    branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
+    if [[ -n $branch ]]; then
+        branch="%F{white}%F{blue}${branch}"
+        changes="$(git diff --shortstat 2>/dev/null | awk '{
+            printf "%s~%d %s+%d %s-%d%s", "%F{yellow}", $1, "%F{green}", $4, "%F{red}", $6, "%F{blue}";
+        }')"
+        stash="$(git stash list 2>/dev/null | wc -l)"
+        if [[ $stash -ne 0 ]]; then
+            stash="%F{yellow}{$stash}"
+        else
+            stash=''
+        fi
+        info=" %F{blue}|"
+        [[ -n $branch ]] && info="$info %f$branch%f"
+        [[ -n $changes ]] && info="$info %f$changes%f"
+        [[ -n $stash ]] && info="$info %f$stash%f"
+        info="$info %F{blue}|%f "
+        echo -e "$info"
+    fi
+fi

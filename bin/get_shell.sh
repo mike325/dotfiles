@@ -35,9 +35,16 @@ BACKUP=0
 VERBOSE=0
 
 # shellcheck disable=SC2009,SC2046
-CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-CURRENT_SHELL="${CURRENT_SHELL##*/}"
-CURRENT_SHELL="${CURRENT_SHELL##*:}"
+if [[ -n "$ZSH_NAME" ]]; then
+    CURRENT_SHELL="zsh"
+elif [[ -n "$BASH" ]]; then
+    CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    if [[ -z "$CURRENT_SHELL" ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
 
 # colors
 # shellcheck disable=SC2034
@@ -195,7 +202,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [[ "$CURRENT_SHELL" =~ bash ]]; then
+if [[ "$CURRENT_SHELL" == bash ]]; then
 
     rm_framework "$HOME/.bash_it"
 
@@ -215,7 +222,7 @@ if [[ "$CURRENT_SHELL" =~ bash ]]; then
     else
         warn_msg "Bash-it is already install"
     fi
-elif [[ "$CURRENT_SHELL" =~ zsh ]]; then
+elif [[ "$CURRENT_SHELL" == zsh ]]; then
 
     rm_framework "$HOME/.oh-my-zsh"
 

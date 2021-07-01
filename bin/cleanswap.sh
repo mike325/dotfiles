@@ -65,17 +65,14 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
-CURRENT_SHELL="bash"
-
-# shellcheck disable=SC2009,SC2046
-CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-CURRENT_SHELL="${CURRENT_SHELL##*/}"
-
-if ! is_windows; then
-    # Hack when using sudo
-    # TODO: Must fix this
-    if [[ $CURRENT_SHELL == "sudo" ]] || [[ $CURRENT_SHELL == "su" ]]; then
-        CURRENT_SHELL="$(ps | head -4 | tail -n 1 | awk '{ print $4 }')"
+if [[ -n "$ZSH_NAME" ]]; then
+    CURRENT_SHELL="zsh"
+elif [[ -n "$BASH" ]]; then
+    CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    if [[ -z "$CURRENT_SHELL" ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
 

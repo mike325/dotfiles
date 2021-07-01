@@ -181,9 +181,6 @@ elif [[ -n "$BASH" ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    # CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
-    # CURRENT_SHELL="${CURRENT_SHELL##*/}"
-    # CURRENT_SHELL="${CURRENT_SHELL##*:}"
     if [[ -z "$CURRENT_SHELL" ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi

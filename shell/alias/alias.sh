@@ -51,38 +51,9 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/.config/nvim"
 
-            _nvim="$(which nvim)"
-
             # Fucking typos
             alias nvi="nvim"
             alias vnim="nvim"
-
-            function nvim() {
-                if hash nvr 2>/dev/null && [[ -e  "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
-                    local args=()
-                    local avoid=0
-                    for arg in "$@"; do
-                        case "$arg" in
-                            -*|+*)
-                                if [[ "$arg" == '--cmd' ]]; then
-                                    local avoid=1
-                                else
-                                    local avoid=0
-                                fi
-                                ;;
-                            *)
-                                if [[ $avoid -eq 0 ]]; then
-                                    args+=("$arg")
-                                fi
-                                [[ $avoid -eq 1 ]] && local avoid=0
-                                ;;
-                        esac
-                    done
-                    nvr --servername "$HOME/.cache/nvim/socket$TMUX_WINDOW" --remote-silent "${args[@]}"
-                else
-                    $_nvim --listen "$HOME/.cache/nvim/socket$TMUX_WINDOW" $@
-                fi
-            }
 
             if hash rshell 2>/dev/null; then
                 if hash nvr 2>/dev/null; then
@@ -95,13 +66,13 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
             if hash nvr 2>/dev/null && [[ -e "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
                 alias vi="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-silent"
             else
-                alias vi="$_nvim --cmd 'let g:minimal=1'"
+                alias vi="nvim --cmd 'let g:minimal=1'"
             fi
 
             if hash nvr 2>/dev/null && [[ -n $VIMRUNTIME ]]; then
                 export MANPAGER="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW +'Man!' --remote-silent -"
             else
-                export MANPAGER="$_nvim --cmd 'let g:minimal=1' +Man!"
+                export MANPAGER="nvim --cmd 'let g:minimal=1' +Man!"
             fi
             export EDITOR="nvim"
 

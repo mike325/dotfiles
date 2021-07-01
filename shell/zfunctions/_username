@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+if [[ $EUID -eq 0 ]]; then
+    echo -e "%F{red}$USER%f at "
+fi
