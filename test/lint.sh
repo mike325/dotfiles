@@ -303,13 +303,8 @@ verbose_msg "Shellcheck version: ${version}"
 # shellcheck disable=SC2046
 if [[ $version =~ 0\.[0-3]\.[0-9] ]]; then
     warn_msg "Shellcheck is too old, skipping"
-elif [[ $version =~ 0\.[4-5]\.[0-9] ]]; then
-    if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
-        error_msg 'Fail shellcheck test'
-        exit 2
-    fi
 else
-    if ! shellcheck -x -a -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
+    if ! shellcheck -x -e 1117 $(find . -iname '*.sh' ! -iname 'zsh.sh'  ! -path '*/shell/scripts/*' ! -path '*/shell/host/*'); then
         error_msg 'Fail shellcheck test'
         exit 2
     fi
