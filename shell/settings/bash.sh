@@ -121,7 +121,7 @@ fi
 # pip bash completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
     hash pip 2>/dev/null && eval "$(pip completion --bash)"
-    hash pip2 2>/dev/null && eval "$(pip2 completion --bash)"
+    hash pip2 2>/dev/null && eval "$(pip2 completion --bash 2>/dev/null)"
     hash pip3 2>/dev/null && eval "$(pip3 completion --bash)"
 fi
 # pip bash completion end

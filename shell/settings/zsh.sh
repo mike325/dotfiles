@@ -57,7 +57,7 @@ bindkey -M viins 'jj' vi-cmd-mode
 # pip zsh completion start
 if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
     hash pip 2>/dev/null && eval "$(pip completion --zsh)"
-    hash pip2 2>/dev/null && eval "$(pip2 completion --zsh)"
+    hash pip2 2>/dev/null && eval "$(pip2 completion --zsh 2>/dev/null)"
     hash pip3 2>/dev/null && eval "$(pip3 completion --zsh)"
 fi
 # pip zsh completion end
