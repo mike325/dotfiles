@@ -310,7 +310,7 @@ function get_portable() {
     if [[ $DEV -eq 1 ]]; then
         build='nightly'
     elif [[ $NVIM_VERSION == 'latest' ]]; then
-        build='stable'
+        build="${version}"
     else
         build="v${NVIM_VERSION}"
     fi
