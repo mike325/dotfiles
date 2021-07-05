@@ -302,6 +302,11 @@ if [[ $- == *i* ]]; then
 
     # shellcheck disable=SC1090,SC1091
     [[ -n "$VIRTUAL_ENV" ]] && source "$VIRTUAL_ENV/bin/activate"
+
+    if hash nodejs 2>/dev/null; then
+        [[ "$(nodejs --version)" =~ ^v10\..* ]] && export NODE_OPTIONS=--experimental-worker
+    fi
+
     [[ -f "$HOME/.config/shell/banner" ]] && cat "$HOME/.config/shell/banner"
 
 fi
