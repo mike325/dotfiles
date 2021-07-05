@@ -39,9 +39,8 @@ fi
 if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     # We already checked the file exists so its "safe"
     # shellcheck disable=SC1090,SC1091
-    if [[ -z $PROXY_ENABLE ]]; then
+    if [[ -z $PROXY_DISABLE ]]; then
         source "$HOME/.config/shell/host/proxy.sh"
-        export PROXY_ENABLE=1
     fi
     function toggleProxy() {
         # shellcheck disable=SC2154
@@ -51,12 +50,12 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
             unset "ftp_proxy"
             unset "socks_proxy"
             unset "no_proxy"
-            unset PROXY_ENABLE
+            export PROXY_DISABLE=1
             echo "Proxy disable"
         else
             # shellcheck disable=SC1090,SC1091
             source "$HOME/.config/shell/host/proxy.sh"
-            export PROXY_ENABLE=1
+            unset PROXY_DISABLE
             echo "Proxy enable"
         fi
     }
