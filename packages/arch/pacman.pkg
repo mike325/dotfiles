@@ -11,6 +11,8 @@ wget
 cppcheck
 gcc
 clang
+clangd
+lldb
 llvm
 make
 sed
