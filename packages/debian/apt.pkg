@@ -14,9 +14,9 @@ clang-tools-11
 clangd-11
 clang-tidy-11
 make
+cmake
 sed
 htop
-cmake
 universal-ctags
 global
 cscope

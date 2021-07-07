@@ -25,6 +25,11 @@
 
 NAME="$0"
 NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
+WARN_COUNT=0
+ERR_COUNT=0
+NOCOLOR=0
+NOLOG=0
 
 function help_user() {
     cat << EOF
@@ -51,9 +56,60 @@ Usage:
 EOF
 }
 
+function warn_msg() {
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
+    else
+        printf "[!] Warning:\t %s\n" "$msg"
+    fi
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+    fi
+    return 0
+}
+
 function error_msg() {
-    ERROR_MESSAGE="$1"
-    printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
+    else
+        printf "[X] Error:\t %s\n" "$msg" 1>&2
+    fi
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+    fi
+    return 0
+}
+
+function status_msg() {
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
+    else
+        printf "[*] Info:\t %s\n" "$msg"
+    fi
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+    fi
+    return 0
+}
+
+function verbose_msg() {
+    local msg="$1"
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
+        else
+            printf "[+] Debug:\t %s\n" "$msg"
+        fi
+    fi
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+    fi
+    return 0
 }
 
 

@@ -9,8 +9,8 @@ wget
 gcc
 g++
 build-essential
-clang
 # clang-tools
+clang
 clang-tools-10
 make
 sed

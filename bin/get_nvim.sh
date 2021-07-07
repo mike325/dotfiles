@@ -23,7 +23,6 @@
 
 NAME="$0"
 NAME="${NAME##*/}"
-LOCATION="$(pwd)"
 URL="https://github.com/neovim/neovim"
 PYTHON_LIBS=0
 RUBY_LIBS=0
@@ -31,9 +30,17 @@ BUILD_LIBS=0
 CLONE=0
 FORCE_INSTALL=0
 PORTABLE=0
-NOCOLOR=0
 VERBOSE=0
 DEV=0
+NOLOG=1
+NOCOLOR=0
+
+NAME="$0"
+NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
+
+WARN_COUNT=0
+ERR_COUNT=0
 
 NVIM_VERSION="latest"
 
@@ -216,43 +223,57 @@ EOF
 }
 
 function warn_msg() {
-    local warn_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s \n" "$warn_message"
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
     else
-        printf "[!] Warning:\t %s \n" "$warn_message"
+        printf "[!] Warning:\t %s\n" "$msg"
+    fi
+    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
-    local error_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${red}[X] Error:${reset_color}\t %s \n" "$error_message" 1>&2
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
     else
-        printf "[X] Error:\t %s \n" "$error_message" 1>&2
+        printf "[X] Error:\t %s\n" "$msg" 1>&2
+    fi
+    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
-    local status_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s \n" "$status_message"
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
     else
-        printf "[*] Info:\t %s \n" "$status_message"
+        printf "[*] Info:\t %s\n" "$msg"
+    fi
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
+    local msg="$1"
     if [[ $VERBOSE -eq 1 ]]; then
-        local debug_message="$1"
         if [[ $NOCOLOR -eq 0 ]]; then
-            printf "${purple}[+] Debug:${reset_color}\t %s \n" "$debug_message"
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
         else
-            printf "[+] Debug:\t %s \n" "$debug_message"
+            printf "[+] Debug:\t %s\n" "$msg"
         fi
+    fi
+    if [[ $NOLOG -eq 0 ]]; then
+        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
     fi
     return 0
 }
@@ -347,7 +368,7 @@ function get_portable() {
 
 function get_libs() {
     if [[ $PYTHON_LIBS -eq 1 ]]; then
-        hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --upgrade --user pynvim; }
+        # hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --upgrade --user pynvim; }
         hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --upgrade --user pynvim; }
     fi
 
@@ -392,23 +413,79 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Not a valid version ${_result##*=}"
                 exit 1
             fi
-            NVIM_VERSION="$_result"
+            NVIM_VERSION="v$_result"
             ;;
         --portable)
             PORTABLE=1
             if [[ "$2" =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
-                NVIM_VERSION="$2"
+                NVIM_VERSION="v$2"
                 shift
             fi
             ;;
         -f|--force)
             FORCE_INSTALL=1
             ;;
+        --compiler=*)
+            _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            export CC="$_result"
+            if [[ "$CC" == gcc ]]; then
+                export CXX=g++
+            elif [[ "$CC" == clang ]]; then
+                export CXX=clang++
+            fi
+            if ! hash "$CC" 2>/dev/null; then
+                error_msg "Missing compiler C $CC in PATH"
+                exit 1
+            elif ! hash "$CXX" 2>/dev/null; then
+                error_msg "Missing compiler C++ $CXX in PATH"
+                exit 1
+            fi
+            ;;
+        -C|--compiler)
+            if [[ -z "$2" ]]; then
+                error_msg "Missing compiler"
+                exit 1
+            elif [[ ! "$2" =~ ^(gcc|clang)$ ]]; then
+                error_msg "Invalid compiler $2, please select gcc or clang "
+                exit 1
+            fi
+            export CC="$2"
+            shift
+            if [[ "$CC" == gcc ]]; then
+                export CXX=g++
+            elif [[ "$CC" == clang ]]; then
+                export CXX=clang++
+            fi
+            if ! hash "$CC" 2>/dev/null; then
+                error_msg "Missing compiler C $CC in PATH"
+                exit 1
+            elif ! hash "$CXX" 2>/dev/null; then
+                error_msg "Missing compiler C++ $CXX in PATH"
+                exit 1
+            fi
+            ;;
+        --clone=*)
+            CLONE=1
+            _result=$(__parse_args "$key" "clone" '.+')
+            if [[ "$_result" == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            CLONE_LOC="$_result"
+            ;;
         -c|--clone)
             CLONE=1
             ;;
-        -d|--dir)
-            LOCATION="$2"
+        -i|--install)
+            if [[ -z "$2" ]]; then
+                error_msg "Missing install path"
+                exit 1
+            fi
+            INSTALL_DIR="$2"
             shift
             ;;
         -p|--python)
@@ -425,6 +502,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --dev)
             DEV=1
+            BRANCH="master"
             ;;
         -h|--help)
             show_help
@@ -455,57 +533,33 @@ if is_windows; then
     exit 1
 fi
 
-if [[ "$CLONE" -eq 1 ]] && [[ ! -d "$LOCATION/neovim" ]]; then
-    LOCATION="$LOCATION/neovim"
-    git clone --quiet --recursive "$URL" "$LOCATION" || exit 1
-
-elif [[ -d "$LOCATION/neovim" ]]; then
-    warn_msg "$LOCATION/neovim already exists, skipping cloning"
-    LOCATION="$LOCATION/neovim"
+if [[ $CLONE -eq 1 ]]; then
+    status_msg "Cloning neovim repo"
+    if ! git clone --recursive https://github.com/neovim/neovim "${CLONE_LOC:.}"; then
+        error_msg "Failed to clone neovim"
+        exit 2
+    fi
+    pushd "${CLONE_LOC:-neovim}" &>/dev/null || { error_msg "Failed to cd into ${CLONE_LOC:-neovim}" && exit 1; }
 fi
-
-if [[ -f "$LOCATION/bin/nvim" ]] && [[ $FORCE_INSTALL -eq 0 ]]; then
-    status_msg "Neovim is already compiled, aborting"
-    exit 0
-elif [[ $FORCE_INSTALL -eq 1 ]]; then
-    warn_msg "Neovim is already compiled, but fuck it, you want to recompile"
-fi
-
-
-if [[ -d "$LOCATION" ]]; then
-    pushd "$LOCATION" > /dev/null || { error_msg "Could not get to $LOCATION" && exit 1; }
-else
-    error_msg "$LOCATION doesn't exist"
-    exit 1
-fi
-
-# Remove all unstaged changes
-if ! git checkout . 2>/dev/null; then
-    # No a Git repo
-    error_msg "The current dir $(pwd -P) is not a Neovim git repo"
-    popd > /dev/null && exit 1
-fi
-
-# Remove all untracked files
-git clean -xdf . 2>/dev/null
-rm -fr build/
-
-# Get latest version
-git checkout master
-git pull origin master
 
 if [[ "$BUILD_LIBS" -eq 1 ]]; then
     status_msg "Looking for system dependencies"
-
     if hash apt-get 2> /dev/null; then
         sudo apt-get install -y \
-            libtool \
-            libtool-bin \
-            autoconf \
-            automake \
-            cmake \
-            g++ \
-            pkg-config \
+            libtool             \
+            libtool-bin         \
+            autoconf            \
+            automake            \
+            pkg-config          \
+            gcc                 \
+            g++                 \
+            lldb-11             \
+            clang-11            \
+            clang-tools-11      \
+            clangd-11           \
+            clang-tidy-11       \
+            make                \
+            cmake               \
             unzip
             # build-essential
             # python-dev
@@ -513,30 +567,27 @@ if [[ "$BUILD_LIBS" -eq 1 ]]; then
             # ruby-dev
     elif hash dnf 2> /dev/null; then
         sudo dnf -y install \
-            libtool \
-            autoconf \
-            automake \
-            cmake \
-            gcc \
-            gcc-c++ \
-            make \
-            pkgconfig \
-            unzip
-            # python-dev
-            # python2-dev
-            # ruby-dev
-    elif hash yaourt 2> /dev/null; then
-        yaourt -S --noconfirm \
-            base-devel \
-            cmake \
+            libtool         \
+            autoconf        \
+            automake        \
+            cmake           \
+            gcc             \
+            gcc-c++         \
+            make            \
+            pkgconfig       \
             unzip
             # python-dev
             # python2-dev
             # ruby-dev
     elif hash pacman 2> /dev/null; then
         sudo pacman -S --noconfirm \
-            base-devel \
-            cmake \
+            base-devel        \
+            clang             \
+            clangd            \
+            lldb              \
+            llvm              \
+            make              \
+            cmake             \
             unzip
             # python-dev
             # python2-dev
@@ -556,47 +607,38 @@ EOF
     fi
 fi
 
-# BUG: Since the latest stable version (v0.2.0 up to Jul/2017) have "old" deps
-# GCC7 works just for the master branch
-GCC_VERSION="$(gcc --version | head -1 | awk '{print $3}')"
-GCC_VERSION="${GCC_VERSION%%.*}"
-# Checkout to the latest stable version
-if (( GCC_VERSION < 7 )) || [[ $DEV -eq 0 ]]; then
-    status_msg "Using latest stable version $( git tag | tail -n 1 )"
-    git checkout "$( git tag | tail -n 1 )" 2>/dev/null
-elif [[ $DEV -eq 1 ]]; then
-    status_msg "Using master HEAD"
-fi
-
 # Always clean the build dir
+status_msg "Cleaning repo"
+# Remove all untracked files
+git clean -df . 2>/dev/null
 make clean
+# make distclean
 
-# Prefix the current dir
-make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(pwd)"
+# Get latest version
+status_msg "Pulling latest changes"
+git checkout master
+git pull origin master
+status_msg "Checking out to ${BRANCH:-$(git tag | sort -h | tail -1)}"
+git checkout "${BRANCH:-$(git tag | sort -h | tail -1)}"
 
-# make CMAKE_BUILD_TYPE=RelWithDebInfo
-# Set the type release to avoid debug messages
-# Continue only if there isn't errors
-if make CMAKE_BUILD_TYPE=Release; then
-
-    if make install; then
-        # export PATH="$(pwd)/bin:$PATH"
-
-        echo ""
-        # echo "You may want to add 'export PATH=\"$(pwd)/bin:\$PATH\"' in your ~/.${SHELL##*/}rc"
-        echo ""
-
+status_msg "Building neovim"
+if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="${INSTALL_DIR:-$HOME/.local}"; then
+    status_msg "Installing neovim into ${INSTALL_DIR:-$HOME/.local}"
+    if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="${INSTALL_DIR:-$HOME/.local}" install; then
         get_libs
-
     else
-        _show_nvim_help
-        popd > /dev/null && exit 1
+        error_msg "Failed to install neovim"
     fi
 else
-    _show_nvim_help
-    popd > /dev/null && exit 1
+    error_msg "Failed to compile neovim"
 fi
 
-popd > /dev/null || exit 1
+if [[ $CLONE -eq 1 ]]; then
+    popd > /dev/null || exit 1
+fi
+
+if [[ $ERR_COUNT -gt 0 ]]; then
+    exit 1
+fi
 
 exit 0
