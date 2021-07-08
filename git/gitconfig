@@ -1,398 +1,401 @@
-;						   -`
-;		   ...			  .o+`
-;		.+++s+	 .h`.	 `ooo/
-;	   `+++%++	.h+++	`+oooo:
-;	   +++o+++ .hhs++. `+oooooo:
-;	   +s%%so%.hohhoo'	'oooooo+:
-;	   `+ooohs+h+sh++`/:  ++oooo+:
-;		hh+o+hoso+h+`/++++.+++++++:
-;		 `+h+++h.+ `/++++++++++++++:
-;				  `/+++ooooooooooooo/`
-;				 ./ooosssso++osssssso+`
-;				.oossssso-````/osssss::`
-;			   -osssssso.	   :ssss``to.
-;			  :osssssss/  Mike	osssl	+
-;			 /ossssssss/   8a	+sssslb
-;		   `/ossssso+/:-		-:/+ossss'.-
-;		  `+sso+:-`					`.-/+oso:
-;		 `++:.							 `-/+/
-;		 .`   github.com/mike325/dotfiles	`/
+;                          -`
+;          ...            .o+`
+;       .+++s+   .h`.    `ooo/
+;      `+++%++  .h+++   `+oooo:
+;      +++o+++ .hhs++. `+oooooo:
+;      +s%%so%.hohhoo'  'oooooo+:
+;      `+ooohs+h+sh++`/:  ++oooo+:
+;       hh+o+hoso+h+`/++++.+++++++:
+;        `+h+++h.+ `/++++++++++++++:
+;                 `/+++ooooooooooooo/`
+;                ./ooosssso++osssssso+`
+;               .oossssso-````/osssss::`
+;              -osssssso.      :ssss``to.
+;             :osssssss/  Mike  osssl   +
+;            /ossssssss/   8a   +sssslb
+;          `/ossssso+/:-        -:/+ossss'.-
+;         `+sso+:-`                 `.-/+oso:
+;        `++:.                           `-/+/
+;        .`   github.com/mike325/dotfiles   `/
 
-[init]
-	templatedir = ~/.config/git/templates/
+; [init]
+;   templatedir = ~/.config/git/templates/
 
 [core]
-	editor = $EDITOR
-	autocrlf = input
-	symlinks = true
-	; excludesFile = $HOME/.config/git/ignore
-	; pager = bat --style full
-	; pager = delta --24-bit-color always
+    editor = $EDITOR
+    autocrlf = input
+    symlinks = true
+    ; excludesFile = $HOME/.config/git/ignore
+    ; pager = bat --style full
+    ; pager = delta --24-bit-color always
 
 [delta]
-	; plus-color = "#012800"
-	; minus-color = "#340001"
-	features = side-by-side line-numbers decorations
-	whitespace-error-style = 22 reverse
-	line-numbers = true
-	side-by-side = true
+    ; plus-color = "#012800"
+    ; minus-color = "#340001"
+    features = side-by-side line-numbers decorations
+    whitespace-error-style = 22 reverse
+    line-numbers = true
+    side-by-side = true
 
 [delta "decorations"]
-	commit-decoration-style = bold yellow box ul
-	file-style = bold yellow ul
-	file-decoration-style = none
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
 
 [interactive]
-	diffFilter = delta --color-only
+    diffFilter = delta --color-only
 
 [diff]
-	colorMoved = default
+    colorMoved = default
 
 [user]
-	name = Mike
-	email = mickiller.25@gmail.com
-	signingkey = BFF0120AA4E5E4C1931C31911A3C1B6965F2F860
+    name = Mike
+    email = mickiller.25@gmail.com
+    signingkey = BFF0120AA4E5E4C1931C31911A3C1B6965F2F860
 
 [commit]
-	gpgsign = true
+    gpgsign = true
 
 [tag]
-	gpgsign = true
+    gpgsign = true
 
 [credential "https://git.prodeveloper.me"]
-	username = mike
+    username = mike
 
 [credential "https://github.com"]
-	username = mike325
+    username = mike325
 
 [url "https://github.com/mike325/"]
-	insteadOf = mike:
+    insteadOf = mike:
 
 [url "git@github.com:mike325/"]
-	insteadOf = smike:
+    insteadOf = smike:
 
 [url "https://github.com/"]
-	insteadOf = gh:
+    insteadOf = gh:
 
 [url "git@github.com:"]
-	insteadOf = sgh:
+    insteadOf = sgh:
 
 ; [credential "helperselector"]
-;	selected = <
+;   selected = <
 [credential]
-	helper = cache --timeout=57600
+    helper = cache --timeout=57600
 
 [color]
-	ui			= auto
-	; diff		  = auto
-	; status	  = auto
-	; branch	  = auto
-	interactive = auto
-	grep		= auto
-	log			= auto
+    ui          = auto
+    ; diff        = auto
+    ; status      = auto
+    ; branch      = auto
+    interactive = auto
+    grep        = auto
+    log         = auto
 
 [color "branch"]
-	current = green
-	local	= yellow
-	remote	= red
+    current = green
+    local   = yellow
+    remote  = red
 
 [color "diff"]
-	frag = magenta
-	meta = yellow
-	new  = green
-	old  = red
+    frag = magenta
+    meta = yellow
+    new  = green
+    old  = red
 
 [color "status"]
-	; Bold colors are the only ones that works in windows
-	added	  = green bold
-	changed   = yellow bold
-	untracked = red bold
+    ; Bold colors are the only ones that works in windows
+    added     = green bold
+    changed   = yellow bold
+    untracked = red bold
 
 [push]
-	; Make `git push` automatically push relevant annotated tags when pushing
-	followTags = true
-	default = tracking
+    ; Make `git push` automatically push relevant annotated tags when pushing
+    followTags = true
+    default = tracking
 
 [pull]
-	rebase = false
+    rebase = false
 
 [help]
-	autocorrect = 1
+    autocorrect = 1
 
 [alias]
 ;###############################################################################
-;				  Just a status												   #
+;                 Just a status                                                #
 ;###############################################################################
 
-	s = status --show-stash --renames --branch
+    s = status --show-stash --renames --branch
 
 ;###############################################################################
-;				  Get the tag of the current commit							   #
+;                 Get the tag of the current commit                            #
 ;###############################################################################
 
-	dt	= describe --tag
+    dt  = describe --tag
 
 ;###############################################################################
-;				  clone recursive											   #
+;                 clone recursive                                              #
 ;###############################################################################
 
-	cn = clone --recursive
+    cn = clone --recursive
 
 ;###############################################################################
-;				  Clean the repo of all untracked files						   #
+;                 Clean the repo of all untracked files                        #
 ;###############################################################################
 
-	cl	= clean -df .  ; Remove all untracked files (excluding ignore ones)
-	cla = clean -xdf . ; Remove everything, including ignored files
+    cl  = clean -df .  ; Remove all untracked files (excluding ignore ones)
+    cla = clean -xdf . ; Remove everything, including ignored files
 
 ;###############################################################################
-;				  Submodule management										   #
+;                 Submodule management                                         #
 ;###############################################################################
 
-	sb	  = submodule
-	sbf   = submodule foreach
-	sbfp  = submodule foreach git pull
-	sbu   = submodule update
-	sbur  = submodule update --recursive
-	sbui  = submodule update --init
-	sbuir = submodule update --init --recursive ; init and update all submodules
+    sb    = submodule
+    sbf   = submodule foreach
+    sbfp  = submodule foreach git pull
+    sbu   = submodule update
+    sbur  = submodule update --recursive
+    sbui  = submodule update --init
+    sbuir = submodule update --init --recursive ; init and update all submodules
 
 ;###############################################################################
-;				  Quick add files											   #
+;                 Quick add files                                              #
 ;###############################################################################
 
-	a  = add		; Add stuff
-	au = add -u		; update the index with just the changed files
-	aa = add --all	; Add all stuff
-	ai = add -i		; Add interactive stuff
+    a  = add        ; Add stuff
+    au = add -u     ; update the index with just the changed files
+    aa = add --all  ; Add all stuff
+    ai = add -i     ; Add interactive stuff
 
 ;###############################################################################
-;				  Branch management											   #
+;                 Branch management                                            #
 ;###############################################################################
 
-	b	= !git --no-pager branch		; Show local branches
-	ba	= !git --no-pager branch --all	; Show all local and remote branches
-	bd	= !git --no-pager branch -d		; Delete a merged branch
-	bdd = !git --no-pager branch -D		; Force branch deletion
-	bdr = !git push origin --delete		; Delete remote branch
-	br	= !git --no-pager branch -m		; Rename a branch
+    b   = !git --no-pager branch        ; Show local branches
+    ba  = !git --no-pager branch --all  ; Show all local and remote branches
+    bd  = !git --no-pager branch -d     ; Delete a merged branch
+    bdd = !git --no-pager branch -D     ; Force branch deletion
+    bdr = !git push origin --delete     ; Delete remote branch
+    br  = !git --no-pager branch -m     ; Rename a branch
 
 ;###############################################################################
-;				  Commit shortcuts											   #
+;                 Commit shortcuts                                             #
 ;###############################################################################
 
-	c	= commit			; Normal commit
-	cm	= commit -m			; Short commit
-	ca	= commit --amend	; Commit over the last commit
+    c   = commit            ; Normal commit
+    cm  = commit -m         ; Short commit
+    ca  = commit --amend    ; Commit over the last commit
 
 ;###############################################################################
-;				  Cherry pick commits										   #
+;                 Cherry pick commits                                          #
 ;###############################################################################
 
-	ch	= cherry-pick
-	chc = cherry-pick --continue
-	cha = cherry-pick --abort
+    ch  = cherry-pick
+    chc = cherry-pick --continue
+    cha = cherry-pick --abort
 
 ;###############################################################################
-;				  Diff stuff												   #
+;                 Diff stuff                                                   #
 ;###############################################################################
 
-	d	= diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto
-	dc	= diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --cached
-	dk	= diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --check
-	ds	= diff --find-copies-harder --shortstat
+    d   = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto
+    dc  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --cached
+    dk  = diff --diff-algorithm=patience -B -C --find-copies-harder --color=auto --check
+    ds  = diff --find-copies-harder --shortstat
 
 ;###############################################################################
-;				  Grep something in the current repo						   #
+;                 Grep something in the current repo                           #
 ;###############################################################################
 
-	g  = grep -nI --color=auto	 ; Grep showing the line number and ignore binaries
-	gi = grep -nIi --color=auto  ; Same as above but ignore case
+    g  = grep -nI --color=auto   ; Grep showing the line number and ignore binaries
+    gi = grep -nIi --color=auto  ; Same as above but ignore case
 
 ;###############################################################################
-;				  Git log stuff												   #
+;                 Git log stuff                                                #
 ;###############################################################################
 
-	l	= log --color=auto								 ; Normal log
-	ln	= log --color=auto --name-status				 ; get files that changed
-	lg	= log --color=auto --graph						 ; Normal log with graph
-	ll	= log --color=auto --pretty=custom				 ; Short log with pretty format
-	llg = log --color=auto --graph --pretty=custom		 ; Short pretty log with graph
-	lln = log --color=auto --name-status --pretty=custom ; get files that changed
-	w	= whatchanged --color=auto						 ; Old whatchanged
-	wp	= whatchanged --color=auto -p					 ; Old whatchanged with diff
+    l   = log --show-signature --color=auto               ; Normal log
+    ln  = log --show-signature --color=auto --name-status ; get files that changed
+    lg  = log --show-signature --color=auto --graph       ; Normal log with graph
+    ll  = log --color=auto --pretty=custom                ; Short log with pretty format
+    llg = log --color=auto --graph --pretty=custom        ; Short pretty log with graph
+    lln = log --color=auto --name-status --pretty=custom  ; get files that changed
+    w   = log --show-signature --color=auto --name-status ; Old whatchanged
+    wp  = log --show-signature --color=auto -p            ; Old whatchanged with diff
 
 ;###############################################################################
-;				  Git ls a bit simpler and with grep search					   #
+;                 Git ls a bit simpler and with grep search                    #
 ;###############################################################################
 
-	ls = ls-files ; Display tracked files
+    ls = ls-files ; Display tracked files
 
 ;###############################################################################
-;				  Merge shortcuts											   #
+;                 Merge shortcuts                                              #
 ;###############################################################################
 
-	m  = merge
-	ma = merge --abort
-	mc = merge --continue
-	ms = merge --skip
+    m  = merge
+    ma = merge --abort
+    mc = merge --continue
+    ms = merge --skip
 
 ;###############################################################################
-;				  Checkout ** TODO add more shortcuts						   #
+;                 Checkout ** TODO add more shortcuts                          #
 ;###############################################################################
 
-	o  = checkout		; checkout shortcut
-	ob = checkout -b	; checkout to a given branch
-	od = checkout --	; Reset the changes in a given file
-	or = checkout .		; Reset the changes of the working space
+    o  = checkout       ; checkout shortcut
+    ob = checkout -b    ; checkout to a given branch
+    od = checkout --    ; Reset the changes in a given file
+    or = checkout .     ; Reset the changes of the working space
 
 ;###############################################################################
-;				  Shortcuts to push changes									   #
+;                 Shortcuts to push changes                                    #
 ;###############################################################################
 
-	ps	  = push					; Normal push shortcut
-	pso   = push origin				; Push to origin remote
-	psom  = push origin master		; Push master to origin remote
-	pshm  = push origin HEAD:master ; push HEAD to master's origin
+    ps    = push                    ; Normal push shortcut
+    pso   = push origin             ; Push to origin remote
+    psom  = push origin master      ; Push master to origin remote
+    pshm  = push origin HEAD:master ; push HEAD to master's origin
 
 ;###############################################################################
-;				  Shortcuts for pull cmd's									   #
+;                 Shortcuts for pull cmd's                                     #
 ;###############################################################################
 
-	; pl	= pull
-	pl	  = pull
-	plo   = pull origin
-	plom  = pull origin master
-	pb	  = pull --rebase
-	pbo   = pull --rebase origin
-	pbom  = pull --rebase origin master
+    ; pl    = pull
+    pl    = pull
+    plo   = pull origin
+    plom  = pull origin master
+    pb    = pull --rebase
+    pbo   = pull --rebase origin
+    pbom  = pull --rebase origin master
 
 ;###############################################################################
-;				  Simple rebase settings									   #
+;                 Simple rebase settings                                       #
 ;###############################################################################
 
-	rb = rebase
-	rba = rebase --abort
-	rbc = rebase --continue
-	rbi = rebase --interactive
-	rbs = rebase --skip
+    rb = rebase
+    rba = rebase --abort
+    rbc = rebase --continue
+    rbi = rebase --interactive
+    rbs = rebase --skip
 
 ;###############################################################################
-;				  Reset the HEAD of the repo								   #
+;                 Reset the HEAD of the repo                                   #
 ;###############################################################################
 
-	re	 = reset
-	rh	 = reset HEAD
-	reh  = reset --hard
-	res  = reset --soft
+    re   = reset
+    rh   = reset HEAD
+    reh  = reset --hard
+    res  = reset --soft
 
 ;###############################################################################
-;				  Worktree management										   #
+;                 Worktree management                                          #
 ;###############################################################################
 
-	wt	 = worktree
-	wta  = worktree add
-	wtab = worktree add -b
-	wtp  = worktree prune
-	wtr  = worktree remove
-	wtl  = worktree list
+    wt   = worktree
+    wta  = worktree add
+    wtab = worktree add -b
+    wtp  = worktree prune
+    wtr  = worktree remove
+    wtl  = worktree list
 
 ;###############################################################################
-;				  Remotes management										   #
+;                 Remotes management                                           #
 ;###############################################################################
 
-	r	= remote			 ; remote shortcut
-	ra	= remote add		 ; Add remote
-	rr	= remote rm			 ; remove remote
-	rm	= remote rename		 ; rename remote
-	rs	= remote show		 ; show info if remote
-	rao = remote add origin  ; add origin remote
-	rso = remote show origin ; Show origin remote info
+    r   = remote             ; remote shortcut
+    ra  = remote add         ; Add remote
+    rr  = remote rm          ; remove remote
+    rm  = remote rename      ; rename remote
+    rs  = remote show        ; show info if remote
+    rao = remote add origin  ; add origin remote
+    rso = remote show origin ; Show origin remote info
 
 ;###############################################################################
-;				  Stash stuff												   #
+;                 Stash stuff                                                  #
 ;###############################################################################
 
-	sc = !git --no-pager stash clear
-	sl = !git --no-pager stash list
-	ss = !git --no-pager stash save
+    sc = !git --no-pager stash clear
+    sl = !git --no-pager stash list
 
 ;###############################################################################
-;	   SVN compatibility (I have to use this crap, hope no one else need it)   #
+;      SVN compatibility (I have to use this crap, hope no one else need it)   #
 ;###############################################################################
 
-	svnr = svn rebase
-	svnd = svn dcommit
-	svnl = svn log --oneline --show-commit
+    svnr = svn rebase
+    svnd = svn dcommit
+    svnl = svn log --oneline --show-commit
 
 ;###############################################################################
-;				  Custom functions											   #
+;                 Custom functions                                             #
 ;###############################################################################
 
-;	Create a stash of the current changes and then reapply them
-	snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+    patch = "!f(){ git diff --diff-algorithm=patience -B -C --find-copies-harder --color=never $1 > \"${2:-$(basename $(pwd))}.patch\"; }; f"
+    slc = "!f(){ git log --show-signature --color=auto -p ${1:--1}; }; f"
 
-;	Auto create tags files and place it in .git dir Credits to Tpope
-	ctags = "!f() {\
-		if [ -f .git ] || [ -d .git ]; then\
-			dir=$( git rev-parse --git-dir ) ; \
-			if [ -f .git ]; then \
-				${dir}/../../hooks/ctags ;\
-			else \
-				${dir}/hooks/ctags; \
-			fi ;\
-		else \
-			git init && .git/hooks/ctags ;\
-		fi;\
-	}; f"
+;   Create a stash of the current changes and then reapply them
+    snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
 
-	np	= "!f() { git --no-pager $@; }; f"
-	npc = "!f() { git --no-pager $@ --color; }; f"
+;   Auto create tags files and place it in .git dir Credits to Tpope
+    ctags = "!f() {\
+        if [ -f .git ] || [ -d .git ]; then\
+            dir=$( git rev-parse --git-dir ) ; \
+            if [ -f .git ]; then \
+                ${dir}/../../hooks/ctags ;\
+            else \
+                ${dir}/hooks/ctags; \
+            fi ;\
+        else \
+            git init && .git/hooks/ctags ;\
+        fi;\
+    }; f"
 
-	norm2bare = "!f() { mv .git .. && rm -rf * && mv ../.git . && mv .git/* . && rm -rf .git && git config --local --bool core.bare true; }; f"
+    np  = "!f() { git --no-pager $@; }; f"
+    npc = "!f() { git --no-pager $@ --color; }; f"
 
-;	Update just one file form specific remote
-	updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
+    norm2bare = "!f() { mv .git .. && rm -rf * && mv ../.git . && mv .git/* . && rm -rf .git && git config --local --bool core.bare true; }; f"
 
-;	Reset a staged file to its original state (index)
-	rf	= "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
+;   Update just one file form specific remote
+    updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
 
-;	Push the current branch to the master of a remote
-	psrhm = "!f() { git push $1 HEAD:master }; f"
+;   Reset a staged file to its original state (index)
+    rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
 
-;	Get the filenames of all changes a given commit and the HEAD
-	dn	= "!f() { git diff --name-status $1 HEAD; }; f"
+;   Push the current branch to the master of a remote
+    psrhm = "!f() { git push $1 HEAD:master }; f"
 
-;	Remove any given number of commits
-	rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
+;   Get the filenames of all changes a given commit and the HEAD
+    dn  = "!f() { git diff --name-status $1 HEAD; }; f"
 
-;	Undo any given number of commits
-	ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
+;   Remove any given number of commits
+    rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
 
-;	Apply, pop or drop a specific stash
-	sa = "!f(){ if [ -z $1 ]; then git --no-pager stash apply; else git --no-pager stash apply stash@{$1}; fi; }; f"
-	sp = "!f(){ if [ -z $1 ]; then git --no-pager stash pop;   else git --no-pager stash pop stash@{$1};   fi; }; f"
-	sw = "!f(){ if [ -z $1 ]; then git stash show -p;  else git stash show -p stash@{$1};  fi; }; f"
-	sd = "!f(){ if [ -z $1 ]; then git --no-pager stash drop;  else git --no-pager stash drop stash@{$1}; fi; }; f"
+;   Undo any given number of commits
+    ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
 
-;	--------- Below here credits to https://github.com/alrra/dotfiles ---------
+;   Apply, pop or drop a specific stash
+    sa = "!f(){ git --no-pager stash stash@{${1:-0}}; }; f"
+    sp = "!f(){ git --no-pager stash pop stash@{${1:-0}}; }; f"
+    sw = "!f(){ git stash show -p stash@{${1:-0}}; }; f"
+    sd = "!f(){ git --no-pager stash drop stash@{${1:-0}}; }; f"
+    ss = "!f(){ git --no-pager stash save $1; }; f"
 
-;	Remove the tag with the specified tag name if exists and tag the latest
-;	commit with that name.
-	retag = "!f() { \
-		git tag -d $1 &> /dev/null; \
-		git tag $1; \
-	}; f"
+;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 
-;	Find commits by commit message.
-	cm = "!f() { \
-		git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
-	}; f"
+;   Remove the tag with the specified tag name if exists and tag the latest
+;   commit with that name.
+    retag = "!f() { \
+        git tag -d $1 &> /dev/null; \
+        git tag $1; \
+    }; f"
+
+;   Find commits by commit message.
+    cm = "!f() { \
+        git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
+    }; f"
 
 [pretty]
-	custom = "%C(magenta bold)%h%C(red bold)%d %C(yellow bold)%ar %C(green bold)%s %C(yellow bold)(%an)"
-	;		   │			   │			│				   │				└─ author name
-	;		   │			   │			│				   └─ message
-	;		   │			   │			└─ date (relative)
-	;		   │			   └─ decorations (branch, heads or tags)
-	;		   └─ hash (abbreviated)
+    custom = "%C(magenta bold)%h%C(red bold)%d %C(yellow bold)%ar %C(green bold)%s %C(yellow bold)(%an)"
+    ;          │               │            │                  │                └─ author name
+    ;          │               │            │                  └─ message
+    ;          │               │            └─ date (relative)
+    ;          │               └─ decorations (branch, heads or tags)
+    ;          └─ hash (abbreviated)
