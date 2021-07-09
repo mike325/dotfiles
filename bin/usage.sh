@@ -32,6 +32,8 @@ _NAME="$0"
 _NAME="${_NAME##*/}"
 
 SORT=0
+FILES=0
+
 declare -a ARGS
 
 function help_user() {
@@ -62,6 +64,9 @@ for key in "$@"; do
             help_user
             exit 0
             ;;
+        -f|--files)
+            FILES=1
+            ;;
         -s|--sort)
             SORT=1
             ;;
@@ -72,10 +77,18 @@ for key in "$@"; do
     esac
 done
 
-if [[ $SORT -eq 1 ]]; then
-    du -h --max-depth=1 "${ARGS[@]}" | sort -h
+if [[ $FILES -eq 0 ]]; then
+    if [[ $SORT -eq 1 ]]; then
+        du -h --max-depth=1 "${ARGS[@]}" | sort -h
+    else
+        du -h --max-depth=1 "${ARGS[@]}"
+    fi
 else
-    du -h --max-depth=1 "${ARGS[@]}"
+    if [[ $SORT -eq 1 ]]; then
+        ls -lAh "${ARGS[@]}" | awk '{ printf("%s   %s\n", $5, $9) }' | sort -h
+    else
+        ls -lAh "${ARGS[@]}" | awk '{ printf("%s   %s\n", $5, $9) }'
+    fi
 fi
 
 exit 0
