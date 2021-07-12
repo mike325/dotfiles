@@ -372,11 +372,11 @@
     ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
 
 ;   Apply, pop or drop a specific stash
-    sa = "!f(){ git --no-pager stash stash@{${1:-0}}; }; f"
-    sp = "!f(){ git --no-pager stash pop stash@{${1:-0}}; }; f"
     sw = "!f(){ git stash show -p stash@{${1:-0}}; }; f"
-    sd = "!f(){ git --no-pager stash drop stash@{${1:-0}}; }; f"
-    ss = "!f(){ git --no-pager stash save $1; }; f"
+    sa = "!f(){ git --no-pager stash apply stash@{${1:-0}}; }; f"
+    sp = "!f(){ git --no-pager stash pop   stash@{${1:-0}}; }; f"
+    sd = "!f(){ git --no-pager stash drop  stash@{${1:-0}}; }; f"
+    ss = "!f(){ git --no-pager stash save  $1; }; f"
 
 ;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 
