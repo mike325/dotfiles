@@ -1926,7 +1926,7 @@ function setup_pkgs() {
             local filename
             filename=$(basename "$pkg")
             local cmdname="${filename%.pkg}"
-            if ! hash "${cmdname}"; then
+            if ! hash "${cmdname}" 2>/dev/null; then
                 warn_msg "Skipping pacakges from ${filename}, ${cmdname} is not install or missing in the PATH"
                 continue
             fi
