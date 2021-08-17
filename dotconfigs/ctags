@@ -30,4 +30,3 @@
 --exclude=tmp/*
 --exclude=*.xml
 --extras=+q
---tags-relative=yes

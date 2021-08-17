@@ -39,7 +39,7 @@ git ls-files --exclude-standard --cached | ctags \
     --exclude=tmp/* \
     --exclude=*.xml \
     --extras=+q \
-    --tags-relative=yes \
+    --tag-relative=yes \
     -L \
     - -f"$dir/tags.$$"
 

@@ -340,11 +340,11 @@ def convert_path(path: str, send: bool, hostname: str):
             tail = path.replace(loc, '')
             if remote.find('%PROJECT'):
                 remote = remote.replace('%PROJECT', project)
-            remote_path = remote + tail
+            remote_path = os.path.join(remote, tail)
             break
 
     if not send and remote_path == './':
-        remote_path = remote_path + os.path.basename(path)
+        remote_path = os.path.join(remote_path, os.path.basename(path))
 
     return remote_path
 
