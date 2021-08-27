@@ -9,16 +9,22 @@
 import atexit
 import os
 import sys
+
 # import rlcompleter
 
+readline = None
+
 try:
-    import pyreadline as readline
+    import pyreadline
+
+    readline = pyreadline
 except ImportError:
     try:
-        import readline
+        import readline as _readline
+
+        readline = _readline
     except ImportError:
         print("Error importing readline and pyreadline modules")
-        readline = None
 
 __header__ = """
                                -'
@@ -56,12 +62,12 @@ class Quit(object):
         exit()
 
     def __str__(self):
-        return 'Quit object to quick quit current prompt'
+        return "Quit object to quick quit current prompt"
 
 
 q = Quit()
-home = 'HOME' if os.name != 'nt' else 'USERPROFILE'
-history_file = os.path.join(os.environ[home], '.pyhistory')
+home = "HOME" if os.name != "nt" else "USERPROFILE"
+history_file = os.path.join(os.environ[home], ".pyhistory")
 
 if readline is not None:
 
@@ -78,7 +84,7 @@ if readline is not None:
 
         hist_len = readline.get_current_history_length()
         last_input = readline.get_history_item(hist_len)
-        indent = ''
+        indent = ""
 
         try:
             last_indent_index = last_input.rindex("    ")
@@ -88,21 +94,21 @@ if readline is not None:
 
         if len(last_input.strip()) > 1:
             if last_input.count("(") > last_input.count(")"):
-                indent = ''.join(["    " for _ in range(last_indent + 2)])
+                indent = "".join(["    " for _ in range(last_indent + 2)])
             elif last_input.count(")") > last_input.count("("):
-                indent = ''.join(["    " for _ in range(last_indent - 1)])
+                indent = "".join(["    " for _ in range(last_indent - 1)])
             elif last_input.count("[") > last_input.count("]"):
-                indent = ''.join(["    " for _ in range(last_indent + 2)])
+                indent = "".join(["    " for _ in range(last_indent + 2)])
             elif last_input.count("]") > last_input.count("["):
-                indent = ''.join(["    " for _ in range(last_indent - 1)])
+                indent = "".join(["    " for _ in range(last_indent - 1)])
             elif last_input.count("{") > last_input.count("}"):
-                indent = ''.join(["    " for _ in range(last_indent + 2)])
+                indent = "".join(["    " for _ in range(last_indent + 2)])
             elif last_input.count("}") > last_input.count("{"):
-                indent = ''.join(["    " for _ in range(last_indent - 1)])
+                indent = "".join(["    " for _ in range(last_indent - 1)])
             elif last_input[-1] == ":":
-                indent = ''.join(["    " for _ in range(last_indent + 1)])
+                indent = "".join(["    " for _ in range(last_indent + 1)])
             else:
-                indent = ''.join(["    " for _ in range(last_indent)])
+                indent = "".join(["    " for _ in range(last_indent)])
         readline.insert_text(indent)
 
     try:
@@ -112,7 +118,7 @@ if readline is not None:
         readline.set_history_length(1000)
         atexit.register(readline.write_history_file, history_file)
     except IOError:
-        print('Could not open {}'.format(history_file))
+        print("Could not open {}".format(history_file))
     except AttributeError:
         # Pyreadline is old and not longer mainteined so It doesn't have most
         # of the functions readline module does, sooo we just silently fail

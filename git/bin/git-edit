@@ -186,27 +186,27 @@ while [[ $# -gt 0 ]]; do
 done
 
 # _GITDIR="$(git rev-parse --git-dir)"
-worklist=($(git worktree list | awk '{print $1}'))
-for i in ${worklist[*]}; do
+IFS=$'\n' read -r -d '' -a worklist < <(git worktree list 2>/dev/null | awk '{print $1}')
+for i in "${worklist[@]}"; do
     [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && WORKTREE="$i"
 done
 
 if [[ -n "$CACHED" ]]; then
     if [[ -n "$WORKTREE" ]]; then
-        FILES=($(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}'))
+        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
     else
-        FILES=($(git --no-pager status --short | awk '{print $2}'))
+        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')
     fi
 else
     if [[ -n "$WORKTREE" ]]; then
-        FILES=($(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}'))
+        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
     else
-        FILES=($(git --no-pager status --short | awk '{print $2}'))
+        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')
     fi
 fi
 
-
-if [[ -n $FILES ]]; then
+# shellcheck disable=SC2009,SC2046
+if [[ -n ${FILES[0]} ]]; then
     "$EDITOR" "${FILES[@]}"
 else
     warn_msg "No files to edit"

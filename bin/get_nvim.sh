@@ -28,7 +28,7 @@ PYTHON_LIBS=0
 RUBY_LIBS=0
 BUILD_LIBS=0
 CLONE=0
-FORCE_INSTALL=0
+# FORCE_INSTALL=0
 PORTABLE=0
 VERBOSE=0
 DEV=0
@@ -422,9 +422,9 @@ while [[ $# -gt 0 ]]; do
                 shift
             fi
             ;;
-        -f|--force)
-            FORCE_INSTALL=1
-            ;;
+        # -f|--force)
+        #     FORCE_INSTALL=1
+        #     ;;
         --compiler=*)
             _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
             if [[ "$_result" == "$key" ]]; then

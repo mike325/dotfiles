@@ -55,9 +55,9 @@ function __parse_args() {
     local arg="$1"
     local _NAME="$2"
 
-    local pattern="^--$_NAME[=][a-zA-Z0-9./]+$"
-    if [[ ! -z "$3" ]]; then
-        local pattern="^--$_NAME[=]$3$"
+    local pattern="^--${_NAME}[=][a-zA-Z0-9./]+$"
+    if [[ -n "$3" ]]; then
+        local pattern="^--${_NAME}[=]$3$"
     fi
 
     if [[ $arg =~ $pattern ]]; then
@@ -87,12 +87,12 @@ function runGit() {
     local gitdir worktree
     gitdir="$(git rev-parse --git-dir)"
     if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
-        worklist=($(git worktree list 2>/dev/null | awk '{print $1}'))
-        for i in ${worklist[*]}; do
+        IFS=$'\n' read -r -d '' -a worklist < <(git worktree list 2>/dev/null | awk '{print $1}')
+        for i in "${worklist[@]}"; do
             [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && worktree="$i"
         done
     fi
-    if [[ ! -z "$worktree" ]]; then
+    if [[ -n "$worktree" ]]; then
         if [[ -z "$1" ]]; then
             if hash git-svn 2>/dev/null && git --git-dir="$gitdir" --work-tree="$worktree" svn fetch 2>/dev/null; then
                 git --git-dir="$gitdir" --work-tree="$worktree" svn rebase "$@"

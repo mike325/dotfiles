@@ -313,7 +313,7 @@ fi
 status_msg 'Starting python lint test'
 verbose_msg "Flake version: $(flake8 --version)"
 
-if ! flake8 --max-line-length=120 --max-complexity=18; then
+if ! flake8 --max-line-length=120 --max-complexity=18 .; then
     error_msg "Failed python lint test"
     exit 3
 fi

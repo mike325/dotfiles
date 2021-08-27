@@ -64,4 +64,3 @@ languages:
 
   lua:
     - <<: *lua-luacheck
-

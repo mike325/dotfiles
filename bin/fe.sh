@@ -11,6 +11,30 @@ NOCOLOR=0
 NOLOG=0
 EDITOR="${EDITOR:-vim}"
 
+# colors
+# shellcheck disable=SC2034
+black="\033[0;30m"
+# shellcheck disable=SC2034
+red="\033[0;31m"
+# shellcheck disable=SC2034
+green="\033[0;32m"
+# shellcheck disable=SC2034
+yellow="\033[0;33m"
+# shellcheck disable=SC2034
+blue="\033[0;34m"
+# shellcheck disable=SC2034
+purple="\033[0;35m"
+# shellcheck disable=SC2034
+cyan="\033[0;36m"
+# shellcheck disable=SC2034
+white="\033[0;37;1m"
+# shellcheck disable=SC2034
+orange="\033[0;91m"
+# shellcheck disable=SC2034
+normal="\033[0m"
+# shellcheck disable=SC2034
+reset_color="\033[39m"
+
 function help_user() {
     cat<<EOF
 

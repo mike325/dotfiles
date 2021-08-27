@@ -85,8 +85,10 @@ if [[ $FILES -eq 0 ]]; then
     fi
 else
     if [[ $SORT -eq 1 ]]; then
+        # shellcheck disable=SC2012
         ls -lAh "${ARGS[@]}" | awk '{ printf("%s   %s\n", $5, $9) }' | sort -h
     else
+        # shellcheck disable=SC2012
         ls -lAh "${ARGS[@]}" | awk '{ printf("%s   %s\n", $5, $9) }'
     fi
 fi

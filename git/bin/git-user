@@ -26,7 +26,7 @@ NOCOLOR=0
 NOLOG=1
 WARN_COUNT=0
 ERR_COUNT=0
-FROM_STDIN=()
+# FROM_STDIN=()
 GLOBAL=0
 
 NAME="$0"
@@ -331,12 +331,12 @@ while [[ $# -gt 0 ]]; do
             USER="${WORK_USER:-Miguel Ochoa}"
             EMAIL="${WORK_MAIL:-[ omitted ]}"
             ;;
-        -)
-            while read -r from_stdin; do
-                FROM_STDIN=("$from_stdin")
-            done
-            break
-            ;;
+        # -)
+        #     while read -r from_stdin; do
+        #         FROM_STDIN=("$from_stdin")
+        #     done
+        #     break
+        #     ;;
         *)
             initlog
             error_msg "Unknown argument $key"
