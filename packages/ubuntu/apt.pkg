@@ -43,10 +43,9 @@ network-manager
 avahi-daemon
 samba
 pv
-zram-tools
-# fd-find  # available on ubuntu 20.04 onwards
-# ripgrep  # available on ubuntu 20.04 onwards
-# emacs
-# python-pip
-# davfs2
+# zram-tools # available on ubuntu 20.04 onwards
+# fd-find    # available on ubuntu 20.04 onwards
+# ripgrep    # available on ubuntu 20.04 onwards
+# python-pip # Deprecated
 # clangd # pkg seems broken in ubuntu, as it may need to be install without snapd
+# davfs2
