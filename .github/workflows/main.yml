@@ -82,7 +82,7 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: OS Info
         run: |
           sudo apt install -y wget
@@ -121,7 +121,7 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
           brew install git curl shellcheck python
@@ -148,11 +148,12 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Enable Chocolatey and Scoop
         shell: powershell
         run: |
-          ./init.ps1
+          # ./init.ps1
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
           $env:PATH = "$env:APPDATA\Neovim\bin;$env:PATH"
       - name: Install dependencies
