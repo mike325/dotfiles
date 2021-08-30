@@ -11,21 +11,21 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: OS update
         run: |
-          sudo apt update --fix-missing
-          sudo apt upgrade -y
+          sudo apt-get update --fix-missing
+          sudo apt-get upgrade -y
       - name: OS Info
         run: |
-          sudo apt install -y wget
+          sudo apt-get install -y wget
           wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
       - name: Install dependencies
         run: |
-          sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
-          sudo apt install -y python3-pip
-          sudo pip3 install --upgrade pip
-          pip3 --version
+          sudo apt-get install -y curl git shellcheck python3-setuptools python-setuptools
+          sudo apt-get install -y python3-pip
+          # sudo pip3 install --upgrade pip
+          # pip3 --version
       - name: Full install
         run: |
           ./install.sh --verbose --portables
