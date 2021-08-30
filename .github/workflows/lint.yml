@@ -20,7 +20,7 @@ jobs:
           sudo apt install -y curl git python3-setuptools python-setuptools
           # Setting up pip
           sudo apt install -y python3-pip
-          sudo pip3 install --upgrade pip
+          # sudo pip3 install --upgrade pip
           # sudo pip3 install -r ./test/requirements.txt
           # Getting latest shellcheck
 

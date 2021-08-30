@@ -28,7 +28,7 @@ PYTHON_LIBS=0
 RUBY_LIBS=0
 BUILD_LIBS=0
 CLONE=0
-# FORCE_INSTALL=0
+FORCE_INSTALL=0
 PORTABLE=0
 VERBOSE=0
 DEV=0
@@ -289,6 +289,11 @@ function get_portable() {
         return 1
     fi
 
+    if hash nvim 2>/dev/null && [[ $FORCE_INSTALL -ne 1 ]]; then
+        warn_msg "Neovim is already install, use --force to bypass this check"
+        return 1
+    fi
+
     # wget -qO- $URL
     # wget $URL -O out
 
@@ -422,9 +427,9 @@ while [[ $# -gt 0 ]]; do
                 shift
             fi
             ;;
-        # -f|--force)
-        #     FORCE_INSTALL=1
-        #     ;;
+        -f|--force)
+            FORCE_INSTALL=1
+            ;;
         --compiler=*)
             _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
             if [[ "$_result" == "$key" ]]; then
@@ -531,6 +536,11 @@ if is_windows; then
     warn_msg "Mingw platform is currently unsupported"
     error_msg "Please follow the official instructions to get Neovim in windows https://github.com/neovim/neovim/wiki/Installing-Neovim#windows"
     exit 1
+fi
+
+if hash nvim 2>/dev/null && [[ $FORCE_INSTALL -ne 1 ]]; then
+    warn_msg "Neovim is already install, use --force to bypass this check"
+    return 1
 fi
 
 if [[ $CLONE -eq 1 ]]; then
