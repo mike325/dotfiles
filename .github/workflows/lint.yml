@@ -17,20 +17,5 @@ jobs:
       - name: Install dependencies
         run: |
           # Install basic packages
-          sudo apt-get install -y curl git python3-setuptools python-setuptools
-          # Setting up pip
-          sudo apt-get install -y python3-pip
-          # sudo pip3 install --upgrade pip
-          # sudo pip3 install -r ./test/requirements.txt
-          # Getting latest shellcheck
-
-          GITHUB='https://github.com'
-          PKG="shellcheck-latest.linux.x86_64.tar.xz"
-          URL="${GITHUB}/koalaman/shellcheck"
-
-          wget "${url}/releases/download/latest/${pkg}"
-          tar xf "${pkg}"
-          chmod u+x "shellcheck-latest/shellcheck"
-          mkdir -p "$HOME/.local/bin/" && mv "shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-          rm -rf shellcheck*
+          sudo apt-get install -y curl git shellcheck python3-setuptools python-setuptools python3-pip
       - uses: pre-commit/action@v2.0.3

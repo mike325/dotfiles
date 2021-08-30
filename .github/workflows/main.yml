@@ -22,10 +22,7 @@ jobs:
           wget -O screenfetch-dev https://git.io/vaHfR && chmod +x screenfetch-dev && ./screenfetch-dev
       - name: Install dependencies
         run: |
-          sudo apt-get install -y curl git shellcheck python3-setuptools python-setuptools
-          sudo apt-get install -y python3-pip
-          # sudo pip3 install --upgrade pip
-          # pip3 --version
+          sudo apt-get install -y curl git shellcheck python3-setuptools python-setuptools python3-pip
       - name: Full install
         run: |
           ./install.sh --verbose --portables
