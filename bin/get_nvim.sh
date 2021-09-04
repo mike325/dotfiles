@@ -77,17 +77,16 @@ if [ -z "$SHELL_PLATFORM" ]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
         case "$OSTYPE" in
-            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
-            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
-            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
-            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
-            *'windows'* ) export SHELL_PLATFORM='windows' ;;
-            *           ) export SHELL_PLATFORM='unknown' ;;
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
         esac
     fi
 fi
-
 
 case "$SHELL_PLATFORM" in
     # TODO: support more linux distros
@@ -104,7 +103,7 @@ case "$SHELL_PLATFORM" in
             fi
         fi
         ;;
-    cygwin|msys|windows)
+    cygwin | msys | windows)
         OS='windows'
         ;;
     osx)
@@ -128,7 +127,7 @@ fi
 
 if ! hash is_wsl 2>/dev/null; then
     function is_wsl() {
-        if [[ "$(uname -r)" =~ Microsoft ]] ; then
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
             return 0
         fi
         return 1
@@ -146,7 +145,7 @@ fi
 
 # Warning ! This script delete everything in the work directory before install
 function _show_nvim_libs() {
-    cat << EOF
+    cat <<EOF
 Please also consider to install the python libs
     $ pip3 install --upgrade --user pynvim && pip2 install --upgrade --user pynvim
 and Ruby libs
@@ -155,7 +154,7 @@ EOF
 }
 
 function _show_nvim_help() {
-    cat << EOF
+    cat <<EOF
 Ubuntu/Debian/Linux mint
     # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip
 
@@ -168,14 +167,14 @@ EOF
 
     _show_nvim_libs
 
-    cat << EOF
+    cat <<EOF
 For other Unix systems (BSD, Linux and MacOS) and Windows please check
     https://github.com/neovim/neovim/wiki/Building-Neovim
 EOF
 }
 
 function show_help() {
-    cat << EOF
+    cat <<EOF
 Simple script to build and install Neovim directly from the source
 with some pretty basic options.
 
@@ -229,9 +228,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -243,9 +242,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -258,7 +257,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -273,7 +272,7 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -311,7 +310,7 @@ function get_portable() {
 
     verbose_msg "Using ${cmd} as command"
 
-    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+    [[ ! -d $dir ]] && mkdir -p "$dir"
 
     if [[ $DEV -eq 0 ]] && [[ $NVIM_VERSION == 'latest' ]]; then
         version=$( eval "${cmd} ${URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
@@ -355,12 +354,12 @@ function get_portable() {
         fi
         rm -rf "${TMP:?}/${name}"
     elif is_osx; then
-        pushd "$TMP" > /dev/null || { error_msg "Could not get to $TMP" && exit 1; }
+        pushd "$TMP" >/dev/null  || { error_msg "Could not get to $TMP" && exit 1; }
         verbose_msg "Unpacking ${name}"
         if ! tar xzvf "$TMP/$name" && mv "${TMP}/nvim-osx64/*" "$HOME/.local/"; then
             return 1
         fi
-        popd > /dev/null || { error_msg "Could not get out of $TMP" && exit 1; }
+        popd >/dev/null  || { error_msg "Could not get out of $TMP" && exit 1; }
         rm -rf "${TMP:?}/${name}"
         rm -rf "${TMP:?}/nvim-osx64"
     else
@@ -374,11 +373,11 @@ function get_portable() {
 function get_libs() {
     if [[ $PYTHON_LIBS -eq 1 ]]; then
         # hash pip2 2> /dev/null && { status_msg "Installing python2 libs" && pip2 install --upgrade --user pynvim; }
-        hash pip3 2> /dev/null && { status_msg "Installing python3 libs" && pip3 install --upgrade --user pynvim; }
+        hash pip3 2>/dev/null  && { status_msg "Installing python3 libs" && pip3 install --upgrade --user pynvim; }
     fi
 
     if [[ $RUBY_LIBS -eq 1 ]]; then
-        hash gem 2> /dev/null && { status_msg "Installing ruby libs" && gem install --user-install neovim; }
+        hash gem 2>/dev/null  && { status_msg "Installing ruby libs" && gem install --user-install neovim; }
     fi
 }
 
@@ -393,7 +392,7 @@ function __parse_args() {
 
     local pattern="^--${name}=[a-zA-Z0-9.:@_/~-]+$"
 
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local pattern="^--${name}=$3$"
     fi
 
@@ -414,7 +413,7 @@ while [[ $# -gt 0 ]]; do
         --portable=*)
             PORTABLE=1
             _result=$(__parse_args "$key" "portable" '[0-9]\.[0-9](\.[0-9])?')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid version ${_result##*=}"
                 exit 1
             fi
@@ -422,24 +421,24 @@ while [[ $# -gt 0 ]]; do
             ;;
         --portable)
             PORTABLE=1
-            if [[ "$2" =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
+            if [[ $2 =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
                 NVIM_VERSION="v$2"
                 shift
             fi
             ;;
-        -f|--force)
+        -f | --force)
             FORCE_INSTALL=1
             ;;
         --compiler=*)
             _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid version ${_result##*=}"
                 exit 1
             fi
             export CC="$_result"
-            if [[ "$CC" == gcc ]]; then
+            if [[ $CC == gcc ]]; then
                 export CXX=g++
-            elif [[ "$CC" == clang ]]; then
+            elif [[ $CC == clang ]]; then
                 export CXX=clang++
             fi
             if ! hash "$CC" 2>/dev/null; then
@@ -450,19 +449,19 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
-        -C|--compiler)
-            if [[ -z "$2" ]]; then
+        -C | --compiler)
+            if [[ -z $2 ]]; then
                 error_msg "Missing compiler"
                 exit 1
-            elif [[ ! "$2" =~ ^(gcc|clang)$ ]]; then
+            elif [[ ! $2 =~ ^(gcc|clang)$ ]]; then
                 error_msg "Invalid compiler $2, please select gcc or clang "
                 exit 1
             fi
             export CC="$2"
             shift
-            if [[ "$CC" == gcc ]]; then
+            if [[ $CC == gcc ]]; then
                 export CXX=g++
-            elif [[ "$CC" == clang ]]; then
+            elif [[ $CC == clang ]]; then
                 export CXX=clang++
             fi
             if ! hash "$CC" 2>/dev/null; then
@@ -476,40 +475,40 @@ while [[ $# -gt 0 ]]; do
         --clone=*)
             CLONE=1
             _result=$(__parse_args "$key" "clone" '.+')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid version ${_result##*=}"
                 exit 1
             fi
             CLONE_LOC="$_result"
             ;;
-        -c|--clone)
+        -c | --clone)
             CLONE=1
             ;;
-        -i|--install)
-            if [[ -z "$2" ]]; then
+        -i | --install)
+            if [[ -z $2 ]]; then
                 error_msg "Missing install path"
                 exit 1
             fi
             INSTALL_DIR="$2"
             shift
             ;;
-        -p|--python)
+        -p | --python)
             PYTHON_LIBS=1
             ;;
-        -r|--ruby)
+        -r | --ruby)
             RUBY_LIBS=1
             ;;
-        -b|--build)
+        -b | --build)
             BUILD_LIBS=1
             ;;
-        -v|--verbose)
+        -v | --verbose)
             VERBOSE=1
             ;;
         --dev)
             DEV=1
             BRANCH="master"
             ;;
-        -h|--help)
+        -h | --help)
             show_help
             exit 0
             ;;
@@ -552,58 +551,58 @@ if [[ $CLONE -eq 1 ]]; then
     pushd "${CLONE_LOC:-neovim}" &>/dev/null || { error_msg "Failed to cd into ${CLONE_LOC:-neovim}" && exit 1; }
 fi
 
-if [[ "$BUILD_LIBS" -eq 1 ]]; then
+if [[ $BUILD_LIBS -eq 1   ]]; then
     status_msg "Looking for system dependencies"
-    if hash apt-get 2> /dev/null; then
+    if hash apt-get 2>/dev/null; then
         sudo apt-get install -y \
-            libtool             \
-            libtool-bin         \
-            autoconf            \
-            automake            \
-            pkg-config          \
-            gcc                 \
-            g++                 \
-            lldb-11             \
-            clang-11            \
-            clang-tools-11      \
-            clangd-11           \
-            clang-tidy-11       \
-            make                \
-            cmake               \
+            libtool \
+            libtool-bin \
+            autoconf \
+            automake \
+            pkg-config \
+            gcc \
+            g++ \
+            lldb-11 \
+            clang-11 \
+            clang-tools-11 \
+            clangd-11 \
+            clang-tidy-11 \
+            make \
+            cmake \
             unzip
             # build-essential
             # python-dev
             # python3-dev
             # ruby-dev
-    elif hash dnf 2> /dev/null; then
+    elif hash dnf 2>/dev/null; then
         sudo dnf -y install \
-            libtool         \
-            autoconf        \
-            automake        \
-            cmake           \
-            gcc             \
-            gcc-c++         \
-            make            \
-            pkgconfig       \
+            libtool \
+            autoconf \
+            automake \
+            cmake \
+            gcc \
+            gcc-c++ \
+            make \
+            pkgconfig \
             unzip
             # python-dev
             # python2-dev
             # ruby-dev
-    elif hash pacman 2> /dev/null; then
+    elif hash pacman 2>/dev/null; then
         sudo pacman -S --noconfirm \
-            base-devel        \
-            clang             \
-            clangd            \
-            lldb              \
-            llvm              \
-            make              \
-            cmake             \
+            base-devel \
+            clang \
+            clangd \
+            lldb \
+            llvm \
+            make \
+            cmake \
             unzip
             # python-dev
             # python2-dev
             # ruby-dev
     else
-        cat << EOF
+        cat <<EOF
     ---- [X] Error your system is not supported to preinstall deps
              Supported systems are:
                   - Debian family
@@ -644,7 +643,7 @@ else
 fi
 
 if [[ $CLONE -eq 1 ]]; then
-    popd > /dev/null || exit 1
+    popd >/dev/null  || exit 1
 fi
 
 if [[ $ERR_COUNT -gt 0 ]]; then

@@ -6,19 +6,19 @@
 ################################################################################
 #                         Make some dir that I normally use                    #
 ################################################################################
-if [[ -z "$XDG_DATA_HOME" ]]; then
+if [[ -z $XDG_DATA_HOME ]]; then
     export XDG_DATA_HOME="$HOME/.local/share"
-    [[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
+    [[ ! -d $XDG_DATA_HOME ]] && mkdir -p "$XDG_DATA_HOME"
 fi
 
-if [[ -z "$XDG_CONFIG_HOME" ]]; then
+if [[ -z $XDG_CONFIG_HOME ]]; then
     export XDG_CONFIG_HOME="$HOME/.config"
-    [[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
+    [[ ! -d $XDG_CONFIG_HOME ]] && mkdir -p "$XDG_CONFIG_HOME"
 fi
 
-if [[ -z "$XDG_CACHE_HOME" ]]; then
+if [[ -z $XDG_CACHE_HOME ]]; then
     export XDG_CACHE_HOME="$HOME/.cache"
-    [[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
+    [[ ! -d $XDG_CACHE_HOME ]] && mkdir -p "$XDG_CACHE_HOME"
 fi
 
 [[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
@@ -36,7 +36,7 @@ fi
 # fi
 
 # Load all proxy settings
-if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
+if [[ -f "$HOME/.config/shell/host/proxy.sh" ]]; then
     # We already checked the file exists so its "safe"
     # shellcheck disable=SC1090,SC1091
     if [[ -z $PROXY_DISABLE ]]; then
@@ -44,7 +44,7 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh"  ]]; then
     fi
     function toggleProxy() {
         # shellcheck disable=SC2154
-        if [[ -n "$http_proxy" ]]; then
+        if [[ -n $http_proxy ]]; then
             unset "http_proxy"
             unset "https_proxy"
             unset "ftp_proxy"
@@ -64,7 +64,7 @@ fi
 # Load all ENV variables
 # We already checked the file exists so its "safe"
 # shellcheck disable=SC1090,SC1091
-[[ -f "$HOME/.config/shell/host/env.sh"  ]] && source "$HOME/.config/shell/host/env.sh"
+[[ -f "$HOME/.config/shell/host/env.sh" ]] && source "$HOME/.config/shell/host/env.sh"
 [[ -d "/usr/sbin/" ]] && export PATH="/usr/sbin/:$PATH"
 [[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
 [[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
@@ -75,7 +75,7 @@ fi
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
     export PYTHONSTARTUP="$HOME/.local/lib/pythonstartup.py"
-elif [[ -f "$PYTHONSTARTUP_SCRIPT" ]]; then
+elif [[ -f $PYTHONSTARTUP_SCRIPT ]]; then
     export PYTHONSTARTUP="$PYTHONSTARTUP_SCRIPT"
 fi
 
@@ -83,7 +83,7 @@ fi
 # If Neovim is installed in a different path, you could set it in "env" file
 if [[ -d "$HOME/.local/neovim/bin" ]]; then
     export PATH="$HOME/.local/neovim/bin:$PATH"
-elif [[ -n $NEOVIM_PATH ]] && [[ -d "$NEOVIM_PATH" ]]; then
+elif [[ -n $NEOVIM_PATH ]] && [[ -d $NEOVIM_PATH ]]; then
     export PATH="$NEOVIM_PATH:$PATH"
 fi
 
@@ -113,13 +113,13 @@ if [ -z "$SHELL_PLATFORM" ]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
         case "$OSTYPE" in
-            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
-            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
-            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
-            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
-            *'windows'* ) export SHELL_PLATFORM='windows' ;;
-            *           ) export SHELL_PLATFORM='unknown' ;;
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
         esac
     fi
 fi
@@ -132,7 +132,7 @@ function is_windows() {
 }
 
 function is_wsl() {
-    if [[ "$(uname -r)" =~ Microsoft ]] ; then
+    if [[ "$(uname -r)" =~ Microsoft ]]; then
         return 0
     fi
     return 1
@@ -174,13 +174,13 @@ function is_64bits() {
     return 1
 }
 
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
@@ -247,7 +247,7 @@ fi
 if [[ $- == *i* ]]; then
 
     # Set terminal colors
-    if [[ -z "$TMUX" ]] && { [[ -z "$TERM" ]] || [[ $TERM =~ ^xterm-.* ]];}; then
+    if [[ -z $TMUX ]] && { [[ -z $TERM ]] || [[ $TERM =~ ^xterm-.* ]]; }; then
         export TERM=xterm-256color
     fi
 
@@ -255,14 +255,14 @@ if [[ $- == *i* ]]; then
     export LESS=' -R '
 
     # Load custom shell framework settings (override default shell framework settings)
-    if [[ -f  "$HOME/.config/shell/host/framework.sh" ]]; then
+    if [[ -f "$HOME/.config/shell/host/framework.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/host/framework.sh"
     fi
 
     # Configure shell framework and specific shell settings
-    if [[ -f  "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh" ]]; then
+    if [[ -f "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh"
@@ -281,14 +281,14 @@ if [[ $- == *i* ]]; then
     fi
 
     # Load alias after bash-it to give them higher priority
-    if [[ -f "$HOME/.config/shell/alias/alias.sh"  ]]; then
+    if [[ -f "$HOME/.config/shell/alias/alias.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/alias/alias.sh"
     fi
 
     # Load host settings (override general alias and funtions)
-    if [[ -f  "$HOME/.config/shell/host/settings.sh" ]]; then
+    if [[ -f "$HOME/.config/shell/host/settings.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091
         source "$HOME/.config/shell/host/settings.sh"
@@ -300,7 +300,7 @@ if [[ $- == *i* ]]; then
     fi
 
     # shellcheck disable=SC1090,SC1091
-    [[ -n "$VIRTUAL_ENV" ]] && source "$VIRTUAL_ENV/bin/activate"
+    [[ -n $VIRTUAL_ENV ]] && source "$VIRTUAL_ENV/bin/activate"
 
     if hash nodejs 2>/dev/null; then
         [[ "$(nodejs --version)" =~ ^v10\..* ]] && export NODE_OPTIONS=--experimental-worker

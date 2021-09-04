@@ -74,9 +74,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$warn_message"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$warn_message" >>"${LOG}"
     fi
     return 0
 }
@@ -88,9 +88,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$error_message" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${LOG}"
+        printf "[X] Error:\t\t %s\n" "$error_message" >>"${LOG}"
     fi
     return 0
 }
@@ -103,7 +103,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$status_message"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$status_message" >>"${LOG}"
     fi
     return 0
 }
@@ -118,7 +118,7 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >>"${LOG}"
     fi
     return 0
 }
@@ -132,7 +132,7 @@ function initlog() {
             return 1
         fi
         if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
+            cat "${SCRIPT_PATH}/shell/banner" >"${LOG}"
         fi
         if ! is_osx; then
             LOG=$(readlink -e "${LOG}")
@@ -142,18 +142,17 @@ function initlog() {
     return 0
 }
 
-
 function exit_append() {
     if [[ $NOLOG -eq 0 ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${LOG}"
+            printf "\n\n" >>"${LOG}"
         fi
 
         if [[ $WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
         fi
         if [[ $ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >> "${LOG}"
+            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >>"${LOG}"
         fi
     fi
     return 0
@@ -166,29 +165,29 @@ shrink() {
 
     status_msg "Shrinking PDF size"
 
-    gs                                       \
-        -q -dNOPAUSE -dBATCH -dSAFER         \
-        -sDEVICE=pdfwrite                    \
-        -dCompatibilityLevel=1.3             \
-        -dPDFSETTINGS=/screen                \
-        -dEmbedAllFonts=true                 \
-        -dSubsetFonts=true                   \
-        -dAutoRotatePages=/None              \
-        -dColorImageDownsampleType=/Bicubic  \
-        -dColorImageResolution="$3"          \
-        -dGrayImageDownsampleType=/Bicubic   \
-        -dGrayImageResolution= "$3"          \
+    gs \
+        -q -dNOPAUSE -dBATCH -dSAFER \
+        -sDEVICE=pdfwrite \
+        -dCompatibilityLevel=1.3 \
+        -dPDFSETTINGS=/screen \
+        -dEmbedAllFonts=true \
+        -dSubsetFonts=true \
+        -dAutoRotatePages=/None \
+        -dColorImageDownsampleType=/Bicubic \
+        -dColorImageResolution="$3" \
+        -dGrayImageDownsampleType=/Bicubic \
+        -dGrayImageResolution= "$3" \
         -dMonoImageDownsampleType=/Subsample \
-        -dMonoImageResolution= "$3"          \
-        -sOutputFile= "$2"                   \
+        -dMonoImageResolution= "$3" \
+        -sOutputFile= "$2" \
         "$1"
 }
 
-check_smaller () {
+check_smaller()  {
     # If $1 and $2 are regular files, we can compare file sizes to
     # see if we succeeded in shrinking. If not, we copy $1 over $2:
-    if [[ ! -f "$1" ]] || [[ ! -f "$2" ]]; then
-        return 0;
+    if [[ ! -f $1 ]] || [[ ! -f $2 ]]; then
+        return 0
     fi
     ISIZE=$(wc -c "$1" | cut -f1 -d\ )
     OSIZE=$(wc -c "$2" | cut -f1 -d\ )
@@ -198,8 +197,8 @@ check_smaller () {
     fi
 }
 
-usage () {
-    cat<<EOF
+usage()  {
+    cat <<EOF
     Reduces PDF filesize by lossy recompressing with Ghostscript.
     Not guaranteed to succeed, but usually works.
       Usage: $NAME infile [outfile] [resolution_in_dpi]

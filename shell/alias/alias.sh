@@ -12,10 +12,10 @@
 ! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
 ! hash is_windows 2>/dev/null && is_windows() { return 0; }
 
-if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
+if hash vim 2>/dev/null  || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
 
-        if [[ -n "$TMUX_PANE" ]]; then
+        if [[ -n $TMUX_PANE ]]; then
             TMUX_WINDOW="$(tmux display-message -p '#I')"
             export TMUX_WINDOW
         else
@@ -29,7 +29,7 @@ if hash vim 2> /dev/null || hash nvim 2>/dev/null; then
         if is_windows && ! is_wsl; then
             alias cdvi="cd ~/.vim"
             alias cdvim="cd ~/AppData/Local/nvim/"
-            if [[ -z "$NVIM_LISTEN_ADDRESS" ]] || ! hash nvr 2>/dev/null; then
+            if [[ -z $NVIM_LISTEN_ADDRESS ]] || ! hash nvr 2>/dev/null; then
                 export EDITOR="vim"
                 alias vi="vim --cmd 'let g:minimal=1'"
                 alias viu="vim -u NONE"
@@ -168,7 +168,7 @@ fi
 
 # Termux's grep doesn't have color support
 if [[ $(uname --all) =~ Android ]]; then
-    unalias grep > /dev/null
+    unalias grep >/dev/null
     alias grep="grep -n"
 else
     alias grep="grep --color=auto -n"
@@ -287,7 +287,7 @@ if hash fzf 2>/dev/null; then
         fi
     fi
 
-    if [[ -n "$FZF_DEFAULT_COMMAND" ]]; then
+    if [[ -n $FZF_DEFAULT_COMMAND ]]; then
         export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     fi
 
@@ -322,7 +322,7 @@ if hash fzf 2>/dev/null; then
         fssh() {
             # shellcheck disable=SC2155
             local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
-            if [[ -n "$host" ]]; then
+            if [[ -n $host ]]; then
                 ssh "$host"
             fi
         }
@@ -368,7 +368,7 @@ fi
 # I added this alias
 # TODO add other distros commands I've used, like Solus
 pkg=""
-if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; then
+if hash yaourt 2>/dev/null || hash yay 2>/dev/null || hash pacman 2>/dev/null; then
     # 'Install' package maybe in the PATH
 
     if hash yay 2>/dev/null; then
@@ -392,7 +392,7 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
             fi
             # shellcheck disable=SC2155
             local name=$( ${pkg} -Ss "$@" | fzf)
-            if [[ -n "$name" ]]; then
+            if [[ -n $name ]]; then
                 echo "$name"
             fi
         }
@@ -422,9 +422,9 @@ if hash yaourt 2>/dev/null|| hash yay 2>/dev/null || hash pacman 2>/dev/null; th
                 local pkg="yaourt"
             fi
 
-            if [[ -z "$1" ]]; then
+            if [[ -z $1 ]]; then
                  sh -c "${pkg} -Syu --repo --noconfirm"
-             else
+            else
                  sh -c "${pkg} -Syu $*"
             fi
         }
@@ -467,7 +467,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
             fi
             # shellcheck disable=SC2155
             local name=$(apt-cache search "$@" | fzf)
-            if [[ -n "$name" ]]; then
+            if [[ -n $name ]]; then
                 echo "$name"
             fi
         }
@@ -495,7 +495,7 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
         alias rmpkg="${pkg} remove"
     fi
 
-elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
+elif hash dnf 2>/dev/null || hash yum 2>/dev/null; then
 
     if hash dnf 2>/dev/null; then
         pkg="dnf"
@@ -514,7 +514,7 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null ; then
             fi
             # shellcheck disable=SC2155
             local name=$( ${pkg} search "$@" | fzf)
-            if [[ -n "$name" ]]; then
+            if [[ -n $name ]]; then
                 echo "$name"
             fi
         }
@@ -568,7 +568,7 @@ function ssha() {
 
 # Simple map of "q" to deactivate virtualenv or exit terminal session
 function q() {
-    if hash deactivate 2> /dev/null || [[ -n $VIRTUAL_ENV ]]; then
+    if hash deactivate 2>/dev/null  || [[ -n $VIRTUAL_ENV ]]; then
         deactivate
     else
         exit 0
@@ -584,7 +584,7 @@ function venv() {
     while [[ $# -gt 0 ]]; do
         local key="$1"
         case "$key" in
-            -h|--help)
+            -h | --help)
                 echo ""
                 echo "  Source given virtualevn"
                 echo ""
@@ -601,13 +601,13 @@ function venv() {
                 echo ""
                 return 0
                 ;;
-            -n|--name)
+            -n | --name)
                 _name=("$2")
                 _nogit=1
                 shift
                 ;;
-            *)
-                ;;
+            *)  ;;
+
         esac
         shift
     done
@@ -647,7 +647,7 @@ alias vevn="venv"
 function bk() {
     for key in "$@"; do
         case "$key" in
-            -h|--help)
+            -h | --help)
 
                 echo ""
                 echo "  Function to go back any number of dirs"
@@ -668,13 +668,13 @@ function bk() {
         esac
     done
 
-    if [[ -n "$1" ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
+    if [[ -n $1 ]] && [[ $1 =~ ^[0-9]+$ ]]; then
         local parent="./"
-        for (( i = 0; i < $1; i++ )); do
+        for ((i = 0; i < $1; i++)); do
             local parent="${parent}../"
         done
         cd "$parent" || return 1
-    elif [[ -z "$1" ]]; then
+    elif [[ -z $1 ]]; then
         cd ..
     else
         echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
@@ -687,7 +687,7 @@ function bk() {
 function mkcd() {
     for key in "$@"; do
         case "$key" in
-            -h|--help)
+            -h | --help)
 
                 echo ""
                 echo "  Create a dir an move to it"
@@ -707,7 +707,7 @@ function mkcd() {
         esac
     done
 
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         mkdir -p "$1"
         cd "$1" || return 1
         return 0
@@ -716,7 +716,7 @@ function mkcd() {
 }
 
 function llg() {
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         # shellcheck disable=SC2010
         ls -lhA | grep "$@"
     fi
@@ -748,7 +748,7 @@ function gobk() {
 # Check what's in the trash can
 function cdt() {
     if [[ -d /tmp/.trash ]]; then
-        pushd /tmp/.trash 1> /dev/null || exit 1
+        pushd /tmp/.trash 1>/dev/null  || exit 1
     fi
     return 0
 }
@@ -759,7 +759,7 @@ function replace_base() {
     local new_cwd
     for key in "$@"; do
         case "$key" in
-            -h|--help)
+            -h | --help)
 
                 echo ""
                 echo "  Function to look for the nearest ancestor with the full given path"
@@ -781,7 +781,7 @@ function replace_base() {
         esac
     done
 
-    if [[ -z "$1" ]]; then
+    if [[ -z $1 ]]; then
         echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
         return 1
     fi
@@ -797,8 +797,8 @@ function replace_base() {
 
     for i in "${array_list[@]}"; do
         new_path="${cwd/$i/$new_cwd}"
-        if [[ -d "$new_path" ]] && [[ "$new_path" != "$(pwd)" ]]; then
-            if ! pushd "$new_path" 1> /dev/null; then
+        if [[ -d $new_path ]] && [[ $new_path != "$(  pwd)" ]]; then
+            if ! pushd "$new_path" 1>/dev/null; then
                 return 1
             fi
             return 0
@@ -817,7 +817,7 @@ function change_base() {
     local new_cwd
     for key in "$@"; do
         case "$key" in
-            -h|--help)
+            -h | --help)
 
                 echo ""
                 echo "  Function to look for the nearest ancestor of given dir"
@@ -839,7 +839,7 @@ function change_base() {
         esac
     done
 
-    if [[ -z "$1" ]]; then
+    if [[ -z $1 ]]; then
         echo "  ---- [X] Error Unexpected arg $1, please provide a number" 1>&2
         return 1
     fi
@@ -853,8 +853,8 @@ function change_base() {
         local cwd="${cwd%/*}"
         local new_path="$cwd/$new_cwd"
 
-        if [[ -d  "$new_path" ]] && [[ "$new_path" != "$(pwd)" ]]; then
-            if ! pushd "$new_path" 1> /dev/null; then
+        if [[ -d $new_path  ]] && [[ $new_path != "$(  pwd)" ]]; then
+            if ! pushd "$new_path" 1>/dev/null; then
                 return 1
             fi
             return 0
@@ -866,7 +866,6 @@ function change_base() {
 }
 
 alias cb="change_base"
-
 
 if hash emacs 2>/dev/null; then
     function cmacs() {
@@ -896,7 +895,7 @@ if hash ffprobe 2>/dev/null; then
     function media_info() {
         local filename="$1"
 
-        if [[ -n "$2" ]]; then
+        if [[ -n $2 ]]; then
             ffprobe -v quiet -show_format -show_streams -hide_banner -print_format "$2" -i "$filename"
         else
             ffprobe -v quiet -show_format -show_streams -hide_banner -i "$filename"
@@ -914,7 +913,7 @@ export EMAIL='mickiller.25@gmail.com'
 [[ -z $GIT_USER ]] && export GIT_USER='Mike'
 [[ -z $GIT_MAIL ]] && export GIT_MAIL='mickiller.25@gmail.com'
 
-if hash mqttwarn 2>/dev/null && [[ -f  "$HOME/.config/mqttwarn/mqttwarn.ini" ]] && [[ -z $MQTTWARNINI ]] ; then
+if hash mqttwarn 2>/dev/null && [[ -f "$HOME/.config/mqttwarn/mqttwarn.ini" ]] && [[ -z $MQTTWARNINI ]]; then
     export MQTTWARNINI="$HOME/.config/mqttwarn/mqttwarn.ini"
 fi
 

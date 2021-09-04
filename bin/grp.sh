@@ -56,7 +56,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Tries to get the real path of the given dir/file
@@ -87,9 +87,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -101,9 +101,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -116,7 +116,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -131,15 +131,14 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
-
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -147,52 +146,52 @@ for key in "$@"; do
 done
 
 if hash realpath 2>/dev/null; then
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         realpath "$@"
     else
         realpath "."
     fi
 elif hash readlink 2>/dev/null; then
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         readlink -f "$@"
     else
         readlink -f "."
     fi
 else
     # TODO Optimize code for file management
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         FULL_PATH="$1"
         ROOT_PATH="${FULL_PATH%/*}"
         FILE_PATH="${FULL_PATH##*/}"
 
-        pushd . 1> /dev/null || exit 1
+        pushd . 1>/dev/null  || exit 1
 
-        if [[ -f "$FULL_PATH" ]]; then
+        if [[ -f $FULL_PATH ]]; then
 
             # I haven't think a better way to check if the given path was
             # push into the stack, that's why I can't print the path a
             # then pop it
-            if pushd "$ROOT_PATH" 2> /dev/null; then
+            if pushd "$ROOT_PATH" 2>/dev/null; then
                 echo "$(pwd -P)/$FILE_PATH"
-                popd 1> /dev/null || exit 1
+                popd 1>/dev/null  || exit 1
             else
                 echo "$(pwd -P)/$FILE_PATH"
             fi
 
-        elif [[ -d "$FULL_PATH" ]]; then
+        elif [[ -d $FULL_PATH ]]; then
             ROOT_PATH="$1"
 
-            pushd "$ROOT_PATH" 1> /dev/null || exit 1
+            pushd "$ROOT_PATH" 1>/dev/null  || exit 1
 
             pwd -P
 
-            popd 1> /dev/null || exit 1
+            popd 1>/dev/null  || exit 1
         else
             error_msg "The given path doesn't exist"
         fi
 
         # Retrun to the original dir
-        popd 1> /dev/null || exit 1
+        popd 1>/dev/null  || exit 1
 
     else
         pwd -P

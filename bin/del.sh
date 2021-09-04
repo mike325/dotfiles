@@ -61,7 +61,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Move files/folders to hidden location in tmp, that gets cleared on each reboot
@@ -79,7 +79,6 @@ Usage:
 EOF
 }
 
-
 function warn_msg() {
     local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
@@ -87,9 +86,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -101,9 +100,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -116,7 +115,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -131,15 +130,14 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
-
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -149,8 +147,8 @@ done
 mkdir -p /tmp/.trash
 
 for i in "$@"; do
-    if [[ -d "$i" ]] || [[ -f "$i" ]]; then
-        mv --backup=numbered "$i" /tmp/.trash;
+    if [[ -d $i ]] || [[ -f $i ]]; then
+        mv --backup=numbered "$i" /tmp/.trash
     else
         error_msg "$i doesn't exists"
     fi

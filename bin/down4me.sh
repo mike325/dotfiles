@@ -36,7 +36,7 @@ NAME="${NAME##*/}"
 _PING=0
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Checks whether a website is down for you, or everybody
@@ -55,10 +55,10 @@ EOF
 
 for key in "$@"; do
     case "$key" in
-        -p|--ping)
+        -p | --ping)
             _PING=1
             ;;
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -66,12 +66,12 @@ for key in "$@"; do
 done
 
 if [[ $_PING -eq 1 ]]; then
-    if ! ping -c 5 www.downforeveryoneorjustme.com > /dev/null; then
+    if ! ping -c 5 www.downforeveryoneorjustme.com >/dev/null; then
         echo 'You may not have network'
     else
         echo 'Great!! it seems you have external connectivity'
     fi
-elif [[ -n "$1" ]]; then
+elif [[ -n $1 ]]; then
     curl -Ls --max-redirs 1 "http://www.downforeveryoneorjustme.com/$1" | grep -oE "It's just you.|It's not just you!"
 fi
 

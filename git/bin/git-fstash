@@ -28,7 +28,7 @@ _NAME="${_NAME##*/}"
 _NAME="${_NAME##*-}"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Script to pull changes from a repository
@@ -56,7 +56,7 @@ function __parse_args() {
     local _NAME="$2"
 
     local pattern="^--${_NAME}[=][a-zA-Z0-9./]+$"
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local pattern="^--${_NAME}[=]$3$"
     fi
 
@@ -92,24 +92,24 @@ fstash() {
     local out q k sha
     while out=$(
         git stash list --pretty="%C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
-        fzf --ansi --no-sort --query="$q" --print-query \
-            --expect=ctrl-d,ctrl-b);
-    do
-        mapfile -t out <<< "$out"
+            fzf --ansi --no-sort --query="$q" --print-query \
+                --expect=ctrl-d,ctrl-b
+    ); do
+        mapfile -t out <<<"$out"
         q="${out[0]}"
         k="${out[1]}"
         sha="${out[-1]}"
         sha="${sha%% *}"
-        [[ -z "$sha" ]] && continue
-        if [[ "$k" == 'ctrl-d' ]]; then
-            if [[ -n "$GIT_PAGER" ]]; then
+        [[ -z $sha ]] && continue
+        if [[ $k == 'ctrl-d' ]]; then
+            if [[ -n $GIT_PAGER ]]; then
                 git diff --diff-algorithm=patience -B -C --find-copies-harder --color=never "$sha"
             else
                 git diff --diff-algorithm=patience -B -C --find-copies-harder "$sha"
             fi
-        elif [[ "$k" == 'ctrl-b' ]]; then
+        elif [[ $k == 'ctrl-b' ]]; then
             git stash branch "stash-$sha" "$sha"
-            break;
+            break
         else
             git stash show -p "$sha"
         fi
@@ -118,7 +118,7 @@ fstash() {
 
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;

@@ -36,11 +36,11 @@ NAME="$0"
 NAME="${NAME##*/}"
 LOG="${NAME%%.*}.log"
 
-if [[ -z "$MEDIA_PATH" ]]; then
+if [[ -z $MEDIA_PATH ]]; then
     MEDIA_PATH="$(pwd)"
 fi
 
-if [[ -z "$ARCHIVE" ]]; then
+if [[ -z $ARCHIVE ]]; then
     ARCHIVE="$(pwd)/archive"
 fi
 
@@ -55,9 +55,9 @@ trap '{ clean_up && exit_append && exit 1; }' SIGTERM SIGINT
 if hash realpath 2>/dev/null; then
     SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
     SCRIPT_PATH="$(pwd -P)"
-    popd 1> /dev/null || exit 1
+    popd 1>/dev/null  || exit 1
 fi
 
 if [ -z "$SHELL_PLATFORM" ]; then
@@ -65,13 +65,13 @@ if [ -z "$SHELL_PLATFORM" ]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
         case "$OSTYPE" in
-            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
-            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
-            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
-            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
-            *'windows'* ) export SHELL_PLATFORM='windows' ;;
-            *           ) export SHELL_PLATFORM='unknown' ;;
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
         esac
     fi
 fi
@@ -93,7 +93,7 @@ case "$SHELL_PLATFORM" in
             fi
         fi
         ;;
-    cygwin|msys|windows)
+    cygwin | msys | windows)
         OS='windows'
         ;;
     osx)
@@ -115,7 +115,7 @@ fi
 
 if ! hash is_wsl 2>/dev/null; then
     function is_wsl() {
-        if [[ "$(uname -r)" =~ Microsoft ]] ; then
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
             return 0
         fi
         return 1
@@ -131,16 +131,16 @@ if ! hash is_osx 2>/dev/null; then
     }
 fi
 
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
     # CURRENT_SHELL="$(ps | grep $$ | grep -Eo '(ba|z|tc|c)?sh')"
     # CURRENT_SHELL="${CURRENT_SHELL##*/}"
     # CURRENT_SHELL="${CURRENT_SHELL##*:}"
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
@@ -180,7 +180,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat<<EOF
+    cat <<EOF
 Script to automate video convertion to h265 with 320k aac
 
 Usage:
@@ -225,7 +225,7 @@ function __parse_args() {
 
     local pattern="^--${converter}=[a-zA-Z0-9.:@_/~-]+$"
 
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local pattern="^--${converter}=$3$"
     fi
 
@@ -244,9 +244,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$warn_message"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$warn_message" >>"${LOG}"
     fi
     return 0
 }
@@ -258,9 +258,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$error_message" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t\t %s\n" "$error_message" >> "${LOG}"
+        printf "[X] Error:\t\t %s\n" "$error_message" >>"${LOG}"
     fi
     return 0
 }
@@ -273,7 +273,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$status_message"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$status_message" >>"${LOG}"
     fi
     return 0
 }
@@ -288,7 +288,7 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$debug_message" >>"${LOG}"
     fi
     return 0
 }
@@ -302,7 +302,7 @@ function initlog() {
             return 1
         fi
         if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
+            cat "${SCRIPT_PATH}/shell/banner" >"${LOG}"
         fi
         if ! is_osx; then
             LOG=$(readlink -e "${LOG}")
@@ -315,14 +315,14 @@ function initlog() {
 function exit_append() {
     if [[ $NOLOG -eq 0 ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${LOG}"
+            printf "\n\n" >>"${LOG}"
         fi
 
         if [[ $WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
         fi
         if [[ $ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >> "${LOG}"
+            printf "[*] Errors:\t\t%s\n" "$ERR_COUNT" >>"${LOG}"
         fi
     fi
     return 0
@@ -337,27 +337,27 @@ while [[ $# -gt 0 ]]; do
         --nocolor)
             NOCOLOR=1
             ;;
-        -v|--verbose)
+        -v | --verbose)
             VERBOSE=1
             ;;
-        -o|--output)
-            if [[ -z "${2}" ]]; then
+        -o | --output)
+            if [[ -z ${2} ]]; then
                 error_msg "No path for output media path"
                 exit 1
             fi
             OUTPUT_DIR="${2}"
             shift
             ;;
-        -m|--media)
-            if [[ -z "${2}" ]]; then
+        -m | --media)
+            if [[ -z ${2} ]]; then
                 error_msg "No path for media path"
                 exit 1
             fi
             MEDIA_PATH="${2}"
             shift
             ;;
-        -a|--archive)
-            if [[ -z "${2}" ]]; then
+        -a | --archive)
+            if [[ -z ${2} ]]; then
                 error_msg "No path for archive"
                 exit 1
             fi
@@ -365,15 +365,15 @@ while [[ $# -gt 0 ]]; do
             NO_ARCHIVE=0
             shift
             ;;
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
-        -f|--file)
-            if [[ -z "$2" ]]; then
+        -f | --file)
+            if [[ -z $2 ]]; then
                 error_msg "No file was provided for $key flag"
                 exit 1
-            elif [[ ! -f "$2" ]]; then
+            elif [[ ! -f $2 ]]; then
                 error_msg "Not a valid file $2"
                 exit 1
             fi
@@ -417,13 +417,13 @@ function get_cmd() {
     local cmd
     local args
 
-    if [[ "$name" == 'fd' ]]; then
+    if [[ $name == 'fd' ]]; then
         args=" -uu -t f -e m4a -e mp4 --absolute-path . "
     else
         args=" -regextype posix-extended -iregex '.*\.(mp4|m4a)$' "
     fi
 
-    if [[ "$name" == 'fd' ]]; then
+    if [[ $name == 'fd' ]]; then
         cmd="$name $args \"$path\""
     else
         cmd="$name \"$path\" $args"
@@ -506,7 +506,7 @@ function convert_files() {
     verbose_msg "Video codec: $vcodec"
     verbose_msg "Audio codec: $acodec"
 
-    if [[ "$vcodec" == hevc ]] && { [[ "$acodec" == aac ]] || [[ "$acodec" == null ]] ; }; then
+    if [[ $vcodec == hevc ]] && { [[ $acodec == aac ]] || [[ $acodec == null ]];  }; then
         warn_msg "Skipping $filename, already h265 with aac"
         return 1
     fi
@@ -514,11 +514,11 @@ function convert_files() {
     local vcmd="$vconverter"
     local acmd="$aconverter"
 
-    if [[ "$vcodec" == hevc ]]; then
+    if [[ $vcodec == hevc ]]; then
         vcmd="$vcopy"
     fi
 
-    if [[ "$acodec" == aac ]] || [[ "$acodec" == null ]]; then
+    if [[ $acodec == aac ]] || [[ $acodec == null ]]; then
         acmd="$acopy"
     fi
 
@@ -530,7 +530,7 @@ function convert_files() {
 
     CURRENT="${output}/${file_basename}.265.mp4"
 
-    if [[ -f "$CURRENT" ]]; then
+    if [[ -f $CURRENT ]]; then
         warn_msg "Skipping $CURRENT, already exists in $output"
         return 0
     fi
@@ -563,7 +563,7 @@ function media_archive() {
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
 
-    if [[ ! -d "${ARCHIVE}" ]]; then
+    if [[ ! -d ${ARCHIVE} ]]; then
         verbose_msg "Creating archive ${ARCHIVE}"
         mkdir -p "${ARCHIVE}"
     fi
@@ -622,7 +622,7 @@ function start_convertion() {
 }
 
 function clean_up() {
-    if [[ -f "$CURRENT" ]]; then
+    if [[ -f $CURRENT ]]; then
         verbose_msg "Cleaning up last transcoded file $CURRENT"
         rm -f "${CURRENT}" 2>/dev/null
     fi

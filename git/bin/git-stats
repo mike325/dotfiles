@@ -27,7 +27,7 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Get statistics of the current git dir (CWD)
@@ -53,36 +53,33 @@ function error_msg() {
     printf "[X]     ---- Error!!!   %s \n" "$ERROR_MESSAGE" 1>&2
 }
 
-
-
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
     esac
 done
 
-if [[ -n "$(git symbolic-ref HEAD 2> /dev/null)" ]]; then
+if [[ -n "$(git symbolic-ref HEAD 2>/dev/null)" ]]; then
     echo "Number of commits per author:"
     git --no-pager shortlog -sn --all
     AUTHORS=$( git shortlog -sn --all | cut -f2 | cut -f1 -d' ')
     LOGOPTS=""
-    if [[  "$1" == '-w' ]]; then
+    if [[ $1 == '-w' ]]; then
         LOGOPTS="$LOGOPTS -w"
         shift
     fi
-    if [[  "$1" == '-M' ]]; then
+    if [[ $1 == '-M' ]]; then
         LOGOPTS="$LOGOPTS -M"
         shift
     fi
-    if [[  "$1" == '-C' ]]; then
+    if [[ $1 == '-C' ]]; then
         LOGOPTS="$LOGOPTS -C --find-copies-harder"
         shift
     fi
-    for a in $AUTHORS
-    do
+    for a in $AUTHORS; do
         echo '-------------------'
         echo "Statistics for: $a"
         echo -n "Number of files changed: "

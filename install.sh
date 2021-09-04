@@ -24,7 +24,6 @@
 #            `++:.                           `-/+/
 #            .`   github.com/mike325/dotfiles   `/
 
-
 # TODO: create a install.ps1 to install
 # - scoop and aditional buckets versions, extras and nerd-fonts
 # - chocolatey
@@ -86,18 +85,18 @@ trap '{ clean_up; }' SIGTERM SIGINT
 if hash realpath 2>/dev/null; then
     SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
     SCRIPT_PATH="$(pwd -P)"
-    popd 1> /dev/null || exit 1
+    popd 1>/dev/null  || exit 1
 fi
 
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
@@ -107,13 +106,13 @@ if [ -z "$SHELL_PLATFORM" ]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
         case "$OSTYPE" in
-            *'linux'*   ) export SHELL_PLATFORM='linux' ;;
-            *'darwin'*  ) export SHELL_PLATFORM='osx' ;;
-            *'freebsd'* ) export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*  ) export SHELL_PLATFORM='cygwin' ;;
-            *'msys'*    ) export SHELL_PLATFORM='msys' ;;
-            *'windows'* ) export SHELL_PLATFORM='windows' ;;
-            *           ) export SHELL_PLATFORM='unknown' ;;
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
         esac
     fi
 fi
@@ -133,7 +132,7 @@ case "$SHELL_PLATFORM" in
             fi
         fi
         ;;
-    cygwin|msys|windows)
+    cygwin | msys | windows)
         OS='windows'
         ;;
     osx)
@@ -152,7 +151,7 @@ function is_windows() {
 }
 
 function is_wsl() {
-    if [[ "$(uname -r)" =~ Microsoft ]] ; then
+    if [[ "$(uname -r)" =~ Microsoft ]]; then
         return 0
     fi
     return 1
@@ -211,7 +210,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat<<EOF
+    cat <<EOF
 
 Description
     Simple installer of this dotfiles, by default install (link) all settings and configurations
@@ -417,9 +416,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -431,9 +430,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -446,7 +445,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -461,7 +460,7 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -477,7 +476,7 @@ function __parse_args() {
 
     local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
 
-    if [[ -n "$3" ]]; then
+    if [[ -n $3   ]]; then
         local pattern="^--${flag}=$3$"
     fi
 
@@ -498,7 +497,7 @@ function initlog() {
             return 1
         fi
         if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
-            cat "${SCRIPT_PATH}/shell/banner" > "${LOG}"
+            cat "${SCRIPT_PATH}/shell/banner" >"${LOG}"
         fi
         if ! is_osx; then
             LOG=$(readlink -e "${LOG}")
@@ -511,14 +510,14 @@ function initlog() {
 function exit_append() {
     if [[ $NOLOG -eq 0 ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
-            printf "\n\n" >> "${LOG}"
+            printf "\n\n" >>"${LOG}"
         fi
 
         if [[ $WARN_COUNT -gt 0 ]]; then
-            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >> "${LOG}"
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
         fi
         if [[ $ERR_COUNT -gt 0 ]]; then
-            printf "[*] Errors:\t%s\n" "$ERR_COUNT" >> "${LOG}"
+            printf "[*] Errors:\t%s\n" "$ERR_COUNT" >>"${LOG}"
         fi
     fi
     return 0
@@ -545,10 +544,10 @@ function setup_config() {
     if [[ $BACKUP -eq 1 ]]; then
         # We check if the target exist since we could be adding new
         # scripts that may no be installed
-        if [[ -f "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+        if [[ -f $post_cmd   ]] || [[ -d $post_cmd   ]]; then
             local name="${post_cmd##*/}"
             # We want to copy all non symbolic links
-            if [[ ! -L "$post_cmd" ]]; then
+            if [[ ! -L $post_cmd   ]]; then
                 verbose_msg "Backing up $post_cmd to ${BACKUP_DIR}/${name}"
                 cp -rf --backup=numbered "$post_cmd" "${BACKUP_DIR}/${name}"
             elif [[ -d "$post_cmd/host" ]] && [[ $(ls -A "$post_cmd/host") ]]; then
@@ -564,7 +563,7 @@ function setup_config() {
     elif [[ $FORCE_INSTALL -eq 1 ]]; then
         verbose_msg "Removing $post_cmd"
         rm -rf "$post_cmd"
-    elif [[ -f "$post_cmd" ]] || [[ -e "$post_cmd" ]] || [[ -d "$post_cmd" ]]; then
+    elif [[ -f $post_cmd   ]] || [[ -e $post_cmd   ]] || [[ -d $post_cmd   ]]; then
         warn_msg "Skipping ${post_cmd##*/}, already exists in ${post_cmd%/*}"
         return 1
     fi
@@ -606,7 +605,7 @@ function download_asset() {
     local asset="$1"
     local url="$2"
     local dest=""
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local dest="$3"
     fi
 
@@ -618,7 +617,7 @@ function download_asset() {
             cmd="$cmd -s "
         fi
         cmd="$cmd $url"
-        if [[ -n "$dest" ]]; then
+        if [[ -n $dest ]]; then
             cmd="$cmd -o $dest"
         fi
     else  # If not curl, wget is available since we checked with "has_fetcher"
@@ -626,26 +625,26 @@ function download_asset() {
         if [[ $VERBOSE -eq 0 ]]; then
             cmd="$cmd -q "
         fi
-        if [[ -n "$dest" ]]; then
+        if [[ -n $dest ]]; then
             cmd="$cmd -O $dest"
         fi
         cmd="$cmd $url"
     fi
 
     if [[ $BACKUP -eq 1 ]]; then
-        if [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+        if [[ -e $dest ]] || [[ -d $dest ]]; then
             verbose_msg "Backing up $dest into $BACKUP_DIR"
             mv --backup=numbered "$dest" "$BACKUP_DIR"
         fi
     elif [[ $FORCE_INSTALL -eq 1 ]]; then
         verbose_msg "Removing $dest"
         rm -rf "$dest"
-    elif [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+    elif [[ -e $dest ]] || [[ -d $dest ]]; then
         warn_msg "Skipping $asset, already exists in ${dest%/*}"
         return 4
     fi
 
-    if [[ ! -d "$dest" ]] && [[ ! -f "$dest" ]]; then
+    if [[ ! -d $dest ]] && [[ ! -f $dest ]]; then
         verbose_msg "Downloading $asset"
         if eval "$cmd"; then
             return 0
@@ -667,19 +666,19 @@ function clone_repo() {
 
     if hash git 2>/dev/null; then
         if [[ $BACKUP -eq 1 ]]; then
-            if [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+            if [[ -e $dest ]] || [[ -d $dest ]]; then
                 verbose_msg "Backing up $dest into $BACKUP_DIR"
                 mv --backup=numbered "$dest" "$BACKUP_DIR"
             fi
         elif [[ $FORCE_INSTALL -eq 1 ]]; then
             verbose_msg "Removing $dest"
             rm -rf "$dest"
-        elif [[ -e "$dest" ]] || [[ -d "$dest" ]]; then
+        elif [[ -e $dest ]] || [[ -d $dest ]]; then
             warn_msg "Skipping ${repo##*/}, already exists in $dest"
             return 1
         fi
 
-        if [[ ! -d "$dest" ]] && [[ ! -f "$dest" ]]; then
+        if [[ ! -d $dest ]] && [[ ! -f $dest ]]; then
             verbose_msg "Cloning $repo into $dest"
             # TODO: simplify this crap
             if [[ $VERBOSE -eq 1 ]]; then
@@ -701,7 +700,6 @@ function clone_repo() {
     fi
     return 1
 }
-
 
 function setup_bin() {
     status_msg "Getting shell functions and scripts"
@@ -823,7 +821,7 @@ function setup_shell_scripts() {
         rst=1
     fi
 
-    if has_fetcher && { ! hash screenfetch 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if has_fetcher && { ! hash screenfetch 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing screenfetch install'
         status_msg 'Getting screenfetch'
         local pkg='screenfetch'
@@ -929,20 +927,20 @@ function get_vim_dotfiles() {
 function get_nvim_dotfiles() {
     status_msg "Setting up neovim"
 
-    if [[ $PORTABLES -eq 0 ]] && [[ $ALL -eq 0 ]] && [[ $NEOVIM_DOTFILES -eq 0 ]] && ! [[ "$ARCH" =~ ^arm ]]; then
+    if [[ $PORTABLES -eq 0 ]] && [[ $ALL -eq 0 ]] && [[ $NEOVIM_DOTFILES -eq 0 ]] && ! [[ $ARCH =~ ^arm ]]; then
         local args="--portable"
 
         [[ $FORCE_INSTALL -eq 1 ]] && args=" --force $args"
         [[ $NOCOLOR -eq 1 ]] && args=" --nocolor $args"
         [[ $VERBOSE -eq 1 ]] && args=" --verbose $args"
         [[ $NEOVIM_DEV -eq 1 ]] && args=" --dev $args"
-        if ! hash nvim 2> /dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+        if ! hash nvim 2>/dev/null  || [[ $FORCE_INSTALL -eq 1 ]]; then
             if ! eval "${SCRIPT_PATH}/bin/get_nvim.sh ${args}"; then
                 error_msg ""
                 return 1
             fi
         fi
-    elif [[ "$ARCH" =~ ^arm ]]; then
+    elif [[ $ARCH =~ ^arm ]]; then
         warn_msg "Skipping neovim install, Portable not available for ARM systemas"
     elif [[ $NEOVIM_DOTFILES -eq 0 ]]; then
         verbose_msg "Skipping neovim install, already install with defaults or portables"
@@ -970,8 +968,8 @@ function get_nvim_dotfiles() {
         # settings, lets use them
         status_msg "Checking existing vim dotfiles"
         if [[ -d "$HOME/.vim" ]]; then
-            [[ "$CMD" == "ln -s" ]] && status_msg "Linking current vim dotfiles"
-            [[ "$CMD" == "cp -rf" ]] && status_msg "Copying current vim dotfiles"
+            [[ $CMD == "ln -s" ]] && status_msg "Linking current vim dotfiles"
+            [[ $CMD == "cp -rf" ]] && status_msg "Copying current vim dotfiles"
             if ! setup_config "$HOME/.vim" "$HOME/.config/nvim"; then
                 error_msg "Failed gettings dotvim files"
                 return 1
@@ -992,12 +990,12 @@ function _windows_portables() {
     local rst=0
     local github='https://github.com'
 
-    if ! has_fetcher ; then
+    if ! has_fetcher; then
         error_msg "Missing curl and wget, aborting portables installation"
         return 3
     fi
 
-    if ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck-latest.zip'
@@ -1017,7 +1015,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.zip'
@@ -1032,7 +1030,7 @@ function _windows_portables() {
         status_msg "Downloading bat version: ${version}"
         local os_type='x86_64-pc-windows-msvc'
         if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if ! unzip -o "$TMP/${pkg}" -d "$TMP/bat-${version}-${os_type}/"; then
                 error_msg "An error occurred extracting zip file"
@@ -1043,7 +1041,7 @@ function _windows_portables() {
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1052,7 +1050,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
         status_msg "Getting delta"
         local pkg='delta.zip'
@@ -1067,7 +1065,7 @@ function _windows_portables() {
         status_msg "Downloading delta version: ${version}"
         local os_type='x86_64-pc-windows-msvc'
         if download_asset "delta" "${url}/releases/download/${version}/delta-${version}-${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if ! unzip -o "$TMP/${pkg}"; then
                 error_msg "An error occurred extracting zip file"
@@ -1078,7 +1076,7 @@ function _windows_portables() {
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1087,7 +1085,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
         local pkg='ripgrep.zip'
@@ -1102,7 +1100,7 @@ function _windows_portables() {
         status_msg "Downloading rg version: ${version}"
         local os_type="${ARCH}-pc-windows-gnu"
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if ! unzip -o "$TMP/${pkg}"; then
                 error_msg "An error occurred extracting zip file"
@@ -1113,7 +1111,7 @@ function _windows_portables() {
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1122,7 +1120,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
         local pkg='fd.zip'
@@ -1137,7 +1135,7 @@ function _windows_portables() {
         status_msg "Downloading fd version: ${version}"
         local os_type="${ARCH}-pc-windows-gnu"
         if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if ! unzip -o "$TMP/${pkg}" -d "$TMP/fd-${version}-${os_type}/"; then
                 error_msg "An error occurred extracting zip file"
@@ -1148,7 +1146,7 @@ function _windows_portables() {
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1157,7 +1155,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
         status_msg "Getting texlab"
         local pkg='texlab.zip'
@@ -1172,13 +1170,13 @@ function _windows_portables() {
         status_msg "Downloading texlab version: ${version}"
         local os_type="${ARCH}-windows"
         if download_asset "texlab" "${url}/releases/download/${version}/texlab-${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             unzip -o "$TMP/${pkg}"
             chmod u+x "$TMP/texlab.exe"
             mv "$TMP/texlab.exe" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1187,7 +1185,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
         status_msg "Getting minio client"
         if download_asset "Minio client" "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "$HOME/.local/bin/mc.exe"; then
@@ -1203,7 +1201,7 @@ function _windows_portables() {
         rst=2
     fi
 
-    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ;} ; then
+    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
         status_msg "Getting efm-langserver"
         local pkg='efm-langserver.zip'
@@ -1218,13 +1216,13 @@ function _windows_portables() {
         status_msg "Downloading efm-langserver version: ${version}"
         local os_type="windows_amd64"
         if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             unzip -o "$TMP/${pkg}"
             chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe"
             mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1233,6 +1231,40 @@ function _windows_portables() {
         rst=1
     else
         warn_msg "Skipping efm-langserver, already installed"
+        rst=2
+    fi
+
+    if  ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
+        status_msg "Getting shfmt"
+        local pkg='shfmt.exe'
+        local url="${github}/mvdan/sh"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading shfmt version: ${version}"
+        local os_type
+        if [[ $ARCH == 'x86_64' ]]; then
+            os_type="windows_amd64"
+        elif [[ $ARCH == 'x86' ]]; then
+            os_type="windows_386"
+        else
+            os_type="windows_arm"
+        fi
+        if download_asset "shfmt" "${url}/releases/download/${version}/shfmt_${version}_${os_type}.exe" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            chmod u+x "$TMP/${pkg}"
+            mv "$TMP/${pkg}" "$HOME/.local/bin/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping shfmt, already installed"
         rst=2
     fi
 
@@ -1266,17 +1298,17 @@ function _linux_portables() {
         rst=2
     fi
 
-    if [[ "$ARCH" =~ ^armv6 ]]; then
+    if [[ $ARCH =~ ^armv6   ]]; then
         warn_msg "Skipping no ARMv6 compatible portables"
         return 2
     fi
 
-    if ! has_fetcher ; then
+    if ! has_fetcher; then
         error_msg "Missing curl and wget, aborting portables installation"
         return 3
     fi
 
-    if ! hash lazygit 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash lazygit 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing lazygit install'
         status_msg "Getting lazygit"
         local pkg='lazygit.tar.gz'
@@ -1289,20 +1321,20 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading lazygit version: ${version}"
-        if [[ "$ARCH" =~ ^arm ]]; then
+        if [[ $ARCH =~ ^arm   ]]; then
             local os_type='Linux_arm64'
-        elif [[ "$ARCH" == 'x86' ]]; then
+        elif [[ $ARCH == 'x86'   ]]; then
             local os_type="Linux_32-bit"
         else
             local os_type="Linux_${ARCH}"
         fi
         if download_asset "lazygit" "${url}/releases/download/${version}/lazygit_${version#v}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/lazygit"
             mv "$TMP/lazygit" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1311,7 +1343,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash bat 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing bat install'
         status_msg "Getting bat"
         local pkg='bat.tar.xz'
@@ -1324,19 +1356,19 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading bat version: ${version}"
-        if [[ "$ARCH" =~ ^arm ]]; then
+        if [[ $ARCH =~ ^arm   ]]; then
             local os_type='arm-unknown-linux-gnueabihf'
         else
             local os_type="${ARCH}-unknown-linux-musl"
         fi
         if download_asset "Bat" "${url}/releases/download/${version}/bat-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/bat-${version}-${os_type}/bat"
             mv "$TMP/bat-${version}-${os_type}/bat" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1345,7 +1377,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash delta 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing delta install'
         status_msg "Getting delta"
         local pkg='delta.tar.gz'
@@ -1358,19 +1390,19 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -ruh | head -n 1)"
         fi
         status_msg "Downloading delta version: ${version}"
-        if [[ "$ARCH" =~ ^arm ]]; then
+        if [[ $ARCH =~ ^arm   ]]; then
             local os_type='arm-unknown-linux-gnueabihf'
         else
             local os_type="${ARCH}-unknown-linux-musl"
         fi
         if download_asset "delta" "${url}/releases/download/${version}/delta-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/delta-${version}-${os_type}/delta"
             mv "$TMP/delta-${version}-${os_type}/delta" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1379,7 +1411,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
         local pkg='rg.tar.xz'
@@ -1394,20 +1426,20 @@ function _linux_portables() {
 
         status_msg "Downloading rg version: ${version}"
 
-        if [[ "$ARCH" =~ ^arm ]]; then
+        if [[ $ARCH =~ ^arm   ]]; then
             local os_type='arm-unknown-linux-gnueabihf'
         else
             local os_type="${ARCH}-unknown-linux-musl"
         fi
 
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/ripgrep-${version}-${os_type}/rg"
             mv "$TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1416,7 +1448,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
         local pkg='fd.tar.xz'
@@ -1429,19 +1461,19 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | tail -n 1)"
         fi
         status_msg "Downloading fd version: ${version}"
-        if [[ "$ARCH" =~ ^arm ]]; then
+        if [[ $ARCH =~ ^arm   ]]; then
             local os_type='arm-unknown-linux-gnueabihf'
         else
             local os_type="${ARCH}-unknown-linux-musl"
         fi
         if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/fd-${version}-${os_type}/fd"
             mv "$TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1450,28 +1482,28 @@ function _linux_portables() {
         rst=2
     fi
 
-    if [[ "$ARCH" =~ ^arm ]]; then
+    if [[ $ARCH =~ ^arm ]]; then
         warn_msg "Skipping no ARM compatible portables"
         return 2
     fi
 
-    if [[ $ARCH == 'x86_64' ]] && { ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; } ; then
+    if [[ $ARCH == 'x86_64' ]] && { ! hash shellcheck 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shellcheck install'
         status_msg "Getting shellcheck"
         local pkg='shellcheck-latest.linux.x86_64.tar.xz'
         local url="${github}/koalaman/shellcheck"
         if download_asset "Shellcheck" "${url}/releases/download/latest/${pkg}" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/shellcheck-latest/shellcheck"
             mv "$TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/shellcheck-latest/" && rm -rf "$TMP/shellcheck-latest/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
-    elif ! hash shellcheck 2>/dev/null && [[ ! $ARCH == 'x86_64' ]] ; then
+    elif ! hash shellcheck 2>/dev/null && [[ $ARCH != 'x86_64' ]]; then
         warn_msg "Shellcheck does not have prebuild binaries for non 64 bits x86 devices"
         rst=2
     else
@@ -1479,7 +1511,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; } ; then
+    if is_64bits && { ! hash texlab 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing texlab install'
         status_msg "Getting texlab"
         local pkg='texlab.tar.gz'
@@ -1494,12 +1526,12 @@ function _linux_portables() {
         status_msg "Downloading texlab version: ${version}"
         local os_type="${ARCH}-linux"
         if download_asset "texlab" "${url}/releases/download/${version}/texlab-${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/texlab"
             mv "$TMP/texlab" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1511,7 +1543,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
         status_msg "Getting minio client"
         if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
@@ -1527,7 +1559,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash jq 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if ! hash jq 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing jq install'
         status_msg "Getting jq"
         local pkg='jq'
@@ -1545,10 +1577,10 @@ function _linux_portables() {
             os_type="linux64"
         fi
         if download_asset "jq" "${url}/releases/download/${version}/jq-${os_type}" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             chmod u+x "$TMP/${pkg}"
             mv "$TMP/${pkg}" "$HOME/.local/bin/"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1557,7 +1589,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; } ; then
+    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
         status_msg "Getting efm-langserver"
         local pkg='efm-langserver.tar.gz'
@@ -1572,12 +1604,12 @@ function _linux_portables() {
         status_msg "Downloading efm-langserver version: ${version}"
         local os_type="linux_amd64"
         if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver"
             mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
@@ -1589,17 +1621,17 @@ function _linux_portables() {
         rst=2
     fi
 
-    if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; then
+    if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
         status_msg "Getting gh"
         local pkg='gh.tar.gz'
         local url="${github}/cli/cli"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2 )"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2 )"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2)"
         fi
         status_msg "Downloading github cli version: ${version}"
         local os_type
@@ -1607,23 +1639,59 @@ function _linux_portables() {
             os_type="linux_amd64"
         elif [[ $ARCH == 'x86' ]]; then
             os_type="linux_386"
-        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]] ; then
+        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]]; then
             os_type="linux_arm64"
         else
             os_type="linux_arm6"
         fi
         if download_asset "gh" "${url}/releases/download/v${version}/gh_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1> /dev/null || return 1
+            pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/gh_${version}_${os_type}/bin/gh"
             mv "$TMP/gh_${version}_${os_type}/bin/gh" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1> /dev/null || return 1
+            popd 1>/dev/null  || return 1
         else
             rst=1
         fi
     else
         warn_msg "Skipping gh, already installed"
+        rst=2
+    fi
+
+    if  ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
+        status_msg "Getting shfmt"
+        local pkg='shfmt'
+        local url="${github}/mvdan/sh"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading shfmt version: ${version}"
+        local os_type
+        if [[ $ARCH == 'x86_64' ]]; then
+            os_type="linux_amd64"
+        elif [[ $ARCH == 'x86' ]]; then
+            os_type="linux_386"
+        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]]; then
+            os_type="linux_arm64"
+        else
+            os_type="linux_arm"
+        fi
+        if download_asset "shfmt" "${url}/releases/download/${version}/shfmt_${version}_${os_type}" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            chmod u+x "$TMP/${pkg}"
+            mv "$TMP/${pkg}" "$HOME/.local/bin/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping shfmt, already installed"
         rst=2
     fi
 
@@ -1637,7 +1705,7 @@ function get_portables() {
 
     local github='https://github.com'
 
-    if ! [[ "$ARCH" =~ ^arm ]] && { ! hash nvim 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]] ; }; then
+    if ! [[ $ARCH =~ ^arm ]] && { ! hash nvim 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
         status_msg "Getting Neovim"
 
@@ -1652,7 +1720,7 @@ function get_portables() {
             error_msg "Fail to install Neovim"
             rst=1
         fi
-    elif [[ "$ARCH" =~ ^arm ]]; then
+    elif [[ $ARCH =~ ^arm ]]; then
         warn_msg "Skipping neovim install, Portable not available for ARM systemas"
     else
         warn_msg "Skipping Neovim, already installed"
@@ -1677,7 +1745,6 @@ function get_portables() {
     fi
     return $rst
 }
-
 
 function get_emacs_dotfiles() {
     status_msg "Installing Evil Emacs"
@@ -1739,7 +1806,7 @@ function get_cool_fonts() {
                 if [[ $VERBOSE -eq 1 ]]; then
                     "$HOME"/.local/fonts/install.sh
                 else
-                    "$HOME"/.local/fonts/install.sh 1> /dev/null
+                    "$HOME"/.local/fonts/install.sh 1>/dev/null
                 fi
             fi
         else
@@ -1754,7 +1821,7 @@ function get_cool_fonts() {
 
 function setup_systemd() {
     if ! is_windows && ! is_osx; then
-        if hash systemctl 2> /dev/null; then
+        if hash systemctl 2>/dev/null; then
             status_msg "Setting up User's systemd services"
             if [[ -d "$HOME/.config/systemd/user" ]] && [[ $FORCE_INSTALL -eq 1 ]]; then
                 [[ $FORCE_INSTALL -eq 1 ]] && { warn_msg "Removing old systemd dir" && rm -rf "$HOME/.config/systemd/user"; }
@@ -1909,16 +1976,16 @@ function setup_pkgs() {
             warn_msg "Windows package install must be run from privilege Git bash terminal"
         fi
         local cmd=""
-        if [[ -z "$PKG_FILE" ]]; then
-            if ! ls "${SCRIPT_PATH}/packages/${OS}"/*.pkg > /dev/null; then
+        if [[ -z $PKG_FILE ]]; then
+            if ! ls "${SCRIPT_PATH}/packages/${OS}"/*.pkg >/dev/null; then
                 error_msg "No package file for \"${OS}\" OS"
                 return 2
             fi
-            declare -a pkgs=( "${SCRIPT_PATH}/packages/${OS}"/*.pkg )
-        elif [[ -f "$PKG_FILE" ]]; then
-            local pkgs=( "$PKG_FILE" )
+            declare -a pkgs=("${SCRIPT_PATH}/packages/${OS}"/*.pkg)
+        elif [[ -f $PKG_FILE ]]; then
+            local pkgs=("$PKG_FILE")
         else
-            local pkgs=( "${SCRIPT_PATH}/packages/${OS}/${PKG_FILE}.pkg" )
+            local pkgs=("${SCRIPT_PATH}/packages/${OS}/${PKG_FILE}.pkg")
         fi
         for pkg in "${pkgs[@]}"; do
             verbose_msg "Package file $pkg"
@@ -1931,13 +1998,13 @@ function setup_pkgs() {
                 continue
             fi
             while IFS= read -r line; do
-                if [[ -z "$cmd" ]] && [[ "$line" =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
+                if [[ -z $cmd ]] && [[ $line =~ ^sudo\ .* ]] && [[ $EUID -eq 0 ]]; then
                     # remove sudo instruction if root user is running the script
                     cmd="${line##*sudo}"
-                elif [[ ! "$line" =~ ^#.* ]]; then # if the line starts with "#" then it's a comment
+                elif [[ ! $line =~ ^#.* ]]; then # if the line starts with "#" then it's a comment
                     cmd="$cmd $line"
                 fi
-            done < "$pkg"
+            done <"$pkg"
             status_msg "Installing packages from ${cmdname}"
             # if [[ $_VERBOSE -eq 0 ]]; then
             #     cmd="$cmd"
@@ -1958,7 +2025,7 @@ function version() {
         cat "${SCRIPT_PATH}/shell/banner"
     fi
 
-    cat<<EOF
+    cat <<EOF
 Mike's install script
 
     Author   : Mike 8a
@@ -1982,8 +2049,8 @@ while [[ $# -gt 0 ]]; do
             BACKUP=1
             BACKUP_DIR="$_result"
             ;;
-        -p|--protocol)
-            if [[ ! "$2" =~ ^(git|https|ssh)$ ]]; then
+        -p | --protocol)
+            if [[ ! $2 =~ ^(git|https|ssh)$ ]]; then
                 error_msg "Not a valid protocol $2"
                 exit 1
             fi
@@ -1992,7 +2059,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --protocol=*)
             _result=$(__parse_args "$key" "protocol" '(https|git|ssh)')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid protocol $_result"
                 exit 1
             fi
@@ -2004,7 +2071,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         --host=*)
             _result=$(__parse_args "$key" "host")
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid host $_result"
                 exit 1
             fi
@@ -2016,14 +2083,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --user=*)
             _result=$(__parse_args "$key" "user")
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid gituser $_result"
                 exit 1
             fi
             GIT_USER="$_result"
             ;;
         --url)
-            if [[ ! "$2" =~ ^(https://|git://|git@)[a-zA-Z0-9.:@_-/~]+$ ]]; then
+            if [[ ! $2 =~ ^(https://|git://|git@)[a-zA-Z0-9.:@_-/~]+$ ]]; then
                 error_msg "Not a valid url $2"
                 exit 1
             fi
@@ -2032,39 +2099,39 @@ while [[ $# -gt 0 ]]; do
             ;;
         --url=*)
             _result=$(__parse_args "$key" "url" '(https://|git://|git@)[a-zA-Z0-9.:@_-/~]+')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid url $_result"
                 exit 1
             fi
             URL="$_result"
             ;;
-        -y|--systemd)
+        -y | --systemd)
             SYSTEMD=1
             ALL=0
             ;;
-        -t|--portable|--portables)
+        -t | --portable | --portables)
             PORTABLES=1
             ALL=0
             ;;
-        --fonts|--powerline)
+        --fonts | --powerline)
             COOL_FONTS=1
             ALL=0
             ;;
-        -c|--copy)
+        -c | --copy)
             CMD="cp -rf"
             ;;
-        -s|--shell)
+        -s | --shell)
             DOTCONFIGS=1
             ALL=0
             ;;
-        --scripts|--shell_scripts)
+        --scripts | --shell_scripts)
             DOTCONFIGS=1
             SHELL_SCRIPTS=1
             ALL=0
             ;;
         --shell_frameworks=*)
             _result=$(__parse_args "$key" "shell_frameworks" '(ba|z)sh')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid shell ${_result##*=}, available shell are bash and zsh"
                 exit 1
             fi
@@ -2072,32 +2139,32 @@ while [[ $# -gt 0 ]]; do
             SHELL_FRAMEWORK=1
             ALL=0
             ;;
-        -w|--shell_frameworks)
+        -w | --shell_frameworks)
             SHELL_FRAMEWORK=1
             ALL=0
-            if [[ "$2" =~ ^(ba|z)sh$ ]]; then
+            if [[ $2 =~ ^(ba|z)sh$ ]]; then
                 CURRENT_SHELL="$2"
                 shift
             fi
             ;;
-        -f|--force)
+        -f | --force)
             FORCE_INSTALL=1
             ;;
-        -d|--dotfiles)
+        -d | --dotfiles)
             DOTFILES=1
             ALL=0
             ;;
-        -e|--emacs)
+        -e | --emacs)
             EMACS=1
             ALL=0
             ;;
-        -v|--vim)
+        -v | --vim)
             VIM=1
             ALL=0
             ;;
         --neovim=*)
             _result=$(__parse_args "$key" "neovim" '(dotfiles|stable|dev(elop(ment)?)?)')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid neovim build type ${_result##*=}"
                 exit 1
             fi
@@ -2111,28 +2178,28 @@ while [[ $# -gt 0 ]]; do
             NVIM=1
             ALL=0
             ;;
-        -n|--neovim|--nvim)
+        -n | --neovim | --nvim)
             NVIM=1
             ALL=0
-            if [[ "$2" =~ ^stable$ ]]; then
+            if [[ $2 =~ ^stable$ ]]; then
                 NEOVIM_DEV=0
                 shift
-            elif [[ "$2" =~ ^dotfiles$ ]]; then
+            elif [[ $2 =~ ^dotfiles$ ]]; then
                 NEOVIM_DEV=0
                 NEOVIM_DOTFILES=1
                 shift
-            elif [[ "$2" =~ ^dev(elop(ment)?)?$ ]]; then
+            elif [[ $2 =~ ^dev(elop(ment)?)?$ ]]; then
                 NEOVIM_DEV=1
                 shift
             fi
             ;;
-        -b|--bin)
+        -b | --bin)
             BIN=1
             ALL=0
             ;;
         --python=*)
             _result=$(__parse_args "$key" "python" '(2|3)')
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid python version ${_result##*=}"
                 exit 1
             fi
@@ -2143,57 +2210,57 @@ while [[ $# -gt 0 ]]; do
         --python)
             PYTHON=1
             ALL=0
-            if [[ "$2" =~ ^(2|3)$ ]]; then
+            if [[ $2 =~ ^(2|3)$ ]]; then
                 PYTHON_VERSION"$2"
                 shift
             fi
             ;;
-        -g|--git)
+        -g | --git)
             GIT=1
             ALL=0
             ;;
         --pkgs=*)
             _result=$(__parse_args "$key" "pkgs")
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid package file ${_result##*=}"
                 exit 1
-            elif [[ ! -f "$_result" ]]; then
+            elif [[ ! -f $_result ]]; then
                 error_msg "Package file $_result does not exists"
                 exit 1
-            elif [[ ! "$_result" =~ \.pkg$ ]]; then
+            elif [[ ! $_result =~ \.pkg$ ]]; then
                 error_msg "$_result is not a valid package file, the file must have .pkg extention"
                 exit 1
             fi
             PKG_FILE="$_result"
             PKGS=1
-            if [[ "$2" =~ ^--only$ ]]; then
+            if [[ $2 =~ ^--only$ ]]; then
                 ALL=0
                 shift
             fi
             ;;
         --packages=*)
             _result=$(__parse_args "$key" "packages")
-            if [[ "$_result" == "$key" ]]; then
+            if [[ $_result == "$key" ]]; then
                 error_msg "Not a valid package file ${_result##*=}"
                 exit 1
-            elif [[ ! -f "$_result" ]]; then
+            elif [[ ! -f $_result ]]; then
                 error_msg "Package file $_result does not exists"
                 exit 1
-            elif [[ ! "$_result" =~ \.pkg$ ]] || [[ ! -f "${SCRIPT_PATH}/packages/${OS}/${_result}.pkg" ]]; then
+            elif [[ ! $_result =~ \.pkg$ ]] || [[ ! -f "${SCRIPT_PATH}/packages/${OS}/${_result}.pkg" ]]; then
                 error_msg "$_result is not a valid package file, the file must have .pkg extention"
                 exit 1
             fi
             PKG_FILE="$_result"
             PKGS=1
-            if [[ "$2" =~ ^--only$ ]]; then
+            if [[ $2 =~ ^--only$ ]]; then
                 ALL=0
                 shift
             fi
             ;;
-        --pkgs|--packages)
+        --pkgs | --packages)
             PKGS=1
-            if [[ ! "$2" =~ ^-(-)?.*$ ]] ; then
-                if [[ -f "$2" ]] && [[ "$2" =~ \.pkg$ ]] ; then
+            if [[ ! $2 =~ ^-(-)?.*$ ]]; then
+                if [[ -f $2 ]] && [[ $2 =~ \.pkg$ ]]; then
                     PKG_FILE="$2"
                     shift
                 elif [[ -f "${SCRIPT_PATH}/packages/${OS}/${2}.pkg" ]]; then
@@ -2202,7 +2269,7 @@ while [[ $# -gt 0 ]]; do
                 fi
             fi
 
-            if [[ "$2" =~ ^--only$ ]]; then
+            if [[ $2 =~ ^--only$ ]]; then
                 ALL=0
                 shift
             fi
@@ -2213,7 +2280,7 @@ while [[ $# -gt 0 ]]; do
         --verbose)
             VERBOSE=1
             ;;
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -2257,7 +2324,7 @@ if [[ -z $URL ]]; then
         ssh)
             URL="git@$GIT_HOST:$GIT_USER"
             ;;
-        https|http)
+        https | http)
             URL="$PROTOCOL://$GIT_HOST/$GIT_USER"
             ;;
         git)

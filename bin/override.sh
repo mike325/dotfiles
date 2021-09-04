@@ -27,7 +27,7 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Move a original dir to the 'trash' and move/rename the first dir.
@@ -47,14 +47,14 @@ EOF
 
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
     esac
 done
 
-if [[ -n "$1" ]] && [[ -n "$2" ]]; then
+if [[ -n $1 ]] && [[ -n $2 ]]; then
     mkdir -p /tmp/.trash
     mv --backup=numbered "$2" /tmp/.trash
     mv "$1" "$2"

@@ -35,13 +35,13 @@ BACKUP=0
 VERBOSE=0
 
 # shellcheck disable=SC2009,SC2046
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
@@ -71,7 +71,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Small script to install bash-it or oh-my-zsh shell frameworks
@@ -166,13 +166,13 @@ while [[ $# -gt 0 ]]; do
         --verbose)
             VERBOSE=1
             ;;
-        -s|--shell)
-            if [[ -n "$2" ]]; then
+        -s | --shell)
+            if [[ -n $2 ]]; then
                 case $2 in
-                    bash|bash_it|bash-it)
+                    bash | bash_it | bash-it)
                         CURRENT_SHELL="bash"
                         ;;
-                    zsh|oh-my-zsh|oh_my_zsh)
+                    zsh | oh-my-zsh | oh_my_zsh)
                         CURRENT_SHELL="zsh"
                         ;;
                     *)
@@ -186,10 +186,10 @@ while [[ $# -gt 0 ]]; do
         --backup)
             BACKUP=1
             ;;
-        -f|--force)
+        -f | --force)
             FORCE_INSTALL=1
             ;;
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -202,7 +202,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-if [[ "$CURRENT_SHELL" == bash ]]; then
+if [[ $CURRENT_SHELL == bash ]]; then
 
     rm_framework "$HOME/.bash_it"
 
@@ -222,7 +222,7 @@ if [[ "$CURRENT_SHELL" == bash ]]; then
     else
         warn_msg "Bash-it is already install"
     fi
-elif [[ "$CURRENT_SHELL" == zsh ]]; then
+elif [[ $CURRENT_SHELL == zsh ]]; then
 
     rm_framework "$HOME/.oh-my-zsh"
 

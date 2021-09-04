@@ -38,9 +38,9 @@ SCRIPT_PATH="${SCRIPT_PATH%/*}"
 if hash realpath 2>/dev/null; then
     SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
     SCRIPT_PATH="$(pwd -P)"
-    popd 1> /dev/null || exit 1
+    popd 1>/dev/null  || exit 1
 fi
 
 if ! hash is_windows 2>/dev/null; then
@@ -54,7 +54,7 @@ fi
 
 if ! hash is_wsl 2>/dev/null; then
     function is_wsl() {
-        if [[ "$(uname -r)" =~ Microsoft ]] ; then
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
             return 0
         fi
         return 1
@@ -70,19 +70,19 @@ if ! hash is_osx 2>/dev/null; then
     }
 fi
 
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Quick edit modified files in a git repo
@@ -118,7 +118,7 @@ function __parse_args() {
 
     local pattern="^--${name}[=][a-zA-Z0-9._-/~]+$"
 
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local pattern="^--${name}[=]$3$"
     fi
 
@@ -158,22 +158,22 @@ while [[ $# -gt 0 ]]; do
         --verbose)
             VERBOSE=1
             ;;
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
-        -e|--editor)
-            if [[ -z "$2" ]]; then
+        -e | --editor)
+            if [[ -z $2 ]]; then
                 error_msg "No editor received"
                 exit 1
-            elif ! hash "$2" 2> /dev/null; then
+            elif ! hash "$2" 2>/dev/null; then
                 error_msg "Not a valid editor $2"
                 exit 1
             fi
             EDITOR="$2"
             shift
             ;;
-        -c|--cached)
+        -c | --cached)
             CACHED="--cached"
             ;;
         *)
@@ -188,17 +188,17 @@ done
 # _GITDIR="$(git rev-parse --git-dir)"
 IFS=$'\n' read -r -d '' -a worklist < <(git worktree list 2>/dev/null | awk '{print $1}')
 for i in "${worklist[@]}"; do
-    [[ "$i" == "$(git rev-parse --show-toplevel)" ]] && WORKTREE="$i"
+    [[ $i == "$(  git rev-parse --show-toplevel)" ]] && WORKTREE="$i"
 done
 
-if [[ -n "$CACHED" ]]; then
-    if [[ -n "$WORKTREE" ]]; then
+if [[ -n $CACHED ]]; then
+    if [[ -n $WORKTREE ]]; then
         IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
     else
         IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')
     fi
 else
-    if [[ -n "$WORKTREE" ]]; then
+    if [[ -n $WORKTREE ]]; then
         IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
     else
         IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')

@@ -58,18 +58,17 @@ normal="\033[0m"
 # shellcheck disable=SC2034
 reset_color="\033[39m"
 
-
 if hash realpath 2>/dev/null; then
     SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
 else
-    pushd "$SCRIPT_PATH" 1> /dev/null || exit 1
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
     SCRIPT_PATH="$(pwd -P)"
-    popd 1> /dev/null || exit 1
+    popd 1>/dev/null  || exit 1
 fi
 
 if ! hash is_windows 2>/dev/null; then
     function is_windows() {
-        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]] ; then
+        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
             return 0
         fi
         return 1
@@ -78,7 +77,7 @@ fi
 
 if ! hash is_wsl 2>/dev/null; then
     function is_wsl() {
-        if [[ "$(uname -r)" =~ Microsoft ]] ; then
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
             return 0
         fi
         return 1
@@ -95,19 +94,19 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 # _DEFAULT_SHELL="${SHELL##*/}"
-if [[ -n "$ZSH_NAME" ]]; then
+if [[ -n $ZSH_NAME ]]; then
     CURRENT_SHELL="zsh"
-elif [[ -n "$BASH" ]]; then
+elif [[ -n $BASH ]]; then
     CURRENT_SHELL="bash"
 else
     # shellcheck disable=SC2009,SC2046
-    if [[ -z "$CURRENT_SHELL" ]]; then
+    if [[ -z $CURRENT_SHELL ]]; then
         CURRENT_SHELL="${SHELL##*/}"
     fi
 fi
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Clean (Neo)vim swap files
@@ -128,7 +127,7 @@ function __parse_args() {
     local name="$2"
 
     local pattern="^--${name}[=][a-zA-Z0-9./]+$"
-    if [[ -n "$3" ]]; then
+    if [[ -n $3 ]]; then
         local pattern="^--${name}[=]$3$"
     fi
 
@@ -147,9 +146,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -161,9 +160,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -176,7 +175,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -191,7 +190,7 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -199,7 +198,7 @@ function verbose_msg() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;

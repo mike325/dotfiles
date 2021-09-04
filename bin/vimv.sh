@@ -28,7 +28,7 @@ NAME="$0"
 NAME="${NAME##*/}"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
 
@@ -53,7 +53,7 @@ EOF
 
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -61,21 +61,21 @@ for key in "$@"; do
 done
 
 if [ $# -ne 0 ]; then
-    src=( "$@" )
+    src=("$@")
 else
     # shellcheck disable=SC2016
     IFS=$'\r\n' GLOBIGNORE='*' command eval  'src=($(ls))'
 fi
 
-if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+if git rev-parse --is-inside-work-tree >/dev/null  2>&1; then
     MOVE_CMD='git mv'
 else
     MOVE_CMD='mv'
 fi
 
 touch /tmp/vimv.$$
-for ((i=0;i<${#src[@]};++i)); do
-    echo "${src[i]}" >> /tmp/vimv.$$
+for ((i = 0; i < ${#src[@]}; ++i)); do
+    echo "${src[i]}" >>/tmp/vimv.$$
 done
 
 ${EDITOR:-vi} /tmp/vimv.$$
@@ -84,7 +84,7 @@ ${EDITOR:-vi} /tmp/vimv.$$
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'dest=($(cat /tmp/vimv.$$))'
 
 count=0
-for ((i=0;i<${#src[@]};++i)); do
+for ((i = 0; i < ${#src[@]}; ++i)); do
     # shellcheck disable=SC2154
     if [ "${src[i]}" != "${dest[i]}" ]; then
         $MOVE_CMD "${src[i]}" "${dest[i]}"

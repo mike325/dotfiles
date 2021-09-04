@@ -37,7 +37,7 @@ FILES=0
 declare -a ARGS
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 Description:
     Disk usage per directory/file in Linux
 
@@ -60,14 +60,14 @@ EOF
 i=0
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
-        -f|--files)
+        -f | --files)
             FILES=1
             ;;
-        -s|--sort)
+        -s | --sort)
             SORT=1
             ;;
         *)

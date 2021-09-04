@@ -64,7 +64,7 @@ fi
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet
-if is_windows || ! is_64bits ; then
+if is_windows || ! is_64bits; then
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='demula'
 else
     [[ -z $BASH_IT_THEME ]] && export BASH_IT_THEME='bakke'
@@ -119,7 +119,7 @@ if ! shopt -oq posix; then
 fi
 
 # pip bash completion start
-if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
+if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null; then
     hash pip 2>/dev/null && eval "$(pip completion --bash)"
     hash pip2 2>/dev/null && eval "$(pip2 completion --bash 2>/dev/null)"
     hash pip3 2>/dev/null && eval "$(pip3 completion --bash)"
@@ -136,13 +136,13 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     source "$BASH_IT/bash_it.sh"
 else
 
-    __schroot_name(){
+    __schroot_name() {
         if [[ -n ${SCHROOT_CHROOT_NAME} ]]; then
             echo -e "${echo_red}(${SCHROOT_CHROOT_NAME})${echo_reset_color} "
         fi
     }
 
-    __git_info(){
+    __git_info() {
         if hash git 2>/dev/null; then
             local branch changes stash info
             branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
@@ -167,13 +167,13 @@ else
         fi
     }
 
-    __user(){
+    __user() {
         if [[ $EUID -eq 0 ]]; then
             echo -e "${echo_red}$USER${echo_reset_color} at "
         fi
     }
 
-    __jobs(){
+    __jobs() {
         # local j
         # j=$(jobs | wc -l)
         # if [[ $j -gt 1 ]]; then
@@ -182,7 +182,7 @@ else
         :
     }
 
-    __exit_code(){
+    __exit_code() {
         local rc=$?
         # NOTE: ignore send to background and <CTRL-c> exit codes
         if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
@@ -190,17 +190,17 @@ else
         fi
     }
 
-    __venv(){
-        if [[ -n "$VIRTUAL_ENV" ]]; then
+    __venv() {
+        if [[ -n $VIRTUAL_ENV ]]; then
             local version
             version="$(python --version | awk '{print $2}')"
             echo -e " ${echo_white}(${VIRTUAL_ENV##*/} 🐍 ${version})${echo_reset_color}"
         fi
     }
 
-    __proxy(){
+    __proxy() {
         # shellcheck disable=SC2154
-        if [[ -n "$http_proxy" ]]; then
+        if [[ -n $http_proxy ]]; then
             echo -e " ${echo_green}🌐${echo_reset_color}"
         fi
     }

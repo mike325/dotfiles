@@ -56,7 +56,7 @@ normal="\033[0m"
 reset_color="\033[39m"
 
 function help_user() {
-    cat << EOF
+    cat <<EOF
 
 Description:
     Extract any given number of compressed files
@@ -88,9 +88,9 @@ function warn_msg() {
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
-    WARN_COUNT=$(( WARN_COUNT + 1 ))
+    WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$msg" >> "${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -102,9 +102,9 @@ function error_msg() {
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
-    ERR_COUNT=$(( ERR_COUNT + 1 ))
+    ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$msg" >> "${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -117,7 +117,7 @@ function status_msg() {
         printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -132,14 +132,14 @@ function verbose_msg() {
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$msg" >> "${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 for key in "$@"; do
     case "$key" in
-        -h|--help)
+        -h | --help)
             help_user
             exit 0
             ;;
@@ -151,18 +151,18 @@ error_code=0
 while [[ $# -gt 0 ]]; do
     filename="$1"
 
-    if [[ -f "$filename" ]]; then
+    if [[ -f $filename ]]; then
         case "$filename" in
-            *.tar|*.tar.*) extraction "$filename" "tar -xf";;
-            *.zip|*.ZIP)   extraction "$filename" "unzip";;
-            *.pax.Z)       extraction "$filename" "uncompress";;
-            *.bz2)         extraction "$filename" "bunzip2";;
-            *.dmg)         extraction "$filename" "hdiutil mount";;
-            *.pax)         extraction "$filename" "cat";;
-            *.rar)         extraction "$filename" "unrar x";;
-            *.7z)          extraction "$filename" "7z x";;
-            *.gz)          extraction "$filename" "gunzip";;
-            *.Z)           extraction "$filename" "uncompress";;
+            *.tar | *.tar.*) extraction "$filename" "tar -xf" ;;
+            *.zip | *.ZIP) extraction "$filename" "unzip" ;;
+            *.pax.Z)       extraction "$filename" "uncompress" ;;
+            *.bz2)         extraction "$filename" "bunzip2" ;;
+            *.dmg)         extraction "$filename" "hdiutil mount" ;;
+            *.pax)         extraction "$filename" "cat" ;;
+            *.rar)         extraction "$filename" "unrar x" ;;
+            *.7z)          extraction "$filename" "7z x" ;;
+            *.gz)          extraction "$filename" "gunzip" ;;
+            *.Z)           extraction "$filename" "uncompress" ;;
             *) echo " ---- [X] Error '$filename' cannot be extracted/mounted via extract()" ;;
         esac
     else

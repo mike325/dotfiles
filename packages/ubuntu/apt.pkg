@@ -6,6 +6,7 @@ zsh
 curl
 git
 wget
+golang
 gcc
 g++
 build-essential
