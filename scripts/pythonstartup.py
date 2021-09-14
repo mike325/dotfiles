@@ -69,6 +69,9 @@ q = Quit()
 home = "HOME" if os.name != "nt" else "USERPROFILE"
 history_file = os.path.join(os.environ[home], ".pyhistory")
 
+if not os.path.exists(history_file):
+    open(history_file, "a").close()
+
 if readline is not None:
 
     def rl_autoindent():
