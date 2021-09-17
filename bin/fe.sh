@@ -151,9 +151,9 @@ fe() {
     local files
     # shellcheck disable=SC2207
     if [[ ! "$(uname -r)" =~ 4\.(4\.0-142|15.0-44) ]]; then
-        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview-window 'right:60%' --preview '(bat --color=always {} || cat {}) 2> /dev/null'))
+        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview-window 'right:60%' --preview '(bat --color=always {} || cat {}) 2> /dev/null' --height=60%))
     else
-        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+        IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --height=60%))
     fi
     # shellcheck disable=SC2128
     [[ -n $files ]] && ${EDITOR} "${files[@]}"
