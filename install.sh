@@ -1003,8 +1003,8 @@ function _windows_portables() {
         if download_asset "Shellcheck" "${url}/releases/download/latest/${pkg}" "$TMP/${pkg}"; then
             [[ -d "$TMP/shellcheck-latest" ]] && rm -rf "$TMP/shellcheck-latest"
             unzip -o "$TMP/${pkg}" -d "$TMP/shellcheck-latest"
-            chmod +x "$TMP/shellcheck-latest/shellcheck-latest.exe"
-            mv "$TMP/shellcheck-latest/shellcheck-latest.exe" "$HOME/.local/bin/shellcheck.exe"
+            chmod +x "$TMP/shellcheck-latest/shellcheck.exe"
+            mv "$TMP/shellcheck-latest/shellcheck.exe" "$HOME/.local/bin/shellcheck.exe"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleanning up data $TMP/shellcheck-latest" && rm -rf "$TMP/shellcheck-latest"
         else
