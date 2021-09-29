@@ -611,6 +611,8 @@ function download_asset() {
 
     local cmd=""
 
+    verbose_msg "Fetching $url"
+
     if hash curl 2>/dev/null; then
         cmd='curl -L '
         if [[ $VERBOSE -eq 0 ]]; then
@@ -1268,6 +1270,37 @@ function _windows_portables() {
         rst=2
     fi
 
+    if [[ $ARCH == 'x86_64' ]] && { ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
+        status_msg "Getting stylua"
+        local pkg='stylua.zip'
+        local url="${github}/johnnymorganz/stylua"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading stylua version: ${version}"
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${version#v}-win64.zip" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/"
+            chmod u+x "$TMP/stylua.exe"
+            mv "$TMP/stylua.exe" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    elif ! [[ $ARCH == 'x86_64' ]]; then
+        error_msg "stylua portable is only Available for x86 64 bits"
+        rst=1
+    else
+        warn_msg "Skipping stylua, already installed"
+        rst=2
+    fi
+
     return $rst
 }
 
@@ -1659,7 +1692,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if  ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+    if ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
         status_msg "Getting shfmt"
         local pkg='shfmt'
@@ -1692,6 +1725,37 @@ function _linux_portables() {
         fi
     else
         warn_msg "Skipping shfmt, already installed"
+        rst=2
+    fi
+
+    if [[ $ARCH == 'x86_64' ]] && { ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
+        status_msg "Getting stylua"
+        local pkg='stylua.zip'
+        local url="${github}/johnnymorganz/stylua"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading stylua version: ${version}"
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${version#v}-linux.zip" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/"
+            chmod u+x "$TMP/stylua"
+            mv "$TMP/stylua" "$HOME/.local/bin/"
+            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    elif ! [[ $ARCH == 'x86_64' ]]; then
+        error_msg "stylua portable is only Available for x86 64 bits"
+        rst=1
+    else
+        warn_msg "Skipping stylua, already installed"
         rst=2
     fi
 
