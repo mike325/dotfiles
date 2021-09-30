@@ -1743,7 +1743,7 @@ function _linux_portables() {
         status_msg "Downloading stylua version: ${version}"
         if download_asset "stylua" "${url}/releases/download/${version}/stylua-${version#v}-linux.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/"
+            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null
             chmod u+x "$TMP/stylua"
             mv "$TMP/stylua" "$HOME/.local/bin/"
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
