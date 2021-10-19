@@ -336,7 +336,7 @@ def _execute(cmd: Sequence[str], background: bool):
     stdout: TextIO = sys.stdout if not background else cast(TextIO, PIPE)
     stderr: TextIO = sys.stderr if not background else cast(TextIO, PIPE)
     _log.debug(f"Executing cmd: {cmd}")
-    cmd_obj = Popen(" ".join(cmd), stdout=stdout, stderr=stderr, text=True)
+    cmd_obj = Popen(cmd, stdout=stdout, stderr=stderr, text=True)
     out, err = cmd_obj.communicate()
     if out is not None and len(out) > 0:
         _log.debug(out)
