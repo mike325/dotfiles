@@ -328,11 +328,14 @@ def _parse_ssh_config():
 def _execute(cmd: Sequence[str], background: bool):
     """Execute a synchronous command
 
-    :cmd: AnyStr: command to execute
-    :returns: Popen obj: command object after execution
+    Args:
+        cmd: command to execute in the form of a list with its args
+        background: controls if cmd outputs to stdout/stderr
+
+    Returns
+        returns exit code of the cmd
 
     """
-    rc = 0
     stdout: TextIO = sys.stdout if not background else cast(TextIO, PIPE)
     stderr: TextIO = sys.stderr if not background else cast(TextIO, PIPE)
     _log.debug(f"Executing cmd: {cmd}")
@@ -341,11 +344,10 @@ def _execute(cmd: Sequence[str], background: bool):
     if out is not None and len(out) > 0:
         _log.debug(out)
     if cmd_obj.returncode != 0:
-        rc = 1
         _log.error(f"Command exited with {cmd_obj.returncode}")
         if err is not None:
             _log.error(err)
-    return rc
+    return cmd_obj.returncode
 
 
 def convert_path(path: str, send: bool, hostname: str):

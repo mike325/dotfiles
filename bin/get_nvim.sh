@@ -296,10 +296,14 @@ function get_portable() {
     # wget -qO- $URL
     # wget $URL -O out
 
-    local dir="$HOME/.local/bin"
+    local dir
+    local exe_path
     local cmd=''
+    local name
+    local pkg
     local version
     local build
+    local has_backup=false
 
     if hash curl 2>/dev/null; then
         local cmd='curl -L'
@@ -309,8 +313,6 @@ function get_portable() {
     fi
 
     verbose_msg "Using ${cmd} as command"
-
-    [[ ! -d $dir ]] && mkdir -p "$dir"
 
     if [[ $DEV -eq 0 ]] && [[ $NVIM_VERSION == 'latest' ]]; then
         version=$( eval "${cmd} ${URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
@@ -322,15 +324,23 @@ function get_portable() {
     fi
 
     if is_windows; then
-        local name="nvim.zip"
-        local pkg='nvim-win64.zip'
+        dir="$HOME/AppData/Roaming/"
+        exe_path="$dir/Neovim/nvim"
+        name="nvim.zip"
+        pkg='nvim-win64.zip'
     elif is_osx; then
-        local name="nvim.tar.gz"
-        local pkg='nvim-macos.tar.gz'
+        dir="$HOME/.local/bin"
+        exe_path="$dir/nvim"
+        name="nvim.tar.gz"
+        pkg='nvim-macos.tar.gz'
     else
-        local name="nvim"
-        local pkg='nvim.appimage'
+        dir="$HOME/.local/bin"
+        exe_path="$dir/nvim"
+        name="nvim"
+        pkg='nvim.appimage'
     fi
+
+    [[ ! -d $dir ]] && mkdir -p "$dir"
 
     if [[ $DEV -eq 1 ]]; then
         build='nightly'
@@ -347,16 +357,28 @@ function get_portable() {
         return 1
     fi
 
+    [[ ! -d "$HOME/.cache" ]] && mkdir -p "$HOME/.cache"
+
     if is_windows; then
         verbose_msg "Unpacking ${name}"
-        if ! unzip -qo "$TMP/$name" -d "$HOME/AppData/Roaming/"; then
+        if [[ -d "$dir/Neovim" ]]; then
+            verbose_msg "Backing up neovim $dir/Neovim"
+            cp -rf "$dir/Neovim" "$HOME/.cache/"
+            has_backup=true
+        fi
+        if ! unzip -qo "$TMP/$name" -d "$dir"; then
             return 1
         fi
         rm -rf "${TMP:?}/${name}"
     elif is_osx; then
         pushd "$TMP" >/dev/null  || { error_msg "Could not get to $TMP" && exit 1; }
         verbose_msg "Unpacking ${name}"
-        if ! tar xzvf "$TMP/$name" && mv "${TMP}/nvim-osx64/*" "$HOME/.local/"; then
+        if [[ -f "$dir/nvim" ]]; then
+            verbose_msg "Backing up neovim $dir/nvim"
+            cp "$dir/nvim" "$HOME/.cache/nvim_backup"
+            has_backup=true
+        fi
+        if ! tar xzvf "$TMP/$name" && mv "${TMP}/nvim-osx64/*" "$dir/"; then
             return 1
         fi
         popd >/dev/null  || { error_msg "Could not get out of $TMP" && exit 1; }
@@ -364,7 +386,26 @@ function get_portable() {
         rm -rf "${TMP:?}/nvim-osx64"
     else
         verbose_msg "Installing into $dir/$name"
+        if [[ -f "$dir/nvim" ]]; then
+            verbose_msg "Backing up neovim $dir/nvim"
+            cp "$dir/nvim" "$HOME/.cache/nvim_backup"
+            has_backup=true
+        fi
         chmod u+x "$TMP/$name" && mv "$TMP/$name" "$dir/$name"
+    fi
+
+    if [[ $(file -b "$exe_path" | awk '{print $1}') == 'ASCII' ]]; then
+        error_msg "Failed to execute neovim"
+        if [[ $has_backup == true ]]; then
+            if is_windows; then
+                rm -rf "$HOME/AppData/Roaming/Neovim"
+                status_msg "Restoring neovim $HOME/.cache/Neovim -> $HOME/AppData/Roaming/Neovim"
+                mv "$HOME/.cache/Neovim" "$HOME/AppData/Roaming/Neovim"
+            else
+                status_msg "Restoring neovim $HOME/.cache/nvim -> $dir/nvim"
+                mv "$HOME/.cache/nvim_backup" "$dir/nvim"
+            fi
+        fi
     fi
 
     return 0
