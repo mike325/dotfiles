@@ -7,6 +7,9 @@ if hash git 2>/dev/null; then
         changes="$(git diff --shortstat 2>/dev/null | awk '{
             printf "%s~%d %s+%d %s-%d%s", "%F{yellow}", $1, "%F{green}", $4, "%F{red}", $6, "%F{blue}";
         }')"
+        to_commit="$(git diff --cached --shortstat 2>/dev/null | awk '{
+            printf "%s*%d", "%F{magenta}", $1;
+        }')"
         stash="$(git stash list 2>/dev/null | wc -l)"
         if [[ $stash -ne 0 ]]; then
             stash="%F{yellow}{$stash}"
@@ -15,6 +18,7 @@ if hash git 2>/dev/null; then
         fi
         info=" %F{blue}|"
         [[ -n $branch ]] && info="$info %f$branch%f"
+        [[ -n $to_commit ]] && info="$info %f$to_commit%f"
         [[ -n $changes ]] && info="$info %f$changes%f"
         [[ -n $stash ]] && info="$info %f$stash%f"
         info="$info %F{blue}|%f "

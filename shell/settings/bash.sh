@@ -151,6 +151,9 @@ else
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
+                to_commit="$(git diff --cached --shortstat 2>/dev/null | awk '{
+                    printf "%s*%d", ENVIRON["echo_purple"],, $1;
+                }')"
                 stash="$(git stash list 2>/dev/null | wc -l)"
                 if [[ $stash -ne 0 ]]; then
                     stash="${echo_yellow}{$stash}"
@@ -159,6 +162,7 @@ else
                 fi
                 info=" ${echo_blue}|"
                 [[ -n $branch ]] && info="$info ${echo_reset_color}$branch${echo_reset_color}"
+                [[ -n $to_commit ]] && info="$info ${echo_reset_color}$to_commit${echo_reset_color}"
                 [[ -n $changes ]] && info="$info ${echo_reset_color}$changes${echo_reset_color}"
                 [[ -n $stash ]] && info="$info ${echo_reset_color}$stash${echo_reset_color}"
                 info="$info ${echo_blue}|${echo_reset_color} "
@@ -186,7 +190,7 @@ else
         local rc=$?
         # NOTE: ignore send to background and <CTRL-c> exit codes
         if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
-            echo -e " ${echo_red}✘${echo_reset_color} "
+            echo -e " ${echo_red}❌${echo_reset_color} "
         fi
     }
 

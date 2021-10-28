@@ -27,6 +27,11 @@
 
 
 $PSDefaultParameterValues["Out-File:Encoding"] = "utf8"
+# [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+# [Console]::InputEncoding = [System.Text.Encoding]::UTF8
+# $OutputEncoding = [System.Text.UTF8Encoding]::new()
+# $OutputEncoding = [ System.Text.Encoding]::UTF8
+$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 $MaximumHistoryCount = 10000;
 
 if ($env:SHELL -eq $null) {
@@ -97,10 +102,26 @@ function Test-Administrator {
 function Write-Git-Info {
     Invoke-Expression "git symbolic-ref --short HEAD" 2> $null | Tee-Object -Variable branch | Out-Null
     if ($LASTEXITCODE -eq 0) {
-        $git_info  = " | "
-        $git_info += $branch
-        $git_info += " | "
-        Write-Host $git_info -NoNewline -ForegroundColor blue
+        (Invoke-Expression "git stash list" 2> $null | Measure-Object -Line).Lines | Tee-Object -Variable stash | Out-Null
+        # Invoke-Expression "git diff --shortstat" 2> $null | Tee-Object -Variable changes | Out-Null
+        # Invoke-Expression "git diff --cached --shortstat" 2> $null | Tee-Object -Variable to_commit | Out-Null
+
+        Write-Host " | " -NoNewline -ForegroundColor Blue
+        Write-Host "$branch " -NoNewline -ForegroundColor Blue
+        # if ($to_commit -ne $null) {
+        #     $files_staged = $to_commit.split(' ')[1]
+        #     Write-Host "*$files_staged " -NoNewline -ForegroundColor Magenta
+        # }
+        # if ($changes -ne $null) {
+        #     $changes = $changes.split(',')
+        #     $files_changed = $changes[0].split(' ')[1]
+        #     $changes_message = "~$files_changed"
+        #     Write-Host "$changes_message " -NoNewline -ForegroundColor DarkYellow
+        # }
+        if ($stash -gt 0) {
+            Write-Host "{$stash} " -NoNewline -ForegroundColor Yellow
+        }
+        Write-Host "| " -NoNewline -ForegroundColor Blue
     }
 }
 
@@ -116,9 +137,13 @@ function prompt {
         Write-Host "(Elevated) " -NoNewline -ForegroundColor Red
     }
 
-    Write-Host "$ENV:USERNAME" -NoNewline -ForegroundColor Magenta
+    # if ($realLASTEXITCODE -ne 0) {
+    #     Write-Host "❌ " -NoNewline -ForegroundColor DarkRed
+    # }
+
+    Write-Host "$env:USERNAME" -NoNewline -ForegroundColor Magenta
     Write-Host " at " -NoNewline -ForegroundColor White
-    Write-Host "$ENV:COMPUTERNAME" -NoNewline -ForegroundColor Cyan
+    Write-Host "$env:COMPUTERNAME" -NoNewline -ForegroundColor Cyan
 
     if ($s -ne $null) {  # color for PSSessions
         Write-Host " (`$s: " -NoNewline -ForegroundColor DarkGray
@@ -126,18 +151,25 @@ function prompt {
         Write-Host ") " -NoNewline -ForegroundColor DarkGray
     }
 
-    Write-Host ": " -NoNewline -ForegroundColor DarkGray
+    Write-Host ": " -NoNewline -ForegroundColor White
     Write-Host $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -NoNewline -ForegroundColor Yellow
 
+    # if ($env:http_proxy -ne $null) {
+    #     Write-Host " 🌐 " -NoNewline -ForegroundColor Green
+    # }
+
+    # if ($env:VIRTUAL_ENV -ne $null) {
+    #     # Python Virtual environment
+    #     # Write-Host " 🌐 " -NoNewline -ForegroundColor Green
+    # }
 
     if (Get-Command "git" -ErrorAction SilentlyContinue) {
         Write-Git-Info
     }
 
-    $global:LASTEXITCODE = $realLASTEXITCODE
-
     Write-Host ""
 
+    $global:LASTEXITCODE = $realLASTEXITCODE
     return "$ "
 }
 
@@ -217,6 +249,7 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete -ErrorAction SilentlyCo
 # Autocompletion for arrow keys
 Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward -ErrorAction SilentlyContinue
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward -ErrorAction SilentlyContinue
+Set-PSReadlineKeyHandler -Key Ctrl+p -Function HistorySearchBackward -ErrorAction SilentlyContinue
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"

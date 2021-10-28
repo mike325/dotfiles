@@ -125,11 +125,15 @@ else {
     }
 }
 
-New-Alias -Name open -Value 'ii'
+New-Alias -Name open -Value 'ii' -ErrorAction SilentlyContinue;
 
 if (Get-Command "bat" -ErrorAction SilentlyContinue) {
+    del alias:cat -ErrorAction SilentlyContinue;
     New-Alias -Name cat -Value 'bat' -ErrorAction SilentlyContinue;
     $env:GIT_PAGER = "bat.exe";
+}
+else {
+    New-Alias -Name cat -Value 'Get-Content' -ErrorAction SilentlyContinue;
 }
 
 if (Get-Command "coreutils" -ErrorAction SilentlyContinue) {
@@ -229,4 +233,33 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
 
 if ( Get-Command "thefuck.exe" -ErrorAction SilentlyContinue ) {
     iex "$(thefuck --alias)";
+}
+
+if (Test-Path("$env:USERPROFILE\.config\shell\host\proxy.ps1")) {
+    function toggleProxy {
+        $proxy = "$env:USERPROFILE\.config\shell\host\proxy.ps1"
+        if ($env:http_proxy -ne $null -AND $env:http_proxy -ne '') {
+            Remove-Item env:\http_proxy
+            Remove-Item env:\https_proxy
+            Remove-Item env:\ftp_proxy
+            Remove-Item env:\socks_proxy
+            Remove-Item env:\no_proxy
+            if (Test-Administrator) {
+                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Hyper"} | Set-NetIPInterface -InterfaceMetric 5000 -ErrorAction SilentlyContinue;
+                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Cisco"} | Set-NetIPInterface -InterfaceMetric 1 -ErrorAction SilentlyContinue;
+            }
+            Write-Host " Proxy disable" -ForegroundColor Yellow
+        }
+        elseif (Test-Path($proxy)) {
+            . "$env:USERPROFILE\.config\shell\host\proxy.ps1"
+            if (Test-Administrator) {
+                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Hyper"} | Set-NetIPInterface -InterfaceMetric 1 -ErrorAction SilentlyContinue;
+                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Cisco"} | Set-NetIPInterface -InterfaceMetric 6000 -ErrorAction SilentlyContinue;
+            }
+            Write-Host " Proxy enable" -ForegroundColor Green
+        }
+        else {
+            Write-Host " Missing proxy file at $proxy" -ForegroundColor Red
+        }
+    }
 }
