@@ -23,16 +23,16 @@ repos:
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 2.1.5  # or master
     hooks:
+      # TODO: Migrate some checks to python to make them "universal"
       # - id: bundler-audit
-      # - id: check-mailmap
+      # - id: check-mailmap   # Depends on sh, does not work in Powershell/Windows
       - id: forbid-binary
       # - id: forbid-space-in-indent
-      - id: git-check  # Configure in .gitattributes
-      # - id: git-dirty  # Configure in .gitignore
-      # - id: markdownlint # Configure in .mdlrc
-      # - id: reek
+      # - id: git-check       # Configure in .gitattributes, Depends on sh, does not work in Powershell/Windows
+      # - id: git-dirty       # Configure in .gitignore
+      # - id: markdownlint    # Configure in .mdlrc, depends on Ruby
+      # - id: protect-first-parent  # TODO: This fails in GH CI since Ubuntu 20.04 has an old Git version
       # - id: require-ascii
-      # - id: rubocop
       # - id: script-must-have-extension
       # - id: script-must-not-have-extension
       # - id: shellcheck

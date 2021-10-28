@@ -83,12 +83,13 @@ if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
 }
 
 # NOTE: It's better to install python with scoop and use versions to manage it
-# $python_versions = @('9', '8', '7', '6', '5', '4', '3')
-# foreach($version in $python_versions) {
-#     if (Test-Path "$env:APPDATA\Python\Python3$version\Scripts") {
-#         $env:path = "$env:APPDATA\Python\Python3$version\Scripts;$env:path"
-#     }
-# }
+$python_versions = @('12', '11', '10', '9', '8', '7', '6')
+foreach($version in $python_versions) {
+    if (Test-Path "$env:APPDATA\Python\Python3$version\Scripts") {
+        $env:path = "$env:APPDATA\Python\Python3$version\Scripts;$env:path"
+        break
+    }
+}
 
 if ( Test-Path "$env:USERPROFILE\.local\lib\pythonstartup.py") {
     $env:PYTHONSTARTUP = "$env:USERPROFILE\.local\lib\pythonstartup.py"
@@ -250,6 +251,7 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete -ErrorAction SilentlyCo
 Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward -ErrorAction SilentlyContinue
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward -ErrorAction SilentlyContinue
 Set-PSReadlineKeyHandler -Key Ctrl+p -Function HistorySearchBackward -ErrorAction SilentlyContinue
+Set-PSReadlineKeyHandler -Key Ctrl+n -Function HistorySearchForward -ErrorAction SilentlyContinue
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"

@@ -207,19 +207,17 @@ if is_windows; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    python3=("39" "38" "37" "36" "35" "34")
+    python=("12" "11" "10" "9" "8" "7" "6")
 
-    for version in "${python3[@]}"; do
-        if [[ -d "${windows_root}/Python${version}/Scripts" ]]; then
-            export PATH="${windows_root}/Python${version}/Scripts:$PATH"
+    for version in "${python[@]}"; do
+        if [[ -d "${windows_root}/Python3${version}/Scripts" ]]; then
+            export PATH="${windows_root}/Python3${version}/Scripts:$PATH"
+            break
         fi
 
         # Override Root packeges
-        if [[ -d "${windows_user}/Python/Python${version}/Scripts" ]]; then
-            export PATH="${windows_user}/Python/Python${version}/Scripts:$PATH"
-        fi
-
-        if [[ -d "${windows_root}/Python${version}/Scripts" ]] || [[ -d "${windows_user}/Python/Python${version}/Scripts" ]]; then
+        if [[ -d "${windows_user}/Python/Python3${version}/Scripts" ]]; then
+            export PATH="${windows_user}/Python/Python3${version}/Scripts:$PATH"
             break
         fi
     done
