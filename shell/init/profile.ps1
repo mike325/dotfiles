@@ -159,9 +159,9 @@ function prompt {
     Write-Host ": " -NoNewline -ForegroundColor White
     Write-Host $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -NoNewline -ForegroundColor Yellow
 
-    # if ($env:http_proxy -ne $null) {
-    #     Write-Host " 🌐 " -NoNewline -ForegroundColor Green
-    # }
+    if ($env:http_proxy -ne $null) {
+        Write-Host " -P-" -NoNewline -ForegroundColor Green
+    }
 
     # if ($env:VIRTUAL_ENV -ne $null) {
     #     # Python Virtual environment

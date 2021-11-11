@@ -26,12 +26,12 @@ $tweaks = @(
     "RequireAdmin",
     "CreateRestorePoint",
 
-     "Install-Choco",    # "Install-Choco-Proxy",
-     "Install-Scoop",
-     # "Install-Scoop-Buckets",
-     # "Install-Scoop-Packages",
-     # # "Install-Scoop-Gui",
-     # "Install-Choco-Packages",
+    "Install-Choco",    # "Install-Choco-Proxy",
+    "Install-Scoop",
+    # "Install-Scoop-Buckets",
+    # "Install-Scoop-Packages",
+    # # "Install-Scoop-Gui",
+    # "Install-Choco-Packages",
 
     ### Chris Titus Tech Additions
     # "TitusRegistryTweaks",
