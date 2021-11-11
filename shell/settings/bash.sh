@@ -220,6 +220,26 @@ if hash tmux 2>/dev/null; then
     bind '"\C-a":"tmux a || tmux new -s main\n"'
 fi
 
+function toggleProxy() {
+    # shellcheck disable=SC2154
+    if [[ -n $http_proxy ]]; then
+        unset "http_proxy"
+        unset "https_proxy"
+        unset "ftp_proxy"
+        unset "socks_proxy"
+        unset "no_proxy"
+        export PROXY_DISABLE=1
+        echo -e " ${echo_yellow}Proxy disable${echo_reset_color}"
+    elif [[ -f "$HOME/.config/shell/host/proxy.sh" ]]; then
+        # shellcheck disable=SC1090,SC1091
+        source "$HOME/.config/shell/host/proxy.sh"
+        unset PROXY_DISABLE
+        echo -e " ${echo_green}Proxy enable${echo_reset_color}"
+    else
+        echo -e " ${echo_red}Missing proxy file !!${echo_reset_color}"
+    fi
+}
+
 #######################################################################
 #                          Bash Completion                            #
 #######################################################################

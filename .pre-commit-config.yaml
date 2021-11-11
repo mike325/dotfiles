@@ -16,6 +16,12 @@ repos:
       - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
+        exclude: |
+            (?x)^(
+                shell/init/profile|
+                shell/init/shellrc.sh|
+                shell/init/shellrc.csh
+            )$
       - id: check-vcs-permalinks
       - id: check-symlinks
       - id: mixed-line-ending

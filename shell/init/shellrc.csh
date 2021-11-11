@@ -1,5 +1,3 @@
-#!/usr/bin/env tcsh
-
 ################################################################################
 #                                                                              #
 #  NOT TESTED!!!! Draft of a simple/basic port of my shellrc                   #
@@ -98,13 +96,13 @@ if ($?prompt) then
     # Make less colorful
     setenv LESS ' -R '
 
-#     # Load custom shell framework settings (override default shell framework settings)
-#     if ( -f  "$HOME/.config/shell/host/framework_settings" ) then
-#         source "$HOME/.config/shell/host/framework_settings"
-#     endif
-#
-#     # NOTE: can't make this crap works yet
-#     #
+    # Load custom shell framework settings (override default shell framework settings)
+    # if ( -f  "$HOME/.config/shell/host/framework_settings" ) then
+    #     source "$HOME/.config/shell/host/framework_settings"
+    # endif
+
+    # NOTE: can't make this crap works yet
+    #
     # Configure shell framework and specific shell settings (Just bash and zsh)
     # are supported
     if ( -f  "$HOME/.config/shell/settings/${CURRENT_SHELL}.csh" ) then

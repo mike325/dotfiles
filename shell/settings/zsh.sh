@@ -148,6 +148,7 @@ else
     autoload _git_info
     autoload _venv
     autoload _proxy
+    autoload toggleProxy
 
     PROMPT=$'\n''$(_username)%F{cyan}%m%f: %F{yellow}%~%f$(_proxy)$(_venv)$(_git_info)'$'\n'"→ "
     RPROMPT='$(_exit_code)'

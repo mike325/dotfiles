@@ -181,20 +181,6 @@ function prompt {
 $powersource = "$env:USERPROFILE\.config\shell\host\proxy.ps1"
 if (Test-Path($powersource)) {
     . $powersource
-    function toggleProxy {
-        if ($env:http_proxy -ne $null -AND $env:http_proxy -ne '') {
-            Remove-Item env:\http_proxy
-            Remove-Item env:\https_proxy
-            Remove-Item env:\ftp_proxy
-            Remove-Item env:\socks_proxy
-            Remove-Item env:\no_proxy
-            Write-Host " Proxy disable" -ForegroundColor Red
-        }
-        else {
-            . "$env:USERPROFILE\.config\shell\host\proxy.ps1"
-            Write-Host " Proxy enable" -ForegroundColor Green
-        }
-    }
 }
 
 $powersource = "$env:USERPROFILE\.config\shell\alias\alias.ps1"

@@ -42,23 +42,6 @@ if [[ -f "$HOME/.config/shell/host/proxy.sh" ]]; then
     if [[ -z $PROXY_DISABLE ]]; then
         source "$HOME/.config/shell/host/proxy.sh"
     fi
-    function toggleProxy() {
-        # shellcheck disable=SC2154
-        if [[ -n $http_proxy ]]; then
-            unset "http_proxy"
-            unset "https_proxy"
-            unset "ftp_proxy"
-            unset "socks_proxy"
-            unset "no_proxy"
-            export PROXY_DISABLE=1
-            echo "Proxy disable"
-        else
-            # shellcheck disable=SC1090,SC1091
-            source "$HOME/.config/shell/host/proxy.sh"
-            unset PROXY_DISABLE
-            echo "Proxy enable"
-        fi
-    }
 fi
 
 # Load all ENV variables
