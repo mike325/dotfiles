@@ -188,11 +188,11 @@ if (Test-Path($powersource)) {
             Remove-Item env:\ftp_proxy
             Remove-Item env:\socks_proxy
             Remove-Item env:\no_proxy
-            Write-Host " Proxy disable"
+            Write-Host " Proxy disable" -ForegroundColor Red
         }
         else {
             . "$env:USERPROFILE\.config\shell\host\proxy.ps1"
-            Write-Host " Proxy enable"
+            Write-Host " Proxy enable" -ForegroundColor Green
         }
     }
 }
