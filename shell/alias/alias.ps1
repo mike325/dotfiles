@@ -239,11 +239,11 @@ if (Test-Path("$env:USERPROFILE\.config\shell\host\proxy.ps1")) {
     function toggleProxy {
         $proxy = "$env:USERPROFILE\.config\shell\host\proxy.ps1"
         if ($env:http_proxy -ne $null -AND $env:http_proxy -ne '') {
-            Remove-Item env:\http_proxy
-            Remove-Item env:\https_proxy
-            Remove-Item env:\ftp_proxy
-            Remove-Item env:\socks_proxy
-            Remove-Item env:\no_proxy
+            Remove-Item env:\http_proxy -ErrorAction SilentlyContinue
+            Remove-Item env:\https_proxy -ErrorAction SilentlyContinue
+            Remove-Item env:\ftp_proxy -ErrorAction SilentlyContinue
+            Remove-Item env:\socks_proxy -ErrorAction SilentlyContinue
+            Remove-Item env:\no_proxy -ErrorAction SilentlyContinue
             if (Test-Administrator) {
                 Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Hyper"} | Set-NetIPInterface -InterfaceMetric 5000 -ErrorAction SilentlyContinue;
                 Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Cisco"} | Set-NetIPInterface -InterfaceMetric 1 -ErrorAction SilentlyContinue;
