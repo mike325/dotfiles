@@ -25,14 +25,14 @@ sl
 vim-nox
 neovim
 unzip
-python-pip
+# python-pip
 python3-pip
 # docker
 shellcheck
 ntfs-3g
 davfs2
 libssl-dev
-btrfs-tools
+# btrfs-tools  # TODO: Need to check this package
 exfat-fuse
 exfat-utils
 nfs-common

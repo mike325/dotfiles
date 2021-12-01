@@ -25,7 +25,7 @@ shopt -s nocaseglob
 HISTCONTROL='erasedups:ignoreboth'
 HISTFILESIZE=9999
 HISTSIZE=9999
-PROMPT_COMMAND='history -a'
+# PROMPT_COMMAND='history -a'
 shopt -s histappend histverify
 
 # Path to the bash it configuration
@@ -40,7 +40,7 @@ else
     export green="\[\e[0;32m\]"
     export yellow="\[\e[0;33m\]"
     export blue="\[\e[0;34m\]"
-    export purple="\[\e[0;35m\]"
+    export magenta="\[\e[0;35m\]"
     export cyan="\[\e[0;36m\]"
     export white="\[\e[0;37m\]"
     export orange="\[\e[0;91m\]"
@@ -53,7 +53,7 @@ else
     export echo_green="\033[0;32m"
     export echo_yellow="\033[0;33m"
     export echo_blue="\033[0;34m"
-    export echo_purple="\033[0;35m"
+    export echo_magenta="\033[0;35m"
     export echo_cyan="\033[0;36m"
     export echo_white="\033[0;37;1m"
     export echo_orange="\033[0;91m"
@@ -136,12 +136,6 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     source "$BASH_IT/bash_it.sh"
 else
 
-    __schroot_name() {
-        if [[ -n ${SCHROOT_CHROOT_NAME} ]]; then
-            echo -e "${echo_red}(${SCHROOT_CHROOT_NAME})${echo_reset_color} "
-        fi
-    }
-
     __git_info() {
         if hash git 2>/dev/null; then
             local branch changes stash info
@@ -152,7 +146,7 @@ else
                     printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
                 to_commit="$(git diff --cached --shortstat 2>/dev/null | awk '{
-                    printf "%s*%d", ENVIRON["echo_purple"],, $1;
+                    printf "%s*%d", ENVIRON["echo_magenta"], $1;
                 }')"
                 stash="$(git stash list 2>/dev/null | wc -l)"
                 if [[ $stash -ne 0 ]]; then
@@ -160,14 +154,29 @@ else
                 else
                     stash=''
                 fi
-                info=" ${echo_blue}|"
+                info="${echo_blue}|"
                 [[ -n $branch ]] && info="$info ${echo_reset_color}$branch${echo_reset_color}"
                 [[ -n $to_commit ]] && info="$info ${echo_reset_color}$to_commit${echo_reset_color}"
                 [[ -n $changes ]] && info="$info ${echo_reset_color}$changes${echo_reset_color}"
                 [[ -n $stash ]] && info="$info ${echo_reset_color}$stash${echo_reset_color}"
                 info="$info ${echo_blue}|${echo_reset_color} "
-                echo -e " $info "
+                echo -e "$info"
             fi
+        fi
+    }
+
+    __venv() {
+        if [[ -n $VIRTUAL_ENV ]]; then
+            local version
+            version="$(python --version | awk '{print $2}')"
+            echo -e "${echo_white}(${VIRTUAL_ENV##*/} 🐍 ${version})${echo_reset_color} "
+        fi
+    }
+
+    __proxy() {
+        # shellcheck disable=SC2154
+        if [[ -n $http_proxy ]]; then
+            echo -e "${echo_green}🌐${echo_reset_color} "
         fi
     }
 
@@ -177,39 +186,39 @@ else
         fi
     }
 
-    __jobs() {
-        # local j
-        # j=$(jobs | wc -l)
-        # if [[ $j -gt 1 ]]; then
-        #     echo -e " ${echo_red}(${j})${echo_reset_color}"
-        # fi
-        :
-    }
-
     __exit_code() {
         local rc=$?
         # NOTE: ignore send to background and <CTRL-c> exit codes
-        if [[ rc -ne 0 ]] && [[ rc -ne 148 ]] && [[ rc -ne 130 ]]; then
+        if [[ $rc -ne 0 ]] && [[ $rc -ne 148 ]] && [[ rc -ne 130 ]]; then
             echo -e " ${echo_red}❌${echo_reset_color} "
         fi
     }
 
-    __venv() {
-        if [[ -n $VIRTUAL_ENV ]]; then
-            local version
-            version="$(python --version | awk '{print $2}')"
-            echo -e " ${echo_white}(${VIRTUAL_ENV##*/} 🐍 ${version})${echo_reset_color}"
+    __schroot_name() {
+        if [[ -n ${SCHROOT_CHROOT_NAME} ]]; then
+            echo -e "${echo_red}(${SCHROOT_CHROOT_NAME})${echo_reset_color} "
         fi
     }
 
-    __proxy() {
-        # shellcheck disable=SC2154
-        if [[ -n $http_proxy ]]; then
-            echo -e " ${echo_green}🌐${echo_reset_color}"
-        fi
-    }
+    # PS1="\n$(__schroot_name)\$(__exit_code)$(__user)${cyan}\h${reset_color}: ${yellow}\w${reset_color} ${magenta}J:\j${reset_color} \$(__proxy)\$(__venv)\$(__git_info) \n→ "
 
-    PS1="\n$(__schroot_name)\$(__exit_code)$(__user)${cyan}\h${reset_color}: ${yellow}\w${reset_color}\$(__proxy)\$(__venv)\$(__git_info) \n→ "
+    _prompt_command() {
+        # EXIT_CODE=$?
+
+        PS1="\n"
+        PS1+="$(__schroot_name)"
+        PS1+="$(__exit_code)"
+        PS1+="$(__user)"
+        PS1+="${cyan}\h${reset_color}: "
+        PS1+="${yellow}\w${reset_color} "
+        PS1+="${magenta}J:\j${reset_color} "
+        PS1+="$(__proxy)"
+        PS1+="$(__venv)"
+        PS1+="$(__git_info) "
+        PS1+="\n→ "
+    }
+    PROMPT_COMMAND=_prompt_command
+
 fi
 
 if hash kitty 2>/dev/null; then

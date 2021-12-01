@@ -2,7 +2,6 @@
 
 # Each host can have custom commands
 
-git/host/
-
-shell/host/
 /shell/scripts/
+/shell/host
+/git/host/

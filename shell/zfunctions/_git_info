@@ -16,7 +16,7 @@ if hash git 2>/dev/null; then
         else
             stash=''
         fi
-        info=" %F{blue}|"
+        info="%F{blue}|"
         [[ -n $branch ]] && info="$info %f$branch%f"
         [[ -n $to_commit ]] && info="$info %f$to_commit%f"
         [[ -n $changes ]] && info="$info %f$changes%f"

@@ -2,5 +2,5 @@
 
 if [[ -n "$VIRTUAL_ENV" ]]; then
     version="$(python --version | awk '{print $2}')"
-    echo " %F{white}(${VIRTUAL_ENV##*/} 🐍 ${version})%f"
+    echo " %F{white}(${VIRTUAL_ENV##*/} 🐍 ${version})%f "
 fi

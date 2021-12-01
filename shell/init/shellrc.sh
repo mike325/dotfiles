@@ -215,7 +215,10 @@ if hash gtags 2>/dev/null; then
     export GTAGSLABEL=pygments
 fi
 
-if hash gpgconf 2>/dev/null; then
+if hash gpgconf 2>/dev/null && hash gpg 2>/dev/null; then
+    if [[ ! -f "$HOME/.gnupg/trustdb.gpg" ]]; then
+        gpg -K 2>/dev/null
+    fi
     GPG_TTY="$(tty)"
     export GPG_TTY
     gpgconf --launch gpg-agent
