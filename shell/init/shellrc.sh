@@ -92,10 +92,12 @@ if hash nvm 2>/dev/null; then
     [[ -d "$HOME/.nvm" ]] && mkdir -p "$HOME/.nvm"
     export NVM_DIR="$HOME/.nvm"
 
-    # This loads nvm
-    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
-    # This loads nvm bash_completion
-    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+    _NVM="/opt/homebrew/opt/nvm"
+
+    # shellcheck disable=SC1090,SC1091
+    [ -s "${_NVM}/nvm.sh" ] && . "${_NVM}/nvm.sh" # This loads nvm
+    # shellcheck disable=SC1090,SC1091
+    [ -s "${_NVM}/etc/bash_completion.d/nvm" ] && . "${_NVM}/etc/bash_completion.d/nvm" # This loads nvm bash_completion
 fi
 
 ################################################################################

@@ -254,7 +254,7 @@ if (Test-Path("$env:USERPROFILE\.config\shell\host\proxy.ps1")) {
             . "$env:USERPROFILE\.config\shell\host\proxy.ps1"
             if (Test-Administrator) {
                 Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Hyper"} | Set-NetIPInterface -InterfaceMetric 1 -ErrorAction SilentlyContinue;
-                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Cisco"} | Set-NetIPInterface -InterfaceMetric 6000 -ErrorAction SilentlyContinue;
+                Get-NetAdapter | Where-Object {$_.InterfaceDescription -Match "Cisco"} | Set-NetIPInterface -InterfaceMetric 5000 -ErrorAction SilentlyContinue;
             }
             Write-Host " Proxy enable" -ForegroundColor Green
         }
