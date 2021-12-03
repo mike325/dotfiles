@@ -58,3 +58,5 @@ network-manager
 samba
 pv
 zram-tools
+sqlite3
+libsqlite3-dev

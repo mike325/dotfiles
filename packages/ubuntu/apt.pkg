@@ -50,3 +50,5 @@ pv
 # python-pip # Deprecated
 # clangd # pkg seems broken in ubuntu, as it may need to be install without snapd
 # davfs2
+sqlite3
+libsqlite3-dev
