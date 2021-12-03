@@ -139,7 +139,8 @@ else
     __git_info() {
         if hash git 2>/dev/null; then
             local branch changes stash info
-            branch="$(git branch 2>/dev/null | head -n1 | awk '{$1=""; print $0}')"
+            # shellcheck disable=SC2063
+            branch="$(git branch 2>/dev/null | grep '^*' | awk '{$1=""; print $0}')"
             if [[ -n $branch ]]; then
                 branch="${echo_white}${echo_blue}${branch}"
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
