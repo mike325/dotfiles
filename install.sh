@@ -1143,11 +1143,11 @@ function _windows_portables() {
                 error_msg "An error occurred extracting zip file"
                 rst=1
             else
-                chmod u+x "$TMP/fd-${version}-${os_type}/fd.exe"
-                mv "$TMP/fd-${version}-${os_type}/fd.exe" "$HOME/.local/bin/"
+                chmod u+x "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/fd.exe"
+                mv "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/fd.exe" "$HOME/.local/bin/"
             fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
+            verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
