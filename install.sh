@@ -35,7 +35,7 @@ VIM=0
 NVIM=0
 BIN=0
 SHELL_SCRIPTS=0
-SHELL_FRAMEWORK=0
+# SHELL_FRAMEWORK=0
 EMACS=0
 DOTFILES=0
 GIT=0
@@ -954,8 +954,10 @@ function get_nvim_dotfiles() {
         status_msg "Getting neovim in $HOME/AppData/Local/nvim"
         if [[ -d "$HOME/.vim" ]]; then
             setup_config "$HOME/.vim" "$HOME/AppData/Local/nvim"
+            setup_config "$HOME/.vim" "$HOME/.config/nvim"
         elif [[ -d "$HOME/vimfiles" ]]; then
             setup_config "$HOME/vimfiles" "$HOME/AppData/Local/nvim"
+            setup_config "$HOME/.vim" "$HOME/.config/nvim"
         else
             status_msg "Cloning neovim dotfiles in $HOME/AppData/Local/nvim"
             if ! clone_repo "$URL/.vim" "$HOME/.config/nvim"; then
@@ -2200,17 +2202,17 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             CURRENT_SHELL="$_result"
-            SHELL_FRAMEWORK=1
+            # SHELL_FRAMEWORK=1
             ALL=0
             ;;
-        -w | --shell_frameworks)
-            SHELL_FRAMEWORK=1
-            ALL=0
-            if [[ $2 =~ ^(ba|z)sh$ ]]; then
-                CURRENT_SHELL="$2"
-                shift
-            fi
-            ;;
+        # -w | --shell_frameworks)
+        #     SHELL_FRAMEWORK=1
+        #     ALL=0
+        #     if [[ $2 =~ ^(ba|z)sh$ ]]; then
+        #         CURRENT_SHELL="$2"
+        #         shift
+        #     fi
+        #     ;;
         -f | --force)
             FORCE_INSTALL=1
             ;;
@@ -2426,7 +2428,7 @@ if [[ $ALL -eq 1 ]]; then
     setup_bin
     setup_dotconfigs
     setup_shell_scripts
-    setup_shell_framework
+    # setup_shell_framework
     setup_git
     get_portables
     get_vim_dotfiles
@@ -2439,7 +2441,7 @@ else
     [[ $BIN -eq 1 ]] && setup_bin
     [[ $DOTCONFIGS -eq 1 ]] && setup_dotconfigs
     [[ $SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
-    [[ $SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
+    # [[ $SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $GIT -eq 1 ]] && setup_git
     [[ $PORTABLES -eq 1 ]] && get_portables
     [[ $VIM -eq 1 ]] && get_vim_dotfiles
