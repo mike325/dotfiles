@@ -131,6 +131,7 @@
 ;###############################################################################
 
     dt  = describe --tag
+    lastag  = "!f() { git tag | sort -h | uniq | tail -n1; }; f"
 
 ;###############################################################################
 ;                 clone recursive                                              #
@@ -245,6 +246,7 @@
     ob = checkout -b    ; checkout to a given branch
     od = checkout --    ; Reset the changes in a given file
     or = checkout .     ; Reset the changes of the working space
+    olt  = "!f() { git checkout $(git tag | sort -h | uniq | tail -n1); }; f"
 
 ;###############################################################################
 ;                 Shortcuts to push changes                                    #
