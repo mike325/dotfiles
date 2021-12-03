@@ -54,6 +54,7 @@ fi
 [[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
 [[ -d "$HOME/.luarocks/bin" ]] && export PATH="$HOME/.luarocks/bin/:$PATH"
 [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin/:$PATH"
+[[ -d "/opt/homebrew/bin" ]] && export PATH="/opt/homebrew/bin:$PATH"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
@@ -85,6 +86,16 @@ if hash npm 2>/dev/null; then
     [[ ! -d "$HOME/.npm-global/" ]] && mkdir -p "$HOME/.npm-global"
     export NPM_CONFIG_PREFIX="$HOME/.npm-global"
     export PATH="$HOME/.npm-global/bin:$PATH"
+fi
+
+if hash nvm 2>/dev/null; then
+    [[ -d "$HOME/.nvm" ]] && mkdir -p "$HOME/.nvm"
+    export NVM_DIR="$HOME/.nvm"
+
+    # This loads nvm
+    [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
+    # This loads nvm bash_completion
+    [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 fi
 
 ################################################################################
@@ -190,9 +201,8 @@ if is_windows; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    python=("12" "11" "10" "9" "8" "7" "6")
-
-    for version in "${python[@]}"; do
+    _python=("12" "11" "10" "9" "8" "7" "6")
+    for version in "${_python[@]}"; do
         if [[ -d "${windows_root}/Python3${version}/Scripts" ]]; then
             export PATH="${windows_root}/Python3${version}/Scripts:$PATH"
             break
@@ -207,6 +217,16 @@ if is_windows; then
 
     export PYTHONIOENCODING="utf8"
 
+elif is_osx; then
+    # /Users/mike/Library/Python/3.8/bin
+    _python=("12" "11" "10" "9" "8" "7" "6")
+    _osx_root="$HOME/Library/"
+    for version in "${_python[@]}"; do
+        if [[ -d "${_osx_root}/Python/3.${version}/bin" ]]; then
+            export PATH="${_osx_root}/Python/3.${version}/bin:$PATH"
+            break
+        fi
+    done
 fi
 
 export _DEFAULT_SHELL="${SHELL##*/}"

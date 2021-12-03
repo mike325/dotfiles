@@ -12,6 +12,8 @@
 ! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
 ! hash is_windows 2>/dev/null && is_windows() { return 0; }
 
+_platform="$(uname)"
+
 if hash vim 2>/dev/null  || hash nvim 2>/dev/null; then
     if hash nvim 2>/dev/null; then
 
@@ -167,7 +169,7 @@ elif [[ -f /proc/sys/vm/swappiness ]]; then
 fi
 
 # Termux's grep doesn't have color support
-if [[ $(uname --all) =~ Android ]]; then
+if [[ $(uname -a) =~ Android ]]; then
     unalias grep >/dev/null
     alias grep="grep -n"
 else
@@ -177,7 +179,11 @@ fi
 alias grepo="grep -o"
 alias grepe="grep -E"
 
-alias ls='ls --color --classify --human-readable'
+if [[ $_platform == 'Darwin' ]]; then
+    alias ls='ls --color'
+else
+    alias ls='ls --color --classify --human-readable'
+fi
 alias l="ls"
 alias la="ls -A"
 alias ll="ls -l"
