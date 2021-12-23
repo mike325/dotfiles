@@ -132,9 +132,8 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 if ! hash is_64bits 2>/dev/null; then
-    # TODO: This should work with ARM 64bits
     function is_64bits() {
-        if [[ $ARCH == 'x86_64' ]]; then
+        if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
             return 0
         fi
         return 1

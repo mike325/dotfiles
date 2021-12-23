@@ -216,7 +216,7 @@ else
         PS1+="$(__proxy)"
         PS1+="$(__venv)"
         PS1+="$(__git_info) "
-        PS1+="\n→ "
+        PS1+="\n$ "
     }
     PROMPT_COMMAND=_prompt_command
 

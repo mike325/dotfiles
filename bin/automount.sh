@@ -32,6 +32,12 @@ NAME="$0"
 NAME="${NAME##*/}"
 LOG="${NAME%%.*}.log"
 
+DISK_INFO=""
+DRIVE_NAME=""
+DRIVE_DEV=""
+
+NTFS_EXE="/opt/homebrew/bin/ntfs-3g"
+
 SCRIPT_PATH="$0"
 
 SCRIPT_PATH="${SCRIPT_PATH%/*}"
@@ -130,6 +136,7 @@ if ! hash is_osx 2>/dev/null; then
 fi
 
 if ! hash is_64bits 2>/dev/null; then
+    # TODO: This should work with ARM 64bits
     function is_64bits() {
         if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
             return 0
@@ -164,8 +171,7 @@ reset_color="\033[39m"
 
 function help_user() {
     cat <<EOF
-Description:
-    Update all git repositories inside a directory
+Description
 
 Usage:
     $NAME [OPTIONAL]
@@ -187,57 +193,57 @@ EOF
 }
 
 function warn_msg() {
-    local warn_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
     else
-        printf "[!] Warning:\t %s\n" "$warn_message"
+        printf "[!] Warning:\t %s\n" "$msg"
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >>"${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
-    local error_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
     else
-        printf "[X] Error:\t %s\n" "$error_message" 1>&2
+        printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
     ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$error_message" >>"${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
-    local status_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
     else
-        printf "[*] Info:\t %s\n" "$status_message"
+        printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >>"${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
-    local debug_message="$1"
+    local msg="$1"
     if [[ $VERBOSE -eq 1 ]]; then
         if [[ $NOCOLOR -eq 0 ]]; then
-            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
         else
-            printf "[+] Debug:\t %s\n" "$debug_message"
+            printf "[+] Debug:\t %s\n" "$msg"
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >>"${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -253,7 +259,7 @@ function __parse_args() {
 
     local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
 
-    if [[ -n $3 ]]; then
+    if [[ -n $3   ]]; then
         local pattern="^--${flag}=$3$"
     fi
 
@@ -316,12 +322,14 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
-        # -)
-        #     while read -r from_stdin; do
-        #         FROM_STDIN=("$from_stdin")
-        #     done
-        #     break
-        #     ;;
+        -n | -d | --name | --drive)
+            if [[ -z $2 ]]; then
+                error_msg "Missing drive name!"
+                exit 1
+            fi
+            DRIVE_NAME="$2"
+            shift
+            ;;
         *)
             initlog
             error_msg "Unknown argument $key"
@@ -343,22 +351,54 @@ verbose_msg "OS            : ${OS}"
 #                           CODE Goes Here                            #
 #######################################################################
 
-for i in *; do
-    if [[ -d $i ]]; then
-        if pushd "$i" &>/dev/null; then
-            if git rev-parse --show-toplevel &>/dev/null; then
-                status_msg "Updating $i"
-                if ! git pull &>/dev/null; then
-                    error_msg "Failed to update $i"
-                fi
-            else
-                warn_msg "Skipping $i, not a git repo"
-            fi
-            popd &>/dev/null || exit 1
-        fi
-    fi
-done
+if [[ ! -f $NTFS_EXE ]]; then
+    error_msg "Missing ntfs-3g, cannot re-mount the drives"
+    exit 1
+fi
 
+if [[ -z $DRIVE_NAME ]]; then
+    DISK_INFO="$(diskutil list | grep -i 'windows_ntfs' | head -n1)"
+    if [[ -z $DISK_INFO ]]; then
+        error_msg "There's no ntfs drive connected!!"
+        exit 1
+    fi
+    DRIVE_NAME="$(echo "$DISK_INFO" | grep -i 'windows_ntfs' | awk '{print $3}')"
+    DRIVE_DEV="/dev/$(echo "$DISK_INFO" | awk '{print $6}')"
+else
+    DISK_INFO="$(diskutil list | grep -i "$DRIVE_NAME" | head -n1)"
+    if [[ -z $DISK_INFO ]]; then
+        error_msg "The drive $DRIVE_NAME is not connected!!"
+        exit 1
+    fi
+    DRIVE_DEV="/dev/$(echo "$DISK_INFO" | awk '{print $6}')"
+fi
+
+if [[ -z $DRIVE_DEV ]] || [[ -z $DRIVE_NAME ]] || [[ -z $DISK_INFO ]]; then
+    error_msg "Missing Drive info!"
+    exit 1
+fi
+
+# status_msg "Drive name: $DRIVE_NAME, located in $DRIVE_DEV"
+if ! eval '$(df -h | grep -qi "/Volumes/$DRIVE_NAME")'; then
+    status_msg "Unmounting ${DRIVE_DEV}"
+    if ! sudo diskutil unmount "$DRIVE_DEV"; then
+        error_msg "Failed to unmount $DRIVE_NAME"
+        exit 1
+    fi
+fi
+
+sleep 1
+status_msg "Creating mouting point"
+sudo mkdir -p "/Volumes/$DRIVE_NAME"
+status_msg "Remounting disk as ${DRIVE_NAME}"
+if ! sudo "$NTFS_EXE" "$DRIVE_DEV" "/Volumes/$DRIVE_NAME" -o local -o allow_other -o auto_xattr -o auto_cache; then
+    error_msg "Failed to mount $DRIVE_NAME with write permissions"
+    exit 1
+fi
+
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
 fi

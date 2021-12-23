@@ -180,7 +180,7 @@ alias grepo="grep -o"
 alias grepe="grep -E"
 
 if [[ $_platform == 'Darwin' ]]; then
-    alias ls='ls --color'
+    alias ls='ls -h --color'
 else
     alias ls='ls --color --classify --human-readable'
 fi

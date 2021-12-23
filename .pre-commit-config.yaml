@@ -95,6 +95,7 @@ repos:
             (?x)^(
                 shell/zfunctions/.*|
                 shell/scripts/.*|
+                bin/converter.sh|
                 .*\.(t)?csh|
                 .*zsh.*|
                 .*\.zsh

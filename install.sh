@@ -171,9 +171,8 @@ function has_fetcher() {
     return 1
 }
 
-# TODO: This should work with ARM 64bits
 function is_64bits() {
-    if [[ $ARCH == 'x86_64' ]]; then
+    if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
         return 0
     fi
     return 1

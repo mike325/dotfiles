@@ -162,9 +162,10 @@ function has_sudo() {
     return 1
 }
 
-# TODO: This should work with ARM 64bits
 function is_64bits() {
-    if [[ "$(uname -m)" =~ (x86_64) ]]; then
+    local arch
+    arch="$(uname -m)"
+    if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
         return 0
     fi
     return 1

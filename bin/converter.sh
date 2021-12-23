@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 #
 #                              -`
@@ -31,6 +31,7 @@ FILES=()
 AUTO_LOCATE=1
 NO_ARCHIVE=1
 OUTPUT_DIR=""
+USE_SW_ENCODE=0
 
 NAME="$0"
 NAME="${NAME##*/}"
@@ -52,13 +53,9 @@ OS='unknown'
 trap '{ exit_append; }' EXIT
 trap '{ clean_up && exit_append && exit 1; }' SIGTERM SIGINT
 
-if hash realpath 2>/dev/null; then
-    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
-else
-    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
-    SCRIPT_PATH="$(pwd -P)"
-    popd 1>/dev/null  || exit 1
-fi
+pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
+SCRIPT_PATH="$(pwd -P)"
+popd 1>/dev/null  || exit 1
 
 if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
@@ -146,9 +143,8 @@ else
 fi
 
 if ! hash is_64bits 2>/dev/null; then
-    # TODO: This should work with ARM 64bits
     function is_64bits() {
-        if [[ $ARCH == 'x86_64' ]]; then
+        if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
             return 0
         fi
         return 1
@@ -181,7 +177,7 @@ reset_color="\033[39m"
 
 function help_user() {
     cat <<EOF
-Script to automate video convertion to h265 with 320k aac
+Script to automate video convertion to h265/HEVC with 320k aac
 
 Usage:
     $NAME [OPTIONAL]
@@ -381,6 +377,9 @@ while [[ $# -gt 0 ]]; do
             FILES+=("$2")
             shift
             ;;
+        --sw | --software)
+            USE_SW_ENCODE=1
+            ;;
         -)
             while read -r from_stdin; do
                 AUTO_LOCATE=0
@@ -441,110 +440,132 @@ function check_sizes() {
     if [[ $old_size -lt $new_size ]]; then
         warn_msg "Old file $1 is smaller"
         clean_up
-        # if [[ ! -f "${location}/$1" ]]; then
-        #     status_msg "Copying old file"
-        #     verbose_msg "Using -> cp '$1' '${location}'"
-        #     if ! cp "$1" "${location}/"; then
-        #         error_msg "Failed to move old file '$1' to new location"
-        #         return 1
-        #     fi
-        # else
-        #     status_msg "Skipping $1, already exits in ${location}"
-        # fi
+        return 1
     fi
-
     return 0
 }
 
 function convert_files() {
     # local file_path="$1"
-    local file_dir
-    local file_abspath
-    local filename
-    local file_basename
-    # local has_hwaccel=false
-    local converter
-    local vconverter
-    local file_dir file_abspath filename file_basename
-    local converter vconverter
+    local file_dir file_abspath filename file_basename converter vconverter
+    local vcodec acodec
+    local vcmd=""
+    local acmd=""
+    local hwaccel=""
+    local hevc_encoder=""
+    local aconverter=""
+    local vcopy="-c:v copy"
+    local acopy="-c:a copy"
     local output="$OUTPUT_DIR"
+    local default_hw_quality=75
+    local default_sw_quality=30
 
-    file_abspath="$(readlink -f "$1")"
+    if is_osx; then
+        file_abspath="$1:A"
+    else
+        file_abspath="$(readlink -f "$1")"
+    fi
+
     file_dir="${file_abspath%/*}"
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
 
-    if hash vainfo 2>/dev/null && { vainfo 2>/dev/null | grep -qi hevc; }; then
-        converter="ffmpeg -hwaccel vaapi -hwaccel_output_format vaapi -init_hw_device vaapi=encoder:/dev/dri/renderD128 -filter_hw_device encoder -hide_banner"
-        vconverter="-c:v hevc_vaapi -rc_mode 1 -crf 0 -qp 25 -profile:v main -tier high -level 186 "
-    else
-        converter="ffmpeg -hwaccel auto -hide_banner "
-        vconverter="-c:v hevc -crf 0 -preset slow"
-    fi
+    # TODO: support intel quicksync, windows ryzen amf and nvidia accelerators
+    hwaccel="$(ffmpeg -hide_banner -hwaccels | grep -iEo '^(vaapi|videotoolbox)$' | head -n1)"
+    hevc_encoder="$(ffmpeg -hide_banner -codecs | grep -iEo 'hevc_(vaapi|videotoolbox)')"
 
-    local aconverter="-c:a aac -b:a 320k"
-    local vcopy="-c:v copy"
-    local acopy="-c:a copy"
-    local vcodec
-    local acodec
-
-    if [[ $VERBOSE -eq 0 ]]; then
-        converter="$converter -v quiet "
-    else
-        converter="$converter -v verbose "
-    fi
-
-    # local metadata=" --metadata authr=$_AUTHOR"
+    verbose_msg "Hardware encoder: $hwaccel"
+    verbose_msg "Hardware h265 encoder: $hevc_encoder"
 
     verbose_msg "Getting video info"
-
-    if hash ffprobe 2>/dev/null && hash jq 2>/dev/null; then
-        vcodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_abspath}" |  jq .streams[0].codec_name | cut -f2 -d'"')"
-        acodec="$(ffprobe -v quiet -show_format -show_streams -print_format json -hide_banner -i "${file_abspath}" |  jq .streams[1].codec_name | cut -f2 -d'"')"
+    if hash ffprobe 2>/dev/null; then
+        vcodec="$(ffprobe -v error -select_streams 'v:0' -show_entries stream=codec_name -of default=nokey=1:noprint_wrappers=1 "${file_abspath}")"
+        acodec="$(ffprobe -v error -select_streams 'a:0' -show_entries stream=codec_name -of default=nokey=1:noprint_wrappers=1 "${file_abspath}")"
+    else
+        vcodec="unknown"
+        acodec="unknown"
     fi
 
     verbose_msg "Video codec: $vcodec"
     verbose_msg "Audio codec: $acodec"
 
     if [[ $vcodec == hevc ]] && { [[ $acodec == aac ]] || [[ $acodec == null ]];  }; then
-        warn_msg "Skipping $filename, already h265 with aac"
+        warn_msg "Skipping $filename, already hevc with aac"
         return 1
     fi
 
-    local vcmd="$vconverter"
-    local acmd="$aconverter"
+    local quality=$default_hw_quality
+    while true; do
+        if [[ -n $hevc_encoder ]] && [[ $USE_SW_ENCODE -eq 0 ]]; then
+            status_msg "HW transcode with video with ${quality}"
+            if [[ $hwaccel == 'vaapi' ]]; then
+                converter="ffmpeg -map_metadata 0 -map 0:v -map 0:a -map 0:d -hwaccel ${hwaccel} -hwaccel_output_format ${hwaccel} -init_hw_device vaapi=encoder:/dev/dri/renderD128 -rc_mode CQP -filter_hw_device encoder -hide_banner"
+                vconverter="-c:v ${hevc_encoder} -q:v ${quality} -profile:v main -tier high -level 186 "
+            elif [[ $hwaccel == 'videotoolbox' ]]; then
+                # Since we are in a mac we can use the audiotoolkit to accelerate audio convertion
+                converter="ffmpeg -hwaccel ${hwaccel} -hide_banner -map 0:v -map 0:a -map 0:d -map_metadata 0 "
+                vconverter="-c:v ${hevc_encoder} -vtag hvc1 -q:v ${quality} -profile:v main "
+                aconverter="-c:a aac_at -b:a 320k -ac 2"
+            fi
+        else
+            status_msg "SW transcode"
+            converter="ffmpeg -hide_banner -map 0:v -map 0:a -map 0:d -map_metadata 0 "
+            vconverter="-c:v hevc -crf 22 -vtag hvc1 -preset fast -profile:v main "
+        fi
 
-    if [[ $vcodec == hevc ]]; then
-        vcmd="$vcopy"
-    fi
+        if [[ -z $aconverter ]]; then
+            aconverter="-c:a aac -b:a 320k -ac 2"
+        fi
 
-    if [[ $acodec == aac ]] || [[ $acodec == null ]]; then
-        acmd="$acopy"
-    fi
+        if [[ $VERBOSE -eq 0 ]]; then
+            converter="$converter -v quiet "
+        else
+            converter="$converter -v verbose "
+        fi
 
-    status_msg "Converting ${filename}"
+        vcmd="$vconverter"
+        acmd="$aconverter"
 
-    if [[ -z $output ]]; then
-        output="${file_dir}"
-    fi
+        if [[ $vcodec == hevc ]]; then
+            vcmd="$vcopy"
+        fi
 
-    CURRENT="${output}/${file_basename}.265.mp4"
+        if [[ $acodec == aac ]] || [[ $acodec == null ]]; then
+            acmd="$acopy"
+        fi
 
-    if [[ -f $CURRENT ]]; then
-        warn_msg "Skipping $CURRENT, already exists in $output"
-        return 0
-    fi
+        status_msg "Converting ${filename}"
 
-    verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${CURRENT}"
-    if ! eval '${converter} -i "${file_abspath}" ${vcmd} ${acmd} "${CURRENT}"'; then
-        error_msg "Failed to convert video from ${filename}"
-        verbose_msg "Cleaning failed file"
-        rm -f "${CURRENT}"
-        CURRENT=''
-        return 1
-    fi
+        if [[ -z $output ]]; then
+            output="${file_dir}"
+        fi
 
-    check_sizes "${file_abspath}" "${CURRENT}" "${output}"
+        CURRENT="${output}/${file_basename}.hevc.mp4"
+
+        if [[ -f $CURRENT ]]; then
+            warn_msg "Skipping $CURRENT, already exists in $output"
+            return 0
+        fi
+
+        verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${CURRENT}"
+        if ! eval 'bash -c "${converter} -i "${file_abspath}" ${vcmd} ${acmd} \"${CURRENT}\""'; then
+            error_msg "Failed to convert video from ${filename}"
+            verbose_msg "Cleaning failed file"
+            rm -f "${CURRENT}"
+            CURRENT=''
+            return 1
+        fi
+
+        if ! check_sizes "${file_abspath}" "${CURRENT}" "${output}"; then
+            if [[ -n $hevc_encoder ]] && [[ $USE_SW_ENCODE -eq 0 ]]; then
+                quality=$((quality - 5))
+            else
+                break
+            fi
+        else
+            break
+        fi
+    done
 
     CURRENT=''
 
@@ -558,7 +579,11 @@ function media_archive() {
     local filename
     local file_basename
 
-    file_abspath="$(readlink -f "$1")"
+    if is_osx; then
+        file_abspath="$1:A"
+    else
+        file_abspath="$(readlink -f "$1")"
+    fi
     file_dir="${file_abspath%/*}"
     filename=$(basename "$file_abspath")
     file_basename=$(basename "${file_abspath%.*}")
@@ -599,7 +624,11 @@ function start_convertion() {
         verbose_msg "Using ${_cmd}"
         CMD="$(get_cmd "$_cmd" "$MEDIA_PATH")"
         verbose_msg "Getting files with -> ${CMD}"
-        mapfile -t FILES < <(eval "$CMD")
+
+        # readarray -t FILES < <(eval "$CMD")
+        while IFS= read -r line; do
+            FILES+=("$line")
+        done < <(eval "$CMD")
     else
         verbose_msg "Converting input files:"
         for i in "${FILES[@]}"; do
@@ -618,7 +647,6 @@ function start_convertion() {
             fi
         fi
     done
-
 }
 
 function clean_up() {
