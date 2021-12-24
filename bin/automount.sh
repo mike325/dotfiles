@@ -391,7 +391,7 @@ sleep 1
 status_msg "Creating mouting point"
 sudo mkdir -p "/Volumes/$DRIVE_NAME"
 status_msg "Remounting disk as ${DRIVE_NAME}"
-if ! sudo "$NTFS_EXE" "$DRIVE_DEV" "/Volumes/$DRIVE_NAME" -o local -o allow_other -o auto_xattr -o auto_cache; then
+if ! sudo "$NTFS_EXE" "$DRIVE_DEV" "/Volumes/$DRIVE_NAME" -o local -o allow_other -o auto_xattr -o auto_cache -o uid="$(id -u)"; then
     error_msg "Failed to mount $DRIVE_NAME with write permissions"
     exit 1
 fi
