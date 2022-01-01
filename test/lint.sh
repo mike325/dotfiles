@@ -71,7 +71,7 @@ if [ -z "$SHELL_PLATFORM" ]; then
     fi
 fi
 
-if ! hash is_windows 2>/dev/null; then
+if ! which is_windows >/dev/null; then
     function is_windows() {
         if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
             return 0
@@ -80,7 +80,7 @@ if ! hash is_windows 2>/dev/null; then
     }
 fi
 
-if ! hash is_wsl 2>/dev/null; then
+if ! which is_wsl >/dev/null; then
     function is_wsl() {
         if [[ "$(uname -r)" =~ Microsoft ]]; then
             return 0
@@ -89,7 +89,7 @@ if ! hash is_wsl 2>/dev/null; then
     }
 fi
 
-if ! hash is_osx 2>/dev/null; then
+if ! which is_osx >/dev/null; then
     function is_osx() {
         if [[ $SHELL_PLATFORM == 'osx' ]]; then
             return 0

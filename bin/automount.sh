@@ -108,42 +108,12 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
-if ! hash is_windows 2>/dev/null; then
-    function is_windows() {
-        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_wls 2>/dev/null; then
-    function is_wls() {
-        if [[ "$(uname -r)" =~ Microsoft ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_osx 2>/dev/null; then
-    function is_osx() {
-        if [[ $SHELL_PLATFORM == 'osx' ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_64bits 2>/dev/null; then
-    # TODO: This should work with ARM 64bits
-    function is_64bits() {
-        if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
+function is_osx() {
+    if [[ $SHELL_PLATFORM == 'osx' ]]; then
+        return 0
+    fi
+    return 1
+}
 
 # colors
 # shellcheck disable=SC2034

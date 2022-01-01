@@ -66,27 +66,9 @@ else
     popd 1>/dev/null  || exit 1
 fi
 
-if ! hash is_windows 2>/dev/null; then
+if ! which is_windows >/dev/null; then
     function is_windows() {
         if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_wsl 2>/dev/null; then
-    function is_wsl() {
-        if [[ "$(uname -r)" =~ Microsoft ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_osx 2>/dev/null; then
-    function is_osx() {
-        if [[ $SHELL_PLATFORM == 'osx' ]]; then
             return 0
         fi
         return 1

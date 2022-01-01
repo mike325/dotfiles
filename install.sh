@@ -164,15 +164,38 @@ function is_osx() {
     return 1
 }
 
-function has_fetcher() {
-    if hash curl 2>/dev/null || hash wget 2>/dev/null; then
+function is_linux() {
+    if ! is_windows && ! is_wsl && ! is_osx; then
+        return 0
+    fi
+    return 1
+}
+
+function is_root() {
+    if ! is_windows && [[ $EUID -eq 0 ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function has_sudo() {
+    if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
         return 0
     fi
     return 1
 }
 
 function is_64bits() {
-    if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
+    local arch
+    arch="$(uname -m)"
+    if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function has_fetcher() {
+    if hash curl 2>/dev/null || hash wget 2>/dev/null; then
         return 0
     fi
     return 1
