@@ -116,7 +116,7 @@ esac
 
 # _ARCH="$(uname -m)"
 
-if ! hash is_windows >/dev/null; then
+if ! hash is_windows 2>/dev/null; then
     function is_windows() {
         if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
             return 0
@@ -125,7 +125,7 @@ if ! hash is_windows >/dev/null; then
     }
 fi
 
-if ! hash is_osx >/dev/null; then
+if ! hash is_osx 2>/dev/null; then
     function is_osx() {
         if [[ $SHELL_PLATFORM == 'osx' ]]; then
             return 0

@@ -9,8 +9,8 @@
 #                          Set the default text editor                         #
 ################################################################################
 
-! hash is_wsl >/dev/null && is_wsl() { return 0; }
-! hash is_windows >/dev/null && is_windows() { return 0; }
+! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
+! hash is_windows 2>/dev/null && is_windows() { return 0; }
 
 _platform="$(uname)"
 

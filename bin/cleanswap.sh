@@ -66,7 +66,7 @@ else
     popd 1>/dev/null  || exit 1
 fi
 
-if ! hash is_windows >/dev/null; then
+if ! hash is_windows 2>/dev/null; then
     function is_windows() {
         if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
             return 0
