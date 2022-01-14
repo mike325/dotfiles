@@ -101,7 +101,7 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
-if ! which is_osx >/dev/null; then
+if ! hash is_osx >/dev/null; then
     function is_osx() {
         if [[ $SHELL_PLATFORM == 'osx' ]]; then
             return 0
@@ -110,7 +110,7 @@ if ! which is_osx >/dev/null; then
     }
 fi
 
-if ! which is_64bits >/dev/null; then
+if ! hash is_64bits >/dev/null; then
     function is_64bits() {
         if [[ $ARCH == 'x86_64' ]] || [[ $ARCH == 'arm64' ]]; then
             return 0
