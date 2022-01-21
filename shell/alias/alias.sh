@@ -11,6 +11,7 @@
 
 ! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
 ! hash is_windows 2>/dev/null && is_windows() { return 0; }
+! hash has_sudo 2>/dev/null && has_sudo() { return 0; }
 
 _platform="$(uname)"
 
@@ -299,7 +300,7 @@ if hash fzf 2>/dev/null; then
 
     export FZF_CTRL_R_OPTS='--sort'
 
-    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi'
+    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi --height=60%'
 
     if ! is_windows; then
         export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
@@ -374,6 +375,7 @@ fi
 # I added this alias
 # TODO add other distros commands I've used, like Solus
 pkg=""
+
 if hash yaourt 2>/dev/null || hash yay 2>/dev/null || hash pacman 2>/dev/null; then
     # 'Install' package maybe in the PATH
 
@@ -399,7 +401,13 @@ if hash yaourt 2>/dev/null || hash yay 2>/dev/null || hash pacman 2>/dev/null; t
             # shellcheck disable=SC2155
             local name=$( ${pkg} -Ss "$@" | fzf)
             if [[ -n $name ]]; then
-                echo "$name"
+                if [[ $EUID -eq 0 ]]; then
+                    ${pkg} -S "$(echo "$name" | cut -f1 -d' ')"
+                elif has_sudo; then
+                    sudo "${pkg}" -S "$(echo "$name" | cut -f1 -d' ')"
+                else
+                    echo "$name"
+                fi
             fi
         }
     fi
@@ -474,7 +482,13 @@ elif hash apt-get 2>/dev/null || hash apt 2>/dev/null; then
             # shellcheck disable=SC2155
             local name=$(apt-cache search "$@" | fzf)
             if [[ -n $name ]]; then
-                echo "$name"
+                if [[ $EUID -eq 0 ]]; then
+                    ${pkg} install "$(echo "$name" | cut -f1 -d' ')"
+                elif has_sudo; then
+                    sudo "${pkg}" install "$(echo "$name" | cut -f1 -d' ')"
+                else
+                    echo "$name"
+                fi
             fi
         }
     fi
@@ -521,7 +535,13 @@ elif hash dnf 2>/dev/null || hash yum 2>/dev/null; then
             # shellcheck disable=SC2155
             local name=$( ${pkg} search "$@" | fzf)
             if [[ -n $name ]]; then
-                echo "$name"
+                if [[ $EUID -eq 0 ]]; then
+                    ${pkg} install "$(echo "$name" | cut -f1 -d' ')"
+                elif has_sudo; then
+                    sudo "${pkg}" install "$(echo "$name" | cut -f1 -d' ')"
+                else
+                    echo "$name"
+                fi
             fi
         }
     fi
