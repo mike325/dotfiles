@@ -31,11 +31,11 @@ bindkey '^p' history-beginning-search-backward
 bindkey '^n' history-beginning-search-forward
 
 # Navigate words with ctrl+arrow keys
-bindkey '^[Oc' forward-word                                     #
-bindkey '^[Od' backward-word                                    #
-bindkey '^[[1;5D' backward-word                                 #
-bindkey '^[[1;5C' forward-word                                  #
-bindkey '^[[Z' undo                                             # Shift+tab undo last action
+bindkey '^[Oc' forward-word
+bindkey '^[Od' backward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[Z' undo # Shift+tab undo last action
 
 # bind k and j for VI mode
 bindkey -M vicmd 'k' history-beginning-search-backward
@@ -158,4 +158,8 @@ fi
 if hash kitty 2>/dev/null; then
     # Completion for kitty
     kitty + complete setup zsh | source /dev/stdin
+fi
+
+if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
