@@ -30,7 +30,7 @@ jobs:
           ./install.sh --verbose --shell  --shell_scripts --shell_frameworks=bash
           ./install.sh --verbose --emacs
           ./install.sh --verbose --python=3
-          ./install.sh --verbose --vim --neovim dev
+          ./install.sh --verbose --neovim dev
           ./install.sh --verbose --git
       - name: Full force install
         run: |

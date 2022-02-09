@@ -31,7 +31,7 @@
 ALL=1
 COOL_FONTS=0
 DOTCONFIGS=0
-VIM=0
+# VIM=0
 NVIM=0
 BIN=0
 SHELL_SCRIPTS=0
@@ -2246,10 +2246,10 @@ while [[ $# -gt 0 ]]; do
             EMACS=1
             ALL=0
             ;;
-        -v | --vim)
-            VIM=1
-            ALL=0
-            ;;
+        # -v | --vim)
+        #     VIM=1
+        #     ALL=0
+        #     ;;
         --neovim=*)
             _result=$(__parse_args "$key" "neovim" '(dotfiles|stable|dev(elop(ment)?)?)')
             if [[ $_result == "$key" ]]; then
@@ -2453,7 +2453,7 @@ if [[ $ALL -eq 1 ]]; then
     # setup_shell_framework
     setup_git
     get_portables
-    get_vim_dotfiles
+    # get_vim_dotfiles
     get_nvim_dotfiles
     get_emacs_dotfiles
     get_cool_fonts
@@ -2466,7 +2466,7 @@ else
     # [[ $SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $GIT -eq 1 ]] && setup_git
     [[ $PORTABLES -eq 1 ]] && get_portables
-    [[ $VIM -eq 1 ]] && get_vim_dotfiles
+    # [[ $VIM -eq 1 ]] && get_vim_dotfiles
     [[ $NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $COOL_FONTS -eq 1 ]] && get_cool_fonts
