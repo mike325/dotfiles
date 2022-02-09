@@ -162,4 +162,5 @@ fi
 
 if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    bindkey '^ ' autosuggest-execute
 fi

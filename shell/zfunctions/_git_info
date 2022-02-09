@@ -12,6 +12,7 @@ if hash git 2>/dev/null; then
         }')"
         stash="$(git stash list 2>/dev/null | wc -l)"
         if [[ $stash -ne 0 ]]; then
+            stash=${stash##* }
             stash="%F{yellow}{$stash}"
         else
             stash=''
