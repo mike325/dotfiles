@@ -340,7 +340,7 @@ Usage:
 
             Default: on
 
-        -n, --nvim, --neovim=[stable|dev]
+        -n, --nvim, --neovim=[stable|dev|dotfiles]
             Download Neovim executable (portable in windows and linux) if it hasn't been Installed
             Download and install my Vim dotfiles in Neovim's dir.
             Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag) them,
@@ -982,10 +982,11 @@ function get_nvim_dotfiles() {
             setup_config "$HOME/.vim" "$HOME/.config/nvim"
         else
             status_msg "Cloning neovim dotfiles in $HOME/AppData/Local/nvim"
-            if ! clone_repo "$URL/.vim" "$HOME/.config/nvim"; then
+            if ! clone_repo "$URL/.vim" "$HOME/AppData/Local/nvim"; then
                 error_msg "Fail to clone dotvim files"
                 return 1
             fi
+            setup_config "$HOME/AppData/Local/nvim" "$HOME/.config/nvim"
         fi
 
     else

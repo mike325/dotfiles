@@ -1,5 +1,4 @@
 name: dotfiles
-
 on: [push, pull_request]
 
 jobs:
