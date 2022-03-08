@@ -56,6 +56,11 @@ fi
 [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin/:$PATH"
 [[ -d "/opt/homebrew/bin" ]] && export PATH="/opt/homebrew/bin:$PATH"
 
+if [[ -f "$HOME/.cargo/env" ]]; then
+    # shellcheck disable=SC1090,SC1091
+    source "$HOME/.cargo/env"
+fi
+
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
     export PYTHONSTARTUP="$HOME/.local/lib/pythonstartup.py"

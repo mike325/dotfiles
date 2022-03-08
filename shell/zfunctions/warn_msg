@@ -1,0 +1,5 @@
+if [[ $NOCOLOR -eq 0 ]]; then
+    printf "$fg[yellow][] Warning:$fg[white] %s\n" "$1" 1>&2
+else
+    printf "[]  Warning: %s\n" "$1" 1>&2
+fi

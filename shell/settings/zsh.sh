@@ -150,6 +150,8 @@ else
     autoload _proxy
     autoload toggleProxy
 
+    autoload status_msg warn_msg error_msg
+
     PROMPT=$'\n''$(_exit_code)$(_username)%F{cyan}%m%f: %F{yellow}%~%f%F{magenta}%(1j. J:%j.)%f $(_proxy)$(_venv)$(_git_info)'$'\n'"$ "
     # RPROMPT='$(_exit_code)'
 

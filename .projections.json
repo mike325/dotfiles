@@ -15,7 +15,7 @@
   "git/gitconfig"               : { "type": "GitConfig" },
   "shell/alias/*"               : { "type": "Alias" },
   "shell/host/*"                : { "type": "Host" },
-  "shell/zfunctions/*"          : { "type": "ShellFunctions" },
+  "shell/zfunctions/*"          : { "type": "ZFunctions" },
   "shell/init/*"                : { "type": "ShellInit" },
   "shell/samples/*"             : { "type": "ShellSamples" },
   "shell/settings/*"            : { "type": "ShellSettings" },

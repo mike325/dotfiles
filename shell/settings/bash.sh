@@ -41,6 +41,7 @@ else
     export yellow="\[\e[0;33m\]"
     export blue="\[\e[0;34m\]"
     export magenta="\[\e[0;35m\]"
+    export purple="\[\e[0;35m\]"
     export cyan="\[\e[0;36m\]"
     export white="\[\e[0;37m\]"
     export orange="\[\e[0;91m\]"
@@ -54,6 +55,7 @@ else
     export echo_yellow="\033[0;33m"
     export echo_blue="\033[0;34m"
     export echo_magenta="\033[0;35m"
+    export echo_purple="\033[0;35m"
     export echo_cyan="\033[0;36m"
     export echo_white="\033[0;37;1m"
     export echo_orange="\033[0;91m"
@@ -61,6 +63,33 @@ else
     export echo_reset_color="\033[39m"
 
 fi
+
+function error_msg() {
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
+    else
+        printf "[X] Error:\t %s\n" "$msg" 1>&2
+    fi
+}
+
+function warn_msg() {
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
+    else
+        printf "[!] Warning:\t %s\n" "$msg"
+    fi
+}
+
+function status_msg() {
+    local msg="$1"
+    if [[ $NOCOLOR -eq 0 ]]; then
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
+    else
+        printf "[*] Info:\t %s\n" "$msg"
+    fi
+}
 
 # location ~/.bash_it/themes/
 # Load it just in case it's not defined yet

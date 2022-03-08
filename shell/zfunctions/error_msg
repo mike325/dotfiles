@@ -1,0 +1,5 @@
+if [[ $NOCOLOR -eq 0 ]]; then
+    printf "$fg[red][✗] Error:$fg[white]   %s\n" "$1" 1>&2
+else
+    printf "[✗] Error:   %s\n" "$1" 1>&2
+fi

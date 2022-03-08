@@ -929,6 +929,26 @@ if hash ffprobe 2>/dev/null; then
     }
 fi
 
+function gignore() {
+    for i in "$@"; do
+        case $i in
+            --list | -l | l)
+                curl -sL https://www.toptal.com/developers/gitignore/api/list
+                return 0
+                ;;
+            *)
+                local ignore
+                ignore=$(curl -sL "https://www.toptal.com/developers/gitignore/api/$i" 2>/dev/null)
+                if ! eval 'echo "$ignore" | grep -qi "Error:"'; then
+                    echo "$ignore" >>.gitignore
+                else
+                    error_msg "Failed to locate the language $i"
+                fi
+                ;;
+        esac
+    done
+}
+
 #######################################################################
 #                          Global Variables                           #
 #######################################################################
