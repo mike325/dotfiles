@@ -1,56 +1,123 @@
 {
-  "$schema": "https://aka.ms/terminal-profiles-schema",
-  "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-  "copyOnSelect": true,
-  "copyFormatting": false,
-  "profiles":
-  {
-    "defaults":
-    {
-      "fontFace": "DejaVu Sans Mono for Powerline",
-      "fontSize": 11
-    },
-    "list":
-    [
-      {
-        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-        "name": "Windows PowerShell",
-        "commandline": "powershell.exe",
-        "hidden": false
-      },
-      {
-        "guid": "{58ad8b0c-3ef8-5f4d-bc6f-13e4c00f2530}",
-        "hidden": false,
-        "name": "Debian",
-        "source": "Windows.Terminal.Wsl"
-      },
-      {
-        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-        "name": "Command Prompt",
-        "commandline": "cmd.exe",
-        "hidden": false
-      },
-      {
-        "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-        "hidden": false,
-        "name": "Azure Cloud Shell",
-        "source": "Windows.Terminal.Azure"
-      }
-
-    ]
-  },
-  "schemes": [],
-  "keybindings":
-  [
-    { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+insert" },
-    { "command": "paste", "keys": "shift+insert" },
-    { "command": "find", "keys": "ctrl+shift+/" },
-    { "command": "closePane", "keys": "ctrl+shift+x" },
-    { "command": { "action": "moveFocus", "direction": "down" }, "keys": "alt+down" },
-    { "command": { "action": "moveFocus", "direction": "left" }, "keys": "alt+left" },
-    { "command": { "action": "moveFocus", "direction": "right" }, "keys": "alt+right" },
-    { "command": { "action": "moveFocus", "direction": "up" }, "keys": "alt+up" },
-    { "command": "togglePaneZoom", "keys": "ctrl+shift+z" },
-    { "command": "newTab", "keys": "ctrl+shift+t" }
-  ]
+    "editor.renderWhitespace": "trailing",
+    "editor.fontFamily": "FiraCode NF, Menlo, Monaco, 'Courier New', monospace",
+    "terminal.external.osxExec": "kitty.app",
+    "telemetry.telemetryLevel": "crash",
+    "C_Cpp.default.compilerPath": "clang++",
+    "C_Cpp.loggingLevel": "Warning",
+    "C_Cpp.clang_format_sortIncludes": true,
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.clang_format_style": "Google",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.cStandard": "c17",
+    "C_Cpp.default.mergeConfigurations": true,
+    "C_Cpp.experimentalFeatures": "Enabled",
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "C_Cpp.vcFormat.newLine.beforeElse": false,
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true,
+    "C_Cpp.workspaceSymbols": "All",
+    "C_Cpp.default.intelliSenseMode": "windows-clang-x64",
+    "git.alwaysSignOff": true,
+    "git.autofetch": true,
+    "git.autoStash": true,
+    "git.enableCommitSigning": true,
+    "git.showPushSuccessNotification": true,
+    "markdown.preview.fontSize": 13,
+    "python.defaultInterpreterPath": "C:\\Users\\migochoa\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "rust-client.engine": "rust-analyzer",
+    "latex-workshop.bibtex-fields.sort.enabled": true,
+    "latex-workshop.bibtex-format.tab": "4 spaces",
+    "latex-workshop.chktex.enabled": true,
+    "latex-workshop.intellisense.update.aggressive.enabled": true,
+    "latex-workshop.intellisense.unimathsymbols.enabled": true,
+    "latex-workshop.latex.autoClean.run": "onFailed",
+    "latex-workshop.view.pdf.viewer": "external",
+    "C_Cpp.default.compilerArgs": [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Wshadow",
+        "-Wnon-virtual-dtor",
+        "-Wold-style-cast",
+        "-Wcast-align",
+        "-Wunused",
+        "-Woverloaded-virtual",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wsign-conversion",
+        "-Wnull-dereference",
+        "-Wdouble-promotion",
+        "-Wformat=2",
+        "-ffunction-sections",
+        "-fdata-sections"
+    ],
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+          {
+            "name": "C/C++: clang++ build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "miDebuggerPath": "C:\\Program Files\\LLVM\\bin\\lldb.exe",
+            "preLaunchTask": "C/C++: clang++ build and debug active file"
+          },
+          {
+            "name": "C/C++: clang++ build and run active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "C/C++: clang++ build active file"
+          },
+          {
+            "name": "C/C++: g++ build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+              {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+              }
+            ],
+            "preLaunchTask": "C/C++: g++ build and run active file"
+          },
+          {
+            "name": "C/C++: g++ build and run active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "C/C++: g++ build active file"
+          }
+        ]
+    }
 }
