@@ -27,8 +27,8 @@
     "git.autoStash": true,
     "git.enableCommitSigning": true,
     "git.showPushSuccessNotification": true,
-    "markdown.preview.fontSize": 13,
-    "python.defaultInterpreterPath": "C:\\Users\\migochoa\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "markdown.preview.fontSize": 12,
+    "python.defaultInterpreterPath": "python3",
     "rust-client.engine": "rust-analyzer",
     "latex-workshop.bibtex-fields.sort.enabled": true,
     "latex-workshop.bibtex-format.tab": "4 spaces",
@@ -59,65 +59,85 @@
     "launch": {
         "version": "0.2.0",
         "configurations": [
-          {
-            "name": "C/C++: clang++ build and debug active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "lldb",
-            "miDebuggerPath": "C:\\Program Files\\LLVM\\bin\\lldb.exe",
-            "preLaunchTask": "C/C++: clang++ build and debug active file"
-          },
-          {
-            "name": "C/C++: clang++ build and run active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "preLaunchTask": "C/C++: clang++ build active file"
-          },
-          {
-            "name": "C/C++: g++ build and debug active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin\\gdb.exe",
-            "setupCommands": [
-              {
-                "description": "Enable pretty-printing for gdb",
-                "text": "-enable-pretty-printing",
-                "ignoreFailures": true
-              }
-            ],
-            "preLaunchTask": "C/C++: g++ build and run active file"
-          },
-          {
-            "name": "C/C++: g++ build and run active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}\\${fileBasenameNoExtension}.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "preLaunchTask": "C/C++: g++ build active file"
-          }
+            {
+                "name": "C/C++: (gdb) Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": true,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "C/C++: Clang++ Build and Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "(Default Clang++17) Build"
+            },
+            {
+                "name": "C/C++: g++ Build and Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "(Default g++17) Build"
+            }
         ]
-    }
+    },
+    "editor.fontSize": 12,
+    "editor.minimap.enabled": false
 }
