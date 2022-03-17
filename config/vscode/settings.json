@@ -37,30 +37,36 @@
     "latex-workshop.intellisense.unimathsymbols.enabled": true,
     "latex-workshop.latex.autoClean.run": "onFailed",
     "latex-workshop.view.pdf.viewer": "external",
-    "C_Cpp.default.compilerArgs": [
-        "-std=c++17",
-        "-Wall",
-        "-Wextra",
-        "-Wshadow",
-        "-Wnon-virtual-dtor",
-        "-Wold-style-cast",
-        "-Wcast-align",
-        "-Wunused",
-        "-Woverloaded-virtual",
-        "-Wpedantic",
-        "-Wconversion",
-        "-Wsign-conversion",
-        "-Wnull-dereference",
-        "-Wdouble-promotion",
-        "-Wformat=2",
-        "-ffunction-sections",
-        "-fdata-sections"
-    ],
     "launch": {
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "C/C++: (gdb) Launch",
+                "name": "C/C++: (gdb) Windows",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+                "args": [],
+                "stopAtEntry": true,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb.exe",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "C/C++: (gdb) Linux",
                 "type": "cppdbg",
                 "request": "launch",
                 "program": "${workspaceFolder}/${fileBasenameNoExtension}",
@@ -85,33 +91,137 @@
                 ]
             },
             {
-                "name": "C/C++: Clang++ Build and Debug",
+                "name": "C/C++: (lldb) Windows",
                 "type": "cppdbg",
                 "request": "launch",
-                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
                 "args": [],
-                "stopAtEntry": false,
+                "stopAtEntry": true,
                 "cwd": "${fileDirname}",
                 "environment": [],
                 "externalConsole": false,
-                "MIMode": "gdb",
-                "miDebuggerPath": "gdb",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    },
-                    {
-                        "description":  "Set Disassembly Flavor to Intel",
-                        "text": "-gdb-set disassembly-flavor intel",
-                        "ignoreFailures": true
-                    }
-                ],
-                "preLaunchTask": "(Default Clang++17) Build"
+                "MIMode": "lldb",
+                "miDebuggerPath": "lldb-vscode.exe"
             },
             {
-                "name": "C/C++: g++ Build and Debug",
+                "name": "C/C++: (lldb) Linux",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": true,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "miDebuggerPath": "lldb-vscode"
+            },
+            {
+                "name": "C/C++: (lldb vscode) MacOS",
+                "type": "cppdbg",
+                "request": "launch",
+                "targetArchitecture": "arm64",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb"
+            },
+            {
+                "name": "C/C++: (lldb native) MacOS",
+                "type": "lldb",
+                "request": "launch",
+                "targetArchitecture": "arm64",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb"
+            },
+            {
+                "name": "C/C++: Clang++ Windows Build and Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb.exe",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "windows clang++ build"
+            },
+            {
+                "name": "C/C++: g++ Windows Build and Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "gdb.exe",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "windows g++ build"
+            },
+            {
+                "name": "C/C++: Clang++ Unix Build and Debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "miDebuggerPath": "lldb-vscode",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description":  "Set Disassembly Flavor to Intel",
+                        "text": "-gdb-set disassembly-flavor intel",
+                        "ignoreFailures": true
+                    }
+                ],
+                "preLaunchTask": "unix clang++ build"
+            },
+            {
+                "name": "C/C++: g++ Unix Build and Debug",
                 "type": "cppdbg",
                 "request": "launch",
                 "program": "${workspaceFolder}/${fileBasenameNoExtension}",
@@ -134,10 +244,39 @@
                         "ignoreFailures": true
                     }
                 ],
-                "preLaunchTask": "(Default g++17) Build"
+                "preLaunchTask": "unix g++ build"
+            },
+            {
+                "name": "C/C++: Clang++ MacOS Build and Debug",
+                "type": "lldb",
+                "request": "launch",
+                "targetArchitecture": "arm64",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "preLaunchTask": "unix clang++ build"
+            },
+            {
+                "name": "C/C++: g++ MacOS Build and Debug",
+                "type": "lldb",
+                "request": "launch",
+                "targetArchitecture": "arm64",
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${fileDirname}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "lldb",
+                "preLaunchTask": "unix g++ build"
             }
         ]
     },
     "editor.fontSize": 12,
+    "editor.fontLigatures": true,
     "editor.minimap.enabled": false
 }
