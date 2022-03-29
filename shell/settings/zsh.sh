@@ -1,10 +1,7 @@
 #!/usr/bin/env zsh
 
-autoload -Uz history-search-end compinit colors zcalc
-compinit -d
+autoload -Uz history-search-end colors zcalc
 colors
-
-compinit
 
 # Set vi key mode
 bindkey -v
@@ -54,14 +51,6 @@ bindkey -M viins 'jj' vi-cmd-mode
 [[ -d "$HOME/.oh-my-zsh" ]] && ZSH="$HOME/.oh-my-zsh"
 [[ -z $SHELL ]] && SHELL='/bin/zsh'
 
-# # pip zsh completion start
-# if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
-#     hash pip 2>/dev/null && eval "$(pip completion --zsh)"
-#     hash pip2 2>/dev/null && eval "$(pip2 completion --zsh 2>/dev/null)"
-#     hash pip3 2>/dev/null && eval "$(pip3 completion --zsh)"
-# fi
-# # pip zsh completion end
-
 KEYTIMEOUT=20
 
 # HISTFILE=~/.zhistory
@@ -92,25 +81,16 @@ setopt hist_save_no_dups      # Do not write duplicate entries in the history fi
 setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
 setopt hist_verify            # Do not execute immediately upon history expansion.
 
-# Case insesitive tab completion
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-# zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
-# Colored completion (different colors for dirs/files/etc)
-zstyle ':completion:*' list-colors '${(s.:.)LS_COLORS}'
-# Partial completion suggestions
-zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix 
-# Automatically find new executables in path
-zstyle ':completion:*' rehash true
-
-# Speed up completions
-zstyle ':completion:*' accept-exact '*(N)'
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh/cache
-
 [[ ! -d "$HOME/.zsh/zfunctions" ]] && mkdir -p "$HOME/.zsh/zfunctions"
 
 fpath+="$HOME/.config/shell/zfunctions"
 fpath+="$HOME/.zsh/zfunctions"
+
+if [[ -d "$HOME/.local/share/completions/" ]]; then
+    for i in "$HOME/.local/share/completions/"*; do
+        fpath+="$i"
+    done
+fi
 
 # Color man pages
 export LESS_TERMCAP_mb=$'\E[01;32m'
@@ -157,12 +137,39 @@ else
 
 fi
 
-if hash kitty 2>/dev/null; then
-    # Completion for kitty
-    kitty + complete setup zsh | source /dev/stdin
-fi
-
 if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
     bindkey '^ ' autosuggest-execute
+fi
+
+autoload -Uz compinit
+# compinit -d
+compinit
+
+# # pip zsh completion start
+# if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
+#     hash pip 2>/dev/null && eval "$(pip completion --zsh)"
+#     hash pip2 2>/dev/null && eval "$(pip2 completion --zsh 2>/dev/null)"
+#     hash pip3 2>/dev/null && eval "$(pip3 completion --zsh)"
+# fi
+# # pip zsh completion end
+
+# Case insesitive tab completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+# zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+# Colored completion (different colors for dirs/files/etc)
+zstyle ':completion:*' list-colors '${(s.:.)LS_COLORS}'
+# Partial completion suggestions
+zstyle ':completion:*' list-suffixes zstyle ':completion:*' expand prefix suffix 
+# Automatically find new executables in path
+zstyle ':completion:*' rehash true
+
+# Speed up completions
+zstyle ':completion:*' accept-exact '*(N)'
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+
+if hash kitty 2>/dev/null; then
+    # Completion for kitty
+    kitty + complete setup zsh | source /dev/stdin
 fi

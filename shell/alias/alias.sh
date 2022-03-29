@@ -595,11 +595,9 @@ function ssha() {
 # Simple map of "q" to deactivate virtualenv or exit terminal session
 function q() {
     if hash deactivate 2>/dev/null  || [[ -n $VIRTUAL_ENV ]]; then
-        if hash conda 2>/dev/null; then
-            conda deactivate
-        else
-            deactivate
-        fi
+        deactivate
+    elif hash conda 2>/dev/null && [[ -n $CONDA_DEFAULT_ENV ]]; then
+        conda deactivate
     else
         exit 0
     fi
