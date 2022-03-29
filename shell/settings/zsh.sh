@@ -132,9 +132,25 @@ else
 
     autoload status_msg warn_msg error_msg
 
-    PROMPT=$'\n''$(_exit_code)$(_username)%F{cyan}%m%f: %F{yellow}%~%f%F{magenta}%(1j. J:%j.)%f $(_proxy)$(_venv)$(_git_info)'$'\n'"$ "
-    # RPROMPT='$(_exit_code)'
+    _prompt_command() {
+        local EXIT_CODE="$?"
 
+        PS1="\n"
+        # PS1+="$(__schroot_name)"
+        # PS1+="$(__exit_code)"
+        PS1+="$(_username)"
+        PS1+="%F{cyan}%m%f: "
+        PS1+="%F{yellow}%~%f"
+        PS1+="%F{magenta}%(1j. J:%j.)%f "
+        PS1+="$(_proxy)"
+        PS1+="$(_venv)"
+        PS1+="$(_git_info) "
+        PS1+="\n$(_exit_code $EXIT_CODE)"
+        # PS1+="\n$ "
+
+        echo "$PS1"
+    }
+    PROMPT='$(_prompt_command)'
 fi
 
 if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then

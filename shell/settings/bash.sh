@@ -224,10 +224,17 @@ else
     }
 
     __exit_code() {
-        local rc=$?
+        # ➤
+        # ▶
+        # $
+        # ❯
+        # »
+        local rc="$1"
         # NOTE: ignore send to background and <CTRL-c> exit codes
-        if [[ $rc -ne 0 ]] && [[ $rc -ne 148 ]] && [[ rc -ne 130 ]]; then
-            echo -e " ${echo_red}❌${echo_reset_color} "
+        if [[ $rc -ne 0 ]] && [[ $rc -ne 148 ]] && [[ $rc -ne 130 ]]; then
+            echo -e "${echo_red}❯${echo_reset_color} "
+        else
+            echo "❯ "
         fi
     }
 
@@ -240,11 +247,11 @@ else
     # PS1="\n$(__schroot_name)\$(__exit_code)$(__user)${cyan}\h${reset_color}: ${yellow}\w${reset_color} ${magenta}J:\j${reset_color} \$(__proxy)\$(__venv)\$(__git_info) \n→ "
 
     _prompt_command() {
-        # EXIT_CODE=$?
+        local EXIT_CODE="$?"
 
         PS1="\n"
-        PS1+="$(__schroot_name)"
-        PS1+="$(__exit_code)"
+        # PS1+="$(__schroot_name)"
+        # PS1+="$(__exit_code)"
         PS1+="$(__user)"
         PS1+="${cyan}\h${reset_color}: "
         PS1+="${yellow}\w${reset_color} "
@@ -252,7 +259,8 @@ else
         PS1+="$(__proxy)"
         PS1+="$(__venv)"
         PS1+="$(__git_info) "
-        PS1+="\n$ "
+        PS1+="\n$(__exit_code $EXIT_CODE)"
+        # PS1+="\n$ "
     }
     PROMPT_COMMAND=_prompt_command
 
