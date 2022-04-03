@@ -1308,7 +1308,7 @@ function _windows_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${version#v}-win64.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-win64.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/"
             chmod u+x "$TMP/stylua.exe"
@@ -1766,7 +1766,7 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${version#v}-linux.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-linux.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null
             chmod u+x "$TMP/stylua"
