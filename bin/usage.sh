@@ -77,11 +77,21 @@ for key in "$@"; do
     esac
 done
 
+_platform="$(uname)"
+
 if [[ $FILES -eq 0 ]]; then
     if [[ $SORT -eq 1 ]]; then
-        du -h --max-depth=1 "${ARGS[@]}" | sort -h
+        if [[ $_platform == 'Darwin' ]]; then
+            du -h -d 1 "${ARGS[@]}" | sort -h
+        else
+            du -h --max-depth=1 "${ARGS[@]}" | sort -h
+        fi
     else
-        du -h --max-depth=1 "${ARGS[@]}"
+        if [[ $_platform == 'Darwin' ]]; then
+            du -h -d 1 "${ARGS[@]}"
+        else
+            du -h --max-depth=1 "${ARGS[@]}"
+        fi
     fi
 else
     if [[ $SORT -eq 1 ]]; then
