@@ -135,13 +135,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Enable Chocolatey and Scoop
-        shell: powershell
-        run: |
-          # ./init.ps1
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
-          $env:PATH = "$env:APPDATA\Neovim\bin;$env:PATH"
+      # - name: Enable Chocolatey and Scoop
+      #   shell: powershell
+      #   run: |
+      #     # ./init.ps1
+      #     Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+      #     $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
+      #     $env:PATH = "$env:APPDATA\Neovim\bin;$env:PATH"
       - name: Install dependencies
         shell: bash
         run: |
