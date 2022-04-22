@@ -269,6 +269,15 @@ function verbose_msg() {
 }
 
 function get_portable() {
+    local dir
+    local exe_path
+    local cmd=''
+    local name
+    local pkg
+    local version
+    local build
+    local has_backup=false
+
     if [[ $OS == 'raspbian' ]]; then
         error_msg "There's no neovim portable version for ARM devices"
         return 1
@@ -284,18 +293,6 @@ function get_portable() {
         return 1
     fi
 
-    # wget -qO- $URL
-    # wget $URL -O out
-
-    local dir
-    local exe_path
-    local cmd=''
-    local name
-    local pkg
-    local version
-    local build
-    local has_backup=false
-
     if hash curl 2>/dev/null; then
         local cmd='curl -L'
         [[ $VERBOSE -eq 0 ]] && local cmd="${cmd} -s"
@@ -306,7 +303,8 @@ function get_portable() {
     verbose_msg "Using ${cmd} as command"
 
     if [[ $DEV -eq 0 ]] && [[ $NVIM_VERSION == 'latest' ]]; then
-        version=$( eval "${cmd} ${URL}/tags/ | grep -oE 'v[0-9]\.[0-9]\.[0-9]+' | sort -u | tail -n 1")
+        verbose_msg "Fetching latest stable from ${URL}/tags/"
+        version=$( eval "${cmd} ${URL}/tags/ | grep -oE 'v0\.[0-9]\.[0-9]' | sort -u | tail -n 1")
         status_msg "Downloading version: ${version}"
     elif [[ $DEV -eq 1 ]]; then
         status_msg "Downloading Nightly"
@@ -659,13 +657,16 @@ make clean
 status_msg "Pulling latest changes"
 git checkout master
 git pull origin master
-status_msg "Checking out to ${BRANCH:-$(git tag | sort -h | tail -1)}"
-git checkout "${BRANCH:-$(git tag | sort -h | tail -1)}"
+
+BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"
+status_msg "Checking out to $BRANCH"
+git checkout "$BRANCH"
 
 status_msg "Building neovim"
-if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="${INSTALL_DIR:-$HOME/.local}"; then
-    status_msg "Installing neovim into ${INSTALL_DIR:-$HOME/.local}"
-    if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="${INSTALL_DIR:-$HOME/.local}" install; then
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
+if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" -j; then
+    status_msg "Installing neovim into $INSTALL_DIR"
+    if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install -j; then
         get_libs
     else
         error_msg "Failed to install neovim"

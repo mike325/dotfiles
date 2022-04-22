@@ -51,7 +51,7 @@
 [user]
     name = Mike
     email = mickiller.25@gmail.com
-    signingkey = BFF0120AA4E5E4C1931C31911A3C1B6965F2F860
+    signingkey = F970FCFD6106DCF844E547DFB27ADEA45243EBEE
 
 ; [gpg]
 ;     program = C:\\Program Files (x86)\\GnuPG\\bin\\gpg.exe
