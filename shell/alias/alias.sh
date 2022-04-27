@@ -325,6 +325,19 @@ if hash fzf 2>/dev/null; then
         fi
     }
 
+    plist() {
+        local pid
+        if [ "$UID" != "0" ]; then
+            pid=$(ps -f -u $UID | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
+        else
+            pid=$(ps -ef | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
+        fi
+
+        if [ "x$pid" != "x" ]; then
+            echo "$pid" | xargs echo
+        fi
+    }
+
     if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
         fssh() {
             # shellcheck disable=SC2155

@@ -201,6 +201,10 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
             $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || ag -l --follow --color --nogroup --hidden -g '') 2> nul";
             $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND";
         }
+        else {
+            $env:FZF_DEFAULT_COMMAND = "(git --no-pager ls-files -co --exclude-standard || powershell.exe -NoLogo -NoProfile -Noninteractive -Command 'Get-ChildItem -File -Recurse -Name') 2> nul";
+            $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND";
+        }
     }
     else {
         if ( Get-Command "fd.exe" -ErrorAction SilentlyContinue ) {
@@ -214,6 +218,10 @@ if ( Get-Command "fzf.exe" -ErrorAction SilentlyContinue ) {
         }
         elseif ( Get-Command "ag.exe" -ErrorAction SilentlyContinue ) {
             $env:FZF_DEFAULT_COMMAND = "ag -l --follow --color --nogroup --hidden -g ''2> nul";
+            $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND";
+        }
+        else {
+            $env:FZF_DEFAULT_COMMAND = 'powershell.exe -NoLogo -NoProfile -Noninteractive -Command "Get-ChildItem -File -Recurse -Name"';
             $env:FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND";
         }
     }
