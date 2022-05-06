@@ -78,9 +78,9 @@ if ( -d "$HOME/.local/golang/bin" ) then
     setenv PATH "$HOME/.local/golang/bin:$PATH"
 endif
 
-if ( -d "$HOME/.local/golang/src" ) then
-    setenv GOPATH "$HOME/.local/golang/src"
-endif
+# if ( -d "$HOME/.local/golang/src" ) then
+#     setenv GOPATH "$HOME/.local/golang/src"
+# endif
 
 if ( -d "$HOME/.gem/ruby/2.6.0/bin" ) then
     setenv PATH "$HOME/.gem/ruby/2.6.0/bin:$PATH"

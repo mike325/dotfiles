@@ -87,7 +87,7 @@ fi
 # fi
 
 [[ -d "$HOME/.local/golang/src/bin" ]] && export PATH="$HOME/.local/golang/src/bin:$PATH"
-[[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
+# [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
 [[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
 
 if hash npm 2>/dev/null; then
