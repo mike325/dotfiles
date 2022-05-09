@@ -358,6 +358,7 @@ function get_portable() {
         if ! unzip -qo "$TMP/$name" -d "$dir"; then
             return 1
         fi
+        mv "$dir/nvim-win64" "$dir/Neovim"
         rm -rf "${TMP:?}/${name}"
     elif is_osx; then
         pushd "$TMP" >/dev/null  || { error_msg "Could not get to $TMP" && exit 1; }
