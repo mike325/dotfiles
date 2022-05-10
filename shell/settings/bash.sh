@@ -198,15 +198,19 @@ else
     __venv() {
         # TODO: May shoud cache the version and clear cache once we deactivate/change virtual env
         if [[ -n $VIRTUAL_ENV ]]; then
-            version="$(python --version | awk '{print $2}')"
-            echo " %F{white}(${VIRTUAL_ENV##*/} 🐍 ${version})%f "
+            ENV_VERSION="$(python --version | awk '{print $2}')"
+            export ENV_VERSION="${ENV_VERSION%% *}"
+            env_name="${VIRTUAL_ENV##*/}"
         elif [[ -n $CONDA_DEFAULT_ENV ]]; then
-            if hash python3 2>/dev/null; then
-                version="$(python3 --version | awk '{print $2}')"
-            else
-                version="$(python --version | awk '{print $2}')"
-            fi
-            echo " %F{white}(${CONDA_DEFAULT_ENV} 🐍 ${version})%f "
+            ENV_VERSION="$($CONDA_PYTHON_EXE --version | awk '{print $2}')"
+            export ENV_VERSION="${ENV_VERSION%% *}"
+            env_name="$CONDA_DEFAULT_ENV"
+        fi
+
+        if [[ -n $ENV_VERSION ]]; then
+            echo " %F{white}(${env_name} 🐍 ${ENV_VERSION})%f "
+        else
+            unset ENV_VERSION 2>/dev/null
         fi
     }
 
