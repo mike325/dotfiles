@@ -86,6 +86,7 @@ fi
 #     fi
 # fi
 
+# [[ -d "$HOME/.local/golang" ]] && export GOROOT="$HOME/.local/golang/"
 [[ -d "$HOME/.local/golang/src/bin" ]] && export PATH="$HOME/.local/golang/src/bin:$PATH"
 # [[ -d "$HOME/.local/golang/src" ]] && export GOPATH="$HOME/.local/golang/src"
 [[ -d "$HOME/.gem/ruby/2.6.0/bin" ]] && export PATH="$HOME/.gem/ruby/2.6.0/bin:$PATH"
@@ -229,7 +230,7 @@ if is_windows; then
     export PYTHONIOENCODING="utf8"
 
 elif is_osx; then
-    # /Users/mike/Library/Python/3.8/bin
+    # $HOME/Library/Python/3.8/bin
     _python=("12" "11" "10" "9" "8" "7" "6")
     _osx_root="$HOME/Library/"
     for version in "${_python[@]}"; do
