@@ -34,10 +34,6 @@ $PSDefaultParameterValues["Out-File:Encoding"] = "utf8"
 $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 $MaximumHistoryCount = 10000;
 
-if ($env:SHELL -eq $null) {
-    $env:SHELL = 'powershell'
-}
-
 if ( -Not (Get-Command "which" -ErrorAction SilentlyContinue) ) {
     function which($name) {
         Get-Command $name | Select-Object -ExpandProperty Definition
