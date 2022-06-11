@@ -22,8 +22,8 @@ jobs:
           ./screenfetch-dev
       - name: Install dependencies
         run: |
-          # Install basic packages
           sudo apt-get install -y \
+            bison              \
             curl               \
             git                \
             shellcheck         \
@@ -34,7 +34,10 @@ jobs:
             luarocks           \
             golang
 
-          sudo wget "https://github.com/mvdan/sh/releases/download/v3.3.1/shfmt_v3.3.1_linux_amd64" -O /usr/bin/shfmt
-          sudo chmod ugo+x /usr/bin/shfmt
-          mkdir -p "$HOME/.local/bin" && sudo cp /usr/bin/shfmt "$HOME/.local/bin"
+          bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+          source /home/mike/.gvm/scripts/gvm
+          gvm install go1.18.3 -B
+          gvm use go1.18.3 --default
+          go install mvdan.cc/sh/v3/cmd/shfmt@latest
+
       - uses: pre-commit/action@v2.0.3
