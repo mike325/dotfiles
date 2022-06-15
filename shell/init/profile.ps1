@@ -81,6 +81,9 @@ if ( Test-Path "$env:APPDATA\Neovim\bin" ) {
 if ( Test-Path "$env:APPDATA\LuaRocks\bin" ) {
     $env:path = "$env:APPDATA\LuaRocks\bin;$env:path"
 }
+elseif (Test-Path "$env:USERPROFILE\scoop\apps\luarocks\current\rocks\bin"){
+    $env:path = "$env:USERPROFILE\scoop\apps\luarocks\current\rocks\bin;$env:path"
+}
 
 # NOTE: It's better to install python with scoop and use versions to manage it
 $python_versions = @('12', '11', '10', '9', '8', '7', '6')
