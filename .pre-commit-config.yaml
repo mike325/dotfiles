@@ -118,6 +118,21 @@ repos:
             )$
         types: [shell]
         language: system
+      - id: luacheck
+        name: luacheck
+        description: Lua check
+        entry: luacheck
+        # TODO: Fix completxity before adding this back '--max-cyclomatic-complexity', '20',
+        args: ['--std', 'lua54', '--formatter', 'plain', '--codes']
+        language: system
+        types: [lua]
+      - id: stylua
+        name: stylua
+        description: Format Lua files
+        entry: stylua
+        args: [--check, --verify]
+        language: system
+        types: [lua]
         # language: golang
         # minimum_pre_commit_version: 2.4.0
         # additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.1]
