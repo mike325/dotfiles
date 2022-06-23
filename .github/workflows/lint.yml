@@ -48,6 +48,7 @@ jobs:
 
           export PATH="$HOME/.local/bin/:$PATH"
           export PATH="$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/:$PATH"
+          ls -lA "$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/"
 
       - name: Linting source code
         uses: pre-commit/action@v2.0.3
