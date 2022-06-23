@@ -1,6 +1,9 @@
 name: lint
 on: [push, pull_request]
 
+env:
+  GO_VERSION: go1.18.3
+
 jobs:
   precommit:
     runs-on: ubuntu-latest
@@ -41,13 +44,11 @@ jobs:
 
           bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
           source "$HOME/.gvm/scripts/gvm"
-          export GO_VERSION="go1.18.3"
           gvm install "$GO_VERSION" -B
           gvm use "$GO_VERSION" --default
           go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
-          export PATH="$HOME/.local/bin/:$PATH"
-          export PATH="$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/:$PATH"
-
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/" >> $GITHUB_PATH
       - name: Linting source code
         uses: pre-commit/action@v2.0.3
