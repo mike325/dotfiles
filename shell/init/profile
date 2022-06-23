@@ -23,4 +23,5 @@ if [ -d "$HOME/.local/bin" ]; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-[ -s "/Users/mike/.gvm/scripts/gvm" ] && . "/Users/mike/.gvm/scripts/gvm"
+# shellcheck disable=SC1090,SC1091
+[ -s "$HOME/.gvm/scripts/gvm" ] && . "$HOME/.gvm/scripts/gvm"
