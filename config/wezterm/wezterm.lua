@@ -56,8 +56,34 @@ local keys = {
     { key = 'n', mods = 'CTRL|ALT', action = wezterm.action { ActivatePaneDirection = 'Next' } },
     { key = 'p', mods = 'CTRL|ALT', action = wezterm.action { ActivatePaneDirection = 'Prev' } },
 
-    -- { key = 'Insert', mods = 'SHIFT', action = wezterm.action { PasteFrom = 'Clipboard' } },
-    -- { key = 'Insert', mods = 'CTRL', action = wezterm.action { CopyTo = 'Clipboard' } },
+    {
+        key = 'f',
+        mods = 'LEADER',
+        action = wezterm.action {
+            ActivateKeyTable = {
+                name = 'font_size',
+                one_shot = false,
+            },
+        },
+    },
+
+    {
+        key = 'r',
+        mods = 'LEADER',
+        action = wezterm.action {
+            ActivateKeyTable = {
+                name = 'resize_pane',
+                one_shot = false,
+            },
+        },
+    },
+
+    { key = 'c', mods = 'LEADER', action = 'ActivateCopyMode' },
+
+    { key = 'Insert', mods = 'SHIFT', action = wezterm.action { PasteFrom = 'Clipboard' } },
+    { key = 'Insert', mods = 'CTRL', action = wezterm.action { CopyTo = 'ClipboardAndPrimarySelection' } },
+    { key = 'Paste', action = wezterm.action { PasteFrom = 'Clipboard' } },
+    { key = 'Copy', action = wezterm.action { CopyTo = 'ClipboardAndPrimarySelection' } },
 
     { key = 'q', mods = 'LEADER', action = wezterm.action { CloseCurrentTab = { confirm = false } } },
     { key = 'x', mods = 'LEADER', action = wezterm.action { CloseCurrentPane = { confirm = false } } },
@@ -78,6 +104,7 @@ for i = 1, 8 do
 end
 
 return {
+    disable_default_key_bindings = true,
     default_prog = default_prog,
     font = wezterm.font_with_fallback {
         {
@@ -91,6 +118,7 @@ return {
         'Symbols Nerd Font Mono',
         'Last Resort High-Efficiency',
     },
+    scrollback_lines = 10000,
     font_size = 11.0,
     harfbuzz_features = { 'zero' },
     -- use_dead_keys = false,
@@ -100,4 +128,38 @@ return {
     hide_tab_bar_if_only_one_tab = true,
     leader = { key = '\\', mods = 'CTRL', timeout_milliseconds = 1000 },
     keys = keys,
+    key_tables = {
+        font_size = {
+            { key = '+', mods = 'SHIFT', action = 'IncreaseFontSize' },
+            { key = '-', action = 'DecreaseFontSize' },
+            { key = '=', action = 'ResetFontSize' },
+            { key = 'Escape', action = 'PopKeyTable' },
+            { key = 'q', action = 'PopKeyTable' },
+            { key = 'c', mods = 'CTRL', action = 'PopKeyTable' },
+        },
+        resize_pane = {
+            { key = 'LeftArrow', action = wezterm.action { AdjustPaneSize = { 'Left', 1 } } },
+            { key = 'h', action = wezterm.action { AdjustPaneSize = { 'Left', 1 } } },
+
+            { key = 'RightArrow', action = wezterm.action { AdjustPaneSize = { 'Right', 1 } } },
+            { key = 'l', action = wezterm.action { AdjustPaneSize = { 'Right', 1 } } },
+
+            { key = 'UpArrow', action = wezterm.action { AdjustPaneSize = { 'Up', 1 } } },
+            { key = 'k', action = wezterm.action { AdjustPaneSize = { 'Up', 1 } } },
+
+            { key = 'DownArrow', action = wezterm.action { AdjustPaneSize = { 'Down', 1 } } },
+            { key = 'j', action = wezterm.action { AdjustPaneSize = { 'Down', 1 } } },
+
+            { key = 'Escape', action = 'PopKeyTable' },
+            { key = 'q', action = 'PopKeyTable' },
+            { key = 'c', mods = 'CTRL', action = 'PopKeyTable' },
+        },
+    },
+    mouse_bindings = {
+        {
+            event = { Up = { streak = 1, button = 'Left' } },
+            mods = 'CTRL',
+            action = 'OpenLinkAtMouseCursor',
+        },
+    },
 }
