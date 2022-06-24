@@ -105,76 +105,78 @@ function Test-Administrator {
 
 function Write-Git-Info {
     Invoke-Expression "git symbolic-ref --short HEAD" 2> $null | Tee-Object -Variable branch | Out-Null
+    $git_status = ""
     if ($LASTEXITCODE -eq 0) {
         (Invoke-Expression "git stash list" 2> $null | Measure-Object -Line).Lines | Tee-Object -Variable stash | Out-Null
         # Invoke-Expression "git diff --shortstat" 2> $null | Tee-Object -Variable changes | Out-Null
         # Invoke-Expression "git diff --cached --shortstat" 2> $null | Tee-Object -Variable to_commit | Out-Null
 
-        Write-Host " | " -NoNewline -ForegroundColor Blue
-        Write-Host "$branch " -NoNewline -ForegroundColor Blue
+        $git_status += Write-prompt " | " -ForegroundColor Blue
+        $git_status += Write-prompt "$branch " -ForegroundColor Blue
         # if ($to_commit -ne $null) {
         #     $files_staged = $to_commit.split(' ')[1]
-        #     Write-Host "*$files_staged " -NoNewline -ForegroundColor Magenta
+        #     $git_status += Write-prompt "*$files_staged " -ForegroundColor Magenta
         # }
         # if ($changes -ne $null) {
         #     $changes = $changes.split(',')
         #     $files_changed = $changes[0].split(' ')[1]
         #     $changes_message = "~$files_changed"
-        #     Write-Host "$changes_message " -NoNewline -ForegroundColor DarkYellow
+        #     $git_status += Write-prompt "$changes_message " -ForegroundColor DarkYellow
         # }
         if ($stash -gt 0) {
-            Write-Host "{$stash} " -NoNewline -ForegroundColor Yellow
+            $git_status += Write-prompt "{$stash} " -ForegroundColor Yellow
         }
-        Write-Host "| " -NoNewline -ForegroundColor Blue
+        $git_status += Write-prompt "| " -ForegroundColor Blue
     }
+    return $git_status
 }
 
 function prompt {
     $realLASTEXITCODE = $LASTEXITCODE
 
-    Write-Host
-
-    # Reset color, which can be messed up by Enable-GitColors
-    # $Host.UI.RawUI.ForegroundColor = $GitPromptSettings.DefaultForegroundColor
+    $prompt = ""
 
     if (Test-Administrator) {  # Use different username if elevated
-        Write-Host "(Elevated) " -NoNewline -ForegroundColor Red
+        $prompt += Write-prompt "(Elevated) " -NoNewline -ForegroundColor Red
     }
 
     # if ($realLASTEXITCODE -ne 0) {
-    #     Write-Host "❌ " -NoNewline -ForegroundColor DarkRed
+    #     Write-prompt "❌ " -NoNewline -ForegroundColor DarkRed
     # }
 
-    Write-Host "$env:USERNAME" -NoNewline -ForegroundColor Magenta
-    Write-Host " at " -NoNewline -ForegroundColor White
-    Write-Host "$env:COMPUTERNAME" -NoNewline -ForegroundColor Cyan
-
-    if ($s -ne $null) {  # color for PSSessions
-        Write-Host " (`$s: " -NoNewline -ForegroundColor DarkGray
-        Write-Host "$($s.Name)" -NoNewline -ForegroundColor Yellow
-        Write-Host ") " -NoNewline -ForegroundColor DarkGray
-    }
-
-    Write-Host ": " -NoNewline -ForegroundColor White
-    Write-Host $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -NoNewline -ForegroundColor Yellow
+    $prompt += Write-prompt "$env:USERNAME" -ForegroundColor Magenta
+    $prompt += Write-prompt " at " -ForegroundColor White
+    $prompt += Write-prompt "$env:COMPUTERNAME" -ForegroundColor Cyan
+    $prompt += Write-prompt ": " -ForegroundColor White
+    $prompt += Write-prompt $($(Get-Location) -replace ($env:USERPROFILE).Replace('\','\\'), "~") -ForegroundColor Yellow
 
     if ($env:http_proxy -ne $null) {
-        Write-Host " -P-" -NoNewline -ForegroundColor Green
+        $prompt += Write-prompt " -P-" -ForegroundColor Green
     }
 
     # if ($env:VIRTUAL_ENV -ne $null) {
     #     # Python Virtual environment
-    #     # Write-Host " 🌐 " -NoNewline -ForegroundColor Green
+    #     # Write-prompt " 🌐 " -NoNewline -ForegroundColor Green
     # }
 
-    if (Get-Command "git" -ErrorAction SilentlyContinue) {
-        Write-Git-Info
+    if($env:_has_posh -eq 0) {
+        $GitPromptSettings.DefaultPromptPath = ""
+        $prompt += & $GitPromptScriptBlock
+    }
+    else {
+        if (Get-Command "git" -ErrorAction SilentlyContinue) {
+            $prompt += Write-Git-Info
+        }
     }
 
-    Write-Host ""
+    if($prompt) {
+        "`n$prompt`n$ "
+    }
+    else {
+        "PS> "
+    }
 
     $global:LASTEXITCODE = $realLASTEXITCODE
-    return "$ "
 }
 
 $powersource = "$env:USERPROFILE\.config\shell\host\proxy.ps1"
@@ -232,6 +234,7 @@ Remove-Item Env:\TERM -ErrorAction SilentlyContinue
 
 Import-Module posh-git -ErrorAction SilentlyContinue
 Import-Module PSReadLine -ErrorAction SilentlyContinue
+$env:_has_posh = $LASTEXITCODE
 
 # Shows navigable menu of all options when hitting Tab
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete -ErrorAction SilentlyContinue
