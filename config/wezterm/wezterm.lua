@@ -1,6 +1,11 @@
+require 'patch_runtime'
+
 local wezterm = require 'wezterm'
 local sys = require 'sys'
-require 'patch_runtime'
+
+-- local split = require('utils.strings').split
+-- local list_extend = require('utils.tables').list_extend
+-- local version_date = tonumber(split(wezterm.version, '-')[1])
 
 wezterm.on('update-right-status', function(window, _)
     -- "Wed Mar 3 08:14"
@@ -39,6 +44,7 @@ local firacode = sys.name == 'windows' and 'FiraCode NF' or 'FiraCode Nerd Font'
 
 local keys = {
     { key = 'z', mods = 'LEADER', action = 'TogglePaneZoomState' },
+    { key = 'R', mods = 'LEADER', action = wezterm.action.ReloadConfiguration },
 
     { key = 'v', mods = 'LEADER', action = wezterm.action { SplitHorizontal = { domain = 'CurrentPaneDomain' } } },
     { key = 's', mods = 'LEADER', action = wezterm.action { SplitVertical = { domain = 'CurrentPaneDomain' } } },
@@ -63,10 +69,10 @@ local keys = {
             ActivateKeyTable = {
                 name = 'font_size',
                 one_shot = false,
+                replace_current = false,
             },
         },
     },
-
     {
         key = 'r',
         mods = 'LEADER',
@@ -74,6 +80,7 @@ local keys = {
             ActivateKeyTable = {
                 name = 'resize_pane',
                 one_shot = false,
+                replace_current = false,
             },
         },
     },
@@ -118,6 +125,8 @@ return {
         'Symbols Nerd Font Mono',
         'Last Resort High-Efficiency',
     },
+    color_scheme = 'tokyonight',
+    window_background_opacity = 0.9,
     scrollback_lines = 10000,
     font_size = 11.0,
     harfbuzz_features = { 'zero' },
@@ -132,6 +141,7 @@ return {
         font_size = {
             { key = '+', mods = 'SHIFT', action = 'IncreaseFontSize' },
             { key = '-', action = 'DecreaseFontSize' },
+            { key = '_', mods = 'SHIFT', action = 'DecreaseFontSize' },
             { key = '=', action = 'ResetFontSize' },
             { key = 'Escape', action = 'PopKeyTable' },
             { key = 'q', action = 'PopKeyTable' },
