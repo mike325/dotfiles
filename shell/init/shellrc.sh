@@ -257,7 +257,7 @@ if hash gpgconf 2>/dev/null && hash gpg 2>/dev/null; then
 fi
 
 if hash gh 2>/dev/null; then
-    eval "$(gh completion --shell "${SHELL##*/}")"
+    eval "$(gh completion --shell "${CURRENT_SHELL}")"
 fi
 
 if [[ $- == *i* ]]; then
@@ -324,4 +324,9 @@ if [[ $- == *i* ]]; then
 
     [[ -f "$HOME/.config/shell/banner" ]] && cat "$HOME/.config/shell/banner"
 
+    if [[ -d "$HOME/.pyenv" ]]; then
+        export PYENV_ROOT="$HOME/.pyenv"
+        command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+    fi
 fi

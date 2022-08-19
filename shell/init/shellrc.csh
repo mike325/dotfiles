@@ -28,7 +28,9 @@
 ################################################################################
 
 # Set erase character
-stty erase '^?'
+# stty erase '^?'
+
+set autolist=ambiguous
 
 ################################################################################
 #                         Make some dir that I normally use                    #
@@ -131,6 +133,6 @@ if ($?prompt) then
     endif
 
     if ( -f "$HOME/.config/shell/banner" ) then
-        cat "$HOME/.config/shell/banner"
+        command cat "$HOME/.config/shell/banner"
     endif
 endif
