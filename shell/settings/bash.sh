@@ -309,18 +309,18 @@ elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
     # shellcheck disable=SC1091
     source /usr/share/bash-completion/bash_completion
 else
-    completion_dir=''
+    # TODO: This may be too slow in some systems
 
-    if [[ -d /usr/share/bash-completion/completions ]]; then
-        completion_dir=/usr/share/bash-completion/completions
-    elif [[ -d /etc/bash_completion.d/ ]]; then
-        completion_dir=/etc/bash_completion.d/
-    fi
+    completion_dirs=(
+        "/usr/share/bash-completion/completions"
+        "/etc/bash_completion.d/"
+    )
 
-    if [[ -n $completion_dir ]]; then
-        for c in "$completion_dir"/*; do
-            source "$c" 2>/dev/null
-        done
-    fi
-    unset completion_dir
+    for cdir in "${completion_dirs[@]}"; do
+        if [[ -d "$cdir" ]]; then
+            for src in "$cdir"/*; do
+                source "$src" 2>/dev/null
+            done
+        fi
+    done
 fi

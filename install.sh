@@ -150,12 +150,12 @@ function is_windows() {
     return 1
 }
 
-function is_wsl() {
-    if [[ "$(uname -r)" =~ Microsoft ]]; then
-        return 0
-    fi
-    return 1
-}
+# function is_wsl() {
+#     if [[ "$(uname -r)" =~ Microsoft ]]; then
+#         return 0
+#     fi
+#     return 1
+# }
 
 function is_osx() {
     if [[ $SHELL_PLATFORM == 'osx' ]]; then
@@ -164,26 +164,26 @@ function is_osx() {
     return 1
 }
 
-function is_linux() {
-    if ! is_windows && ! is_wsl && ! is_osx; then
-        return 0
-    fi
-    return 1
-}
+# function is_linux() {
+#     if ! is_windows && ! is_wsl && ! is_osx; then
+#         return 0
+#     fi
+#     return 1
+# }
 
-function is_root() {
-    if ! is_windows && [[ $EUID -eq 0 ]]; then
-        return 0
-    fi
-    return 1
-}
+# function is_root() {
+#     if ! is_windows && [[ $EUID -eq 0 ]]; then
+#         return 0
+#     fi
+#     return 1
+# }
 
-function has_sudo() {
-    if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
-        return 0
-    fi
-    return 1
-}
+# function has_sudo() {
+#     if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+#         return 0
+#     fi
+#     return 1
+# }
 
 function is_64bits() {
     local arch
@@ -317,6 +317,7 @@ Usage:
                 - Shell alias in $HOME/.config/shell
                 - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
                 - Everything inside ./dotconfigs into $HOME
+                - Everything inside ./config/ into ${XDG_CONFIG_HOME:-$HOME/.config/} in unix or ~/AppData/Local/ in windows
                 - Python startup script in $HOME/.local/lib/
 
             Default: on
@@ -680,8 +681,6 @@ function download_asset() {
         warn_msg "$asset already exists in $dest, skipping download"
         return 5
     fi
-
-    return 1
 }
 
 function clone_repo() {
@@ -758,6 +757,45 @@ function setup_dotconfigs() {
         verbose_msg "Setup $script into $HOME/.${scriptname}"
         setup_config "$script" "$HOME/.${scriptname}"
     done
+
+    status_msg "Setting Config files"
+    local CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/"
+
+    # TODO: Add windows support
+    for config in "${SCRIPT_PATH}"/config/*; do
+        local config_name="${config##*/}"
+        if [[ ! -e "$CONFIG_DIR/$config_name" ]] || [[ $FORCE_INSTALL -eq 1 ]]; then
+            verbose_msg "Setup $config into ${CONFIG_DIR}"
+            setup_config "$config" "${CONFIG_DIR}/$config_name"
+        elif [[ -d $config ]]; then
+            for configfile in "$config"/*; do
+                local configfilename="${configfile##*/}"
+                if [[ ! -e "$CONFIG_DIR/$config_name/$configfilename" ]]; then
+                    verbose_msg "Setting configfile $configfile into $CONFIG_DIR/$config_name/$configfilename"
+                    setup_config "$configfile" "${CONFIG_DIR}/$config_name/configfilename"
+                else
+                    warn_msg "Skipping ${configfilename}, already exists in ${CONFIG_DIR}/$config_name"
+                fi
+            done
+        elif [[ -f $config ]]; then
+            warn_msg "Skipping $config_name, already in $CONFIG_DIR"
+        else
+            error_msg "Weird, this config $config is not valid, since it is neither a directory or a file"
+        fi
+    done
+
+    # TODO: Add windows support
+    if [[ -f "$CONFIG_DIR/git/ignore" ]]; then
+        if [[ ! -e "${CONFIG_DIR}/fd/"  ]] || [[ $FORCE_INSTALL -eq 1 ]]; then
+            verbose_msg "Setup fd global ignore based in global git ignore"
+            setup_config "$CONFIG_DIR/git/" "${CONFIG_DIR}/fd"
+        elif [[ ! -e "$CONFIG_DIR/fd/ignore" ]] || [[ $FORCE_INSTALL -eq 1 ]]; then
+            verbose_msg "Setup fd global ignore file based in global git ignore"
+            setup_config "$CONFIG_DIR/git/ignore" "${CONFIG_DIR}/fd/ignore"
+        else
+            warn_msg "Skipping fd global ignore, already installed"
+        fi
+    fi
 
     local sh_shells=(bash zsh)
     local csh_shells=(tcsh csh)
@@ -895,56 +933,6 @@ function setup_git() {
             setup_config "$hooks" "${SCRIPT_PATH}/.git/hooks/${hooks##*/}"
         done
     fi
-    return 0
-}
-
-function get_vim_dotfiles() {
-    status_msg "Cloning vim dotfiles in $HOME/.vim"
-
-    # If we couldn't clone our repo, return
-    if ! clone_repo "$URL/.vim" "$HOME/.vim"; then
-        error_msg "Failed to clone Vim's configs"
-        return 1
-    fi
-
-    if [[ ! -f "$HOME/.vim/vimrc" ]] && ! setup_config "$HOME/.vim/init.vim" "$HOME/.vimrc"; then
-        error_msg "Vimrc link failed"
-        return 1
-    fi
-
-    if [[ ! -f "$HOME/.vim/gvimrc" ]] && ! setup_config "$HOME/.vim/ginit.vim" "$HOME/.gvimrc"; then
-        error_msg "gvimrc link failed"
-        return 1
-    fi
-
-    if is_windows; then
-
-        if [[ -d "$HOME/.vim" ]] && [[ ! -d "$HOME/vimfiles" ]]; then
-            status_msg "Copying vim dir into in $HOME/vimfiles"
-            if ! setup_config "$HOME/.vim" "$HOME/vimfiles"; then
-                error_msg "We couldn't copy vim dir"
-                return 1
-            fi
-        else
-            status_msg "Cloning vim dotfiles in $HOME/vimfiles"
-            if ! clone_repo "$URL/.vim" "$HOME/vimfiles"; then
-                error_msg "Couldn't get vim repo"
-                return 1
-            fi
-        fi
-
-        if [[ ! -f "$HOME/vimfiles/vimrc" ]] && ! setup_config "$HOME/vimfiles/init.vim" "$HOME/_vimrc"; then
-            error_msg "Vimrc link failed"
-            return 1
-        fi
-
-        if [[ ! -f "$HOME/vimfiles/gvimrc" ]] && ! setup_config "$HOME/.vim/ginit.vim" "$HOME/_gvimrc"; then
-            error_msg "gvimrc link failed"
-            return 1
-        fi
-
-    fi
-
     return 0
 }
 
@@ -1850,21 +1838,6 @@ function get_emacs_dotfiles() {
     return 0
 }
 
-function setup_shell_framework() {
-    status_msg "Getting shell framework"
-
-    local args=""
-
-    [[ $FORCE_INSTALL -eq 1 ]] && args=" --force $args"
-    [[ $NOCOLOR -eq 1 ]] && args=" --nocolor $args"
-    [[ $VERBOSE -eq 1 ]] && args=" --verbose $args"
-
-    verbose_msg "Calling get_shell as -> ${SCRIPT_PATH}/bin/get_shell.sh $args -s $CURRENT_SHELL"
-    eval "${SCRIPT_PATH}/bin/get_shell.sh $args -s $CURRENT_SHELL" || return 1
-
-    return 0
-}
-
 function get_dotfiles() {
     SCRIPT_PATH="$HOME/.local/dotfiles"
 
@@ -2417,7 +2390,7 @@ if [[ -z $URL ]]; then
             URL="$PROTOCOL://$GIT_HOST/$GIT_USER"
             ;;
         git)
-            warn_message "Git protocol has not been tested, yet"
+            warn_msg "Git protocol has not been tested, yet"
             URL="git://$GIT_HOST/$GIT_USER"
             ;;
         *)
@@ -2449,12 +2422,10 @@ fi
 if [[ $ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
     setup_bin
-    setup_dotconfigs
     setup_shell_scripts
-    # setup_shell_framework
     setup_git
+    setup_dotconfigs
     get_portables
-    # get_vim_dotfiles
     get_nvim_dotfiles
     get_emacs_dotfiles
     get_cool_fonts
@@ -2462,12 +2433,10 @@ if [[ $ALL -eq 1 ]]; then
     setup_python
 else
     [[ $BIN -eq 1 ]] && setup_bin
-    [[ $DOTCONFIGS -eq 1 ]] && setup_dotconfigs
     [[ $SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
-    # [[ $SHELL_FRAMEWORK -eq 1 ]] && setup_shell_framework
     [[ $GIT -eq 1 ]] && setup_git
+    [[ $DOTCONFIGS -eq 1 ]] && setup_dotconfigs
     [[ $PORTABLES -eq 1 ]] && get_portables
-    # [[ $VIM -eq 1 ]] && get_vim_dotfiles
     [[ $NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $EMACS -eq 1 ]] && get_emacs_dotfiles
     [[ $COOL_FONTS -eq 1 ]] && get_cool_fonts
