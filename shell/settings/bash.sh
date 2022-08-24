@@ -317,7 +317,7 @@ else
     )
 
     for cdir in "${completion_dirs[@]}"; do
-        if [[ -d "$cdir" ]]; then
+        if [[ -d $cdir   ]]; then
             for src in "$cdir"/*; do
                 source "$src" 2>/dev/null
             done
