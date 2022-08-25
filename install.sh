@@ -1200,54 +1200,54 @@ function _windows_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
-        status_msg "Getting minio client"
-        if download_asset "Minio client" "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "$HOME/.local/bin/mc.exe"; then
-            chmod +x "$HOME/.local/bin/mc.exe"
-        else
-            rst=1
-        fi
-    elif ! is_64bits; then
-        error_msg "Minio portable is only Available for x86 64 bits"
-        rst=1
-    else
-        warn_msg "Skipping minio client, already installed"
-        rst=2
-    fi
+    # if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+    #     [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
+    #     status_msg "Getting minio client"
+    #     if download_asset "Minio client" "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "$HOME/.local/bin/mc.exe"; then
+    #         chmod +x "$HOME/.local/bin/mc.exe"
+    #     else
+    #         rst=1
+    #     fi
+    # elif ! is_64bits; then
+    #     error_msg "Minio portable is only Available for x86 64 bits"
+    #     rst=1
+    # else
+    #     warn_msg "Skipping minio client, already installed"
+    #     rst=2
+    # fi
 
-    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
-        status_msg "Getting efm-langserver"
-        local pkg='efm-langserver.zip'
-        local url="${github}/mattn/efm-langserver"
-        if hash curl 2>/dev/null; then
-            # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        else
-            # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        fi
-        status_msg "Downloading efm-langserver version: ${version}"
-        local os_type="windows_amd64"
-        if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}"
-            unzip -o "$TMP/${pkg}"
-            chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe"
-            mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1>/dev/null  || return 1
-        else
-            rst=1
-        fi
-    elif ! [[ $ARCH == 'x86_64' ]]; then
-        error_msg "efm-langserver portable is only Available for x86 64 bits"
-        rst=1
-    else
-        warn_msg "Skipping efm-langserver, already installed"
-        rst=2
-    fi
+    # if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; }; then
+    #     [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
+    #     status_msg "Getting efm-langserver"
+    #     local pkg='efm-langserver.zip'
+    #     local url="${github}/mattn/efm-langserver"
+    #     if hash curl 2>/dev/null; then
+    #         # shellcheck disable=SC2155
+    #         local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+    #     else
+    #         # shellcheck disable=SC2155
+    #         local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+    #     fi
+    #     status_msg "Downloading efm-langserver version: ${version}"
+    #     local os_type="windows_amd64"
+    #     if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.zip" "$TMP/${pkg}"; then
+    #         pushd "$TMP" 1>/dev/null  || return 1
+    #         verbose_msg "Extracting into $TMP/${pkg}"
+    #         unzip -o "$TMP/${pkg}"
+    #         chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe"
+    #         mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe" "$HOME/.local/bin/"
+    #         verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+    #         popd 1>/dev/null  || return 1
+    #     else
+    #         rst=1
+    #     fi
+    # elif ! [[ $ARCH == 'x86_64' ]]; then
+    #     error_msg "efm-langserver portable is only Available for x86 64 bits"
+    #     rst=1
+    # else
+    #     warn_msg "Skipping efm-langserver, already installed"
+    #     rst=2
+    # fi
 
     if  ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
@@ -1589,21 +1589,21 @@ function _linux_portables() {
         rst=2
     fi
 
-    if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
-        status_msg "Getting minio client"
-        if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
-            chmod +x "$HOME/.local/bin/mc"
-        else
-            rst=1
-        fi
-    elif ! is_64bits; then
-        error_msg "Minio portable is only Available for x86 64 bits"
-        rst=1
-    else
-        warn_msg "Skipping minio client, already installed"
-        rst=2
-    fi
+    # if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+    #     [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc"; }
+    #     status_msg "Getting minio client"
+    #     if download_asset "MinioClient" "https://dl.min.io/client/mc/release/linux-amd64/mc" "$HOME/.local/bin/mc"; then
+    #         chmod +x "$HOME/.local/bin/mc"
+    #     else
+    #         rst=1
+    #     fi
+    # elif ! is_64bits; then
+    #     error_msg "Minio portable is only Available for x86 64 bits"
+    #     rst=1
+    # else
+    #     warn_msg "Skipping minio client, already installed"
+    #     rst=2
+    # fi
 
     if ! hash jq 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing jq install'
@@ -1635,37 +1635,37 @@ function _linux_portables() {
         rst=2
     fi
 
-    if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
-        status_msg "Getting efm-langserver"
-        local pkg='efm-langserver.tar.gz'
-        local url="${github}/mattn/efm-langserver"
-        if hash curl 2>/dev/null; then
-            # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        else
-            # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        fi
-        status_msg "Downloading efm-langserver version: ${version}"
-        local os_type="linux_amd64"
-        if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-            chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver"
-            mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1>/dev/null  || return 1
-        else
-            rst=1
-        fi
-    elif ! [[ $ARCH == 'x86_64' ]]; then
-        error_msg "efm-langserver portable is only Available for x86 64 bits"
-        rst=1
-    else
-        warn_msg "Skipping efm-langserver, already installed"
-        rst=2
-    fi
+    # if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+    #     [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
+    #     status_msg "Getting efm-langserver"
+    #     local pkg='efm-langserver.tar.gz'
+    #     local url="${github}/mattn/efm-langserver"
+    #     if hash curl 2>/dev/null; then
+    #         # shellcheck disable=SC2155
+    #         local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+    #     else
+    #         # shellcheck disable=SC2155
+    #         local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+    #     fi
+    #     status_msg "Downloading efm-langserver version: ${version}"
+    #     local os_type="linux_amd64"
+    #     if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
+    #         pushd "$TMP" 1>/dev/null  || return 1
+    #         verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
+    #         chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver"
+    #         mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver" "$HOME/.local/bin/"
+    #         verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+    #         popd 1>/dev/null  || return 1
+    #     else
+    #         rst=1
+    #     fi
+    # elif ! [[ $ARCH == 'x86_64' ]]; then
+    #     error_msg "efm-langserver portable is only Available for x86 64 bits"
+    #     rst=1
+    # else
+    #     warn_msg "Skipping efm-langserver, already installed"
+    #     rst=2
+    # fi
 
     if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
