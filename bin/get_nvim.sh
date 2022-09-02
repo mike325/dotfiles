@@ -570,7 +570,7 @@ fi
 
 if hash nvim 2>/dev/null && [[ $FORCE_INSTALL -ne 1 ]]; then
     warn_msg "Neovim is already install, use --force to bypass this check"
-    return 1
+    exit 1
 fi
 
 if [[ $CLONE -eq 1 ]]; then
@@ -648,10 +648,10 @@ EOF
 fi
 
 # Always clean the build dir
-status_msg "Cleaning repo"
+# status_msg "Cleaning repo"
 # Remove all untracked files
-git clean -df . 2>/dev/null
-make clean
+# git clean -df . 2>/dev/null
+# make clean
 # make distclean
 
 # Get latest version
@@ -659,17 +659,17 @@ status_msg "Pulling latest changes"
 git checkout master
 git pull origin master
 
-BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"
-status_msg "Checking out to $BRANCH"
-git checkout "$BRANCH"
+if [[ $DEV -eq 0 ]]; then
+    BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"
+    status_msg "Checking out to $BRANCH"
+    git checkout "$BRANCH"
+fi
 
 status_msg "Building neovim"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
 if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" -j; then
     status_msg "Installing neovim into $INSTALL_DIR"
-    if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install -j; then
-        get_libs
-    else
+    if ! make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install -j; then
         error_msg "Failed to install neovim"
     fi
 else
