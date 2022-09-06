@@ -647,11 +647,8 @@ EOF
     fi
 fi
 
-# Always clean the build dir
-# status_msg "Cleaning repo"
-# Remove all untracked files
-# git clean -df . 2>/dev/null
-# make clean
+status_msg "Cleaning current build"
+make clean
 # make distclean
 
 # Get latest version
