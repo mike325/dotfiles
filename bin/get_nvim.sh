@@ -667,9 +667,9 @@ fi
 
 status_msg "Building neovim"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
-if make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" -j; then
+if make CMAKE_BUILD_TYPE=Release; then
     status_msg "Installing neovim into $INSTALL_DIR"
-    if ! make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install -j; then
+    if ! make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install; then
         error_msg "Failed to install neovim"
     fi
 else
