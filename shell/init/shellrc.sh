@@ -56,6 +56,9 @@ fi
 [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin/:$PATH"
 [[ -d "/opt/homebrew/bin" ]] && export PATH="/opt/homebrew/bin:$PATH"
 
+# NOTE: I'm not sure about adding this directly to the PATH
+[[ -d "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/" ]] && export PATH="$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/:$PATH"
+
 # shellcheck disable=SC1090,SC1091
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 

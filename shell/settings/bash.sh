@@ -165,13 +165,21 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     source "$BASH_IT/bash_it.sh"
 else
 
+    # TODO: May migrate this logic/function to python or go to improve perfomance and better handle output
     __git_info() {
         if hash git 2>/dev/null; then
             local branch changes stash info
             # shellcheck disable=SC2063
-            branch="$(git branch 2>/dev/null | grep '^*' | awk '{$1=""; print $0}')"
+            branch="$(git branch 2>/dev/null | command grep '^*' | awk '{$1=""; print $0}')"
             if [[ -n $branch ]]; then
-                branch="${echo_white}${echo_blue}${branch}"
+                if [[ ${#branch} -gt 20 ]]; then
+                    local br_regex="^[ ]?[A-Za-z]+[-/]([A-Za-z]+-[0-9]+-?)?"
+                    if [[ $branch =~ $br_regex ]]; then
+                        local index
+                        index="$(echo "$branch" | command grep -oE "$br_regex")"
+                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+                    fi
+                fi
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
@@ -184,11 +192,11 @@ else
                 else
                     stash=''
                 fi
-                info="${echo_blue}|"
-                [[ -n $branch ]] && info="$info ${echo_reset_color}$branch${echo_reset_color}"
-                [[ -n $to_commit ]] && info="$info ${echo_reset_color}$to_commit${echo_reset_color}"
-                [[ -n $changes ]] && info="$info ${echo_reset_color}$changes${echo_reset_color}"
-                [[ -n $stash ]] && info="$info ${echo_reset_color}$stash${echo_reset_color}"
+                info="${echo_blue}| ${echo_white}${echo_reset_color}"
+                info="$info${echo_blue}$branch${echo_reset_color}"
+                [[ -n $to_commit ]] && info="$info $to_commit${echo_reset_color}"
+                [[ -n $changes ]] && info="$info $changes${echo_reset_color}"
+                [[ -n $stash ]] && info="$info $stash${echo_reset_color}"
                 info="$info ${echo_blue}|${echo_reset_color} "
                 echo -e "$info"
             fi
@@ -233,10 +241,11 @@ else
         # $
         # ❯
         # »
+        # ❯
         local rc="$1"
         # NOTE: ignore send to background and <CTRL-c> exit codes
         if [[ $rc -ne 0 ]] && [[ $rc -ne 148 ]] && [[ $rc -ne 130 ]]; then
-            echo -e "${echo_red}❯${echo_reset_color} "
+            echo -e "${echo_red}✗${echo_reset_color} "
         else
             echo "❯ "
         fi
@@ -248,8 +257,23 @@ else
         fi
     }
 
-    # PS1="\n$(__schroot_name)\$(__exit_code)$(__user)${cyan}\h${reset_color}: ${yellow}\w${reset_color} ${magenta}J:\j${reset_color} \$(__proxy)\$(__venv)\$(__git_info) \n→ "
+    __cwd() {
+        local _cwd
+        _cwd="$(pwd -P)"
+        _cwd="${_cwd/$HOME/~}"
+        if [[ ${#_cwd} -gt $((COLUMNS / 2)) ]]; then
+            local i=2
+            while [[ ${#_cwd} -gt $((COLUMNS / 2)) ]] || [[ -z $(echo "$_cwd" | awk -F/ "{ print substr(\$$i,1,1)}") ]]; do
+                _cwd="$(echo "$_cwd" | awk -F/ "BEGIN { OFS = FS } { \$$i = substr(\$$i,1,1) } {print}")"
+                i=$((i + 1))
+            done
+            echo -e "${echo_yellow}${_cwd}${echo_reset_color} "
+        else
+            echo -e "${echo_yellow}\w${echo_reset_color} "
+        fi
+    }
 
+    # TODO: This function should short long components automatically
     _prompt_command() {
         local EXIT_CODE="$?"
 
@@ -258,12 +282,13 @@ else
         # PS1+="$(__exit_code)"
         PS1+="$(__user)"
         PS1+="${cyan}\h${reset_color}: "
-        PS1+="${yellow}\w${reset_color} "
+        # PS1+="${yellow}\w${reset_color} "
+        PS1+="$(__cwd)"
         PS1+="${magenta}J:\j${reset_color} "
         PS1+="$(__proxy)"
         PS1+="$(__venv)"
         PS1+="$(__git_info) "
-        PS1+="\n$(__exit_code $EXIT_CODE)"
+        PS1+="\n$(__exit_code "$EXIT_CODE")"
         # PS1+="\n$ "
     }
     PROMPT_COMMAND=_prompt_command

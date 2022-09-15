@@ -134,36 +134,6 @@ if ! hash is_osx 2>/dev/null; then
     }
 fi
 
-# Warning ! This script delete everything in the work directory before install
-function _show_nvim_libs() {
-    cat <<EOF
-Please also consider to install the python libs
-    $ pip3 install --upgrade --user pynvim && pip2 install --upgrade --user pynvim
-and Ruby libs
-    $ gem install --user-install neovim
-EOF
-}
-
-function _show_nvim_help() {
-    cat <<EOF
-Ubuntu/Debian/Linux mint
-    # apt-get install libtool libtool-bin autoconf automake cmake g++ pkg-config unzip
-
-CentOS/RetHat/Fedora
-    # dnf install libtool autoconf automake cmake gcc gcc-c++ make pkgconfig unzip
-
-ArchLinux/Antergos/Manjaro
-    # pacman -S base-devel cmake unzip
-EOF
-
-    _show_nvim_libs
-
-    cat <<EOF
-For other Unix systems (BSD, Linux and MacOS) and Windows please check
-    https://github.com/neovim/neovim/wiki/Building-Neovim
-EOF
-}
-
 function show_help() {
     cat <<EOF
 Simple script to build and install Neovim directly from the source
@@ -202,6 +172,9 @@ Usage:
 
         --dev
             Use developement builds/portables instead of stable
+
+        -C
+            Set the compiler, gcc/clang
 
         -v, --verbose
             Enable debug messages
