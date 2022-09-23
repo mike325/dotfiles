@@ -173,15 +173,20 @@ else
             branch="$(git branch 2>/dev/null | command grep '^*' | awk '{$1=""; print $0}')"
             if [[ -n $branch ]]; then
                 if [[ ${#branch} -gt 20 ]]; then
-                    local br_regex="^[ ]?[A-Za-z]+[-/]([A-Za-z]+-[0-9]+-?)?"
-                    if [[ $branch =~ $br_regex ]]; then
+                    local fer_issue_br_regex="^[ ]?[A-Za-z]+[-/]([A-Za-z]+-[0-9]+-?)?"
+                    local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
+                    if [[ $branch =~ $issue_br_regex ]]; then
                         local index
-                        index="$(echo "$branch" | command grep -oE "$br_regex")"
+                        index="$(echo "$branch" | command grep -oE "$issue_br_regex")"
+                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+                    elif [[ $branch =~ $fer_issue_br_regex ]]; then
+                        local index
+                        index="$(echo "$branch" | command grep -oE "$fer_issue_br_regex")"
                         branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
                     fi
                 fi
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
-                    printf "%s~%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
+                    printf "%s*%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
                 to_commit="$(git diff --cached --shortstat 2>/dev/null | awk '{
                     printf "%s*%d", ENVIRON["echo_magenta"], $1;
@@ -245,7 +250,7 @@ else
         local rc="$1"
         # NOTE: ignore send to background and <CTRL-c> exit codes
         if [[ $rc -ne 0 ]] && [[ $rc -ne 148 ]] && [[ $rc -ne 130 ]]; then
-            echo -e "${echo_red}✗${echo_reset_color} "
+            echo -e "${echo_red}❯${echo_reset_color} "
         else
             echo "❯ "
         fi
@@ -273,7 +278,14 @@ else
         fi
     }
 
+    function __cc_view() {
+        if [[ -n $CLEARCASE_CMDLINE ]]; then
+            echo -e "${echo_red}($(echo "$CLEARCASE_CMDLINE" | awk "{ \$2 = substr(\$2,${#USER}+5) } {print \$2}"))${echo_reset_color}"
+        fi
+    }
+
     # TODO: This function should short long components automatically
+    # TODO: Add support for custom host prompt segments
     _prompt_command() {
         local EXIT_CODE="$?"
 
@@ -287,6 +299,7 @@ else
         PS1+="${magenta}J:\j${reset_color} "
         PS1+="$(__proxy)"
         PS1+="$(__venv)"
+        PS1+="$(__cc_view) "
         PS1+="$(__git_info) "
         PS1+="\n$(__exit_code "$EXIT_CODE")"
         # PS1+="\n$ "

@@ -190,13 +190,13 @@ alias la="ls -A"
 alias ll="ls -l"
 alias lla="ls -lA"
 
-alias lat="ls -A --sort=time"
-alias llt="ls -l --sort=time"
-alias llat="ls -lA --sort=time"
+alias lat="ls -A --sort=time --reverse"
+alias llt="ls -l --sort=time --reverse"
+alias llat="ls -lA --sort=time --reverse"
 
-alias las="ls -A --sort=size"
-alias lls="ls -l --sort=size"
-alias llas="ls -lA --sort=size"
+alias las="ls -A --sort=size --reverse"
+alias lls="ls -l --sort=size --reverse"
+alias llas="ls -lA --sort=size --reverse"
 
 # default fd package in debian is fd-find, so we add a small alias to us fd
 if hash fdfind 2>/dev/null && ! hash fd 2>/dev/null; then
