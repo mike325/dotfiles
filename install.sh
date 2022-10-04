@@ -373,7 +373,6 @@ Usage:
                 - fd
                 - ripgrep
                 - pip2 and pip3
-                - efm-langserver
                 - fzf (GNU/Linux only)
                 - jq (GNU/Linux only)
 
@@ -1107,10 +1106,10 @@ function _windows_portables() {
         local url="${github}/BurntSushi/ripgrep"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$( curl -Ls ${url}/tags | grep -oE 'tag/0\.[0-9]{2}\.[0-9]{1,2}' | sort -u | tail -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$( wget -qO- ${url}/tags | grep -oE 'tag/0\.[0-9]{2}\.[0-9]{1,2}' | sort -u | tail -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
         fi
         status_msg "Downloading rg version: ${version}"
         local os_type="${ARCH}-pc-windows-gnu"
@@ -1200,55 +1199,6 @@ function _windows_portables() {
         rst=2
     fi
 
-    # if is_64bits && { ! hash mc 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-    #     [[ $FORCE_INSTALL -eq 1 ]] && { [[ -f "$HOME/.local/bin/mc.exe" ]] && status_msg 'Forcing minio client install' && rm -rf "$HOME/.local/bin/mc.exe"; }
-    #     status_msg "Getting minio client"
-    #     if download_asset "Minio client" "https://dl.min.io/client/mc/release/windows-amd64/mc.exe" "$HOME/.local/bin/mc.exe"; then
-    #         chmod +x "$HOME/.local/bin/mc.exe"
-    #     else
-    #         rst=1
-    #     fi
-    # elif ! is_64bits; then
-    #     error_msg "Minio portable is only Available for x86 64 bits"
-    #     rst=1
-    # else
-    #     warn_msg "Skipping minio client, already installed"
-    #     rst=2
-    # fi
-
-    # if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; }; then
-    #     [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
-    #     status_msg "Getting efm-langserver"
-    #     local pkg='efm-langserver.zip'
-    #     local url="${github}/mattn/efm-langserver"
-    #     if hash curl 2>/dev/null; then
-    #         # shellcheck disable=SC2155
-    #         local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-    #     else
-    #         # shellcheck disable=SC2155
-    #         local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-    #     fi
-    #     status_msg "Downloading efm-langserver version: ${version}"
-    #     local os_type="windows_amd64"
-    #     if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.zip" "$TMP/${pkg}"; then
-    #         pushd "$TMP" 1>/dev/null  || return 1
-    #         verbose_msg "Extracting into $TMP/${pkg}"
-    #         unzip -o "$TMP/${pkg}"
-    #         chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe"
-    #         mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver.exe" "$HOME/.local/bin/"
-    #         verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-    #         popd 1>/dev/null  || return 1
-    #     else
-    #         rst=1
-    #     fi
-    # elif ! [[ $ARCH == 'x86_64' ]]; then
-    #     error_msg "efm-langserver portable is only Available for x86 64 bits"
-    #     rst=1
-    # else
-    #     warn_msg "Skipping efm-langserver, already installed"
-    #     rst=2
-    # fi
-
     if  ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
         status_msg "Getting shfmt"
@@ -1295,12 +1245,25 @@ function _windows_portables() {
             # shellcheck disable=SC2155
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
+        # FIX: this version is not getting parse correctly, using latest as a WA
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/download/${version}/stylua-win64.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/latest/download/stylua-win64.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/"
-            chmod u+x "$TMP/stylua.exe"
-            mv "$TMP/stylua.exe" "$HOME/.local/bin/"
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if unzip -o "$TMP/${pkg}" -d "$TMP/"; then
+                if chmod u+x "$TMP/stylua.exe"; then
+                    if ! mv "$TMP/stylua.exe" "$HOME/.local/bin/"; then
+                        error_msg "Faild to move stylua.exe to ~/.local/bin/"
+                        rst=1
+                    fi
+                else
+                    error_msg "Failed to make $TMP/stylua.exe executable"
+                    rst=1
+                fi
+            else
+                error_msg "Failed to extract ${TMP}/${pkg}"
+                rst=1
+            fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
@@ -1634,38 +1597,6 @@ function _linux_portables() {
         warn_msg "Skipping jq, already installed"
         rst=2
     fi
-
-    # if [[ $ARCH == 'x86_64' ]] && { ! hash efm-langserver 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-    #     [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing efm-langserver install'
-    #     status_msg "Getting efm-langserver"
-    #     local pkg='efm-langserver.tar.gz'
-    #     local url="${github}/mattn/efm-langserver"
-    #     if hash curl 2>/dev/null; then
-    #         # shellcheck disable=SC2155
-    #         local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-    #     else
-    #         # shellcheck disable=SC2155
-    #         local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-    #     fi
-    #     status_msg "Downloading efm-langserver version: ${version}"
-    #     local os_type="linux_amd64"
-    #     if download_asset "efm-langserver" "${url}/releases/download/${version}/efm-langserver_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-    #         pushd "$TMP" 1>/dev/null  || return 1
-    #         verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-    #         chmod u+x "$TMP/efm-langserver_${version}_${os_type}/efm-langserver"
-    #         mv "$TMP/efm-langserver_${version}_${os_type}/efm-langserver" "$HOME/.local/bin/"
-    #         verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-    #         popd 1>/dev/null  || return 1
-    #     else
-    #         rst=1
-    #     fi
-    # elif ! [[ $ARCH == 'x86_64' ]]; then
-    #     error_msg "efm-langserver portable is only Available for x86 64 bits"
-    #     rst=1
-    # else
-    #     warn_msg "Skipping efm-langserver, already installed"
-    #     rst=2
-    # fi
 
     if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
