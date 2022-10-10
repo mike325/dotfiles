@@ -1684,12 +1684,25 @@ function _linux_portables() {
             # shellcheck disable=SC2155
             local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
         fi
+        # FIX: this version is not getting parse correctly, using latest as a WA
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/download/${version}/stylua-linux.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/latest/download/stylua-linux.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null
-            chmod u+x "$TMP/stylua"
-            mv "$TMP/stylua" "$HOME/.local/bin/"
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null; then
+                if chmod u+x "$TMP/stylua"; then
+                    if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move stylua executable"
+                        rst=1
+                    fi
+                else
+                    error_msg "Failed to make stylua executable"
+                    rst=1
+                fi
+            else
+                error_msg "Failed to unzip stylua"
+                rst=1
+            fi
             verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
