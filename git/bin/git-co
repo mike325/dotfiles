@@ -27,7 +27,6 @@ NOLOG=1
 WARN_COUNT=0
 ERR_COUNT=0
 # FROM_STDIN=()
-GLOBAL=0
 
 NAME="$0"
 NAME="${NAME##*/}"
@@ -39,9 +38,6 @@ SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 OS='unknown'
 ARCH="$(uname -m)"
-
-USER="${GIT_USER:-${USER}}"
-EMAIL="${GIT_MAIL:-mickiller.25@gmail.com}"
 
 trap '{ exit_append; }' EXIT
 
@@ -106,9 +102,56 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
-if ! hash is_osx >/dev/null; then
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_wls 2>/dev/null; then
+    function is_wls() {
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_osx 2>/dev/null; then
     function is_osx() {
         if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if hash is_root 2>/dev/null; then
+    function is_root() {
+        if ! is_windows && [[ $EUID -eq 0 ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if hash has_sudo 2>/dev/null; then
+    function has_sudo() {
+        if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_64bits 2>/dev/null; then
+    function is_64bits() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
             return 0
         fi
         return 1
@@ -163,57 +206,57 @@ EOF
 }
 
 function warn_msg() {
-    local warn_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$warn_message"
+        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
     else
-        printf "[!] Warning:\t %s\n" "$warn_message"
+        printf "[!] Warning:\t %s\n" "$msg"
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[!] Warning:\t %s\n" "$warn_message" >>"${LOG}"
+        printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function error_msg() {
-    local error_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${red}[X] Error:${reset_color}\t %s\n" "$error_message" 1>&2
+        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
     else
-        printf "[X] Error:\t %s\n" "$error_message" 1>&2
+        printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
     ERR_COUNT=$((ERR_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[X] Error:\t %s\n" "$error_message" >>"${LOG}"
+        printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function status_msg() {
-    local status_message="$1"
+    local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s\n" "$status_message"
+        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
     else
-        printf "[*] Info:\t %s\n" "$status_message"
+        printf "[*] Info:\t %s\n" "$msg"
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[*] Info:\t\t %s\n" "$status_message" >>"${LOG}"
+        printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
 
 function verbose_msg() {
-    local debug_message="$1"
+    local msg="$1"
     if [[ $VERBOSE -eq 1 ]]; then
         if [[ $NOCOLOR -eq 0 ]]; then
-            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$debug_message"
+            printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
         else
-            printf "[+] Debug:\t %s\n" "$debug_message"
+            printf "[+] Debug:\t %s\n" "$msg"
         fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
-        printf "[+] Debug:\t\t %s\n" "$debug_message" >>"${LOG}"
+        printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
 }
@@ -229,7 +272,7 @@ function __parse_args() {
 
     local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
 
-    if [[ -n $3 ]]; then
+    if [[ -n $3   ]]; then
         local pattern="^--${flag}=$3$"
     fi
 
@@ -279,6 +322,9 @@ function exit_append() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --nolog)
+            NOLOG=1
+            ;;
         --nocolor)
             NOCOLOR=1
             ;;
@@ -289,32 +335,18 @@ while [[ $# -gt 0 ]]; do
             help_user
             exit 0
             ;;
-        -l | --local)
-            GLOBAL=0
-            ;;
-        -g | --global)
-            GLOBAL=1
-            ;;
-        p | per | personal)
-            USER="${GIT_USER:-Mike}"
-            EMAIL="${GIT_MAIL:-mickiller.25@gmail.com}"
-            ;;
-        w | wo | work)
-            USER="${WORK_USER:-Miguel Ochoa}"
-            EMAIL="${WORK_MAIL:-[ omitted ]}"
-            ;;
-        # -)
-        #     while read -r from_stdin; do
-        #         FROM_STDIN=("$from_stdin")
-        #     done
-        #     break
-        #     ;;
-        *)
-            initlog
-            error_msg "Unknown argument $key"
-            help_user
-            exit 1
-            ;;
+            # -)
+            #     while read -r from_stdin; do
+            #         FROM_STDIN=("$from_stdin")
+            #     done
+            #     break
+            #     ;;
+            # *)
+            #     initlog
+            #     error_msg "Unknown argument $key"
+            #     help_user
+            #     exit 1
+            #     ;;
     esac
     shift
 done
@@ -330,25 +362,31 @@ verbose_msg "OS            : ${OS}"
 #                           CODE Goes Here                            #
 #######################################################################
 
-if ! hash git 2>/dev/null; then
-    error_msg "Missig git"
-    exit 1
-elif ! git rev-parse --git-dir &>/dev/null && ! [[ $GLOBAL -eq 1 ]]; then
-    error_msg "Not a git repository"
-    exit 1
-fi
+# TODO: Add commit log as preview
+checkout() {
+    local branch
+    branch=$( git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
+    if [[ -n $branch ]]; then
+        git o "$branch"
+    fi
+}
 
-verbose_msg "Using User: $USER"
-verbose_msg "Using Mail: $EMAIL"
-
-if [[ $GLOBAL -eq 0 ]]; then
-    git config user.name "$USER"
-    git config user.email "$EMAIL"
+# TODO: Add filter capabilities
+if hash fzf 2>/dev/null; then
+    if git rev-parse --show-toplevel &>/dev/null; then
+        checkout
+    else
+        error_msg "No a git repository"
+        exit 1
+    fi
 else
-    git config --global user.name "$USER"
-    git config --global user.email "$EMAIL"
+    error_msg "FZF is not install"
+    exit 1
 fi
 
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
 fi
