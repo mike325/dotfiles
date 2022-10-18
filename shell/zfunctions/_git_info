@@ -3,7 +3,6 @@
 if hash git 2>/dev/null; then
     branch="$(git branch 2>/dev/null | grep '^*' | awk '{$1=""; print $0}')"
     if [[ -n $branch ]]; then
-        branch="${branch/ /}"
         if [[ ${#branch} -gt 20 ]]; then
             local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
             local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
@@ -17,6 +16,7 @@ if hash git 2>/dev/null; then
                 branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
             fi
         fi
+        branch="${branch/ /}"
         changes="$(git diff --shortstat 2>/dev/null | awk '{
             printf "%s~%d %s+%d %s-%d%s", "%F{yellow}", $1, "%F{green}", $4, "%F{red}", $6, "%F{blue}";
         }')"

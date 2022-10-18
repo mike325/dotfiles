@@ -172,7 +172,6 @@ else
             # shellcheck disable=SC2063
             branch="$(git branch 2>/dev/null | command grep '^*' | awk '{$1=""; print $0}')"
             if [[ -n $branch ]]; then
-                branch="${branch/ /}"
                 if [[ ${#branch} -gt 20 ]]; then
                     local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
                     local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
@@ -186,6 +185,7 @@ else
                         branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
                     fi
                 fi
+                branch="${branch/ /}"
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s*%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
