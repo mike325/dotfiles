@@ -3,7 +3,20 @@
 if hash git 2>/dev/null; then
     branch="$(git branch 2>/dev/null | grep '^*' | awk '{$1=""; print $0}')"
     if [[ -n $branch ]]; then
-        branch="%F{white}%F{blue}${branch}"
+        branch="${branch/ /}"
+        if [[ ${#branch} -gt 20 ]]; then
+            local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
+            local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
+            if [[ $branch =~ $fer_issue_br_regex ]]; then
+                local index
+                index="$(echo "$branch" | command grep -oE "$fer_issue_br_regex")"
+                branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+            elif [[ $branch =~ $issue_br_regex ]]; then
+                local index
+                index="$(echo "$branch" | command grep -oE "$issue_br_regex")"
+                branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+            fi
+        fi
         changes="$(git diff --shortstat 2>/dev/null | awk '{
             printf "%s~%d %s+%d %s-%d%s", "%F{yellow}", $1, "%F{green}", $4, "%F{red}", $6, "%F{blue}";
         }')"
@@ -17,11 +30,17 @@ if hash git 2>/dev/null; then
         else
             stash=''
         fi
-        info="%F{blue}|"
-        [[ -n $branch ]] && info="$info %f$branch%f"
-        [[ -n $to_commit ]] && info="$info %f$to_commit%f"
-        [[ -n $changes ]] && info="$info %f$changes%f"
-        [[ -n $stash ]] && info="$info %f$stash%f"
+        info="%F{blue}|%f"
+        # TODO: Find another icon to represent git branch
+        if [[ -z $NO_COOL_FONTS ]]; then
+            info="$info %F{white}%f"
+            info="$info %F{blue}$branch%f"
+        else
+            info="$info %F{blue}{$branch}%f"
+        fi
+        [[ -n $to_commit ]] && info="$info $to_commit%f"
+        [[ -n $changes ]] && info="$info $changes%f"
+        [[ -n $stash ]] && info="$info $stash%f"
         info="$info %F{blue}|%f "
         echo -e "$info"
     fi

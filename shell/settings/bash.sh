@@ -172,16 +172,17 @@ else
             # shellcheck disable=SC2063
             branch="$(git branch 2>/dev/null | command grep '^*' | awk '{$1=""; print $0}')"
             if [[ -n $branch ]]; then
+                branch="${branch/ /}"
                 if [[ ${#branch} -gt 20 ]]; then
-                    local fer_issue_br_regex="^[ ]?[A-Za-z]+[-/]([A-Za-z]+-[0-9]+-?)?"
+                    local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
                     local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
-                    if [[ $branch =~ $issue_br_regex ]]; then
-                        local index
-                        index="$(echo "$branch" | command grep -oE "$issue_br_regex")"
-                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
-                    elif [[ $branch =~ $fer_issue_br_regex ]]; then
+                    if [[ $branch =~ $fer_issue_br_regex ]]; then
                         local index
                         index="$(echo "$branch" | command grep -oE "$fer_issue_br_regex")"
+                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+                    elif [[ $branch =~ $issue_br_regex ]]; then
+                        local index
+                        index="$(echo "$branch" | command grep -oE "$issue_br_regex")"
                         branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
                     fi
                 fi
@@ -197,8 +198,14 @@ else
                 else
                     stash=''
                 fi
-                info="${echo_blue}| ${echo_white}${echo_reset_color}"
-                info="$info${echo_blue}$branch${echo_reset_color}"
+                info="${echo_blue}|${echo_reset_color}"
+                # TODO: Find another icon to represent git branch
+                if [[ -z $NO_COOL_FONTS ]]; then
+                    info="$info ${echo_white}${echo_reset_color}"
+                    info="$info ${echo_blue}$branch${echo_reset_color}"
+                else
+                    info="$info ${echo_blue}{$branch}${echo_reset_color}"
+                fi
                 [[ -n $to_commit ]] && info="$info $to_commit${echo_reset_color}"
                 [[ -n $changes ]] && info="$info $changes${echo_reset_color}"
                 [[ -n $stash ]] && info="$info $stash${echo_reset_color}"

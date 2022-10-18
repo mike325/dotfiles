@@ -1,7 +1,6 @@
 --append
 --c-kinds=+p
 --c++-kinds=+pl
---python-kinds=+l
 --recurse=yes
 --fields=+i
 --fields=+a
@@ -29,4 +28,3 @@
 --exclude=log/*
 --exclude=tmp/*
 --exclude=*.xml
---extras=+q
