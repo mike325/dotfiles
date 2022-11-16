@@ -127,26 +127,6 @@ unset MAILCHECK
 # https://github.com/djl/vcprompt
 # export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
 
-# Enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-
-# INFO: Use enviroment variables to avoid shellcheck errors in bash_completion file
-if ! shopt -oq posix; then
-
-    COMPLETIONS="/usr/share/bash-completion"
-    if [ -f "$COMPLETIONS/bash_completion" ]; then
-        # shellcheck disable=SC1091
-        source "$COMPLETIONS/bash_completion"
-    fi
-
-    COMPLETIONS="/etc"
-    if [ -f "$COMPLETIONS/bash_completion" ]; then
-        # shellcheck disable=SC1091
-        source "$COMPLETIONS/bash_completion"
-    fi
-fi
-
 # # pip bash completion start
 # if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null; then
 #     hash pip 2>/dev/null && eval "$(pip completion --bash)"
@@ -347,25 +327,29 @@ function toggleProxy() {
 #                          Bash Completion                            #
 #######################################################################
 
-if [[ -f /etc/bash_completion ]]; then
-    # shellcheck disable=SC1091
-    source /etc/bash_completion
-elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
-    # shellcheck disable=SC1091
-    source /usr/share/bash-completion/bash_completion
-else
-    # TODO: This may be too slow in some systems
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+    if [[ -f /etc/bash_completion ]]; then
+        # shellcheck disable=SC1091
+        source /etc/bash_completion
+    elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
+        # shellcheck disable=SC1091
+        source /usr/share/bash-completion/bash_completion
+    else
+        # TODO: This may be too slow in some systems
+        completion_dirs=(
+            "/usr/share/bash-completion/completions/"
+            "/etc/bash_completion.d/"
+        )
 
-    completion_dirs=(
-        "/usr/share/bash-completion/completions"
-        "/etc/bash_completion.d/"
-    )
-
-    for cdir in "${completion_dirs[@]}"; do
-        if [[ -d $cdir   ]]; then
-            for src in "$cdir"/*; do
-                source "$src" 2>/dev/null
-            done
-        fi
-    done
+        for cdir in "${completion_dirs[@]}"; do
+            if [[ -d $cdir   ]]; then
+                for src in "$cdir"/*; do
+                    source "$src" 2>/dev/null
+                done
+            fi
+        done
+    fi
 fi
