@@ -125,12 +125,12 @@ else
     -- TODO: Add a glob to discover these programs
     table.insert(launch_menu, {
         label = 'Bash',
-        args = {'bash', '-l'},
+        args = { 'bash', '-l' },
     })
 
     table.insert(launch_menu, {
         label = 'Zsh',
-        args = {'zsh', '-l'},
+        args = { 'zsh', '-l' },
     })
 end
 
