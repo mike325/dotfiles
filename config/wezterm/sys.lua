@@ -61,7 +61,7 @@ local sys = {
     -- db_root = db_root_path(),
     -- has_sqlite = has_sqlite(),
     -- user = vim.loop.os_get_passwd(),
-    -- version = version(),
+    version = wezterm.version,
 }
 
 -- sys.user.name = sys.user.username

@@ -2,13 +2,14 @@ require 'patch_runtime'
 
 local wezterm = require 'wezterm'
 local sys = require 'sys'
+local str = require 'utils.strings'
 
 -- local split = require('utils.strings').split
 -- local list_extend = require('utils.tables').list_extend
 -- local version_date = tonumber(split(wezterm.version, '-')[1])
 
 wezterm.on('update-right-status', function(window, _)
-    -- "Wed Mar 3 08:14"
+    -- NOTE: Date sample format "Wed Mar 3 08:14"
     local date = wezterm.strftime '%a %b %-d %H:%M '
 
     local bat = ''
@@ -22,7 +23,6 @@ wezterm.on('update-right-status', function(window, _)
 end)
 
 local default_prog
-
 if sys.name == 'windows' then
     -- Use OSC 7 as per the above example
     -- set_environment_variables['prompt'] = '$E]7;file://localhost/$P$E\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m '
@@ -97,6 +97,8 @@ local keys = {
 
     { key = 'q', mods = 'LEADER', action = wezterm.action { CloseCurrentTab = { confirm = false } } },
     { key = 'x', mods = 'LEADER', action = wezterm.action { CloseCurrentPane = { confirm = false } } },
+
+    { key = 'p', mods = 'CTRL|ALT', action = wezterm.action.ShowLauncher },
 }
 
 for i = 1, 8 do
@@ -113,8 +115,38 @@ for i = 1, 8 do
     -- })
 end
 
+local launch_menu = {}
+if sys.name == 'windows' then
+    table.insert(launch_menu, {
+        label = 'PowerShell',
+        args = default_prog,
+    })
+else
+    -- TODO: Add a glob to discover these programs
+    table.insert(launch_menu, {
+        label = 'Bash',
+        args = {'bash', '-l'},
+    })
+
+    table.insert(launch_menu, {
+        label = 'Zsh',
+        args = {'zsh', '-l'},
+    })
+end
+
+local ssh_hosts = require('files').read_sshconfig()
+if ssh_hosts then
+    for host, _ in pairs(ssh_hosts) do
+        table.insert(launch_menu, {
+            label = 'SSH: ' .. str.capitalize(host),
+            args = { 'ssh', host },
+        })
+    end
+end
+
 return {
     disable_default_key_bindings = true,
+    launch_menu = launch_menu,
     default_prog = default_prog,
     font = wezterm.font_with_fallback {
         {
@@ -123,7 +155,7 @@ return {
             stretch = 'Normal',
             style = 'Normal',
         },
-        -- 'Fira Code',
+        'Fira Code',
         'JetBrains Mono',
         'Noto Color Emoji',
         'Symbols Nerd Font Mono',
