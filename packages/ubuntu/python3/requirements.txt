@@ -1,6 +1,6 @@
 # Extra modules
 wheel>=0.29.0
-setuptools==41.2.0
+setuptools==65.5.1
 
 # http querys
 httpie>=1.0.3
