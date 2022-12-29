@@ -325,7 +325,7 @@ if [[ $- == *i* ]]; then
         [[ "$(nodejs --version)" =~ ^v10\..* ]] && export NODE_OPTIONS=--experimental-worker
     fi
 
-    [[ -f "$HOME/.config/shell/banner" ]] && cat "$HOME/.config/shell/banner"
+    [[ -f "$HOME/.config/shell/banner" ]] && command cat "$HOME/.config/shell/banner"
 
     if [[ -d "$HOME/.pyenv" ]]; then
         export PYENV_ROOT="$HOME/.pyenv"

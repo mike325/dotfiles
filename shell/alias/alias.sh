@@ -15,80 +15,53 @@
 
 _platform="$(uname)"
 
-if hash vim 2>/dev/null  || hash nvim 2>/dev/null; then
-    if hash nvim 2>/dev/null; then
+if hash nvim 2>/dev/null; then
 
-        if [[ -n $TMUX_PANE ]]; then
-            TMUX_WINDOW="$(tmux display-message -p '#I')"
-            export TMUX_WINDOW
-        else
-            # TODO: Use shell TTY to separete neovim's socket sessions
-            export TMUX_WINDOW=""
-        fi
+    export EDITOR="nvim"
+    # Fucking typos
+    alias nvi="nvim"
+    alias vnim="nvim"
+    alias vi="nvim --cmd 'let g:minimal=1'"
 
-        [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
-        export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket$TMUX_WINDOW"
-
-        if is_windows && ! is_wsl; then
-            alias cdvi="cd ~/.vim"
-            alias cdvim="cd ~/AppData/Local/nvim/"
-            if [[ -z $NVIM_LISTEN_ADDRESS ]] || ! hash nvr 2>/dev/null; then
-                export EDITOR="vim"
-                alias vi="vim --cmd 'let g:minimal=1'"
-                alias viu="vim -u NONE"
-                # Fucking typos
-                alias nvi="nvim"
-                alias vnim="nvim"
-            else
-                export MANPAGER="nvr +'Man!' --remote -"
-                export GIT_PAGER="nvr -cc 'setlocal modifiable' -c 'setlocal ft=git  nomodifiable' --remote -"
-                export EDITOR="nvr --remote-wait"
-                alias vi="nvr --remote-silent"
-                alias vim="nvr --remote-silent"
-                alias nvi="nvr --remote-silent"
-                alias nvim="nvr --remote-silent"
-                alias vnim="nvr --remote-silent"
-            fi
-
-        else
-            alias cdvi="cd ~/.vim"
-            alias cdvim="cd ~/.config/nvim"
-
-            # Fucking typos
-            alias nvi="nvim"
-            alias vnim="nvim"
-
-            if hash rshell 2>/dev/null; then
-                if hash nvr 2>/dev/null; then
-                    export RSHELL_EDITOR="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-wait"
-                else
-                    export RSHELL_EDITOR="$EDITOR"
-                fi
-            fi
-
-            if hash nvr 2>/dev/null && [[ -e "$HOME/.cache/nvim/socket$TMUX_WINDOW" ]]; then
-                alias vi="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW --remote-silent"
-            else
-                alias vi="nvim --cmd 'let g:minimal=1'"
-            fi
-
-            if hash nvr 2>/dev/null && [[ -n $VIMRUNTIME ]]; then
-                export MANPAGER="nvr --servername $HOME/.cache/nvim/socket$TMUX_WINDOW +'Man!' --remote-silent -"
-            else
-                export MANPAGER="nvim --cmd 'let g:minimal=1' +Man!"
-            fi
-            export EDITOR="nvim"
-
-        fi
+    if [[ -n $TMUX_PANE ]]; then
+        TMUX_WINDOW="$(tmux display-message -p '#I')"
+        export TMUX_WINDOW
     else
-        alias cdvim="cd ~/.vim"
-        alias cdvi="cd ~/.vim"
-        # export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
-        export EDITOR="vim"
-
-        alias vi="vim --cmd 'let g:minimal=1'"
-        alias viu="vim -u NONE"
+        # TODO: Use shell TTY to separete neovim's socket sessions
+        export TMUX_WINDOW=""
     fi
+
+    [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
+    export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket$TMUX_WINDOW"
+
+    if is_windows && ! is_wsl; then
+        alias cdvi="cd ~/.vim"
+        alias cdvim="cd ~/AppData/Local/nvim/"
+    else
+        alias cdvi="cd ~/.vim"
+        alias cdvim="cd ~/.config/nvim"
+    fi
+
+    alias bim="nvim"
+    alias cim="nvim"
+    alias im="nvim"
+
+else
+    export EDITOR="vim"
+
+    alias cdvim="cd ~/.vim"
+    alias cdvi="cd ~/.vim"
+    # export MANPAGER="env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+    alias vi="vim --cmd 'let g:minimal=1'"
+    alias viu="vim -u NONE"
+
+    alias bim="vim"
+    alias cim="vim"
+    alias im="vim"
+fi
+
+if hash rshell 2>/dev/null; then
+    export RSHELL_EDITOR="$EDITOR"
 fi
 
 if hash delta 2>/dev/null; then
@@ -101,6 +74,9 @@ fi
 #                          Fix my common typos                                 #
 ################################################################################
 
+alias bi="vi"
+alias ci="vi"
+
 alias gti="git"
 alias got="git"
 alias gut="git"
@@ -110,23 +86,6 @@ if hash bat 2>/dev/null; then
     alias cat="bat"
     [[ -z $MANPAGER ]] && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
-
-if is_windows; then
-    alias bim="vim"
-    alias cim="vim"
-    alias im="vim"
-elif hash nvim 2>/dev/null; then
-    alias bim="nvim"
-    alias cim="nvim"
-    alias im="nvim"
-else
-    alias bim="vim"
-    alias cim="vim"
-    alias im="vim"
-fi
-
-alias bi="vi"
-alias ci="vi"
 
 alias py="python"
 alias py2="python2"

@@ -44,7 +44,6 @@ local firacode = sys.name == 'windows' and 'FiraCode NF' or 'FiraCode Nerd Font'
 
 local keys = {
     { key = 'z', mods = 'LEADER', action = 'TogglePaneZoomState' },
-    { key = 'R', mods = 'LEADER', action = wezterm.action.ReloadConfiguration },
 
     { key = 'v', mods = 'LEADER', action = wezterm.action { SplitHorizontal = { domain = 'CurrentPaneDomain' } } },
     { key = 's', mods = 'LEADER', action = wezterm.action { SplitVertical = { domain = 'CurrentPaneDomain' } } },
@@ -59,8 +58,10 @@ local keys = {
     { key = 'l', mods = 'LEADER', action = wezterm.action { ActivatePaneDirection = 'Right' } },
     { key = 'k', mods = 'LEADER', action = wezterm.action { ActivatePaneDirection = 'Up' } },
     { key = 'j', mods = 'LEADER', action = wezterm.action { ActivatePaneDirection = 'Down' } },
-    { key = 'n', mods = 'CTRL|ALT', action = wezterm.action { ActivatePaneDirection = 'Next' } },
-    { key = 'p', mods = 'CTRL|ALT', action = wezterm.action { ActivatePaneDirection = 'Prev' } },
+
+    { key = 'R', mods = 'CTRL|SHIFT', action = wezterm.action.ReloadConfiguration },
+    { key = 'N', mods = 'CTRL|SHIFT', action = wezterm.action { ActivatePaneDirection = 'Next' } },
+    { key = 'P', mods = 'CTRL|SHIFT', action = wezterm.action { ActivatePaneDirection = 'Prev' } },
 
     {
         key = 'f',
@@ -73,6 +74,7 @@ local keys = {
             },
         },
     },
+
     {
         key = 'r',
         mods = 'LEADER',
@@ -91,6 +93,7 @@ local keys = {
     { key = 'Insert', mods = 'CTRL', action = wezterm.action { CopyTo = 'ClipboardAndPrimarySelection' } },
     { key = 'Paste', action = wezterm.action { PasteFrom = 'Clipboard' } },
     { key = 'Copy', action = wezterm.action { CopyTo = 'ClipboardAndPrimarySelection' } },
+    { key = 'v', mods = 'CTRL|SHIFT', action = wezterm.action { PasteFrom = 'Clipboard' } },
 
     { key = 'q', mods = 'LEADER', action = wezterm.action { CloseCurrentTab = { confirm = false } } },
     { key = 'x', mods = 'LEADER', action = wezterm.action { CloseCurrentPane = { confirm = false } } },
@@ -120,6 +123,7 @@ return {
             stretch = 'Normal',
             style = 'Normal',
         },
+        -- 'Fira Code',
         'JetBrains Mono',
         'Noto Color Emoji',
         'Symbols Nerd Font Mono',
@@ -170,6 +174,16 @@ return {
             event = { Up = { streak = 1, button = 'Left' } },
             mods = 'CTRL',
             action = 'OpenLinkAtMouseCursor',
+        },
+        {
+            event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+            mods = 'CTRL',
+            action = wezterm.action.IncreaseFontSize,
+        },
+        {
+            event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+            mods = 'CTRL',
+            action = wezterm.action.DecreaseFontSize,
         },
     },
 }

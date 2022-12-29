@@ -8,72 +8,60 @@
 #                          Set the default text editor                         #
 ################################################################################
 
-if ( `where vim` != "" ) then
-    if ( `where nvim` != "" ) then
-        alias cdvi "cd ~/.vim"
-        alias cdvim "cd ~/.config/nvim"
-        # NOTE: This is set inside Neovim settings
-        # shellcheck disable=SC2154
-        if ( ! ($?nvr) ) then
-            setenv MANPAGER "nvim --cmd 'let g:minimal=1' +Man!"
-            # setenv GIT_PAGER "nvim --cmd 'let g:minimal=1' --cmd 'setlocal modifiable noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' - "
-            setenv EDITOR "nvim"
-            alias vi "nvim --cmd 'let g:minimal=1'"
-            alias viu "nvim -u NONE"
-            # Fucking typos
-            alias nvi "nvim"
-            alias vnim "nvim"
-        else
-            setenv MANPAGER "nvr -c 'Man!' --remote-tab -"
-            # setenv GIT_PAGER "nvr -cc 'setlocal modifiable' -c 'setlocal ft=git readonly nomodifiable' --remote-tab -"
-            setenv EDITOR "nvr --remote-tab-wait"
-            alias vi "nvr --remote-silent"
-            alias nvi "nvr --remote-silent"
-            alias nvim "nvr --remote-silent"
-            alias vnim "nvr --remote-silent"
-        endif
-    else
-        alias cdvim "cd ~/.vim"
-        setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man readonly nomodifiable' +MANPAGER -"
-        # setenv GIT_PAGER "vim --cmd 'let g:minimal=1' --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=git readonly nomodifiable' -"
-        setenv EDITOR "vim"
+if ( `where nvim` != "" ) then
+    setenv EDITOR "nvim"
+    # Fucking typos
+    alias nvi "nvim"
+    alias vnim "nvim"
+    alias vi "nvim --cmd 'let g:minimal=1'"
 
-        alias vi "vim --cmd 'let g:minimal=1'"
-        alias viu "vim -u NONE"
+    setenv NVIM_LISTEN_ADDRESS "$HOME/.cache/nvim/socket$TMUX_WINDOW"
+
+    alias cdvi "cd ~/.vim"
+    alias cdvim "cd ~/.config/nvim"
+
+    alias bim "nvim"
+    alias cim "nvim"
+    alias im "nvim"
+else
+    setenv EDITOR "vim"
+
+    alias cdvim "cd ~/.vim"
+    alias cdvi "cd ~/.vim"
+    # setenv MANPAGER "env MAN_PN=1 vim --cmd 'let g:minimal=1 --cmd 'setlocal noswapfile nobackup noundofile' -c 'setlocal ft=man  nomodifiable' +MANPAGER -"
+    alias vi "vim --cmd 'let g:minimal=1'"
+    alias viu "vim -u NONE"
+
+    alias bim "vim"
+    alias cim "vim"
+    alias im "vim"
+endif
+
+if ( `where delta` != "" ); then
+    setenv GIT_PAGER "delta --dark --24-bit-color auto"
+else
+    if ( `where bat` != "" ); then
+        setenv GIT_PAGER "bat"
+        alias cat bat
     endif
 endif
 
 if ( `where bat` != "" ) then
-    setenv GIT_PAGER "bat"
     alias cat bat
+    setenv MANPAGER "sh -c 'col -bx | bat -l man -p'"
 endif
 
 ################################################################################
 #                          Fix my common typos                                 #
 ################################################################################
 
+alias bi "vi"
+alias ci "vi"
+
 alias gti "git"
 alias got "git"
 alias gut "git"
 alias gi "git"
-
-if ( `where nvim` != "" ) then
-    alias bim "nvim"
-    alias cim "nvim"
-    alias im "nvim"
-else
-    alias bim "vim"
-    alias cim "vim"
-    alias im "vim"
-endif
-
-# default fd package in debian is fd-find, so we add a small alias to us fd
-if ( `where fdfind` != "" ) then
-    alias fd "fdfind"
-endif
-
-alias bi "vi"
-alias ci "vi"
 
 alias py "python"
 alias py2 "python2"
@@ -94,7 +82,7 @@ if ( `where thefuck` != "" ) then
     alias fuvk 'fuck'
 endif
 
-alias sshkey 'ssh-keygen -t rsa -b 4096 -C "${MAIL:-mickiller.25@gmail.com}"'
+alias sshkey 'ssh-keygen -t rsa -b 4096 -C "${EMAIL:-mickiller.25@gmail.com}"'
 
 alias user "whoami"
 alias j "jobs"
@@ -103,27 +91,33 @@ alias j "jobs"
 alias psu 'ps -u $USER'
 
 alias cl "clear"
-
 alias q "exit"
 
 # Show used ports
 alias ports "netstat -tulpn"
 
 alias grep "grep --color -n"
-
 alias grepo "grep -o"
 alias grepe "grep -E"
 
-alias ls 'ls --color'
+alias ls "ls --color --classify --human-readable"
+alias l "ls"
 alias la "ls -A"
-alias ll "ls -lh"
-alias lla "ls -lhA"
+alias ll "ls -l"
+alias lla "ls -lA"
 
-# This way sudo commands get the alias of the account
-# ( $EUID -ne 0 ) && alias sudo 'sudo '
+alias lat "ls -A --sort=time --reverse"
+alias llt "ls -l --sort=time --reverse"
+alias llat "ls -lA --sort=time --reverse"
 
-# laod kernel module for virtualbox
-# ( $EUID -ne 0 ) && alias vbk "sudo modprobe vboxdrv"
+alias las "ls -A --sort=size --reverse"
+alias lls "ls -l --sort=size --reverse"
+alias llas "ls -lA --sort=size --reverse"
+
+# default fd package in debian is fd-find, so we add a small alias to us fd
+if ( `where fdfind` != "" ) then
+    alias fd "fdfind"
+endif
 
 ################################################################################
 #             Functions to move around dirs and other simple stuff             #

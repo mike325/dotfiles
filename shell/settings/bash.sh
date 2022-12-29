@@ -208,7 +208,7 @@ else
         fi
 
         if [[ -n $ENV_VERSION ]]; then
-            echo " %F{white}(${env_name} 🐍 ${ENV_VERSION})%f "
+            echo -e " ${echo_white}(${env_name} 🐍 ${ENV_VERSION})${echo_reset_color} "
         else
             unset ENV_VERSION 2>/dev/null
         fi
@@ -278,7 +278,6 @@ else
 
         PS1="\n"
         # PS1+="$(__schroot_name)"
-        # PS1+="$(__exit_code)"
         PS1+="$(__user)"
         PS1+="${cyan}\h${reset_color}: "
         # PS1+="${yellow}\w${reset_color} "
