@@ -134,14 +134,11 @@ else
     })
 end
 
-local ssh_hosts = require('files').read_sshconfig()
-if ssh_hosts then
-    for host, _ in pairs(ssh_hosts) do
-        table.insert(launch_menu, {
-            label = 'SSH: ' .. str.capitalize(host),
-            args = { 'ssh', host },
-        })
-    end
+for host, _ in pairs(wezterm.enumerate_ssh_hosts()) do
+    table.insert(launch_menu, {
+        label = 'SSH: ' .. str.capitalize(host),
+        args = { 'ssh', host },
+    })
 end
 
 return {

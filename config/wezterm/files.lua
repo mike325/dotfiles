@@ -33,7 +33,7 @@ function M.readfile(path, split)
     return utils.split(data, '\n')
 end
 
-function M.writefile(path, data)
+function M.writefile(filename, data)
     assert(type(filename) == type '' and filename ~= '')
     assert(type(data) == type {} or type(data) == type '')
 
@@ -41,30 +41,9 @@ function M.writefile(path, data)
         data = table.concat(data, '\n')
     end
 
-    local fd = io.open(path, 'w')
+    local fd = io.open(filename, 'w')
     fd:write(data)
     fd:close()
-end
-
-function M.read_sshconfig()
-    local ssh_config = sys.home .. '/.ssh/config'
-
-    if M.exists(ssh_config) then
-        local host = ''
-        local hosts = {}
-        local lines = M.readfile(ssh_config)
-        for _, line in pairs(lines) do
-            if line ~= '' and line:match '[hH]ost%s+[a-zA-Z0-9_-%.]+' then
-                host = line:match '[hH]ost%s+([a-zA-Z0-9_-%.]+)'
-            elseif line:match '%s+[hH]ostname%s+[a-zA-Z0-9_-%.]+' and host ~= '' then
-                local addr = line:match '%s+[hH]ostname%s+([a-zA-Z0-9_-%.]+)'
-                hosts[host] = addr
-                host = ''
-            end
-        end
-        return hosts
-    end
-    return false
 end
 
 return M
