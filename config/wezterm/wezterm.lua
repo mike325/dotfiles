@@ -163,7 +163,8 @@ return {
     color_scheme = 'tokyonight',
     window_background_opacity = 0.9,
     scrollback_lines = 10000,
-    font_size = 11.0,
+    -- TODO: Dynamic check for DPi?
+    font_size = sys.name == 'windows' and 11.0 or 13.0,
     harfbuzz_features = { 'zero' },
     -- use_dead_keys = false,
     window_close_confirmation = 'NeverPrompt',

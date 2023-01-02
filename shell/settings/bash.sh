@@ -174,7 +174,7 @@ else
                 }')"
                 stash="$(git stash list 2>/dev/null | wc -l)"
                 if [[ $stash -ne 0 ]]; then
-                    stash="${echo_yellow}{$stash}"
+                    stash="${echo_yellow}{${stash##* }}"
                 else
                     stash=''
                 fi
