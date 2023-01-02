@@ -40,7 +40,7 @@ if sys.name == 'windows' then
     }
 end
 
-local firacode = sys.name == 'windows' and 'FiraCode NF' or 'FiraCode Nerd Font'
+local firacode = sys.name == 'windows' and 'Fira Code' or 'FiraCode Nerd Font'
 
 local keys = {
     { key = 'z', mods = 'LEADER', action = 'TogglePaneZoomState' },
@@ -99,6 +99,8 @@ local keys = {
     { key = 'x', mods = 'LEADER', action = wezterm.action { CloseCurrentPane = { confirm = false } } },
 
     { key = 'p', mods = 'CTRL|ALT', action = wezterm.action.ShowLauncher },
+
+    { key = 'D', mods = 'CTRL|SHIFT', action = wezterm.action.ShowDebugOverlay },
 }
 
 for i = 1, 8 do
