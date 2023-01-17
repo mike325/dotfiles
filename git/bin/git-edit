@@ -28,7 +28,6 @@ NAME="${NAME##*/}"
 NAME="${NAME##*-}"
 
 EDITOR="${EDITOR:-vim}"
-CACHED=""
 
 SCRIPT_PATH="$0"
 WORKTREE=""
@@ -69,9 +68,6 @@ Usage:
         $ git $NAME -e ed # uses ed editor
 
     Optional Flags
-        -c, --cached
-            Edit just the staged files
-
         -e, --editor
             Change the default editor
                 By default this uses \$EDITOR var and fallback vi in it's unset or empty
@@ -146,9 +142,6 @@ while [[ $# -gt 0 ]]; do
             EDITOR="$2"
             shift
             ;;
-        -c | --cached)
-            CACHED="--cached"
-            ;;
         *)
             error_msg "Unknown argument $key"
             help_user
@@ -164,18 +157,10 @@ for i in "${worklist[@]}"; do
     [[ $i == "$(  git rev-parse --show-toplevel)" ]] && WORKTREE="$i"
 done
 
-if [[ -n $CACHED ]]; then
-    if [[ -n $WORKTREE ]]; then
-        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
-    else
-        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')
-    fi
+if [[ -n $WORKTREE ]]; then
+    IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short --porcelain=v2 | awk '{print $9}')
 else
-    if [[ -n $WORKTREE ]]; then
-        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager --work-tree="$WORKTREE" status --short | awk '{print $2}')
-    else
-        IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short | awk '{print $2}')
-    fi
+    IFS=$'\n' read -r -d '' -a FILES < <(git --no-pager status --short --porcelain=v2 | awk '{print $9}')
 fi
 
 # shellcheck disable=SC2009,SC2046

@@ -37,10 +37,10 @@ else
     alias im "vim"
 endif
 
-if ( `where delta` != "" ); then
+if ( `where delta` != "" ) then
     setenv GIT_PAGER "delta --dark --24-bit-color auto"
 else
-    if ( `where bat` != "" ); then
+    if ( `where bat` != "" ) then
         setenv GIT_PAGER "bat"
         alias cat bat
     endif
@@ -155,7 +155,6 @@ if ( `where fzf` != "" ) then
     # Options to fzf command
     setenv FZF_COMPLETION_OPTS '+c -x'
 endif
-
 
 if ( `where tmux` != "" ) then
     alias tma "tmux a"
