@@ -56,6 +56,8 @@ fi
 [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin/:$PATH"
 [[ -d "/opt/homebrew/bin" ]] && export PATH="/opt/homebrew/bin:$PATH"
 
+[[ -d "$HOME/.local/share/man/" ]] && export MANPATH="$HOME/.local/share/man/:$MANPATH"
+
 # NOTE: I'm not sure about adding this directly to the PATH
 [[ -d "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/" ]] && export PATH="$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/:$PATH"
 

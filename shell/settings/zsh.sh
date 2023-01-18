@@ -191,3 +191,11 @@ if hash kitty 2>/dev/null; then
     # Completion for kitty
     kitty + complete setup zsh | source /dev/stdin
 fi
+
+if [[ -d "$HOME/.local/share/completions/" ]]; then
+    for cfile in "$HOME/.local/share/completions/"* ; do
+        if [[ $cfile =~ .*\.zsh$ ]]; then
+            source "$cfile" 2>/dev/null
+        fi
+    done
+fi

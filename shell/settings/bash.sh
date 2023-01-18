@@ -330,6 +330,14 @@ function toggleProxy() {
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
+    if [[ -d "$HOME/.local/share/completions/" ]]; then
+        for cfile in "$HOME/.local/share/completions/"*; do
+            if [[ $cfile =~ .*\.bash$ ]]; then
+                source "$cfile" 2>/dev/null
+            fi
+        done
+    fi
+
     if [[ -f /etc/bash_completion ]]; then
         # shellcheck disable=SC1091
         source /etc/bash_completion
@@ -344,7 +352,7 @@ if ! shopt -oq posix; then
         )
 
         for cdir in "${completion_dirs[@]}"; do
-            if [[ -d $cdir   ]]; then
+            if [[ -d $cdir ]]; then
                 for src in "$cdir"/*; do
                     source "$src" 2>/dev/null
                 done
