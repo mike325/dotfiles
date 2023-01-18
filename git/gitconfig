@@ -295,12 +295,12 @@
 ;                 Worktree management                                          #
 ;###############################################################################
 
-    wt   = worktree
-    wta  = worktree add
-    wtab = worktree add -b
-    wtp  = worktree prune
-    wtr  = worktree remove
-    wtl  = worktree list
+    ; wt   = worktree
+    ; wta  = worktree add
+    ; wtab = worktree add -b
+    ; wtp  = worktree prune
+    ; wtr  = worktree remove
+    ; wtl  = worktree list
 
 ;###############################################################################
 ;                 Remotes management                                           #
