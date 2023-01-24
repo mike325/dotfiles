@@ -150,7 +150,7 @@ else
         if hash git 2>/dev/null; then
             local branch changes stash info
             # shellcheck disable=SC2063
-            branch="$(git rev-parse --abbrev-ref HEAD)"
+            branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
                 if [[ ${#branch} -gt 20 ]]; then
                     local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
