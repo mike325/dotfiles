@@ -150,7 +150,7 @@ else
         if hash git 2>/dev/null; then
             local branch changes stash info
             # shellcheck disable=SC2063
-            branch="$(git branch 2>/dev/null | command grep '^*' | awk '{$1=""; print $0}')"
+            branch="$(git rev-parse --abbrev-ref HEAD)"
             if [[ -n $branch ]]; then
                 if [[ ${#branch} -gt 20 ]]; then
                     local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
@@ -158,14 +158,14 @@ else
                     if [[ $branch =~ $fer_issue_br_regex ]]; then
                         local index
                         index="$(echo "$branch" | command grep -oE "$fer_issue_br_regex")"
-                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index}+1)}")"
                     elif [[ $branch =~ $issue_br_regex ]]; then
                         local index
                         index="$(echo "$branch" | command grep -oE "$issue_br_regex")"
-                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index})}")"
+                        branch=" $(echo "$branch" | awk "{print substr(\$1,${#index}+1)}")"
                     fi
                 fi
-                branch="${branch/ /}"
+                # branch="${branch/ /}"
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s*%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
