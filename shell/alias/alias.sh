@@ -82,6 +82,8 @@ alias got="git"
 alias gut="git"
 alias gi="git"
 
+alias ehco="echo"
+
 if hash bat 2>/dev/null; then
     alias cat="bat"
     [[ -z $MANPAGER ]] && export MANPAGER="sh -c 'col -bx | bat -l man -p'"

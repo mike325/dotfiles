@@ -3,45 +3,6 @@
 autoload -Uz history-search-end colors zcalc
 colors
 
-# Set vi key mode
-bindkey -v
-# bindkey '^?' backward-delete-char
-# bindkey '^h' backward-delete-char
-bindkey '^[[3~' delete-char                                     # Delete key
-bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
-bindkey '^r' history-incremental-search-backward
-
-bindkey '^[[7~' beginning-of-line                               # Home key
-bindkey '^[[H' beginning-of-line                                # Home key
-if [[ ${terminfo[khome]} != ""   ]]; then
-    bindkey "${terminfo[khome]}" beginning-of-line              # [Home] - Go to beginning of line
-fi
-bindkey '^[[8~' end-of-line                                     # End key
-bindkey '^[[F' end-of-line                                      # End key
-if [[ ${terminfo[kend]} != ""   ]]; then
-    bindkey "${terminfo[kend]}" end-of-line                     # [End] - Go to end of line
-fi
-bindkey '^[[2~' overwrite-mode                                  # Insert key
-bindkey '^[[C'  forward-char                                    # Right key
-bindkey '^[[D'  backward-char                                   # Left key
-bindkey '^p' history-beginning-search-backward
-bindkey '^n' history-beginning-search-forward
-
-# Navigate words with ctrl+arrow keys
-bindkey '^[Oc' forward-word
-bindkey '^[Od' backward-word
-bindkey '^[[1;5D' backward-word
-bindkey '^[[1;5C' forward-word
-bindkey '^[[Z' undo # Shift+tab undo last action
-
-# bind k and j for VI mode
-bindkey -M vicmd 'k' history-beginning-search-backward
-bindkey -M vicmd 'j' history-substring-search-down
-
-bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
-bindkey 'jj' vi-cmd-mode
-bindkey -M viins 'jj' vi-cmd-mode
-
 # export ARCHFLAGS="-arch x86_64"
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
@@ -49,7 +10,7 @@ bindkey -M viins 'jj' vi-cmd-mode
 
 # Path to your oh-my-zsh installation.
 [[ -d "$HOME/.oh-my-zsh" ]] && ZSH="$HOME/.oh-my-zsh"
-[[ -z $SHELL ]] && SHELL='/bin/zsh'
+[[ -z $SHELL ]] && SHELL="$(which zsh)"
 
 KEYTIMEOUT=20
 
@@ -85,12 +46,6 @@ setopt hist_verify            # Do not execute immediately upon history expansio
 
 fpath+="$HOME/.config/shell/zfunctions"
 fpath+="$HOME/.zsh/zfunctions"
-
-if [[ -d "$HOME/.local/share/completions/" ]]; then
-    for i in "$HOME/.local/share/completions/"*; do
-        fpath+="$i"
-    done
-fi
 
 # Color man pages
 export LESS_TERMCAP_mb=$'\E[01;32m'
@@ -201,3 +156,42 @@ if [[ -d "$HOME/.local/share/completions/" ]]; then
         fi
     done
 fi
+
+# Set vi key mode
+bindkey -v
+# bindkey '^?' backward-delete-char
+# bindkey '^h' backward-delete-char
+bindkey '^[[3~' delete-char                                     # Delete key
+bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
+bindkey '^r' history-incremental-search-backward
+
+bindkey '^[[7~' beginning-of-line                               # Home key
+bindkey '^[[H' beginning-of-line                                # Home key
+if [[ ${terminfo[khome]} != ""   ]]; then
+    bindkey "${terminfo[khome]}" beginning-of-line              # [Home] - Go to beginning of line
+fi
+bindkey '^[[8~' end-of-line                                     # End key
+bindkey '^[[F' end-of-line                                      # End key
+if [[ ${terminfo[kend]} != ""   ]]; then
+    bindkey "${terminfo[kend]}" end-of-line                     # [End] - Go to end of line
+fi
+bindkey '^[[2~' overwrite-mode                                  # Insert key
+bindkey '^[[C'  forward-char                                    # Right key
+bindkey '^[[D'  backward-char                                   # Left key
+bindkey '^p' history-beginning-search-backward
+bindkey '^n' history-beginning-search-forward
+
+# Navigate words with ctrl+arrow keys
+bindkey '^[Oc' forward-word
+bindkey '^[Od' backward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[Z' undo # Shift+tab undo last action
+
+# bind k and j for VI mode
+bindkey -M vicmd 'k' history-beginning-search-backward
+bindkey -M vicmd 'j' history-substring-search-down
+
+bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
+bindkey 'jj' vi-cmd-mode
+bindkey -M viins 'jj' vi-cmd-mode
