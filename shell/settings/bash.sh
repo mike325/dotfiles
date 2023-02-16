@@ -153,8 +153,8 @@ else
             branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
             if [[ -n $branch ]]; then
                 if [[ ${#branch} -gt 20 ]]; then
-                    local fer_issue_br_regex="^[ ]?[A-Za-z]+[/]([A-Za-z]+-[0-9]+-?)?"
-                    local issue_br_regex="^[ ]?([A-Za-z]+-[0-9]+-?)?"
+                    local fer_issue_br_regex="^[ ]?[A-Za-z]+[/-]([A-Za-z]+[/-][0-9]+[/-])"
+                    local issue_br_regex="^[ ]?([A-Za-z]+[/-][0-9]+[-/])"
                     if [[ $branch =~ $fer_issue_br_regex ]]; then
                         local index
                         index="$(echo "$branch" | command grep -oE "$fer_issue_br_regex")"
@@ -165,7 +165,6 @@ else
                         branch=" $(echo "$branch" | awk "{print substr(\$1,${#index}+1)}")"
                     fi
                 fi
-                # branch="${branch/ /}"
                 changes="$(git diff --shortstat 2>/dev/null | awk '{
                     printf "%s*%d %s+%d %s-%d%s", ENVIRON["echo_yellow"], $1, ENVIRON["echo_green"], $4, ENVIRON["echo_red"], $6, ENVIRON["echo_blue"];
                 }')"
@@ -249,21 +248,21 @@ else
         fi
     }
 
-    __cwd() {
-        local _cwd
-        _cwd="$(pwd -P)"
-        _cwd="${_cwd/$HOME/~}"
-        if [[ ${#_cwd} -gt $((COLUMNS / 2)) ]]; then
-            local i=2
-            while [[ ${#_cwd} -gt $((COLUMNS / 2)) ]] || [[ -z $(echo "$_cwd" | awk -F/ "{ print substr(\$$i,1,1)}") ]]; do
-                _cwd="$(echo "$_cwd" | awk -F/ "BEGIN { OFS = FS } { \$$i = substr(\$$i,1,1) } {print}")"
-                i=$((i + 1))
-            done
-            echo -e "${echo_yellow}${_cwd}${echo_reset_color} "
-        else
-            echo -e "${echo_yellow}\w${echo_reset_color} "
-        fi
-    }
+    # __cwd() {
+    #     local _cwd
+    #     _cwd="$(pwd -P)"
+    #     _cwd="${_cwd/$HOME/~}"
+    #     if [[ ${#_cwd} -gt $((COLUMNS / 2)) ]]; then
+    #         local i=2
+    #         while [[ ${#_cwd} -gt $((COLUMNS / 2)) ]] || [[ -z $(echo "$_cwd" | awk -F/ "{ print substr(\$$i,1,1)}") ]]; do
+    #             _cwd="$(echo "$_cwd" | awk -F/ "BEGIN { OFS = FS } { \$$i = substr(\$$i,1,1) } {print}")"
+    #             i=$((i + 1))
+    #         done
+    #         echo -e "${echo_yellow}${_cwd}${echo_reset_color} "
+    #     else
+    #         echo -e "${echo_yellow}\w${echo_reset_color} "
+    #     fi
+    # }
 
     function __cc_view() {
         if [[ -n $CLEARCASE_CMDLINE ]]; then
@@ -280,8 +279,8 @@ else
         # PS1+="$(__schroot_name)"
         PS1+="$(__user)"
         PS1+="${cyan}\h${reset_color}: "
-        # PS1+="${yellow}\w${reset_color} "
-        PS1+="$(__cwd)"
+        PS1+="${yellow}\w${reset_color} "
+        # PS1+="$(__cwd)"
         PS1+="${magenta}J:\j${reset_color} "
         PS1+="$(__proxy)"
         PS1+="$(__venv)"

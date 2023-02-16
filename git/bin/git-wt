@@ -376,6 +376,11 @@ verbose_msg "OS            : ${OS}"
 #                           CODE Goes Here                            #
 #######################################################################
 
+if ! hash fzf 2>/dev/null || ! hash gum 2>/dev/null; then
+    error_msg "$NAME requires fzf and gum to work"
+    exit 1
+fi
+
 if hash fzf 2>/dev/null; then
     if [[ $LIST -eq 1 ]]; then
         git worktree list
@@ -383,9 +388,11 @@ if hash fzf 2>/dev/null; then
         wt="$(git worktree list | fzf --select-1 --exit-0  --height=60% | awk '{print $1}')"
         if [[ -n $wt ]]; then
             status_msg "Removing worktree ${wt##*/}"
-            if ! git worktree remove "$wt"; then
-                error_msg "Failed to remove worktree"
-                exit 1
+            if gum confirm "Remove worktree: ${wt##*/}"; then
+                if ! git worktree remove "$wt"; then
+                    error_msg "Failed to remove worktree"
+                    exit 1
+                fi
             fi
         fi
     else
@@ -432,6 +439,9 @@ if hash fzf 2>/dev/null; then
                     ln "$git_dir/../../$i" ./
                 fi
             done
+
+            # TODO: Make this dynamic and create it with just C/C++ repos
+            [ ! -d ./.clangd/pchs ] && mkdir -p './.clangd/pchs/'
         fi
     fi
 else

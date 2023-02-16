@@ -145,8 +145,8 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          choco install python git curl -y
-          # scoop install python git curl
+          choco install curl -y
+          # scoop install curl
       - name: Full install
         shell: bash
         run: |

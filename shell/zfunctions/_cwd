@@ -1,0 +1,13 @@
+_cwd
+_cwd="$(pwd -P)"
+_cwd="${_cwd/$HOME/~}"
+if [[ ${#_cwd} -gt $((COLUMNS / 2)) ]]; then
+    local i=2
+    while [[ ${#_cwd} -gt $((COLUMNS / 2)) ]] || [[ -z $(echo "$_cwd" | awk -F/ "{ print substr(\$$i,1,1)}") ]]; do
+        _cwd="$(echo "$_cwd" | awk -F/ "BEGIN { OFS = FS } { \$$i = substr(\$$i,1,1) } {print}")"
+        i=$((i + 1))
+    done
+    echo "%F{yellow}${_cwd}%f "
+else
+    echo "%F{yellow}\w%f "
+fi

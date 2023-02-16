@@ -123,6 +123,8 @@ if [[ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
     source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
 else
     setopt prompt_subst
+    # autoload _cwd
+    autoload _cc_view
     autoload _username
     autoload _exit_code
     autoload _git_info
@@ -134,23 +136,23 @@ else
 
     _prompt_command() {
         local EXIT_CODE="$?"
+        local prompt=""
 
-        PS1="\n"
-        # PS1+="$(__schroot_name)"
-        # PS1+="$(__exit_code)"
-        PS1+="$(_username)"
-        PS1+="%F{cyan}%m%f: "
-        PS1+="%F{yellow}%~%f"
-        # PS1+="$(_cwd)"
-        PS1+="%F{magenta}%(1j. J:%j.)%f "
-        PS1+="$(_proxy)"
-        PS1+="$(_venv)"
-        # PS1+="$(_cc_view) "
-        PS1+="$(_git_info) "
-        PS1+="\n$(_exit_code $EXIT_CODE)"
-        # PS1+="\n$ "
+        prompt="\n"
+        # prompt+="$(__schroot_name)"
+        prompt+="$(_username)"
+        prompt+="%F{cyan}%m%f: "
+        prompt+="%F{yellow}%~%f"
+        # prompt+="$(_cwd)"
+        prompt+="%F{magenta}%(1j. J:%j.)%f "
+        prompt+="$(_proxy)"
+        prompt+="$(_venv)"
+        prompt+="$(_cc_view) "
+        prompt+="$(_git_info) "
+        prompt+="\n$(_exit_code $EXIT_CODE)"
+        # prompt+="\n$ "
 
-        echo "$PS1"
+        echo "$prompt"
     }
     PROMPT='$(_prompt_command)'
 fi

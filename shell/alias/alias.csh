@@ -15,7 +15,7 @@ if ( `where nvim` != "" ) then
     alias vnim "nvim"
     alias vi "nvim --cmd 'let g:minimal=1'"
 
-    setenv NVIM_LISTEN_ADDRESS "$HOME/.cache/nvim/socket$TMUX_WINDOW"
+    # setenv NVIM_LISTEN_ADDRESS "$HOME/.cache/nvim/socket$TMUX_WINDOW"
 
     alias cdvi "cd ~/.vim"
     alias cdvim "cd ~/.config/nvim"
