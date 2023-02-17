@@ -59,10 +59,6 @@ export LESS=-R
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-if hash fzf 2>/dev/null; then
-    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
-fi
-
 if [[ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
 
     plugins=(
@@ -195,3 +191,7 @@ bindkey -M vicmd 'j' history-substring-search-down
 bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
 bindkey 'jj' vi-cmd-mode
 bindkey -M viins 'jj' vi-cmd-mode
+
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+fi

@@ -335,3 +335,5 @@ if [[ $- == *i* ]]; then
         eval "$(pyenv init -)"
     fi
 fi
+# shellcheck disable=SC1090,SC1091
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
