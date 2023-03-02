@@ -624,10 +624,10 @@ status_msg "Cleaning current build"
 make clean
 # make distclean
 
-# Get latest version
-status_msg "Pulling latest changes"
-git checkout master
-git pull origin master
+# # Get latest version
+# status_msg "Pulling latest changes"
+# git checkout master
+# git pull origin master
 
 if [[ $DEV -eq 0 ]]; then
     BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"

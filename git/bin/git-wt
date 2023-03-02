@@ -441,7 +441,7 @@ if hash fzf 2>/dev/null; then
             done
 
             # TODO: Make this dynamic and create it with just C/C++ repos
-            [ ! -d ./.clangd/pchs ] && mkdir -p './.clangd/pchs/'
+            [ ! -d ./.cache/clangd/pchs ] && mkdir -p './.cache/clangd/pchs/'
         fi
     fi
 else
