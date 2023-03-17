@@ -153,6 +153,10 @@ if [[ -d "$HOME/.local/share/completions/" ]]; then
     done
 fi
 
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+fi
+
 # Set vi key mode
 bindkey -v
 # bindkey '^?' backward-delete-char
@@ -191,7 +195,3 @@ bindkey -M vicmd 'j' history-substring-search-down
 bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
 bindkey 'jj' vi-cmd-mode
 bindkey -M viins 'jj' vi-cmd-mode
-
-if hash fzf 2>/dev/null; then
-    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
-fi

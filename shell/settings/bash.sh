@@ -171,12 +171,12 @@ else
                 to_commit="$(git diff --cached --shortstat 2>/dev/null | awk '{
                     printf "%s*%d", ENVIRON["echo_magenta"], $1;
                 }')"
-                stash="$(git stash list 2>/dev/null | wc -l)"
-                if [[ $stash -ne 0 ]]; then
-                    stash="${echo_yellow}{${stash##* }}"
-                else
-                    stash=''
-                fi
+                # stash="$(git stash list 2>/dev/null | wc -l)"
+                # if [[ $stash -ne 0 ]]; then
+                #     stash="${echo_yellow}{${stash##* }}"
+                # else
+                #     stash=''
+                # fi
                 info="${echo_blue}|${echo_reset_color}"
                 # TODO: Find another icon to represent git branch
                 if [[ -z $NO_COOL_FONTS ]]; then
