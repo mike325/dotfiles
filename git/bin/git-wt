@@ -400,6 +400,7 @@ if hash fzf 2>/dev/null; then
         if [[ -n $branch ]]; then
             verbose_msg "Selected branch: $branch"
             if ! git worktree list | awk '{print $3}' | command grep -q "$branch"; then
+                # TODO: Add support for more remotes
                 if [[ $branch =~ ^origin/* ]]; then
                     if ! git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | command grep -q -E "^${branch#origin/}"; then
                         status_msg "Creating local branch from remote $branch"

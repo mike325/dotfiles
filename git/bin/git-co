@@ -366,8 +366,13 @@ verbose_msg "OS            : ${OS}"
 checkout() {
     local branch
     branch=$( git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
+    # NOTE(miochoa): Assuming we just have 1 remote
+    # remote="$(git remote show)"
     if [[ -n $branch ]]; then
-        git o "$branch"
+        if [[ $branch =~ ^origin/ ]]; then
+            git branch --track "${branch#origin/}" "remotes/$branch"
+        fi
+        git switch "${branch#origin/}"
     fi
 }
 

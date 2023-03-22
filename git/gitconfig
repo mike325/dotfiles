@@ -246,10 +246,15 @@
 ;###############################################################################
 
     o  = checkout       ; checkout shortcut
-    ob = checkout -b    ; checkout to a given branch
-    od = checkout --    ; Reset the changes in a given file
-    or = checkout .     ; Reset the changes of the working space
-    olt  = "!f() { git checkout $(git tag | sort -h | uniq | tail -n1); }; f"
+    or = checkout --    ; Reset the changes in a given file
+    olt = "!f() { git checkout $(git tag | sort -h | uniq | tail -n1); }; f"
+
+;###############################################################################
+;                 Switch
+;###############################################################################
+
+    w = switch    ; checkout shortcut
+    w- = switch - ; checkout shortcut
 
 ;###############################################################################
 ;                 Shortcuts to push changes                                    #
@@ -276,7 +281,7 @@
 ;                 Simple rebase settings                                       #
 ;###############################################################################
 
-    rb = rebase
+    rb  = rebase
     rba = rebase --abort
     rbc = rebase --continue
     rbi = rebase --interactive
