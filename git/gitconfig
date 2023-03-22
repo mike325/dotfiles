@@ -204,6 +204,7 @@
     d   = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto
     dc  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --cached
     dk  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --check
+    dn  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --name-only
     ds  = diff --find-copies-harder --shortstat
 
 ;###############################################################################
@@ -378,9 +379,6 @@
 
 ;   Push the current branch to the master of a remote
     psrhm = "!f() { git push $1 HEAD:master }; f"
-
-;   Get the filenames of all changes a given commit and the HEAD
-    dn  = "!f() { git diff --name-status $1 HEAD; }; f"
 
 ;   Remove any given number of commits
     rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"

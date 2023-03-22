@@ -365,8 +365,8 @@ verbose_msg "OS            : ${OS}"
 # TODO: Add commit log as preview
 checkout() {
     local branch
-    branch=$( git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
-    # NOTE(miochoa): Assuming we just have 1 remote
+    branch=$( git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
+    # NOTE: Assuming we just have 1 remote
     # remote="$(git remote show)"
     if [[ -n $branch ]]; then
         if [[ $branch =~ ^origin/ ]]; then

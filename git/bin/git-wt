@@ -396,7 +396,7 @@ if hash fzf 2>/dev/null; then
             fi
         fi
     else
-        branch=$(git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
+        branch=$(git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
         if [[ -n $branch ]]; then
             verbose_msg "Selected branch: $branch"
             if ! git worktree list | awk '{print $3}' | command grep -q "$branch"; then
@@ -412,7 +412,7 @@ if hash fzf 2>/dev/null; then
                     branch="${branch#origin/}"
                 fi
                 status_msg "Creating worktree"
-                if ! git worktree add "/boa_prd/miochoa/${branch#FER-[0-9]*-}" "$branch"; then
+                if ! git worktree add "./../${branch#FER-[0-9]*-}" "$branch"; then
                     error_msg "failed to create worktree"
                     exit 1
                 fi
