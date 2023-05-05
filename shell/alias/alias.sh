@@ -18,6 +18,7 @@ _platform="$(uname)"
 if hash nvim 2>/dev/null; then
 
     export EDITOR="nvim"
+
     # Fucking typos
     alias nvi="nvim"
     alias vnim="nvim"
@@ -31,8 +32,45 @@ if hash nvim 2>/dev/null; then
         export TMUX_WINDOW=""
     fi
 
+    function nvr() {
+        local socket
+        local has_remote_cmd=false
+        local has_server_cmd=false
+        for arg in "$@"; do
+            if [[ $arg =~ ^--remote ]]; then
+                has_remote_cmd=true
+            elif [[ $arg =~ ^--server ]]; then
+                has_server_cmd=true
+            fi
+        done
+        if [[ $has_server_cmd == false ]] && [[ -n $TMUX_PANE ]]; then
+            socket="$HOME/.cache/nvim/socket.win${TMUX_WINDOW}"
+            if [[ $has_remote_cmd == false ]]; then
+                if [[ $has_server_cmd == false ]]; then
+                    nvim --server "$socket" --remote-silent "$@"
+                else
+                    nvim --remote-silent "$@"
+                fi
+            else
+                if [[ $has_server_cmd == false ]]; then
+                    nvim --server "$socket" "$@"
+                else
+                    nvim "$@"
+                fi
+            fi
+        elif [[ $has_server_cmd == true ]]; then
+            if [[ $has_remote_cmd == false ]]; then
+                nvim --remote-silent "$@"
+            else
+                nvim "$@"
+            fi
+        else
+            # TODO: iterate over all servernames
+            :
+        fi
+    }
+
     [[ ! -d "$HOME/.cache/nvim" ]] && mkdir -p "$HOME/.cache/nvim"
-    export NVIM_LISTEN_ADDRESS="$HOME/.cache/nvim/socket$TMUX_WINDOW"
 
     if is_windows && ! is_wsl; then
         alias cdvi="cd ~/.vim"

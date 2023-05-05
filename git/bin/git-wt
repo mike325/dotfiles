@@ -412,7 +412,12 @@ if hash fzf 2>/dev/null; then
                     branch="${branch#origin/}"
                 fi
                 status_msg "Creating worktree"
-                if ! git worktree add "./../${branch#FER-[0-9]*-}" "$branch"; then
+                branch_dir="${branch#FER-[0-9]*-}"
+                for i in feature fix bug feat refactor; do
+                    branch_dir="${branch_dir#"$i"/}"
+                done
+                verbose_msg "Dir location: ${branch_dir} set to branch $branch"
+                if ! git worktree add "./../${branch_dir}" "$branch"; then
                     error_msg "failed to create worktree"
                     exit 1
                 fi
