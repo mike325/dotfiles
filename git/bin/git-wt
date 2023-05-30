@@ -436,6 +436,7 @@ if hash fzf 2>/dev/null; then
                 ".project.lua"
                 ".projections.json"
                 ".pre-commit-config.yaml"
+                "pyproject.toml"
             )
 
             status_msg "Copying project files"
