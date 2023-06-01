@@ -36,7 +36,7 @@ ntfy[telegram,emoji,pywin32]>=2.7.0
 # Misc
 Pygments>=2.3.1
 chardet==3.0.2
-requests==2.22
+requests==2.31.0
 thefuck>=3.27
 
 # HW dev
