@@ -33,7 +33,6 @@ end
 
 local firacode = sys.name == 'windows' and 'Fira Code' or 'FiraCode Nerd Font'
 
--- TODO: Support CMD + v to copy in MacOS
 local keys = {
     { key = 'z', mods = 'LEADER', action = 'TogglePaneZoomState' },
 
@@ -107,6 +106,20 @@ for i = 1, 8 do
     --     key = 'F' .. tostring(i),
     --     action = wezterm.action { ActivateTab = i - 1 },
     -- })
+end
+
+if sys.name == 'macos' then
+    table.insert(keys, {
+        key = 'c',
+        mods = 'CMD',
+        action = wezterm.action { CopyTo = 'ClipboardAndPrimarySelection' },
+    })
+
+    table.insert(keys, {
+        key = 'v',
+        mods = 'CMD',
+        action = wezterm.action { PasteFrom = 'Clipboard' },
+    })
 end
 
 local launch_menu = {}
