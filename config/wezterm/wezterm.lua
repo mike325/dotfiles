@@ -2,25 +2,16 @@ require 'patch_runtime'
 
 local wezterm = require 'wezterm'
 local sys = require 'sys'
-local str = require 'utils.strings'
+require 'events'
+
+-- local str = require 'utils.strings'
+-- local os = require 'os'
+-- local io = require 'io'
+-- local files = require 'files'
 
 -- local split = require('utils.strings').split
 -- local list_extend = require('utils.tables').list_extend
 -- local version_date = tonumber(split(wezterm.version, '-')[1])
-
-wezterm.on('update-right-status', function(window, _)
-    -- NOTE: Date sample format "Wed Mar 3 08:14"
-    local date = wezterm.strftime '%a %b %-d %H:%M '
-
-    local bat = ''
-    for _, b in ipairs(wezterm.battery_info()) do
-        bat = '🔋 ' .. string.format('%.0f%%', b.state_of_charge * 100)
-    end
-
-    window:set_right_status(wezterm.format {
-        { Text = bat .. '   ' .. date },
-    })
-end)
 
 local default_prog
 if sys.name == 'windows' then
@@ -42,6 +33,7 @@ end
 
 local firacode = sys.name == 'windows' and 'Fira Code' or 'FiraCode Nerd Font'
 
+-- TODO: Support CMD + v to copy in MacOS
 local keys = {
     { key = 'z', mods = 'LEADER', action = 'TogglePaneZoomState' },
 
@@ -133,13 +125,6 @@ else
     table.insert(launch_menu, {
         label = 'Zsh',
         args = { 'zsh', '-l' },
-    })
-end
-
-for host, _ in pairs(wezterm.enumerate_ssh_hosts()) do
-    table.insert(launch_menu, {
-        label = 'SSH: ' .. str.capitalize(host),
-        args = { 'ssh', host },
     })
 end
 

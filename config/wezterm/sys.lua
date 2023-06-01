@@ -1,18 +1,7 @@
+-- NOTE: We cannot import anything outside of the wezterm confif dir yet
+--       we first need to patch the runtime
 local wezterm = require 'wezterm'
 local is_windows = wezterm.target_triple == 'x86_64-pc-windows-msvc'
-
--- local forward_slash = function(str)
---     return str:gsub('\\', '/')
--- end
-
-local function split(str, sep)
-    sep = sep or '%s'
-    local t = {}
-    for s in string.gmatch(str, '([^' .. sep .. ']+)') do
-        table.insert(t, s)
-    end
-    return t
-end
 
 local function system_name()
     local name = wezterm.target_triple:lower()
@@ -61,50 +50,34 @@ local sys = {
     -- db_root = db_root_path(),
     -- has_sqlite = has_sqlite(),
     -- user = vim.loop.os_get_passwd(),
+    username = is_windows and os.getenv('USERNAME') or os.getenv('USER'),
     version = wezterm.version,
 }
 
--- sys.user.name = sys.user.username
--- sys.username = sys.user.username
-
-function sys.tmp(filename)
-    local tmpdir = is_windows == 'windows' and 'c:/temp/' or '/tmp/'
-    return tmpdir .. filename
+function sys.tmp()
+    -- local tmpdir = is_windows and 'c:/temp/' or '/tmp/'
+    -- return tmpdir .. filename
+    return os.tmpname()
 end
 
-local runtimepath = split(package.path, ';')
-local paths = {}
-local bases
-local neovim_path
-
-if is_windows then
-    bases = {
-        sys.home .. '/scoop/apps/luarocks/current/rocks/',
-        sys.home .. '/AppData/Local/Temp/nvim/packer_hererocks/2.1.0-beta3/',
-    }
-    neovim_path = sys.home .. '/AppData/Local/nvim/lua/'
-else
-    bases = {
-        sys.home .. '/.luarocks/',
-        sys.home .. '/.cache/nvim/packer_hererocks/2.1.0-beta3/',
-    }
-    neovim_path = sys.home .. '/.config/nvim/lua/'
+function sys.basename(str)
+    return string.gsub(str, '(.*[/\\])(.*)', '%2')
 end
 
--- TODO: Find version "dinamically"
-for _, complement in ipairs { 'lib', 'share' } do
-    for _, base in ipairs(bases) do
-        table.insert(paths, ('%s/%s/%s'):format(base, complement, 'lua/5.4/'))
-        -- table.insert(paths, ("%s/%s/%s"):format(base, complement, "lua/5.1/"))
+function sys.open(uri)
+    local cmd = {}
+    if sys.name == 'windows' then
+        table.insert(cmd, 'powershell')
+        require('utils.tables').list_extend(cmd, { '-noexit', '-executionpolicy', 'bypass', 'Start-Process' })
+    elseif sys.name == 'linux' then
+        table.insert(cmd, 'xdg-open')
+    else
+        -- Problably macos
+        table.insert(cmd, 'open')
     end
+    table.insert(cmd, uri)
+    local success, _, _ = wezterm.run_child_process(cmd)
+    return success
 end
-table.insert(paths, neovim_path)
-
-for _, path in ipairs(paths) do
-    table.insert(runtimepath, path .. '/?.lua')
-    table.insert(runtimepath, path .. '/?/init.lua')
-end
-
-package.path = table.concat(runtimepath, ';')
 
 return sys
