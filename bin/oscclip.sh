@@ -340,10 +340,10 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Cannot use -i and - together"
                 exit 1
             fi
-            if [[ -p "$2" ]]; then
+            if [[ -p $2   ]]; then
                 while IFS= read -r line; do
                     FROM_STDIN+=("$line")
-                done < "$2"
+                done <"$2"
             else
                 CLIP="$2"
             fi
@@ -387,9 +387,9 @@ fi
 
 if [[ -n ${FROM_STDIN[*]} ]]; then
     i=0
-    while [[ $i -lt "${#FROM_STDIN[@]}" ]]; do
+    while [[ $i -lt ${#FROM_STDIN[@]}   ]]; do
         tmp="${FROM_STDIN[$i]}"
-        i=$((i+1))
+        i=$((i + 1))
         if [[ $i -lt ${#FROM_STDIN[@]} ]]; then
             tmp="$tmp\n"
         fi
