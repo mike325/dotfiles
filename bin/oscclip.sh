@@ -336,11 +336,17 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Missing clip content"
                 exit 1
             fi
-            if [[ -z ${FROM_STDIN[*]}   ]]; then
+            if [[ -n ${FROM_STDIN[*]} ]]; then
                 error_msg "Cannot use -i and - together"
                 exit 1
             fi
-            CLIP="$2"
+            if [[ -p "$2" ]]; then
+                while IFS= read -r line; do
+                    FROM_STDIN+=("$line")
+                done < "$2"
+            else
+                CLIP="$2"
+            fi
             shift
             ;;
         -)
@@ -349,7 +355,7 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             while read -r from_stdin; do
-                FROM_STDIN=("$from_stdin")
+                FROM_STDIN+=("$from_stdin")
             done
             break
             ;;
@@ -380,15 +386,23 @@ if ! hash base64 2>/dev/null; then
 fi
 
 if [[ -n ${FROM_STDIN[*]} ]]; then
-    CLIP="${FROM_STDIN}"
+    i=0
+    while [[ $i -lt "${#FROM_STDIN[@]}" ]]; do
+        tmp="${FROM_STDIN[$i]}"
+        i=$((i+1))
+        if [[ $i -lt ${#FROM_STDIN[@]} ]]; then
+            tmp="$tmp\n"
+        fi
+        CLIP="${CLIP}${tmp}"
+    done
 fi
 
 if [[ -n ${TMUX} ]]; then
     # <https://github.com/tmux/tmux/wiki/FAQ#what-is-the-passthrough-escape-sequence-and-how-do-i-use-it>
     # Note that you ALSO need to add "set -g allow-passthrough on" to your tmux.conf
-    printf "\033Ptmux;\033\033]52;c;%s\x07\033\\" "$(echo -n "${CLIP}" | base64)"
+    printf "\033Ptmux;\033\033]52;c;%s\x07\033\\" "$(echo -ne "${CLIP}" | base64)"
 else
-    printf "\033]52;c;%s\x07" "$(echo -n "${CLIP}" | base64)"
+    printf "\033]52;c;%s\x07" "$(echo -ne "${CLIP}" | base64)"
 fi
 
 #######################################################################
