@@ -4,22 +4,8 @@ local wezterm = require 'wezterm'
 local sys = require 'sys'
 require 'events'
 
--- local str = require 'utils.strings'
--- local os = require 'os'
--- local io = require 'io'
--- local files = require 'files'
-
--- local split = require('utils.strings').split
--- local list_extend = require('utils.tables').list_extend
--- local version_date = tonumber(split(wezterm.version, '-')[1])
-
 local default_prog
 if sys.name == 'windows' then
-    -- Use OSC 7 as per the above example
-    -- set_environment_variables['prompt'] = '$E]7;file://localhost/$P$E\\$E[32m$T$E[0m $E[35m$P$E[36m$_$G$E[0m '
-    -- use a more ls-like output format for dir
-    -- set_environment_variables['DIRCMD'] = '/d'
-    -- And inject clink into the command prompt
     default_prog = {
         'powershell.exe',
         '-NoLogo',

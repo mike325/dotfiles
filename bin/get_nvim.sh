@@ -566,11 +566,11 @@ if [[ $BUILD_LIBS -eq 1   ]]; then
             pkg-config \
             gcc \
             g++ \
-            lldb-11 \
-            clang-11 \
-            clang-tools-11 \
-            clangd-11 \
-            clang-tidy-11 \
+            lldb \
+            clang \
+            clang-tools \
+            clangd \
+            clang-tidy \
             make \
             cmake \
             unzip

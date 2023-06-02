@@ -1071,10 +1071,10 @@ function _windows_portables() {
         local url="${github}/dandavison/delta"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -uhr | head -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE '0\.[0-9]+\.[0-9]+' | sort -ruh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -uhr | head -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE '0\.[0-9]+\.[0-9]+' | sort -ruh | head -n 1)"
         fi
         status_msg "Downloading delta version: ${version}"
         local os_type='x86_64-pc-windows-msvc'
@@ -1106,10 +1106,10 @@ function _windows_portables() {
         local url="${github}/BurntSushi/ripgrep"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE 'tag/0\.[0-9]{2}\.[0-9]{1,2}' | sort -u | tail -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+            local version="$(curl -Ls ${url}/tags | grep -oE '[0-3][0-9]\.[0-9]{1}\.[0-9]{1,2}' | sort -u | tail -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE 'tag/0\.[0-9]{2}\.[0-9]{1,2}' | sort -u | tail -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+            local version="$(wget -qO- ${url}/tags | grep -oE '[0-3][0-9]\.[0-9]{1}\.[0-9]{1,2}' | sort -u | tail -n 1)"
         fi
         status_msg "Downloading rg version: ${version}"
         local os_type="${ARCH}-pc-windows-gnu"
@@ -1324,10 +1324,10 @@ function _linux_portables() {
         local url="${github}/jesseduffield/lazygit"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1)"
         fi
         status_msg "Downloading lazygit version: ${version}"
         if [[ $ARCH =~ ^arm   ]]; then
@@ -1393,10 +1393,10 @@ function _linux_portables() {
         local url="${github}/dandavison/delta"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -ruh | head -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE '0\.[0-9]+\.[0-9]+' | sort -ruh | head -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -ruh | head -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE '0\.[0-9]+\.[0-9]+' | sort -ruh | head -n 1)"
         fi
         status_msg "Downloading delta version: ${version}"
         if [[ $ARCH =~ ^arm   ]]; then
@@ -1427,10 +1427,10 @@ function _linux_portables() {
         local url="${github}/BurntSushi/ripgrep"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE '[0-3][0-9]\.[0-9]{1}\.[0-9]{1,2}' | sort -u | tail -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE '[0-9]+\.[0-9]+\.[0-9]+$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE '[0-3][0-9]\.[0-9]{1}\.[0-9]{1,2}' | sort -u | tail -n 1)"
         fi
 
         status_msg "Downloading rg version: ${version}"
@@ -1605,10 +1605,10 @@ function _linux_portables() {
         local url="${github}/cli/cli"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1 | cut -dv -f2)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
         fi
         status_msg "Downloading github cli version: ${version}"
         local os_type
@@ -1808,12 +1808,13 @@ function get_cool_fonts() {
                 if is_osx; then
                     mkdir -p "$HOME/Library/Fonts"
                 fi
-                status_msg "Installing cool fonts"
-                if [[ $VERBOSE -eq 1 ]]; then
-                    "$HOME"/.local/fonts/install.sh
-                else
-                    "$HOME"/.local/fonts/install.sh 1>/dev/null
-                fi
+                # TODO: This exceeds the xargs arguments, needs debugging
+                # status_msg "Installing cool fonts"
+                # if [[ $VERBOSE -eq 1 ]]; then
+                #     "$HOME"/.local/fonts/install.sh
+                # else
+                #     "$HOME"/.local/fonts/install.sh 1>/dev/null
+                # fi
             fi
         else
             error_msg "Fail to install cool fonts"

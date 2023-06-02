@@ -9,11 +9,11 @@ wget
 golang
 gcc
 g++
-lldb-11
-clang-11
-clang-tools-11
-clangd-11
-clang-tidy-11
+lldb
+clang
+clang-tools
+clangd
+clang-tidy
 make
 cmake
 sed

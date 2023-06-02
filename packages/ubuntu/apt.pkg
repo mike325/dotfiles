@@ -10,9 +10,8 @@ golang
 gcc
 g++
 build-essential
-# clang-tools
 clang
-clang-tools-10
+clang-tools
 make
 sed
 htop
