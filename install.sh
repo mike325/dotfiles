@@ -291,7 +291,7 @@ Usage:
             Install some bash/zsh shell scripts like:
                 - tmux tpm
                 - z.sh
-                - screenfetch
+                - neofetch
             Current shell:   $CURRENT_SHELL
 
             Default: on
@@ -882,23 +882,23 @@ function setup_shell_scripts() {
         rst=1
     fi
 
-    if has_fetcher && { ! hash screenfetch 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing screenfetch install'
-        status_msg 'Getting screenfetch'
-        local pkg='screenfetch'
-        local url="https://git.io/vaHfR"
-        if  download_asset "screenfetch script" "${url}" "$TMP/${pkg}"; then
+    if has_fetcher && { ! hash neofetch 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing neofetch install'
+        status_msg 'Getting neofetch'
+        local pkg='neofetch'
+        local url="https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch"
+        if  download_asset "neofetch script" "${url}" "$TMP/${pkg}"; then
             mv "$TMP/${pkg}" "$HOME/.local/bin/"
             chmod u+x "$HOME/.local/bin/${pkg}"
         else
-            error_msg 'Failed to download screenfetch script'
+            error_msg 'Failed to download neofetch script'
             rst=1
         fi
     elif ! has_fetcher; then
-        error_msg "No curl neither wget to download screenfetch"
+        error_msg "No curl neither wget to download neofetch"
         rst=2
     else
-        warn_msg "Skipping screenfetch, already installed"
+        warn_msg "Skipping neofetch, already installed"
         rst=2
     fi
 
