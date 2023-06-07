@@ -2,6 +2,7 @@ require 'patch_runtime'
 
 local wezterm = require 'wezterm'
 local sys = require 'sys'
+local str = require 'utils.strings'
 require 'events'
 
 local default_prog
@@ -124,6 +125,13 @@ else
     table.insert(launch_menu, {
         label = 'Zsh',
         args = { 'zsh', '-l' },
+    })
+end
+
+for host, _ in pairs(wezterm.enumerate_ssh_hosts()) do
+    table.insert(launch_menu, {
+        label = 'SSH: ' .. str.capitalize(host),
+        args = { 'ssh', host },
     })
 end
 

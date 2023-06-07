@@ -14,9 +14,14 @@ wezterm.on('update-right-status', function(window, _)
     })
 end)
 
-wezterm.on('user-var-changed', function(_, _, name, value)
+wezterm.on('user-var-changed', function(window, pane, name, value)
     if name == 'open' then
         require('sys').open(value)
+    elseif name == 'vnc' then
+        local success, _, stderr = wezterm.run_child_process { 'vncviewer', '-Quality=high', value }
+        if not success then
+            wezterm.log_error(stderr)
+        end
     else
         wezterm.log_error('Unsupported command: ' .. name)
     end

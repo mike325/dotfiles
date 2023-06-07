@@ -17,7 +17,7 @@ $if mode=vi
     set keymap vi-command
     "k": history-search-backward
     "j": history-search-forward
-    "\C-l": clear-screen
+    Control-l: clear-screen
 
     # insert mode
     set keymap vi-insert
@@ -26,9 +26,10 @@ $if mode=vi
     "\e[B": history-search-forward
     "\C-p": history-search-backward
     "\C-n": history-search-forward
-    "\C-l": clear-screen
+    Control-l: clear-screen
 $else
     "\C-p": history-search-backward
     "\C-n": history-search-forward
     "\C-l": clear-screen
+    Control-l: clear-screen
 $endif
