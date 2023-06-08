@@ -38,10 +38,8 @@ Usage:
         $ $NAME ~/stuff ./mistake    # will 'remove' ./mistake  and move/rename ~/stuff to ./mistake
         $ $NAME file_stuff new_stuff # will 'remove' new_stuff and move/rename file_stuff to new_stuff
 
-    Optional Flags
-        -h, --help
-            Display help and exit. If you are seeing this, that means that you already know it (nice)
-
+Optional Flags
+    -h, --help  Display this help message
 EOF
 }
 

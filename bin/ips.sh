@@ -75,20 +75,13 @@ Usage:
         $ $NAME
 
     Optional Flags
-        -a, --all
-            Display all IPs, local and real
-
-        -l, --local
-            Display local IPs, this option is enable by default
-            This option is enable by default
-            ----    Turn off real IP
-
-        -r, --real
-            Display the real IP (as seen from the internet)
-            ----    Turn off local IP
-
-        -h, --help
-            Display help and exit. If you are seeing this, that means that you already know it (nice)
+        -a, --all   Display all IPs, local and real
+        -l, --local Display local IPs, this option is enable by default
+                        This option is enable by default
+                        - Turn off real IP
+        -r, --real  Display the real IP (as seen from the internet)
+                        - Turn off local IP
+        -h, --help  Display help and exit. If you are seeing this, that means that you already know it (nice)
 
 EOF
 }

@@ -97,10 +97,7 @@ Usage:
     $NAME [OPTIONAL]
 
     Optional Flags
-
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
-
+        -h, --help      Display this help message
 EOF
 }
 

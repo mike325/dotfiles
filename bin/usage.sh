@@ -48,12 +48,8 @@ Usage:
         $ $_NAME ./folder
 
     Optional Flags
-        -s, --sort
-            Sort the results
-
-        -h, --help
-            Display help and exit. If you are seeing this, that means that you already know it (nice)
-
+        -s, --sort  Sort the results
+        -h, --help  Display this help message
 EOF
 }
 

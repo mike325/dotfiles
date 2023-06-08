@@ -50,13 +50,9 @@ Usage:
         $NAME -e ed # uses ed editor
 
     Optional Flags
-
-        -e, --editor
-            Change the default editor
-                By default this uses \$EDITOR var and fallback vi in it's unset or empty
-
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
+        -e, --editor    Change the default editor
+                            By default this uses \$EDITOR var and fallback vi in it's unset or empty
+        -h, --help      Display this help message
 EOF
 
 }

@@ -165,30 +165,16 @@ Usage:
     $NAME [OPTIONAL]
 
     Optional Flags
-
-        --nolog
-            Disable log writting
-
-        --nocolor
-            Disable color output
-
-        -v, --verbose
-            Enable debug messages
-
-        -o PATH , --output PATH
-            Set output path
-                - Default: Same as the origina file
-
-        -a PATH , --archive PATH
-            Set archive path
-                - Default: ${ARCHIVE}
-
-        -m PATH , --media PATH
-            Set media path
-                - Default: ${MEDIA_PATH}
-
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
+        --nolog                     Disable log writting
+        --nocolor                   Disable color output
+        -v, --verbose               Enable debug messages
+        -o PATH , --output PATH     Set output path
+                                        - Default: Same as the origina file
+        -a PATH , --archive PATH    Set archive path
+                                        - Default: ${ARCHIVE}
+        -m PATH , --media PATH      Set media path
+                                        - Default: ${MEDIA_PATH}
+        -h, --help                  Display this help message
 EOF
 }
 

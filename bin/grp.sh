@@ -74,8 +74,7 @@ Usage:
         $ $NAME
 
     Optional Flags
-        -h, --help
-            Display help and exit. If you are seeing this, that means that you already know it (nice)
+        -h, --help  Display this help message
 
 EOF
 }

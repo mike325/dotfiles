@@ -625,20 +625,16 @@ function venv() {
         local key="$1"
         case "$key" in
             -h | --help)
-                echo ""
-                echo "  Source given virtualevn"
-                echo ""
-                echo "  Usage:"
-                echo "      venv [OPTIONAL]"
-                echo "          Ex."
-                echo "          $ venv -g"
-                echo "          $ venv -g django"
-                echo "          $ venv ~/django"
-                echo ""
-                echo "      Optional Flags"
-                echo "          -h, --help"
-                echo "              Display help and exit."
-                echo ""
+                cat <<EOF
+    Description
+
+    Usage:
+        venv [OPTIONAL]
+
+    Optional Flags
+        -n NAME, --name NAME    Name of the virtual environment
+        -h, --help              Display this help message
+EOF
                 return 0
                 ;;
             -n | --name)
@@ -837,7 +833,7 @@ function replace_base() {
 
     for i in "${array_list[@]}"; do
         new_path="${cwd/$i/$new_cwd}"
-        if [[ -d $new_path ]] && [[ $new_path != "$(  pwd)" ]]; then
+        if [[ -d $new_path ]] && [[ $new_path != "$(pwd)" ]]; then
             if ! pushd "$new_path" 1>/dev/null; then
                 return 1
             fi
