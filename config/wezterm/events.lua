@@ -14,7 +14,7 @@ wezterm.on('update-right-status', function(window, _)
     })
 end)
 
-wezterm.on('user-var-changed', function(window, pane, name, value)
+wezterm.on('user-var-changed', function(_, _, name, value)
     if name == 'open' then
         require('sys').open(value)
     elseif name == 'vnc' then
