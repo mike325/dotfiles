@@ -350,7 +350,7 @@
     slc = "!f(){ git log --show-signature --color=auto -p ${1:--1}; }; f"
 
 ;   Create a stash of the current changes and then reapply them
-    snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+    snapshot = !git stash push --keep-index --message "snapshot: $(date)" && git stash apply --index "stash@{0}"
 
 ;   Auto create tags files and place it in .git dir Credits to Tpope
     ctags = "!f() {\
@@ -388,10 +388,10 @@
 
 ;   Apply, pop or drop a specific stash
     sw = "!f(){ git stash show -p stash@{${1:-0}}; }; f"
-    sa = "!f(){ git --no-pager stash apply stash@{${1:-0}}; }; f"
-    sp = "!f(){ git --no-pager stash pop   stash@{${1:-0}}; }; f"
+    sa = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
+    sp = "!f(){ git --no-pager stash pop   --index stash@{${1:-0}}; }; f"
+    ss = "!f(){ git --no-pager stash push  --keep-index $1; }; f"
     sd = "!f(){ git --no-pager stash drop  stash@{${1:-0}}; }; f"
-    ss = "!f(){ git --no-pager stash save  $1; }; f"
 
 ;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
 
