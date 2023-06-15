@@ -1691,10 +1691,10 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}"
             if unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null; then
                 # if unzip -o "$TMP/release.zip" -d "$TMP/" &>/dev/null; then
-                    if chmod u+x "$TMP/stylua"; then
-                        if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
-                            error_msg "Failed to move stylua executable"
-                            rst=1
+                if chmod u+x "$TMP/stylua"; then
+                    if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move stylua executable"
+                        rst=1
                     fi
                 else
                         error_msg "Failed to make stylua executable"
