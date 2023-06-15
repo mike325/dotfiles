@@ -1695,11 +1695,11 @@ function _linux_portables() {
                         if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
                             error_msg "Failed to move stylua executable"
                             rst=1
-                        fi
-                    else
+                    fi
+                else
                         error_msg "Failed to make stylua executable"
                         rst=1
-                    fi
+                fi
                 # else
                 #     error_msg "Failed to unzip stylua"
                 #     rst=1
