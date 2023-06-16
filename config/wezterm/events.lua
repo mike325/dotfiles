@@ -26,3 +26,7 @@ wezterm.on('user-var-changed', function(_, _, name, value)
         wezterm.log_error('Unsupported command: ' .. name)
     end
 end)
+
+wezterm.on('window-config-reloaded', function(window, pane)
+  window:toast_notification('wezterm', 'configuration reloaded!', nil, 4000)
+end)

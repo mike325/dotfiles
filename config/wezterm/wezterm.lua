@@ -1,8 +1,11 @@
+_G['unpack'] = _G['unpack'] or _G['table'].unpack
+
 require 'patch_runtime'
 
 local wezterm = require 'wezterm'
 local sys = require 'sys'
 local str = require 'utils.strings'
+require 'globals'
 require 'events'
 
 local default_prog
