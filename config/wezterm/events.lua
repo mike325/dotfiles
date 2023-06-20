@@ -27,6 +27,6 @@ wezterm.on('user-var-changed', function(_, _, name, value)
     end
 end)
 
-wezterm.on('window-config-reloaded', function(window, pane)
+wezterm.on('window-config-reloaded', function(window, _)
     window:toast_notification('wezterm', 'configuration reloaded!', nil, 4000)
 end)
