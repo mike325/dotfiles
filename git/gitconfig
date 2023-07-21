@@ -224,8 +224,9 @@
     ll  = log --color=auto --pretty=custom                ; Short log with pretty format
     llg = log --color=auto --graph --pretty=custom        ; Short pretty log with graph
     lln = log --color=auto --name-status --pretty=custom  ; get files that changed
-    w   = log --show-signature --color=auto --name-status ; Old whatchanged
-    wp  = log --show-signature --color=auto -p            ; Old whatchanged with diff
+    wc  = log --show-signature --color=auto --name-status ; Old whatchanged
+    wcp = log --show-signature --color=auto -p            ; Old whatchanged with diff
+    wcd = log --show-signature --color=auto -p            ; Old whatchanged with diff
 
 ;###############################################################################
 ;                 Git ls a bit simpler and with grep search                    #
@@ -346,13 +347,16 @@
 ;                 Custom functions                                             #
 ;###############################################################################
 
+    ; NOTE: Does this work with HEAD?
+    psu = "!f(){ git push --set-upstream ${1:-origin} $(git branch --show-current); }; f"
+
     patch = "!f(){ git diff --diff-algorithm=patience -B -C --find-copies-harder --color=never $1 > \"${2:-$(basename $(pwd))}.patch\"; }; f"
     slc = "!f(){ git log --show-signature --color=auto -p ${1:--1}; }; f"
 
-;   Create a stash of the current changes and then reapply them
+    ; Create a stash of the current changes and then reapply them
     snapshot = !git stash push --keep-index --message "snapshot: $(date)" && git stash apply --index "stash@{0}"
 
-;   Auto create tags files and place it in .git dir Credits to Tpope
+    ; Auto create tags files and place it in .git dir Credits to Tpope
     ctags = "!f() {\
         if [ -f .git ] || [ -d .git ]; then\
             dir=$( git rev-parse --git-dir ) ; \
@@ -371,38 +375,34 @@
 
     norm2bare = "!f() { mv .git .. && rm -rf * && mv ../.git . && mv .git/* . && rm -rf .git && git config --local --bool core.bare true; }; f"
 
-;   Update just one file form specific remote
+    ; Update just one file form specific remote
     updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
 
-;   Reset a staged file to its original state (index)
+    ; Reset a staged file to its original state (index)
     rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
 
-;   Push the current branch to the master of a remote
-    psrhm = "!f() { git push $1 HEAD:master }; f"
-
-;   Remove any given number of commits
+    ; Remove any given number of commits
     rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
 
-;   Undo any given number of commits
+    ; Undo any given number of commits
     ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
 
-;   Apply, pop or drop a specific stash
+    ; Apply, pop or drop a specific stash
     sw = "!f(){ git stash show -p stash@{${1:-0}}; }; f"
-    sa = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
-    sp = "!f(){ git --no-pager stash pop   --index stash@{${1:-0}}; }; f"
-    ss = "!f(){ git --no-pager stash push  --keep-index --message $1; }; f"
+    sa = "!f(){ git --no-pager stash apply stash@{${1:-0}}; }; f"
+    sp = "!f(){ git --no-pager stash pop   stash@{${1:-0}}; }; f"
+    ss = "!f(){ git --no-pager stash save  $1; }; f"
     sd = "!f(){ git --no-pager stash drop  stash@{${1:-0}}; }; f"
 
-;   --------- Below here credits to https://github.com/alrra/dotfiles ---------
-
-;   Remove the tag with the specified tag name if exists and tag the latest
-;   commit with that name.
+    ; --------- Below here credits to https://github.com/alrra/dotfiles ---------
+    ; Remove the tag with the specified tag name if exists and tag the latest
+    ; commit with that name.
     retag = "!f() { \
         git tag -d $1 &> /dev/null; \
         git tag $1; \
     }; f"
 
-;   Find commits by commit message.
+    ; Find commits by commit message.
     cm = "!f() { \
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
     }; f"

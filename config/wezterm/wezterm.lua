@@ -82,6 +82,8 @@ local keys = {
     { key = 'p', mods = 'CTRL|ALT', action = wezterm.action.ShowLauncher },
 
     { key = 'D', mods = 'CTRL|SHIFT', action = wezterm.action.ShowDebugOverlay },
+
+    { key = 'o', mods = 'LEADER', action = wezterm.action.EmitEvent 'toggle-opacity' },
 }
 
 for i = 1, 8 do
