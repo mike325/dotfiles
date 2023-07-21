@@ -133,13 +133,6 @@ else
     })
 end
 
-for host, _ in pairs(wezterm.enumerate_ssh_hosts()) do
-    table.insert(launch_menu, {
-        label = 'SSH: ' .. str.capitalize(host),
-        args = { 'ssh', host },
-    })
-end
-
 return {
     disable_default_key_bindings = true,
     launch_menu = launch_menu,
