@@ -40,4 +40,3 @@ wezterm.on('toggle-opacity', function(window, _)
     end
     window:set_config_overrides(overrides)
 end)
-
