@@ -394,6 +394,12 @@
     ss = "!f(){ git --no-pager stash save  $1; }; f"
     sd = "!f(){ git --no-pager stash drop  stash@{${1:-0}}; }; f"
 
+    ; manage last stash
+    swl = "!f(){ git stash show -p stash@{$(($(git stash list |  wc -l) - 1))}; }; f"
+    sal = "!f(){ git --no-pager stash apply stash@{$(($(git stash list |  wc -l) - 1))}; }; f"
+    spl = "!f(){ git --no-pager stash pop   stash@{$(($(git stash list |  wc -l) - 1))}; }; f"
+    sdl = "!f(){ git --no-pager stash drop  stash@{$(($(git stash list |  wc -l) - 1))}; }; f"
+
     ; --------- Below here credits to https://github.com/alrra/dotfiles ---------
     ; Remove the tag with the specified tag name if exists and tag the latest
     ; commit with that name.
