@@ -91,7 +91,7 @@ function status_msg() {
 fstash() {
     local out q k sha
     while out=$(
-        git stash list --pretty="%C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
+        git stash list --pretty="%C(magenta)%gd %C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
             fzf --ansi --no-sort --query="$q" --print-query \
                 --expect=ctrl-d,ctrl-b --height=60%
     ); do

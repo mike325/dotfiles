@@ -68,10 +68,24 @@ __gi() {
 }
 
 if  [ "$#" -eq 0 ]; then
+
+    gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select language"'
+    fzf_filter='fzf --multi --ansi --exit-0  --height=60%'
+
+    filter
+    if hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
+    elif hash gum 2>/dev/null ; then
+        filter="$gum_filter"
+    else
+        error_msg "Missing fzf and gum, cannot continue"
+        exit 1
+    fi
+
     IFS+=","
     for item in $(__gi list); do
         echo "$item"
-    done | fzf --multi --ansi | paste -s -d "," - |
+    done | bash -c "$filter" | paste -s -d "," - |
         {
             read -r result && { [[ -n $result ]] && __gi "$result"; }
         }

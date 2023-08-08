@@ -269,6 +269,19 @@ if hash ctags 2>/dev/null; then
 fi
 
 if hash fzf 2>/dev/null; then
+
+    export FZF_CTRL_R_OPTS='--sort'
+    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi --height=60%'
+
+    if ! is_windows; then
+        export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
+    fi
+
+    export FZF_COMPLETION_TRIGGER='**'
+
+    # Options to fzf command
+    export FZF_COMPLETION_OPTS='+c -x'
+
     if hash git 2>/dev/null; then
         if hash fd 2>/dev/null; then
             export FZF_DEFAULT_COMMAND="(git --no-pager ls-files -co --exclude-standard || fd --ignore-file ~/.config/git/ignore --type f --hidden --follow --color always -E '*.spl' -E '*.aux' -E '*.out' -E '*.o' -E '*.pyc' -E '*.gz' -E '*.pdf' -E '*.sw' -E '*.swp' -E '*.swap' -E '*.com' -E '*.exe' -E '*.so' -E '*/cache/*' -E '*/__pycache__/*' -E '*/tmp/*' -E '.git/*' -E '.svn/*' -E '.xml' -E '*.bin' -E '*.7z' -E '*.dmg' -E '*.gz' -E '*.iso' -E '*.jar' -E '*.rar' -E '*.tar' -E '*.zip' -E 'TAGS' -E 'tags' -E 'GTAGS' -E 'COMMIT_EDITMSG' . . ) 2> /dev/null"
@@ -296,57 +309,82 @@ if hash fzf 2>/dev/null; then
     if [[ -n $FZF_DEFAULT_COMMAND ]]; then
         export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     fi
+fi
 
-    export FZF_CTRL_R_OPTS='--sort'
+# fkill - kill processes - list only the ones you can kill. Modified the earlier script.
+fkill() {
+    local gum_filter='gum filter --fuzzy --height=20 --width=0 --no-limit --header "Select process"'
+    local fzf_filter='fzf --multi --exit-0'
 
-    export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi --height=60%'
-
-    if ! is_windows; then
-        export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
+    local filter
+    if hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
+    elif hash gum 2>/dev/null ; then
+        filter="$gum_filter"
+    else
+        error_msg "Missing fzf and gum, cannot continue"
+        return 1
     fi
 
-    export FZF_COMPLETION_TRIGGER='**'
-
-    # Options to fzf command
-    export FZF_COMPLETION_OPTS='+c -x'
-
-    # fkill - kill processes - list only the ones you can kill. Modified the earlier script.
-    fkill() {
-        local pid
-        if [ "$UID" != "0" ]; then
-            pid=$(ps -f -u $UID | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
-        else
-            pid=$(ps -ef | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
-        fi
-
-        if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs kill "-${1:-7}"
-        fi
-    }
-
-    plist() {
-        local pid
-        if [ "$UID" != "0" ]; then
-            pid=$(ps -f -u $UID | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
-        else
-            pid=$(ps -ef | sed 1d | fzf --multi --exit-0 | awk '{print $2}')
-        fi
-
-        if [ "x$pid" != "x" ]; then
-            echo "$pid" | xargs echo
-        fi
-    }
-
-    if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
-        fssh() {
-            # shellcheck disable=SC2155
-            local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | fzf)
-            if [[ -n $host ]]; then
-                ssh "$host"
-            fi
-        }
+    local pid
+    if [ "$UID" != "0" ]; then
+        pid=$(ps -f -u $UID | sed 1d | bash -c "$filter" | awk '{print $2}')
+    else
+        pid=$(ps -ef | sed 1d | bash -c "$filter" | awk '{print $2}')
     fi
 
+    if [ "x$pid" != "x" ]; then
+        echo "$pid" | xargs kill "-${1:-7}"
+    fi
+}
+
+plist() {
+    local gum_filter='gum filter --fuzzy --height=20 --width=0 --no-limit --header "Select process"'
+    local fzf_filter='fzf --multi --exit-0'
+
+    local filter
+    if hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
+    elif hash gum 2>/dev/null ; then
+        filter="$gum_filter"
+    else
+        error_msg "Missing fzf and gum, cannot continue"
+        return 1
+    fi
+
+    local pid
+    if [ "$UID" != "0" ]; then
+        pid=$(ps -f -u $UID | sed 1d | bash -c "$filter" | awk '{print $2}')
+    else
+        pid=$(ps -ef | sed 1d | bash -c "$filter" | awk '{print $2}')
+    fi
+
+    if [ "x$pid" != "x" ]; then
+        echo "$pid" | xargs echo
+    fi
+}
+
+if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
+    fssh() {
+        local gum_filter='gum filter --fuzzy --height=20 --width=0 --limit=1 --header "Select hostname"'
+        local fzf_filter='fzf --exit-0'
+
+        local filter
+        if hash fzf 2>/dev/null; then
+            filter="$fzf_filter"
+        elif hash gum 2>/dev/null ; then
+            filter="$gum_filter"
+        else
+            error_msg "Missing fzf and gum, cannot continue"
+            return 1
+        fi
+
+        # shellcheck disable=SC2155
+        local host=$(grep -Ei '^Host\s+[a-zA-Z0-9]+' "$HOME/.ssh/config" | awk '{print $2}' | bash -c "$filter")
+        if [[ -n $host ]]; then
+            ssh "$host"
+        fi
+    }
 fi
 
 ################################################################################

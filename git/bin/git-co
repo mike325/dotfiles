@@ -364,8 +364,21 @@ verbose_msg "OS            : ${OS}"
 
 # TODO: Add commit log as preview
 checkout() {
+    local gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select branch"'
+    local fzf_filter='fzf --select-1 --exit-0  --height=60%'
+
+    local filter
+    if hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
+    elif hash gum 2>/dev/null ; then
+        filter="$gum_filter"
+    else
+        error_msg "Missing fzf and gum, cannot continue"
+        return 1
+    fi
+
     local branch
-    branch=$( git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
+    branch=$( git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
     # NOTE: Assuming we just have 1 remote
     # remote="$(git remote show)"
     if [[ -n $branch ]]; then
@@ -377,7 +390,7 @@ checkout() {
 }
 
 # TODO: Add filter capabilities
-if hash fzf 2>/dev/null; then
+if hash fzf 2>/dev/null || hash gum 2>/dev/null; then
     if git rev-parse --show-toplevel &>/dev/null; then
         checkout
     else
@@ -385,7 +398,7 @@ if hash fzf 2>/dev/null; then
         exit 1
     fi
 else
-    error_msg "FZF is not install"
+    error_msg "Missing FZF and gum"
     exit 1
 fi
 

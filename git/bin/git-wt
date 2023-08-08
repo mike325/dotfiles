@@ -349,6 +349,9 @@ while [[ $# -gt 0 ]]; do
         -l | --list)
             LIST=1
             ;;
+        -p | --pr | --pull-request)
+            LIST=1
+            ;;
         # -)
         #     while read -r from_stdin; do
         #         FROM_STDIN=("$from_stdin")
@@ -376,84 +379,87 @@ verbose_msg "OS            : ${OS}"
 #                           CODE Goes Here                            #
 #######################################################################
 
-if ! hash fzf 2>/dev/null || ! hash gum 2>/dev/null; then
+gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select worktree"'
+fzf_filter='fzf --select-1 --exit-0 --height=60% '
+
+filter
+if hash fzf 2>/dev/null; then
+    filter="$fzf_filter"
+elif hash gum 2>/dev/null ; then
+    filter="$gum_filter"
+else
     error_msg "$NAME requires fzf and gum to work"
     exit 1
 fi
 
-if hash fzf 2>/dev/null; then
-    if [[ $LIST -eq 1 ]]; then
-        git worktree list
-    elif [[ $REMOVE -eq 1 ]]; then
-        wt="$(git worktree list | fzf --select-1 --exit-0  --height=60% | awk '{print $1}')"
-        if [[ -n $wt ]]; then
-            status_msg "Removing worktree ${wt##*/}"
-            if gum confirm "Remove worktree: ${wt##*/}"; then
-                if ! git worktree remove "$wt"; then
-                    error_msg "Failed to remove worktree"
-                    exit 1
-                fi
+if [[ $LIST -eq 1 ]]; then
+    git worktree list
+elif [[ $REMOVE -eq 1 ]]; then
+    wt="$(git worktree list | bash -c "$filter" | awk '{print $1}')"
+    if [[ -n $wt ]]; then
+        status_msg "Removing worktree ${wt##*/}"
+        if gum confirm "Remove worktree: ${wt##*/}"; then
+            if ! git worktree remove "$wt"; then
+                error_msg "Failed to remove worktree"
+                exit 1
             fi
-        fi
-    else
-        branch=$(git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | fzf --select-1 --exit-0  --height=60%)
-        if [[ -n $branch ]]; then
-            verbose_msg "Selected branch: $branch"
-            if ! git worktree list | awk '{print $3}' | command grep -q "$branch"; then
-                # TODO: Add support for more remotes
-                if [[ $branch =~ ^origin/* ]]; then
-                    if ! git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | command grep -q -E "^${branch#origin/}"; then
-                        status_msg "Creating local branch from remote $branch"
-                        if ! git branch --track "${branch#origin/}" "remotes/$branch"; then
-                            error_msg "Failed to create local branch"
-                            exit 1
-                        fi
-                    fi
-                    branch="${branch#origin/}"
-                fi
-                status_msg "Creating worktree"
-                branch_dir="${branch#FER-[0-9]*-}"
-                for i in feature fix bug feat refactor; do
-                    branch_dir="${branch_dir#"$i"/}"
-                done
-                verbose_msg "Dir location: ${branch_dir} set to branch $branch"
-                if ! git worktree add "./../${branch_dir}" "$branch"; then
-                    error_msg "failed to create worktree"
-                    exit 1
-                fi
-            fi
-            wt_dir="$(git worktree list | command grep "${branch#origin/}" | awk '{print $1}')"
-            verbose_msg "Moving to $wt_dir"
-            pushd "$wt_dir" 2>/dev/null || exit 1
-
-            git_dir="$(git rev-parse --git-dir)"
-            verbose_msg "Git dir: $git_dir"
-
-            project_files=(
-                ".clang-format"
-                ".clang-tidy"
-                ".editorconfig"
-                ".project.lua"
-                ".projections.json"
-                ".pre-commit-config.yaml"
-                "pyproject.toml"
-            )
-
-            status_msg "Copying project files"
-            for i in "${project_files[@]}"; do
-                if [[ -f "$git_dir/../../$i" ]]; then
-                    verbose_msg "linking $i"
-                    ln "$git_dir/../../$i" ./
-                fi
-            done
-
-            # TODO: Make this dynamic and create it with just C/C++ repos
-            [ ! -d ./.cache/clangd/pchs ] && mkdir -p './.cache/clangd/pchs/'
         fi
     fi
 else
-    error_msg "FZF is not install"
-    exit 1
+    branch=$(git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
+    if [[ -n $branch ]]; then
+        verbose_msg "Selected branch: $branch"
+        if ! git worktree list | awk '{print $3}' | command grep -q "$branch"; then
+            # TODO: Add support for more remotes
+            if [[ $branch =~ ^origin/* ]]; then
+                if ! git branch --all | tr -d '*' | awk '{gsub("remotes/", "", $1) ; print $1}' | command grep -q -E "^${branch#origin/}"; then
+                    status_msg "Creating local branch from remote $branch"
+                    if ! git branch --track "${branch#origin/}" "remotes/$branch"; then
+                        error_msg "Failed to create local branch"
+                        exit 1
+                    fi
+                fi
+                branch="${branch#origin/}"
+            fi
+            status_msg "Creating worktree"
+            branch_dir="${branch#FER-[0-9]*-}"
+            for i in feature fix bug feat refactor; do
+                branch_dir="${branch_dir#"$i"/}"
+            done
+            verbose_msg "Dir location: ${branch_dir} set to branch $branch"
+            if ! git worktree add "./../${branch_dir}" "$branch"; then
+                error_msg "failed to create worktree"
+                exit 1
+            fi
+        fi
+        wt_dir="$(git worktree list | command grep "${branch#origin/}" | awk '{print $1}')"
+        verbose_msg "Moving to $wt_dir"
+        pushd "$wt_dir" 2>/dev/null || exit 1
+
+        git_dir="$(git rev-parse --git-dir)"
+        verbose_msg "Git dir: $git_dir"
+
+        project_files=(
+            ".clang-format"
+            ".clang-tidy"
+            ".editorconfig"
+            ".project.lua"
+            ".projections.json"
+            ".pre-commit-config.yaml"
+            "pyproject.toml"
+        )
+
+        status_msg "Copying project files"
+        for i in "${project_files[@]}"; do
+            if [[ -f "$git_dir/../../$i" ]]; then
+                verbose_msg "linking $i"
+                ln "$git_dir/../../$i" ./
+            fi
+        done
+
+        # TODO: Make this dynamic and create it with just C/C++ repos
+        [ ! -d ./.cache/clangd/pchs ] && mkdir -p './.cache/clangd/pchs/'
+    fi
 fi
 
 #######################################################################
