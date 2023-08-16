@@ -3,14 +3,23 @@ local wezterm = require 'wezterm'
 local M = {}
 
 function M.get_windows()
-    -- return wezterm.gui.gui_windows()
-    return wezterm.mux.all_windows()
+    return wezterm.gui.gui_windows()
+end
+
+function M.get_active_window()
+    local windows = wezterm.gui.gui_windows()
+    local win
+    for _, win in ipairs(windows) do
+        if win:is_focused() then
+            return win
+        end
+    end
+    return windows[1]
 end
 
 function M.get_active_tab(window)
     if not window then
-        local windows = wezterm.mux.all_windows()
-        window = windows[1]
+        window = M.get_active_window()
     end
     local tab = window:active_tab()
     return tab

@@ -1,4 +1,6 @@
-_G['unpack'] = _G['unpack'] or _G['table'].unpack
+if not unpack then
+    _G['unpack'] = _G['table'].unpack
+end
 
 require 'patch_runtime'
 

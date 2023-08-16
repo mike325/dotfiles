@@ -1,4 +1,4 @@
--- NOTE: We cannot import anything outside of the wezterm confif dir yet
+-- NOTE: We cannot import anything outside of the wezterm config dir yet
 --       we first need to patch the runtime
 local wezterm = require 'wezterm'
 local is_windows = wezterm.target_triple == 'x86_64-pc-windows-msvc'
@@ -65,19 +65,7 @@ function sys.basename(str)
 end
 
 function sys.open(uri)
-    local cmd = {}
-    if sys.name == 'windows' then
-        table.insert(cmd, 'powershell')
-        require('utils.tables').list_extend(cmd, { '-noexit', '-executionpolicy', 'bypass', 'Start-Process' })
-    elseif sys.name == 'linux' then
-        table.insert(cmd, 'xdg-open')
-    else
-        -- Problably macos
-        table.insert(cmd, 'open')
-    end
-    table.insert(cmd, uri)
-    local success, _, _ = wezterm.run_child_process(cmd)
-    return success
+    wezterm.open_with(uri)
 end
 
 return sys
