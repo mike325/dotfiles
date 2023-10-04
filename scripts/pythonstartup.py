@@ -10,18 +10,15 @@ import atexit
 import os
 import sys
 
-# import rlcompleter
-
 readline = None
 
 try:
     import pyreadline
-
     readline = pyreadline
 except ImportError:
     try:
         import readline as _readline
-
+        import rlcompleter
         readline = _readline
     except ImportError:
         print("Error importing readline and pyreadline modules")

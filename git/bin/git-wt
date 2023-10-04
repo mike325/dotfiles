@@ -382,7 +382,7 @@ verbose_msg "OS            : ${OS}"
 gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select worktree"'
 fzf_filter='fzf --select-1 --exit-0 --height=60% '
 
-filter
+filter=""
 if hash fzf 2>/dev/null; then
     filter="$fzf_filter"
 elif hash gum 2>/dev/null ; then

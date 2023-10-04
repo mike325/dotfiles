@@ -32,6 +32,7 @@ FORCE_INSTALL=0
 PORTABLE=0
 VERBOSE=0
 DEV=0
+STABLE=0
 NOLOG=1
 NOCOLOR=0
 
@@ -146,41 +147,33 @@ Usage:
         --portable
             Download the portable version and place it in $HOME/.local/bin
 
-        -c, --clone
-            By default this script expect to run under a git directory with
-            the Neovim's source code, this options clone Neovim's repo and move
-            to the repo's root before starts the compile process
+        -c, --clone             By default this script expect to run under a git directory with
+                                the Neovim's source code, this options clone Neovim's repo and move
+                                to the repo's root before starts the compile process
 
-        -d <DIR> , --dir <DIR>
-            Choose the base root of the repo and move to it before compile
-            the source code, if this options is used with -c/--clone flag
-            it will clone the repo in the desire <DIR>
+        -d <DIR> , --dir <DIR>  Choose the base root of the repo and move to it before compile
+                                the source code, if this options is used with -c/--clone flag
+                                it will clone the repo in the desire <DIR>
 
-        -p, --python
-            Install Neovim's python package for python2 and python3
+        -p, --python            Install Neovim's python package for python2 and python3
 
-        -r, --ruby
-            Install Neovim's ruby package
+        -r, --ruby              Install Neovim's ruby package
 
-        -f, --force
-            Ignore errors and warnings and force compilation
+        -f, --force             Ignore errors and warnings and force compilation
 
-        -b, --build
-            Install all dependencies of the before build neovim's source code
-            Just few systems are supported, Debian's family, Fedora's family and
-            ArchLinux's family
+        -b, --build             Install all dependencies of the before build neovim's source code
+                                Just few systems are supported, Debian's family, Fedora's family and
+                                ArchLinux's family
 
-        --dev
-            Use developement builds/portables instead of stable
+        --dev                   Use developement builds/portables instead of stable
 
-        -C
-            Set the compiler, gcc/clang
+        --stable                Use stable builds/portables instead of stable
 
-        -v, --verbose
-            Enable debug messages
+        -C                      Set the compiler, gcc/clang
 
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
+        -v, --verbose           Enable debug messages
+
+        -h, --help              Display help, if you are seeing this, that means that you already know it (nice)
 EOF
     # _show_nvim_help
 }
@@ -508,9 +501,13 @@ while [[ $# -gt 0 ]]; do
         -v | --verbose)
             VERBOSE=1
             ;;
+        --stable)
+            DEV=0
+            STABLE=1
+            ;;
         --dev)
             DEV=1
-            BRANCH="master"
+            STABLE=0
             ;;
         -h | --help)
             show_help
@@ -548,95 +545,39 @@ fi
 
 if [[ $CLONE -eq 1 ]]; then
     status_msg "Cloning neovim repo"
-    if ! git clone --recursive https://github.com/neovim/neovim "${CLONE_LOC:.}"; then
+    if ! git clone --recursive https://github.com/neovim/neovim "${CLONE_LOC:-.}"; then
         error_msg "Failed to clone neovim"
         exit 2
     fi
     pushd "${CLONE_LOC:-neovim}" &>/dev/null || { error_msg "Failed to cd into ${CLONE_LOC:-neovim}" && exit 1; }
 fi
 
-if [[ $BUILD_LIBS -eq 1   ]]; then
-    status_msg "Looking for system dependencies"
-    if hash apt-get 2>/dev/null; then
-        sudo apt-get install -y \
-            libtool \
-            libtool-bin \
-            autoconf \
-            automake \
-            pkg-config \
-            gcc \
-            g++ \
-            lldb \
-            clang \
-            clang-tools \
-            clangd \
-            clang-tidy \
-            make \
-            cmake \
-            unzip
-            # build-essential
-            # python-dev
-            # python3-dev
-            # ruby-dev
-    elif hash dnf 2>/dev/null; then
-        sudo dnf -y install \
-            libtool \
-            autoconf \
-            automake \
-            cmake \
-            gcc \
-            gcc-c++ \
-            make \
-            pkgconfig \
-            unzip
-            # python-dev
-            # python2-dev
-            # ruby-dev
-    elif hash pacman 2>/dev/null; then
-        sudo pacman -S --noconfirm \
-            base-devel \
-            clang \
-            clangd \
-            lldb \
-            llvm \
-            make \
-            cmake \
-            unzip
-            # python-dev
-            # python2-dev
-            # ruby-dev
-    else
-        cat <<EOF
-    ---- [X] Error your system is not supported to preinstall deps
-             Supported systems are:
-                  - Debian family
-                  - Ubuntu family
-                  - Archlinux, Antergos and Manjaro
-                  - Fedora
-             Please check the ependencies in Neovim's page:
-             https://github.com/neovim/neovim/wiki/Building-Neovim
-EOF
-        exit 1
-    fi
-fi
-
 status_msg "Cleaning current build"
 make clean
 
-if [[ $DEV -eq 0 ]]; then
+BUILD_TYPE="Release"
+
+current_branch="$(git branch --show-current)"
+if [[ $STABLE -eq 1 ]]; then
     BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"
+elif [[ $DEV -eq 1 ]]; then
+    BRANCH="master"
+    BUILD_TYPE="RelWithDebInfo"
+else
+    BRANCH="$current_branch"
+fi
+
+if [[ ! "$BRANCH" == "$current_branch" ]]; then
     status_msg "Checking out to $BRANCH"
     git checkout "$BRANCH"
-else
-    git checkout master
-    # git pull origin master
 fi
 
 status_msg "Building neovim"
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
-if make CMAKE_BUILD_TYPE=Release; then
+verbose_msg "Building $BUILD_TYPE on $BRANCH"
+if make CMAKE_BUILD_TYPE="$BUILD_TYPE"; then
+    INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
     status_msg "Installing neovim into $INSTALL_DIR"
-    if ! make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install; then
+    if ! make  CMAKE_BUILD_TYPE="$BUILD_TYPE" CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install; then
         error_msg "Failed to install neovim"
     fi
 else
