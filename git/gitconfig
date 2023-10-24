@@ -134,7 +134,8 @@
 ;###############################################################################
 
     dt  = describe --tag
-    lastag  = "!f() { git tag | sort -h | uniq | tail -n1; }; f"
+    lasttag  = "!f() { git tag | sort -h | uniq | tail -n1; }; f"
+    rmtag  = "!f() { git tag -d \"$1\" 2>/dev/null; }; f"
 
 ;###############################################################################
 ;                 clone recursive                                              #
@@ -174,12 +175,12 @@
 ;                 Branch management                                            #
 ;###############################################################################
 
-    b   = !git --no-pager branch        ; Show local branches
-    ba  = !git --no-pager branch --all  ; Show all local and remote branches
-    bd  = !git --no-pager branch -d     ; Delete a merged branch
-    bdd = !git --no-pager branch -D     ; Force branch deletion
-    bdr = !git push origin --delete     ; Delete remote branch
-    br  = !git --no-pager branch -m     ; Rename a branch
+    b   = branch               ; Show local branches
+    ba  = branch --all         ; Show all local and remote branches
+    bd  = branch -d            ; Delete a merged branch
+    bdd = branch -D            ; Force branch deletion
+    bdr = push origin --delete ; Delete remote branch
+    br  = branch -m            ; Rename a branch
 
 ;###############################################################################
 ;                 Commit shortcuts                                             #
@@ -322,15 +323,15 @@
 ;                 Stash stuff                                                  #
 ;###############################################################################
 
-    sc = !git --no-pager stash clear
+    sc = stash clear
     sl = !git --no-pager stash list --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs'
 
 ;###############################################################################
 ;                 rev-parse shortcuts                                          #
 ;###############################################################################
 
-    dir = !git rev-parse --git-dir
-    top = !git rev-parse --show-toplevel
+    dir = rev-parse --git-dir
+    top = rev-parse --show-toplevel
 
 ;###############################################################################
 ;      SVN compatibility (I have to use this crap, hope no one else need it)   #
@@ -345,7 +346,7 @@
 ;###############################################################################
 
     ; TODO: Add new shell script to handle arguments in a single git-pr entry point
-    prl = "!gh pr list "
+    prl = "!gh pr list"
 
     ; NOTE: requires gum
     pro = "!f(){ \
@@ -419,7 +420,7 @@
     }; f"
 
     ; Find commits by commit message.
-    cm = "!f() { \
+    grep-cm = "!f() { \
         git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
     }; f"
 
