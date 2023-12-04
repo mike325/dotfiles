@@ -30,20 +30,19 @@ jobs:
 
         # FIX: Temporally fix as currently the latest tag does not have a release
         rm -f ~/.local/bin/shfmt
-        bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
-        source "$HOME/.gvm/scripts/gvm"
-        gvm install "$GO_VERSION" -B
-        gvm use "$GO_VERSION" --default
+        # bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+        # source "$HOME/.gvm/scripts/gvm"
+        # gvm install "$GO_VERSION" -B
+        # gvm use "$GO_VERSION" --default
         go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo "$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/" >> $GITHUB_PATH
+        echo "$HOME/go/bin/" >> $GITHUB_PATH
     - name: Stylua
       run: |
         stylua -s .
     - name: Shfmt
       run: |
-        source "$HOME/.gvm/scripts/gvm"
         shfmt -i 4 -s -ci -kp -w .
         shfmt -i 4 -s -ci -kp -w ./shell/zfunctions/*
     - uses: EndBug/add-and-commit@v4

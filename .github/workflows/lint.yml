@@ -40,13 +40,13 @@ jobs:
 
           sudo luarocks install luacheck
 
-          bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
-          source "$HOME/.gvm/scripts/gvm"
-          gvm install "$GO_VERSION" -B
-          gvm use "$GO_VERSION" --default
+          # bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+          # source "$HOME/.gvm/scripts/gvm"
+          # gvm install "$GO_VERSION" -B
+          # gvm use "$GO_VERSION" --default
           go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "$HOME/.gvm/pkgsets/$GO_VERSION/global/bin/" >> $GITHUB_PATH
+          echo "$HOME/go/bin/" >> $GITHUB_PATH
       - name: Linting source code
         uses: pre-commit/action@v2.0.3
