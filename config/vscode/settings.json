@@ -3,6 +3,7 @@
     "editor.fontFamily": "FiraCode NF, Menlo, Monaco, 'Courier New', monospace",
     "terminal.external.osxExec": "kitty.app",
     "telemetry.telemetryLevel": "crash",
+    "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.default.compilerPath": "clang++",
     "C_Cpp.loggingLevel": "Warning",
     "C_Cpp.clang_format_sortIncludes": true,
@@ -22,6 +23,13 @@
     "C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true,
     "C_Cpp.workspaceSymbols": "All",
     "C_Cpp.default.intelliSenseMode": "windows-clang-x64",
+    "clangd.arguments": [
+        "--background-index",
+        "--clang-tidy",
+        "--header-insertion=iwyu",
+        "--function-arg-placeholders",
+        "--completion-style=bundled"
+    ],
     "git.alwaysSignOff": true,
     "git.autofetch": true,
     "git.autoStash": true,
