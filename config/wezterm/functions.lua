@@ -8,7 +8,6 @@ end
 
 function M.get_active_window()
     local windows = wezterm.gui.gui_windows()
-    local win
     for _, win in ipairs(windows) do
         if win:is_focused() then
             return win

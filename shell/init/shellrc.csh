@@ -138,7 +138,7 @@ if ($?prompt) then
         source "$HOME/.config/shell/alias/alias.csh"
     endif
 
-    # # Load host settings (override general alias and funtions)
+    # # Load host settings (override general alias and functions
     if ( -f  "$HOME/.config/shell/host/settings.csh" ) then
         source "$HOME/.config/shell/host/settings.csh"
     endif

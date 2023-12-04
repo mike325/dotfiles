@@ -32,7 +32,7 @@ else
     neovim_path = sys.home .. '/.config/nvim/lua/'
 end
 
--- TODO: Find version "dinamically"
+-- TODO: Find version "dynamically"
 for _, complement in ipairs { 'lib', 'share' } do
     for _, base in ipairs(bases) do
         table.insert(paths, ('%s/%s/%s'):format(base, complement, 'lua/5.4/'))

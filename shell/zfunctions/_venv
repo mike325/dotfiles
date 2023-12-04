@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-# TODO: May shoud cache the version and clear cache once we deactivate/change virtual env
+# TODO: May should cache the version and clear cache once we deactivate/change virtual env
 if [[ -n $VIRTUAL_ENV ]]; then
     env_version="$(python --version | awk '{print $2}')"
     env_name="${VIRTUAL_ENV##*/}"

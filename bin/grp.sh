@@ -189,7 +189,7 @@ else
             error_msg "The given path doesn't exist"
         fi
 
-        # Retrun to the original dir
+        # Return to the original dir
         popd 1>/dev/null  || exit 1
 
     else

@@ -194,7 +194,7 @@ Usage:
 
         -h, --help      Display help, if you are seeing this, that means that you already know it (nice)
         -v, --verbose   Enable debug messages
-        --nolog         Disable log writting
+        --nolog         Disable log writing
         --nocolor       Disable color output
         -i  [TEXT]      Add TEXT to the clipboard using OSC52
         -               Read from the stdin and copy the content to the clipboard

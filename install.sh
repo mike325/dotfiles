@@ -25,7 +25,7 @@
 #            .`   github.com/mike325/dotfiles   `/
 
 # TODO: create a install.ps1 to install
-# - scoop and aditional buckets versions, extras and nerd-fonts
+# - scoop and additional buckets versions, extras and nerd-fonts
 # - chocolatey
 
 ALL=1
@@ -267,7 +267,7 @@ Usage:
             Default: https
 
         --url
-            Provie full git url (ex. https://gitlab.com/mike325), the new base user must have
+            Provide full git url (ex. https://gitlab.com/mike325), the new base user must have
             the following repos
                 - .vim
                 - .emacs.d
@@ -408,7 +408,7 @@ Usage:
             Default: on
 
         --nolog
-            Disable log writting
+            Disable log writing
 
             Default: off
 
@@ -547,14 +547,14 @@ function exit_append() {
 
 function clean_up() {
     verbose_msg "Cleaning up by interrupt"
-    verbose_msg "Cleanning up rg ${TMP}/rg.*" && rm -rf "${TMP}/rg.*" 2>/dev/null
-    verbose_msg "Cleanning up rg $TMP/ripgrep-*" && rm -rf "$TMP/ripgrep-*" 2>/dev/null
-    verbose_msg "Cleanning up fd ${TMP}/fd.*" && rm -rf "${TMP}/fd.*" 2>/dev/null
-    verbose_msg "Cleanning up fd $TMP/fd-*" && rm -rf "$TMP/fd-*" 2>/dev/null
-    verbose_msg "Cleanning up pip $TMP/get-pip.py" && rm -rf "$TMP/get-pip.py" 2>/dev/null
-    verbose_msg "Cleanning up shellcheck $TMP/shellcheck*" && rm -rf "$TMP/shellcheck*" 2>/dev/null
-    verbose_msg "Cleanning up ctags $TMP/ctags*" && rm -rf "$TMP/ctags*" 2>/dev/null
-    verbose_msg "Cleanning up nvim $TMP/nvim" && rm -rf "$TMP/nvim" 2>/dev/null
+    verbose_msg "Cleaning up rg ${TMP}/rg.*" && rm -rf "${TMP}/rg.*" 2>/dev/null
+    verbose_msg "Cleaning up rg $TMP/ripgrep-*" && rm -rf "$TMP/ripgrep-*" 2>/dev/null
+    verbose_msg "Cleaning up fd ${TMP}/fd.*" && rm -rf "${TMP}/fd.*" 2>/dev/null
+    verbose_msg "Cleaning up fd $TMP/fd-*" && rm -rf "$TMP/fd-*" 2>/dev/null
+    verbose_msg "Cleaning up pip $TMP/get-pip.py" && rm -rf "$TMP/get-pip.py" 2>/dev/null
+    verbose_msg "Cleaning up shellcheck $TMP/shellcheck*" && rm -rf "$TMP/shellcheck*" 2>/dev/null
+    verbose_msg "Cleaning up ctags $TMP/ctags*" && rm -rf "$TMP/ctags*" 2>/dev/null
+    verbose_msg "Cleaning up nvim $TMP/nvim" && rm -rf "$TMP/nvim" 2>/dev/null
     exit_append
     exit 1
 }
@@ -730,7 +730,6 @@ function setup_bin() {
         local scriptname="${script##*/}"
 
         local file_basename="${scriptname%%.*}"
-        # local file_extention="${scriptname##*.}"
 
         verbose_msg "Setup $script into $HOME/.local/bin/$file_basename"
         setup_config "$script" "$HOME/.local/bin/$file_basename"
@@ -751,7 +750,6 @@ function setup_dotconfigs() {
         local scriptname="${script##*/}"
 
         # local file_basename="${scriptname%%.*}"
-        # local file_extention="${scriptname##*.}"
 
         verbose_msg "Setup $script into $HOME/.${scriptname}"
         setup_config "$script" "$HOME/.${scriptname}"
@@ -925,7 +923,6 @@ function setup_git() {
             local scriptname="${script##*/}"
 
             local file_basename="${scriptname%%.*}"
-            # local file_extention="${scriptname##*.}"
 
             verbose_msg "Getting $hooks into ${SCRIPT_PATH}/.git/hooks/${hooks##*/}"
 
@@ -985,7 +982,7 @@ function get_nvim_dotfiles() {
             [[ $CMD == "ln -s" ]] && status_msg "Linking current vim dotfiles"
             [[ $CMD == "cp -rf" ]] && status_msg "Copying current vim dotfiles"
             if ! setup_config "$HOME/.vim" "$HOME/.config/nvim"; then
-                error_msg "Failed gettings dotvim files"
+                error_msg "Failed getting dotvim files"
                 return 1
             fi
         else
@@ -1019,8 +1016,8 @@ function _windows_portables() {
             unzip -o "$TMP/${pkg}" -d "$TMP/shellcheck-latest"
             chmod +x "$TMP/shellcheck-latest/shellcheck.exe"
             mv "$TMP/shellcheck-latest/shellcheck.exe" "$HOME/.local/bin/shellcheck.exe"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/shellcheck-latest" && rm -rf "$TMP/shellcheck-latest"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/shellcheck-latest" && rm -rf "$TMP/shellcheck-latest"
         else
             rst=1
         fi
@@ -1053,8 +1050,8 @@ function _windows_portables() {
                 chmod u+x "$TMP/bat-${version}-${os_type}/bat-${version}-${os_type}/bat.exe"
                 mv "$TMP/bat-${version}-${os_type}/bat-${version}-${os_type}/bat.exe" "$HOME/.local/bin/"
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1088,8 +1085,8 @@ function _windows_portables() {
                 chmod u+x "$TMP/delta-${version}-${os_type}/delta.exe"
                 mv "$TMP/delta-${version}-${os_type}/delta.exe" "$HOME/.local/bin/"
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1123,8 +1120,8 @@ function _windows_portables() {
                 chmod u+x "$TMP/ripgrep-${version}-${os_type}/rg.exe"
                 mv "$TMP/ripgrep-${version}-${os_type}/rg.exe" "$HOME/.local/bin/"
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1158,8 +1155,8 @@ function _windows_portables() {
                 chmod u+x "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/fd.exe"
                 mv "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/fd.exe" "$HOME/.local/bin/"
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/fd-${version}-${os_type}/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/fd-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1189,7 +1186,7 @@ function _windows_portables() {
             unzip -o "$TMP/${pkg}"
             chmod u+x "$TMP/texlab.exe"
             mv "$TMP/texlab.exe" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1253,7 +1250,7 @@ function _windows_portables() {
             if unzip -o "$TMP/${pkg}" -d "$TMP/"; then
                 if chmod u+x "$TMP/stylua.exe"; then
                     if ! mv "$TMP/stylua.exe" "$HOME/.local/bin/"; then
-                        error_msg "Faild to move stylua.exe to ~/.local/bin/"
+                        error_msg "Failed to move stylua.exe to ~/.local/bin/"
                         rst=1
                     fi
                 else
@@ -1264,7 +1261,7 @@ function _windows_portables() {
                 error_msg "Failed to extract ${TMP}/${pkg}"
                 rst=1
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1342,7 +1339,7 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/lazygit"
             mv "$TMP/lazygit" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1375,8 +1372,8 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/bat-${version}-${os_type}/bat"
             mv "$TMP/bat-${version}-${os_type}/bat" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/bat-${version}-${os_type}" && rm -rf "$TMP/bat-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1409,8 +1406,8 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/delta-${version}-${os_type}/delta"
             mv "$TMP/delta-${version}-${os_type}/delta" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1446,8 +1443,8 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/ripgrep-${version}-${os_type}/rg"
             mv "$TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1480,8 +1477,8 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/fd-${version}-${os_type}/fd"
             mv "$TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1506,8 +1503,8 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/shellcheck-latest/shellcheck"
             mv "$TMP/shellcheck-latest/shellcheck" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            verbose_msg "Cleanning up data $TMP/shellcheck-latest/" && rm -rf "$TMP/shellcheck-latest/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up data $TMP/shellcheck-latest/" && rm -rf "$TMP/shellcheck-latest/"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1539,7 +1536,7 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/texlab"
             mv "$TMP/texlab" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1626,7 +1623,7 @@ function _linux_portables() {
             verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
             chmod u+x "$TMP/gh_${version}_${os_type}/bin/gh"
             mv "$TMP/gh_${version}_${os_type}/bin/gh" "$HOME/.local/bin/"
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1708,7 +1705,7 @@ function _linux_portables() {
                 error_msg "Failed to unzip stylua"
                 rst=1
             fi
-            verbose_msg "Cleanning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             popd 1>/dev/null  || return 1
         else
             rst=1
@@ -1803,7 +1800,7 @@ function get_dotfiles() {
 function get_cool_fonts() {
     local github='https://github.com'
     if [[ -z $SSH_CONNECTION ]]; then
-        status_msg "Gettings powerline fonts"
+        status_msg "Getting powerline fonts"
         if clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"; then
             if is_windows; then
                 # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
@@ -1844,7 +1841,6 @@ function setup_systemd() {
                     local servicename="${service##*/}"
 
                     local file_basename="${servicename%%.*}"
-                    # local file_extention="${scriptname##*.}"
 
                     verbose_msg "Setup $service in $HOME/.config/systemd/user/${servicename}"
                     setup_config "${service}" "$HOME/.config/systemd/user/${servicename}"
@@ -2006,7 +2002,7 @@ function setup_pkgs() {
             filename=$(basename "$pkg")
             local cmdname="${filename%.pkg}"
             if ! hash "${cmdname}" 2>/dev/null; then
-                warn_msg "Skipping pacakges from ${filename}, ${cmdname} is not install or missing in the PATH"
+                warn_msg "Skipping packages from ${filename}, ${cmdname} is not install or missing in the PATH"
                 continue
             fi
             while IFS= read -r line; do
@@ -2240,7 +2236,7 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Package file $_result does not exists"
                 exit 1
             elif [[ ! $_result =~ \.pkg$ ]]; then
-                error_msg "$_result is not a valid package file, the file must have .pkg extention"
+                error_msg "$_result is not a valid package file, the file must have .pkg extension"
                 exit 1
             fi
             PKG_FILE="$_result"
@@ -2259,7 +2255,7 @@ while [[ $# -gt 0 ]]; do
                 error_msg "Package file $_result does not exists"
                 exit 1
             elif [[ ! $_result =~ \.pkg$ ]] || [[ ! -f "${SCRIPT_PATH}/packages/${OS}/${_result}.pkg" ]]; then
-                error_msg "$_result is not a valid package file, the file must have .pkg extention"
+                error_msg "$_result is not a valid package file, the file must have .pkg extension"
                 exit 1
             fi
             PKG_FILE="$_result"

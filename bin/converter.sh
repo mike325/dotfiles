@@ -159,13 +159,13 @@ reset_color="\033[39m"
 
 function help_user() {
     cat <<EOF
-Script to automate video convertion to h265/HEVC with 320k aac
+Script to automate video conversion to h265/HEVC with 320k aac
 
 Usage:
     $NAME [OPTIONAL]
 
     Optional Flags
-        --nolog                     Disable log writting
+        --nolog                     Disable log writing
         --nocolor                   Disable color output
         -v, --verbose               Enable debug messages
         -o PATH , --output PATH     Set output path
@@ -470,7 +470,7 @@ function convert_files() {
                 converter="ffmpeg -map_metadata 0 -map 0:v -map 0:a -map 0:d -hwaccel ${hwaccel} -hwaccel_output_format ${hwaccel} -init_hw_device vaapi=encoder:/dev/dri/renderD128 -rc_mode CQP -filter_hw_device encoder -hide_banner"
                 vconverter="-c:v ${hevc_encoder} -q:v ${quality} -profile:v main -tier high -level 186 "
             elif [[ $hwaccel == 'videotoolbox' ]]; then
-                # Since we are in a mac we can use the audiotoolkit to accelerate audio convertion
+                # Since we are in a mac we can use the audiotoolkit to accelerate audio conversion
                 converter="ffmpeg -hwaccel ${hwaccel} -hide_banner -map 0:v -map 0:a -map 0:d -map_metadata 0 "
                 vconverter="-c:v ${hevc_encoder} -vtag hvc1 -q:v ${quality} -profile:v main "
                 aconverter="-c:a aac_at -b:a 320k -ac 2"
@@ -581,7 +581,7 @@ function media_archive() {
     return 0
 }
 
-function start_convertion() {
+function start_conversion() {
     local _cmd='find'
 
     if hash fd 2>/dev/null; then
@@ -627,7 +627,7 @@ function clean_up() {
 verbose_msg "Using media path at ${MEDIA_PATH}"
 verbose_msg "Using archive path at ${ARCHIVE}"
 
-start_convertion
+start_conversion
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

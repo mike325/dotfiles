@@ -91,7 +91,7 @@ Usage:
         -f, --force     Force installation, remove all previous conflict files before installing
                         This flag is always disable by default
         -s, --shell     Force a shell install. Available: bash/bash-it and zsh/oh-my-zsh
-        --nolog         Disable log writting
+        --nolog         Disable log writing
         --nocolor       Disable color output
         -v, --verbose   Enable debug messages
         -h, --help      Display this help message

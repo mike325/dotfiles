@@ -193,23 +193,12 @@ Usage:
 
     Optional Flags
 
-        --nolog
-            Disable log writting
-
-        --nocolor
-            Disable color output
-
-        -r, --remove
-            Remove the selected worktree
-
-        -l, --list
-            List all available worktrees
-
-        -v, --verbose
-            Enable debug messages
-
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
+        --nolog         Disable log writing
+        --nocolor       Disable color output
+        -r, --remove    Remove the selected worktree
+        -l, --list      List all available worktrees
+        -v, --verbose   Enable debug messages
+        -h, --help      Display help, if you are seeing this, that means that you already know it (nice)
 EOF
 }
 
@@ -447,6 +436,8 @@ else
             ".projections.json"
             ".pre-commit-config.yaml"
             "pyproject.toml"
+            "reviewers.json"
+            "typos.toml"
         )
 
         status_msg "Copying project files"

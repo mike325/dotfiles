@@ -165,7 +165,7 @@ Usage:
                                 Just few systems are supported, Debian's family, Fedora's family and
                                 ArchLinux's family
 
-        --dev                   Use developement builds/portables instead of stable
+        --dev                   Use development builds/portables instead of stable
 
         --stable                Use stable builds/portables instead of stable
 
@@ -574,7 +574,7 @@ fi
 
 status_msg "Building neovim"
 verbose_msg "Building $BUILD_TYPE on $BRANCH"
-if make CMAKE_BUILD_TYPE="$BUILD_TYPE"; then
+if make CMAKE_BUILD_TYPE="$BUILD_TYPE" -j; then
     INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
     status_msg "Installing neovim into $INSTALL_DIR"
     if ! make  CMAKE_BUILD_TYPE="$BUILD_TYPE" CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install; then

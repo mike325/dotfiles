@@ -59,7 +59,7 @@ def _createLogger(
     filename: str = "dummy.log",
     name: str = "MainLogger",
 ):
-    """Creaters logging obj
+    """Creators logging obj
 
     stdout_level: int: logging level displayed into the terminal
     file_level: int: logging level saved into the logging file

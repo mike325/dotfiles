@@ -145,7 +145,7 @@ if [[ -f "$BASH_IT/bash_it.sh" ]]; then
     source "$BASH_IT/bash_it.sh"
 else
 
-    # TODO: May migrate this logic/function to python or go to improve perfomance and better handle output
+    # TODO: May migrate this logic/function to python or go to improve performance and better handle output
     __git_info() {
         if hash git 2>/dev/null; then
             local branch changes stash info
@@ -195,7 +195,7 @@ else
     }
 
     __venv() {
-        # TODO: May shoud cache the version and clear cache once we deactivate/change virtual env
+        # TODO: May should cache the version and clear cache once we deactivate/change virtual env
         if [[ -n $VIRTUAL_ENV ]]; then
             ENV_VERSION="$(python --version | awk '{print $2}')"
             export ENV_VERSION="${ENV_VERSION%% *}"

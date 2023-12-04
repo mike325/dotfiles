@@ -308,7 +308,7 @@ if [[ $- == *i* ]]; then
         source "$HOME/.config/shell/alias/alias.sh"
     fi
 
-    # Load host settings (override general alias and funtions)
+    # Load host settings (override general alias and functions)
     if [[ -f "$HOME/.config/shell/host/settings.sh" ]]; then
         # We already checked the file exists so its "safe"
         # shellcheck disable=SC1090,SC1091

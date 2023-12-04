@@ -28,7 +28,7 @@ if hash nvim 2>/dev/null; then
         TMUX_WINDOW="$(tmux display-message -p '#I')"
         export TMUX_WINDOW
     else
-        # TODO: Use shell TTY to separete neovim's socket sessions
+        # TODO: Use shell TTY to separate neovim's socket sessions
         export TMUX_WINDOW=""
     fi
 
@@ -804,7 +804,7 @@ function rl() {
 # Init original path with HOME dir
 ORIGINAL_PATH="$(pwd)"
 
-# Move to the realpath version of the curren working dir
+# Move to the realpath version of the current working dir
 function crp() {
     # Save the current path
     ORIGINAL_PATH="$(pwd)"
