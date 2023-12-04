@@ -136,7 +136,7 @@ else
 end
 
 return {
-    color_scheme = "Catppuccin Mocha", -- or Macchiato, Frappe, Latte
+    color_scheme = 'Catppuccin Mocha', -- or Macchiato, Frappe, Latte
     disable_default_key_bindings = true,
     launch_menu = launch_menu,
     default_prog = default_prog,

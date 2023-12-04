@@ -319,7 +319,7 @@ fkill() {
     local filter
     if hash fzf 2>/dev/null; then
         filter="$fzf_filter"
-    elif hash gum 2>/dev/null ; then
+    elif hash gum 2>/dev/null; then
         filter="$gum_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
@@ -345,7 +345,7 @@ plist() {
     local filter
     if hash fzf 2>/dev/null; then
         filter="$fzf_filter"
-    elif hash gum 2>/dev/null ; then
+    elif hash gum 2>/dev/null; then
         filter="$gum_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
@@ -372,7 +372,7 @@ if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
         local filter
         if hash fzf 2>/dev/null; then
             filter="$fzf_filter"
-        elif hash gum 2>/dev/null ; then
+        elif hash gum 2>/dev/null; then
             filter="$gum_filter"
         else
             error_msg "Missing fzf and gum, cannot continue"

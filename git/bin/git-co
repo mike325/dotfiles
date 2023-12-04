@@ -363,7 +363,7 @@ checkout() {
     local filter
     if hash fzf 2>/dev/null; then
         filter="$fzf_filter"
-    elif hash gum 2>/dev/null ; then
+    elif hash gum 2>/dev/null; then
         filter="$gum_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"

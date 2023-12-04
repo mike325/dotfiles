@@ -567,7 +567,7 @@ else
     BRANCH="$current_branch"
 fi
 
-if [[ ! "$BRANCH" == "$current_branch" ]]; then
+if [[ $BRANCH != "$current_branch"     ]]; then
     status_msg "Checking out to $BRANCH"
     git checkout "$BRANCH"
 fi
