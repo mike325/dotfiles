@@ -26,7 +26,7 @@ NAME="${NAME##*/}"
 URL="https://github.com/neovim/neovim"
 PYTHON_LIBS=0
 RUBY_LIBS=0
-BUILD_LIBS=0
+# BUILD_LIBS=0
 CLONE=0
 FORCE_INSTALL=0
 PORTABLE=0
@@ -160,10 +160,6 @@ Usage:
         -r, --ruby              Install Neovim's ruby package
 
         -f, --force             Ignore errors and warnings and force compilation
-
-        -b, --build             Install all dependencies of the before build neovim's source code
-                                Just few systems are supported, Debian's family, Fedora's family and
-                                ArchLinux's family
 
         --dev                   Use development builds/portables instead of stable
 
@@ -495,9 +491,9 @@ while [[ $# -gt 0 ]]; do
         -r | --ruby)
             RUBY_LIBS=1
             ;;
-        -b | --build)
-            BUILD_LIBS=1
-            ;;
+        # -b | --build)
+        #     BUILD_LIBS=1
+        #     ;;
         -v | --verbose)
             VERBOSE=1
             ;;

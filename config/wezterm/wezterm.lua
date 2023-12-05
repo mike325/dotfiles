@@ -1,12 +1,12 @@
 if not unpack then
-    _G['unpack'] = _G['table'].unpack
+    _G['unpack'] = _G['table'].unpack -- stylua: ignore
 end
 
 require 'patch_runtime'
 
 local wezterm = require 'wezterm'
 local sys = require 'sys'
-local str = require 'utils.strings'
+-- local str = require 'utils.strings'
 require 'globals'
 require 'events'
 
@@ -153,7 +153,6 @@ return {
         'Symbols Nerd Font Mono',
         'Last Resort High-Efficiency',
     },
-    color_scheme = 'tokyonight',
     window_background_opacity = 0.9,
     scrollback_lines = 10000,
     -- TODO: Dynamic check for DPi?

@@ -14,11 +14,13 @@ readline = None
 
 try:
     import pyreadline
+
     readline = pyreadline
 except ImportError:
     try:
         import readline as _readline
-        import rlcompleter
+        import rlcompleter # noqa
+
         readline = _readline
     except ImportError:
         print("Error importing readline and pyreadline modules")
