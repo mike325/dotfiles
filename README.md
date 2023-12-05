@@ -1,11 +1,11 @@
 # Dotfiles
 
 <!-- [![Travis Status](https://travis-ci.com/Mike325/dotfiles.svg?branch=master)](https://travis-ci.com/Mike325/dotfiles)-->
-[![Github Status](https://github.com/Mike325/dotfiles/workflows/dotfiles/badge.svg)](https://github.com/Mike325/dotfiles/actions)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![dotfiles](https://github.com/mike325/dotfiles/actions/workflows/main.yml/badge.svg)](https://github.com/mike325/dotfiles/actions/workflows/main.yml)
+[![lint](https://github.com/mike325/dotfiles/actions/workflows/lint.yml/badge.svg)](https://github.com/mike325/dotfiles/actions/workflows/lint.yml)
 
 Here are most of my dotfiles. Since my Vim settings are quite big, I prefer to
-have them in a different [repo](https://github.com/mike325/.vim),
+have them in a different [repo](https://github.com/mike325/nvim),
 Same goes for my Emacs settings [here](https://github.com/mike325/.emacs.d)
 
 Feel free to make comments about my configuration and of course take anything
