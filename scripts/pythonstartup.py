@@ -19,7 +19,7 @@ try:
 except ImportError:
     try:
         import readline as _readline
-        import rlcompleter # noqa
+        import rlcompleter  # noqa
 
         readline = _readline
     except ImportError:

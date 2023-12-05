@@ -1,5 +1,5 @@
-if not unpack then
-    _G['unpack'] = _G['table'].unpack -- stylua: ignore
+if not _G['unpack'] then
+    _G['unpack'] = _G['table'].unpack
 end
 
 require 'patch_runtime'
