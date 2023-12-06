@@ -83,6 +83,8 @@ if hash nvim 2>/dev/null; then
     alias bim="nvim"
     alias cim="nvim"
     alias im="nvim"
+    export MANPAGER='nvim --clean --cmd "set fileencoding=utf-8" -u "$HOME/.config/nvim/man.lua" +Man!'
+    # export MANPAGER='nvim --cmd "let g:minimal=v:true" +Man!'
 
 else
     export EDITOR="vim"
