@@ -554,7 +554,7 @@ make clean
 BUILD_TYPE="Release"
 
 current_branch="$(git branch --show-current)"
-if [[ -z $current_branch   ]]; then
+if [[ -z $current_branch ]]; then
     current_branch="$(git rev-parse HEAD)"
 fi
 

@@ -1138,10 +1138,10 @@ function _windows_portables() {
         local url="${github}/sharkdp/fd"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$( curl -Ls ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | tail -n 1)"
         else
             # shellcheck disable=SC2155
-            local version="$( wget -qO- ${url}/tags | grep -oE 'v[0-9]\.[0-9]\.[0-9]$' | sort -u | tail -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | tail -n 1)"
         fi
         status_msg "Downloading fd version: ${version}"
         local os_type="${ARCH}-pc-windows-gnu"
