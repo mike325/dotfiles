@@ -554,6 +554,10 @@ make clean
 BUILD_TYPE="Release"
 
 current_branch="$(git branch --show-current)"
+if [[ -z "$current_branch" ]]; then
+    current_branch="$(git rev-parse HEAD)"
+fi
+
 if [[ $STABLE -eq 1 ]]; then
     BRANCH="${BRANCH:-$(git tag | sort -h | tail -1)}"
 elif [[ $DEV -eq 1 ]]; then
@@ -563,7 +567,7 @@ else
     BRANCH="$current_branch"
 fi
 
-if [[ $BRANCH != "$current_branch"     ]]; then
+if [[ $BRANCH != "$current_branch" ]]; then
     status_msg "Checking out to $BRANCH"
     git checkout "$BRANCH"
 fi
