@@ -357,14 +357,14 @@ verbose_msg "OS            : ${OS}"
 
 # TODO: Add commit log as preview
 checkout() {
-    local gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select branch"'
+    local gum_filter='gum filter --fuzzy --height=20 --width=0 --limit=1 --header "Select branch"'
     local fzf_filter='fzf --select-1 --exit-0  --height=60%'
 
     local filter
-    if hash fzf 2>/dev/null; then
-        filter="$fzf_filter"
-    elif hash gum 2>/dev/null; then
+    if hash gum 2>/dev/null; then
         filter="$gum_filter"
+    elif hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
         return 1
