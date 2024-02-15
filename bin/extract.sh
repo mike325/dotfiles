@@ -311,7 +311,6 @@ function exit_append() {
     return 0
 }
 
-
 for key in "$@"; do
     case "$key" in
         -h | --help)
@@ -359,7 +358,7 @@ function get_decompress_cmd() {
 
 while [[ $# -gt 0 ]]; do
     filename="$1"
-    if [[ -f "$filename" ]]; then
+    if [[ -f $filename   ]]; then
         if hash ouch 2>/dev/null; then
             if ! ouch decompress "$filename"; then
                 warn_msg "Failed to use ouch, falling back to extraction()"
