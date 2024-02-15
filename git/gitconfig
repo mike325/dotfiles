@@ -347,9 +347,25 @@
     prl = "!gh pr list"
 
     ; NOTE: requires gum
-    pro = "!f(){ \
+    prco = "!f(){ \
         local pr=\"$(gh pr list | cut -f1,2 | gum filter --fuzzy --limit=1 --height=20 --header='Select PR' | cut -f1)\"; \
         [[ -n $pr ]] && gh pr checkout \"$pr\"; \
+    }; f"
+
+    ; NOTE: requires nvim and gh
+    pro = "!f(){ \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.open_pr()\" +q; \
+    }; f"
+
+    prr = "!f(){ \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.pr_ready(true)\" +q && \
+        gh pr view; \
+    }; f"
+
+    prp = "!f(){ \
+        git push --set-upstream ${1:-origin} $(git branch --show-current) && \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.create_pr()\" +q && \
+        gh pr view; \
     }; f"
 
 ;###############################################################################

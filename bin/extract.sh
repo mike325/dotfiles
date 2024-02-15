@@ -1,35 +1,162 @@
 #!/usr/bin/env bash
 
-#   Author: Credit: http://nparikh.org/notes/zshrc.txt
-#   Description: Extract any given number of compressed files
 #
-#                                     -`
-#                     ...            .o+`
-#                  .+++s+   .h`.    `ooo/
-#                 `+++%++  .h+++   `+oooo:
-#                 +++o+++ .hhs++. `+oooooo:
-#                 +s%%so%.hohhoo'  'oooooo+:
-#                 `+ooohs+h+sh++`/:  ++oooo+:
-#                  hh+o+hoso+h+`/++++.+++++++:
-#                   `+h+++h.+ `/++++++++++++++:
-#                            `/+++ooooooooooooo/`
-#                           ./ooosssso++osssssso+`
-#                          .oossssso-````/osssss::`
-#                         -osssssso.      :ssss``to.
-#                        :osssssss/  Mike  osssl   +
-#                       /ossssssss/   8a   +sssslb
-#                     `/ossssso+/:-        -:/+ossss'.-
-#                    `+sso+:-`                 `.-/+oso:
-#                   `++:.                           `-/+/
-#                   .`   github.com/mike325/dotfiles   `/
+#                              -`
+#              ...            .o+`
+#           .+++s+   .h`.    `ooo/
+#          `+++%++  .h+++   `+oooo:
+#          +++o+++ .hhs++. `+oooooo:
+#          +s%%so%.hohhoo'  'oooooo+:
+#          `+ooohs+h+sh++`/:  ++oooo+:
+#           hh+o+hoso+h+`/++++.+++++++:
+#            `+h+++h.+ `/++++++++++++++:
+#                     `/+++ooooooooooooo/`
+#                    ./ooosssso++osssssso+`
+#                   .oossssso-````/osssss::`
+#                  -osssssso.      :ssss``to.
+#                 :osssssss/  Mike  osssl   +
+#                /ossssssss/   8a   +sssslb
+#              `/ossssso+/:-        -:/+ossss'.-
+#             `+sso+:-`                 `.-/+oso:
+#            `++:.                           `-/+/
+#            .`                                 `/
+
+VERBOSE=0
+NOCOLOR=0
+NOLOG=1
+WARN_COUNT=0
+ERR_COUNT=0
+# FROM_STDIN=()
 
 NAME="$0"
 NAME="${NAME##*/}"
 LOG="${NAME%%.*}.log"
-WARN_COUNT=0
-ERR_COUNT=0
-NOCOLOR=0
-NOLOG=0
+
+SCRIPT_PATH="$0"
+
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
+
+OS='unknown'
+ARCH="$(uname -m)"
+
+trap '{ exit_append; }' EXIT
+
+if hash realpath 2>/dev/null; then
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
+else
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
+    SCRIPT_PATH="$(pwd -P)"
+    popd 1>/dev/null  || exit 1
+fi
+
+if [[ -n $ZSH_NAME ]]; then
+    CURRENT_SHELL="zsh"
+elif [[ -n $BASH ]]; then
+    CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    if [[ -z $CURRENT_SHELL ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
+
+if [ -z "$SHELL_PLATFORM" ]; then
+    if [[ -n $TRAVIS_OS_NAME ]]; then
+        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
+    else
+        case "$OSTYPE" in
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
+        esac
+    fi
+fi
+
+case "$SHELL_PLATFORM" in
+    # TODO: support more linux distros
+    linux)
+        if [[ -f /etc/arch-release ]]; then
+            OS='arch'
+        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+            OS='ubuntu'
+        elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
+            if [[ $ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+                OS='raspbian'
+            else
+                OS='debian'
+            fi
+        fi
+        ;;
+    cygwin | msys | windows)
+        OS='windows'
+        ;;
+    osx)
+        OS='macos'
+        ;;
+    bsd)
+        OS='bsd'
+        ;;
+esac
+
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_wls 2>/dev/null; then
+    function is_wls() {
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_osx 2>/dev/null; then
+    function is_osx() {
+        if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if hash is_root 2>/dev/null; then
+    function is_root() {
+        if ! is_windows && [[ $EUID -eq 0 ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if hash has_sudo 2>/dev/null; then
+    function has_sudo() {
+        if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_64bits 2>/dev/null; then
+    function is_64bits() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
 
 # colors
 # shellcheck disable=SC2034
@@ -57,26 +184,17 @@ reset_color="\033[39m"
 
 function help_user() {
     cat <<EOF
-
 Description:
     Extract any given number of compressed files
 
 Usage:
     $NAME FILE(S) [OPTIONAL]
         Ex.
-        $NAME file.zip stuff.tar foo.rar
+            $NAME file.zip stuff.tar foo.rar
 
-Optional Flags
-    -h, --help  Display this help message
+    Optional Flags
+        -h, --help      Display this help message
 EOF
-}
-
-function extraction() {
-    local filename="$1"
-    local cmd="$2"
-
-    echo "[*] Extracting $filename"
-    sh -c "$cmd $filename 1> /dev/null"
 }
 
 function warn_msg() {
@@ -135,6 +253,65 @@ function verbose_msg() {
     return 0
 }
 
+function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
+    fi
+
+    local flag="$2"
+    local value="$1"
+
+    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
+
+    if [[ -n $3   ]]; then
+        local pattern="^--${flag}=$3$"
+    fi
+
+    if [[ $value =~ $pattern ]]; then
+        local left_side="${value#*=}"
+        echo "${left_side/#\~/$HOME}"
+    else
+        echo "$value"
+    fi
+}
+
+function initlog() {
+    if [[ $NOLOG -eq 0 ]]; then
+        [[ -n $LOG ]] && rm -f "${LOG}" 2>/dev/null
+        if ! touch "${LOG}" &>/dev/null; then
+            error_msg "Fail to init log file"
+            NOLOG=1
+            return 1
+        fi
+        if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${SCRIPT_PATH}/shell/banner" >"${LOG}"
+        fi
+        if ! is_osx; then
+            LOG=$(readlink -e "${LOG}")
+        fi
+        verbose_msg "Using log at ${LOG}"
+    fi
+    return 0
+}
+
+function exit_append() {
+    if [[ $NOLOG -eq 0 ]]; then
+        if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >>"${LOG}"
+        fi
+
+        if [[ $WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
+        fi
+        if [[ $ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t%s\n" "$ERR_COUNT" >>"${LOG}"
+        fi
+    fi
+    return 0
+}
+
+
 for key in "$@"; do
     case "$key" in
         -h | --help)
@@ -144,30 +321,64 @@ for key in "$@"; do
     esac
 done
 
-error_code=0
+initlog
+verbose_msg "Log Disable   : ${NOLOG}"
+verbose_msg "Current Shell : ${CURRENT_SHELL}"
+verbose_msg "Platform      : ${SHELL_PLATFORM}"
+verbose_msg "Architecture  : ${ARCH}"
+verbose_msg "OS            : ${OS}"
+
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
+
+function extraction() {
+    local filename="$1"
+    local cmd="$2"
+
+    echo "[*] Extracting $filename"
+    sh -c "$cmd $filename 1> /dev/null"
+}
+
+function get_decompress_cmd() {
+    local filename="$1"
+    case "$filename" in
+        *.tar | *.tar.*) extraction "$filename" "tar -xf" ;;
+        *.zip | *.ZIP)   extraction "$filename" "unzip" ;;
+        *.pax.Z)         extraction "$filename" "uncompress" ;;
+        *.bz2)           extraction "$filename" "bunzip2" ;;
+        *.dmg)           extraction "$filename" "hdiutil mount" ;;
+        *.pax)           extraction "$filename" "cat" ;;
+        *.rar)           extraction "$filename" "unrar x" ;;
+        *.7z)            extraction "$filename" "7z x" ;;
+        *.gz)            extraction "$filename" "gunzip" ;;
+        *.Z)             extraction "$filename" "uncompress" ;;
+        *) error_msg "'$filename' could not be extract" ;;
+    esac
+}
 
 while [[ $# -gt 0 ]]; do
     filename="$1"
-
-    if [[ -f $filename ]]; then
-        case "$filename" in
-            *.tar | *.tar.*) extraction "$filename" "tar -xf" ;;
-            *.zip | *.ZIP) extraction "$filename" "unzip" ;;
-            *.pax.Z)       extraction "$filename" "uncompress" ;;
-            *.bz2)         extraction "$filename" "bunzip2" ;;
-            *.dmg)         extraction "$filename" "hdiutil mount" ;;
-            *.pax)         extraction "$filename" "cat" ;;
-            *.rar)         extraction "$filename" "unrar x" ;;
-            *.7z)          extraction "$filename" "7z x" ;;
-            *.gz)          extraction "$filename" "gunzip" ;;
-            *.Z)           extraction "$filename" "uncompress" ;;
-            *) echo " ---- [X] Error '$filename' cannot be extracted/mounted via extract()" ;;
-        esac
+    if [[ -f "$filename" ]]; then
+        if hash ouch 2>/dev/null; then
+            if ! ouch decompress "$filename"; then
+                warn_msg "Failed to use ouch, falling back to extraction()"
+                get_decompress_cmd "$filename"
+            fi
+        else
+            get_decompress_cmd "$filename"
+        fi
     else
         error_msg "'$filename' is not a valid file"
-        error_code=1
     fi
     shift
 done
 
-exit $error_code
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
+if [[ $ERR_COUNT -gt 0 ]]; then
+    exit 1
+fi
+
+exit 0
