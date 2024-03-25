@@ -1,8 +1,11 @@
 {
-    "editor.renderWhitespace": "trailing",
-    "editor.fontFamily": "FiraCode NF, Menlo, Monaco, 'Courier New', monospace",
-    "terminal.external.osxExec": "kitty.app",
     "telemetry.telemetryLevel": "crash",
+    "editor.fontFamily": "FiraCode NF, Menlo, Monaco, 'Courier New', monospace",
+    "editor.fontSize": 12,
+    "editor.fontLigatures": true,
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "trailing",
+    "terminal.external.osxExec": "kitty.app",
     "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.default.compilerPath": "clang++",
     "C_Cpp.loggingLevel": "Warning",
@@ -28,7 +31,8 @@
         "--clang-tidy",
         "--header-insertion=iwyu",
         "--function-arg-placeholders",
-        "--completion-style=bundled"
+        "--completion-style=bundled",
+        "--log=error"
     ],
     "git.alwaysSignOff": true,
     "git.autofetch": true,
@@ -283,8 +287,5 @@
                 "preLaunchTask": "unix g++ build"
             }
         ]
-    },
-    "editor.fontSize": 12,
-    "editor.fontLigatures": true,
-    "editor.minimap.enabled": false
+    }
 }

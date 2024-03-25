@@ -191,7 +191,13 @@ bindkey '^[[Z' undo # Shift+tab undo last action
 # bind k and j for VI mode
 bindkey -M vicmd 'k' history-beginning-search-backward
 bindkey -M vicmd 'j' history-substring-search-down
+bindkey -M vicmd 'L' clear-screen
 
 bindkey -s '^a' 'tmux attach 2>/dev/null || tmux new -s main\n'
 bindkey 'jj' vi-cmd-mode
 bindkey -M viins 'jj' vi-cmd-mode
+
+if hash fzf 2>/dev/null; then
+    [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
+    bindkey -v
+fi

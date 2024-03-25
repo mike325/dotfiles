@@ -72,7 +72,6 @@ if  [ "$#" -eq 0 ]; then
     gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select language"'
     fzf_filter='fzf --multi --ansi --exit-0  --height=60%'
 
-    filter
     if hash fzf 2>/dev/null; then
         filter="$fzf_filter"
     elif hash gum 2>/dev/null; then

@@ -48,6 +48,12 @@
 [diff]
     colorMoved = default
 
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
 [user]
     name = Mike
     email = mickiller.25@gmail.com
@@ -248,7 +254,8 @@
 
     o  = checkout       ; checkout shortcut
     or = checkout --    ; Reset the changes in a given file
-    olt = "!f() { git checkout $(git tag | sort -h | uniq | tail -n1); }; f"
+
+    olt = "!f() { git checkout $(git tag | sort -h | uniq | tail -n1); }; f" ; checkout to last tag
 
 ;###############################################################################
 ;                 Switch
@@ -381,23 +388,22 @@
     ; Create a stash of the current changes and then reapply them
     snapshot = !git stash push --keep-index --message "snapshot: $(date)" && git stash apply --index "stash@{0}"
 
-    ; Auto create tags files and place it in .git dir Credits to Tpope
-    ctags = "!f() {\
-        if [ -f .git ] || [ -d .git ]; then\
-            dir=$( git rev-parse --git-dir ) ; \
-            if [ -f .git ]; then \
-                ${dir}/../../hooks/ctags ;\
-            else \
-                ${dir}/hooks/ctags; \
-            fi ;\
-        else \
-            git init && .git/hooks/ctags ;\
-        fi;\
-    }; f"
+    ; Apply, pop or drop a specific stash
+    sw  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{${1:-0}}; }; f"
+    sa  = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
+    sp  = "!f(){ git --no-pager stash pop --index stash@{${1:-0}}; }; f"
+    spf = "!f(){ git stash show -p stash@{${1:-0}} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
+    sd  = "!f(){ git --no-pager stash drop stash@{${1:-0}}; }; f"
+    ss  = "!f(){ git --no-pager stash save $1; }; f"
 
-    np  = "!f() { git --no-pager $@; }; f"
-    npc = "!f() { git --no-pager $@ --color; }; f"
+    ; Manage last stash
+    swl  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    sal  = "!f(){ git --no-pager stash apply --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    spl  = "!f(){ git --no-pager stash pop --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    splf = "!f(){ git --no-pager stash show -p stash@{$(($(git stash list | wc -l) - 1))} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
+    sdl  = "!f(){ git --no-pager stash drop stash@{$(($(git stash list | wc -l) - 1))}; }; f"
 
+    # Convert a git repo into a bare git folder, to pull and push changes from
     norm2bare = "!f() { mv .git .. && rm -rf * && mv ../.git . && mv .git/* . && rm -rf .git && git config --local --bool core.bare true; }; f"
 
     ; Update just one file form specific remote
@@ -411,6 +417,28 @@
 
     ; Undo any given number of commits
     ulc  = "!f(){ git reset --soft HEAD~${1}; }; f"
+
+    ; --------- Below here credits to https://github.com/alrra/dotfiles ---------
+    ; Remove the tag with the specified tag name if exists and tag the latest
+    ; commit with that name.
+    retag = "!f() { git tag -d $1 &> /dev/null; git tag $1; }; f"
+
+    ; Find commits by commit message.
+    grep-cm = "!f() { git log --pretty=custom --decorate --date=short --grep=\"$1\"; }; f"
+
+    ; Auto create tags files and place it in .git dir Credits to Tpope
+    ctags = "!f() {\
+        if [ -f .git ] || [ -d .git ]; then\
+            dir=$( git rev-parse --git-dir ) ; \
+            if [ -f .git ]; then \
+                ${dir}/../../hooks/ctags ;\
+            else \
+                ${dir}/hooks/ctags; \
+            fi ;\
+        else \
+            git init && .git/hooks/ctags ;\
+        fi;\
+    }; f"
 
     ; Gum / Fuzzy integrations
     bd  = "!f(){ \
@@ -429,34 +457,6 @@
             local branch=$(git branch | cut -d' ' -f2,3 | awk '{$1=$1;print}' | gum filter --fuzzy --limit=1 --height=20 --header='Force Delete Branch'); \
             [[ -n $branch ]] && git branch -D "$branch";\
         fi ;\
-    }; f"
-
-    ; Apply, pop or drop a specific stash
-    sw  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{${1:-0}}; }; f"
-    sa  = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
-    sp  = "!f(){ git --no-pager stash pop --index stash@{${1:-0}}; }; f"
-    spf = "!f(){ git stash show -p stash@{${1:-0}} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
-    sd  = "!f(){ git --no-pager stash drop stash@{${1:-0}}; }; f"
-    ss  = "!f(){ git --no-pager stash save $1; }; f"
-
-    ; manage last stash
-    swl  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{$(($(git stash list | wc -l) - 1))}; }; f"
-    sal  = "!f(){ git --no-pager stash apply --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
-    spl  = "!f(){ git --no-pager stash pop --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
-    splf = "!f(){ git --no-pager stash show -p stash@{$(($(git stash list | wc -l) - 1))} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
-    sdl  = "!f(){ git --no-pager stash drop stash@{$(($(git stash list | wc -l) - 1))}; }; f"
-
-    ; --------- Below here credits to https://github.com/alrra/dotfiles ---------
-    ; Remove the tag with the specified tag name if exists and tag the latest
-    ; commit with that name.
-    retag = "!f() { \
-        git tag -d $1 &> /dev/null; \
-        git tag $1; \
-    }; f"
-
-    ; Find commits by commit message.
-    grep-cm = "!f() { \
-        git log --pretty=custom --decorate --date=short --grep=\"$1\"; \
     }; f"
 
 [pretty]
