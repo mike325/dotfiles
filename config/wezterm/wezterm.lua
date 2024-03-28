@@ -89,7 +89,7 @@ local keys = {
 }
 
 for i = 1, 8 do
-    -- CTRL+ALT + number to activate that tab
+    -- CTRL+\\ + number to activate that tab
     table.insert(keys, {
         key = tostring(i),
         mods = 'LEADER',
@@ -136,7 +136,7 @@ else
 end
 
 return {
-    color_scheme = 'Catppuccin Mocha', -- or Macchiato, Frappe, Latte
+    color_scheme = 'Wez (Gogh)',
     disable_default_key_bindings = true,
     launch_menu = launch_menu,
     default_prog = default_prog,
@@ -153,6 +153,7 @@ return {
         'Symbols Nerd Font Mono',
         'Last Resort High-Efficiency',
     },
+    notification_handling = "AlwaysShow",
     window_background_opacity = 0.9,
     scrollback_lines = 10000,
     -- TODO: Dynamic check for DPi?
