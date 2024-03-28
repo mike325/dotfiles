@@ -153,7 +153,7 @@ return {
         'Symbols Nerd Font Mono',
         'Last Resort High-Efficiency',
     },
-    notification_handling = "AlwaysShow",
+    notification_handling = 'AlwaysShow',
     window_background_opacity = 0.9,
     scrollback_lines = 10000,
     -- TODO: Dynamic check for DPi?
