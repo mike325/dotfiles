@@ -25,16 +25,17 @@ sl
 vim-nox
 neovim
 unzip
-# python-pip
 python3-pip
-# docker
 shellcheck
 ntfs-3g
 davfs2
 libssl-dev
-# btrfs-tools  # TODO: Need to check this package
+initramfs-tools
 exfat-fuse
-exfat-utils
+btrfs-progs
+btrbk
+zfs-dkms
+zfsutils-linux
 nfs-common
 apt-transport-https
 ca-certificates
@@ -54,6 +55,7 @@ automake
 pkg-config
 luarocks
 smartmontools
+apparmor-utils
 network-manager
 samba
 pv
