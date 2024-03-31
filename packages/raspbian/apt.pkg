@@ -1,4 +1,5 @@
 sudo apt install -y
+raspberrypi-kernel-headers
 ripgrep
 fd-find
 ufw
@@ -32,6 +33,8 @@ libssl-dev
 btrfs-tools
 exfat-fuse
 exfat-utils
+zfs-dkms
+zfsutils-linux
 nfs-common
 apt-transport-https
 ca-certificates
