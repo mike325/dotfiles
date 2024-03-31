@@ -242,191 +242,87 @@ Usage:
     $NAME [OPTIONS]
 
     Optional Flags
-        --host
-            Change default git host, the new host (ex. gitlab.com) must have the following repos
-                - .vim
-                - .emacs.d
-                - dotfiles
+        --url <URL>             Provide full git url (ex. https://gitlab.com/mike325),
+                                the new base user must have the following repos
+                                    - nvim
+                                    - .emacs.d
+                                    - dotfiles
 
-            Default: github.com
+        --backup                Backup all existing files into $HOME/.local/backup or the provided dir
+                                NOTE: Backup will be auto activated if windows is running or '-c/--copy' flag is used
+                                    Default: off in linux on in windows
 
-        --user
-            Change default git user, the new user (ex. mike325) must have the following repos
-                - .vim
-                - .emacs.d
-                - dotfiles
+        -f, --force             Force installation, remove all previous conflict files before installing
+                                This flag is always disable by default
 
-            Default: mike325
+        --shell_scripts         Install some bash/zsh shell scripts like:
+                                    - tmux tpm
+                                    - z.sh
+                                    - neofetch
+                                Current shell:   $CURRENT_SHELL
 
-        -p, --protocol
-            Alternate between different git protocol
-                - https (default)
-                - ssh
-                - git (not tested)
+        -c, --copy              By default all dotfiles are linked using 'ln -s' command, this flag change
+                                the command to 'cp -rf' this way you can remove the folder after installation
+                                but you need to re-download the files each time you want to update the files
+                                    - Ignored option in Windows platform
+                                    - WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
 
-            Default: https
+        -s, --shell             Installs:
+                                    - Shell alias in $HOME/.config/shell
+                                    - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
+                                    - Everything inside ./dotconfigs into $HOME
+                                    - Everything inside ./config/ into ${XDG_CONFIG_HOME:-$HOME/.config/} in unix or ~/AppData/Local/ in windows
+                                    - Python startup script in $HOME/.local/lib/
 
-        --url
-            Provide full git url (ex. https://gitlab.com/mike325), the new base user must have
-            the following repos
-                - .vim
-                - .emacs.d
-                - dotfiles
+        -d, --dotfiles          Download my dotfiles repo in case, this options is meant to be used in case this
+                                script is standalone executed
+                                    Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/dotfiles
 
-            Default: https://$GIT_HOST/$GIT_USER
+        -e, --emacs             Download and install my evil Emacs dotfiles
+                                    Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/.emacs.d
 
-        --backup,
-            Backup all existing files into $HOME/.local/backup or the provided dir
-            ----    Backup will be auto activated if windows is running or '-c/--copy' flag is used
+        -n, --neovim [TYPE]     Download Neovim executable (portable in windows and linux) if it hasn't been Installed
+                                Download and install my Vim dotfiles in Neovim's dir.
+                                Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag) them,
+                                otherwise download them from vim's dotfiles repo
+                                    Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/.vim
+                                TYPE can be either'stable', 'dev' or dotfiles (no binary install)
 
-            Default: off in linux on in windows
+        -b, --bin               Install shell functions and scripts in $HOME/.local/bin
 
-        -f, --force
-            Force installation, remove all previous conflict files before installing
-            This flag is always disable by default
+        -g, --git               Install git configurations into $HOME/.config/git and $HOME/.gitconfig
 
-            Default: off
+        -t, --portables         Install isolated/portable programs into $HOME/.local/bin
+                                    - neovim            - shellcheck
+                                    - texlab            - fd
+                                    - ripgrep           - pip2 and pip3
+                                    - fzf (Linux only)  - jq (Linux only)
 
-        --shell_scripts
-            Install some bash/zsh shell scripts like:
-                - tmux tpm
-                - z.sh
-                - neofetch
-            Current shell:   $CURRENT_SHELL
+        --fonts, --powerline    Install the powerline patched fonts
+                                    - Since the patched fonts have different install method for Windows
+                                    they are just download
+                                    - This options is ignored if the install script is executed in a SSH session
 
-            Default: on
+        --python                If no version is given install python2 and python3 dependencies from:
+                                    - ./packages/${OS}/python2 - ./packages/${OS}/python3
 
-        -w, --shell_frameworks, --shell_frameworks=SHELL
-            Install shell frameworks, bash-it or oh-my-zsh according to the current shell
-            Current shell:   $CURRENT_SHELL
-            If SHELL is given then force install SHELL framework (bash or zsh)
+        --pkgs, --packages, --packages PKG_FILE [--only]
+                                Install all .pkg files from ./packages/${OS}/
+                                if the package file is given then force install packages from there
+                                Additional flag --only cancel all other flags
 
-            Default: on
+        -y, systemd             Install user's systemd services (Just in Linux systems)
+                                    - Services are install in $HOME/.config/systemd/user
 
-        -c, --copy
-            By default all dotfiles are linked using 'ln -s' command, this flag change
-            the command to 'cp -rf' this way you can remove the folder after installation
-            but you need to re-download the files each time you want to update the files
-            ----    Ignored option in Windows platform
-            ----    WARNING!!! if you use the option -f/--force all host Setting will be deleted!!!
+        --nolog                 Disable log writing
 
-            Default: off in linux on in windows
+        --nocolor               Disable color output
 
-        -s, --shell
-            Install:
-                - Shell alias in $HOME/.config/shell
-                - Shell basic configurations \${SHELL}rc for bash, zsh, tcsh and csh
-                - Everything inside ./dotconfigs into $HOME
-                - Everything inside ./config/ into ${XDG_CONFIG_HOME:-$HOME/.config/} in unix or ~/AppData/Local/ in windows
-                - Python startup script in $HOME/.local/lib/
+        --verbose               Output debug messages
 
-            Default: on
+        --version               Display the version and exit
 
-        -d, --dotfiles
-            Download my dotfiles repo in case, this options is meant to be used in case this
-            script is standalone executed
-                Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/dotfiles
-
-            Default: off unless this script is executed from outside of the repo
-
-        -e, --emacs
-            Download and install my evil Emacs dotfiles
-                Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/.emacs.d
-
-            Default: on
-
-        -v, --vim
-            Download and install my Vim dotfiles
-                Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/.vim
-
-            Default: on
-
-        -n, --nvim, --neovim=[stable|dev|dotfiles]
-            Download Neovim executable (portable in windows and linux) if it hasn't been Installed
-            Download and install my Vim dotfiles in Neovim's dir.
-            Check if vim dotfiles are already install and copy/link (depends of '-c/copy' flag) them,
-            otherwise download them from vim's dotfiles repo
-                Default URL: $PROTOCOL://$GIT_HOST/$GIT_USER/.vim
-            Select the type of neovim version to download using 'stable' or 'dev'
-
-            Default: on
-
-        -b, --bin
-            Install shell functions and scripts in $HOME/.local/bin
-
-            Default: on
-
-        -g, --git
-            Install git configurations into $HOME/.config/git and $HOME/.gitconfig
-            Install:
-                - Gitconfigs
-                - Hooks
-                - Templates
-
-            Default: on
-
-        -t, --portables
-            Install isolated/portable programs into $HOME/.local/bin
-                - neovim
-                - shellcheck
-                - texlab
-                - fd
-                - ripgrep
-                - pip2 and pip3
-                - fzf (GNU/Linux only)
-                - jq (GNU/Linux only)
-
-            Default: on
-
-        --fonts, --powerline
-            Install the powerline patched fonts
-                * Since the patched fonts have different install method for Windows
-                they are just download
-                * This options is ignored if the install script is executed in a SSH session
-
-            Default: on
-
-        --python, --python=VERSION
-            If no version is given install python2 and python3 dependencies from:
-                - ./packages/${OS}/python2
-                - ./packages/${OS}/python3
-            else install packages from the given version (2 or 3)
-
-            Default: on with python2 and python3
-
-        --pkgs, --packages, --packages=PKG_FILE [--only]
-            Install all .pkg files from ./packages/${OS}/
-            if the package file is given then force install packages from there
-            Additional flag --only cancel all other flags
-
-            Default: off
-
-        -y, systemd
-            Install user's systemd services (Just in Linux systems)
-                * Services are install in $HOME/.config/systemd/user
-
-            Default: on
-
-        --nolog
-            Disable log writing
-
-            Default: off
-
-        --nocolor
-            Disable color output
-
-            Default: off
-
-        --verbose
-            Output debug messages
-
-            Default: off
-
-        --version
-            Display the version and exit
-
-        -h, --help
-            Display help, if you are seeing this, that means that you already know it (nice)
+        -h, --help              Display help, if you are seeing this, that means that you already know it (nice)
 
 EOF
 }
@@ -529,6 +425,7 @@ function initlog() {
     return 0
 }
 
+# shellcheck disable=SC2317
 function exit_append() {
     if [[ $NOLOG -eq 0 ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
@@ -545,6 +442,7 @@ function exit_append() {
     return 0
 }
 
+# shellcheck disable=SC2317
 function clean_up() {
     verbose_msg "Cleaning up by interrupt"
     verbose_msg "Cleaning up rg ${TMP}/rg.*" && rm -rf "${TMP}/rg.*" 2>/dev/null
@@ -2368,9 +2266,9 @@ fi
 if [[ $ALL -eq 1 ]]; then
     verbose_msg 'Setting up everything'
     setup_bin
-    setup_shell_scripts
     setup_git
     setup_dotconfigs
+    setup_shell_scripts
     get_portables
     get_nvim_dotfiles
     get_emacs_dotfiles
@@ -2379,9 +2277,9 @@ if [[ $ALL -eq 1 ]]; then
     setup_python
 else
     [[ $BIN -eq 1 ]] && setup_bin
-    [[ $SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
     [[ $GIT -eq 1 ]] && setup_git
     [[ $DOTCONFIGS -eq 1 ]] && setup_dotconfigs
+    [[ $SHELL_SCRIPTS -eq 1 ]] && setup_shell_scripts
     [[ $PORTABLES -eq 1 ]] && get_portables
     [[ $NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $EMACS -eq 1 ]] && get_emacs_dotfiles

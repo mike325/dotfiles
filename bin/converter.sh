@@ -385,9 +385,9 @@ function get_cmd() {
     local args
 
     if [[ $name == 'fd' ]]; then
-        args=" -uu -t f -e m4a -e mp4 --absolute-path . "
+        args=" -uu -t f -e mp4 -e m4a -e mov -e mpge -e 3gp -e mts -e mpge4 --absolute-path . "
     else
-        args=" -regextype posix-extended -iregex '.*\.(mp4|m4a)$' "
+        args=" -regextype posix-extended -iregex '.*\.(mp4|m4a|mov|mpge|3gp|mts|mpge4)$' "
     fi
 
     if [[ $name == 'fd' ]]; then
@@ -467,17 +467,17 @@ function convert_files() {
         if [[ -n $hevc_encoder ]] && [[ $USE_SW_ENCODE -eq 0 ]]; then
             status_msg "HW transcode with video with ${quality}"
             if [[ $hwaccel == 'vaapi' ]]; then
-                converter="ffmpeg -map_metadata 0 -map 0:v -map 0:a -map 0:d -hwaccel ${hwaccel} -hwaccel_output_format ${hwaccel} -init_hw_device vaapi=encoder:/dev/dri/renderD128 -rc_mode CQP -filter_hw_device encoder -hide_banner"
+                converter="ffmpeg -hwaccel ${hwaccel} -hwaccel_output_format ${hwaccel} -init_hw_device vaapi=encoder:/dev/dri/renderD128 -rc_mode CQP -filter_hw_device encoder -hide_banner"
                 vconverter="-c:v ${hevc_encoder} -q:v ${quality} -profile:v main -tier high -level 186 "
             elif [[ $hwaccel == 'videotoolbox' ]]; then
-                # Since we are in a mac we can use the audiotoolkit to accelerate audio conversion
-                converter="ffmpeg -hwaccel ${hwaccel} -hide_banner -map 0:v -map 0:a -map 0:d -map_metadata 0 "
+                # Since we are in a mac we can use the audiotoolkit to accelerate audio convertion
+                converter="ffmpeg -hwaccel ${hwaccel} -hide_banner "
                 vconverter="-c:v ${hevc_encoder} -vtag hvc1 -q:v ${quality} -profile:v main "
                 aconverter="-c:a aac_at -b:a 320k -ac 2"
             fi
         else
             status_msg "SW transcode"
-            converter="ffmpeg -hide_banner -map 0:v -map 0:a -map 0:d -map_metadata 0 "
+            converter="ffmpeg -hide_banner "
             vconverter="-c:v hevc -crf 22 -vtag hvc1 -preset fast -profile:v main "
         fi
 
@@ -516,7 +516,7 @@ function convert_files() {
         fi
 
         verbose_msg "Converting Video -> ${converter} -i ${file_abspath} ${vcmd} ${acmd} ${CURRENT}"
-        if ! eval 'bash -c "${converter} -i "${file_abspath}" ${vcmd} ${acmd} \"${CURRENT}\""'; then
+        if ! eval 'bash -c "${converter} -i \"${file_abspath}\" ${vcmd} ${acmd} \"${CURRENT}\""'; then
             error_msg "Failed to convert video from ${filename}"
             verbose_msg "Cleaning failed file"
             rm -f "${CURRENT}"
