@@ -35,6 +35,7 @@ DEV=0
 STABLE=0
 NOLOG=1
 NOCOLOR=0
+INSTALL_DIR="$HOME/.local"
 
 NAME="$0"
 NAME="${NAME##*/}"
@@ -151,25 +152,18 @@ Usage:
                                 the Neovim's source code, this options clone Neovim's repo and move
                                 to the repo's root before starts the compile process
 
-        -d <DIR> , --dir <DIR>  Choose the base root of the repo and move to it before compile
+        -d, --dir <DIR>         Choose the base root of the repo and move to it before compile
                                 the source code, if this options is used with -c/--clone flag
                                 it will clone the repo in the desire <DIR>
-
+        -i, --install <PATH>    Path where neovim will be install, default: $INSTALL_DIR
         -p, --python            Install Neovim's python package for python2 and python3
-
         -r, --ruby              Install Neovim's ruby package
-
         -f, --force             Ignore errors and warnings and force compilation
-
         --dev                   Use development builds/portables instead of stable
-
         --stable                Use stable builds/portables instead of stable
-
         -C                      Set the compiler, gcc/clang
-
         -v, --verbose           Enable debug messages
-
-        -h, --help              Display help, if you are seeing this, that means that you already know it (nice)
+        -h, --help              Displays help
 EOF
     # _show_nvim_help
 }

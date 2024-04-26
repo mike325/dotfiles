@@ -298,7 +298,7 @@ if hash kitty 2>/dev/null; then
 fi
 
 if hash tmux 2>/dev/null; then
-    bind '"\C-a":"tmux a || tmux new -s main\n"'
+    bind '"\C-a":"tmux attach -t main || tmux new -s main\n"'
 fi
 
 function toggleProxy() {

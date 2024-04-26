@@ -50,6 +50,7 @@ if ( ! -d "$HOME/.local/bin" ) mkdir -p "$HOME/.local/bin"
 if ( ! -d "$HOME/.local/lib" ) mkdir -p "$HOME/.local/lib"
 if ( ! -d "$HOME/.local/share" ) mkdir -p "$HOME/.local/share"
 if ( ! -d "$HOME/.local/golang/src" ) mkdir -p "$HOME/.local/golang/src"
+if ( ! -d "$HOME/.local/golang/pkgs" ) mkdir -p "$HOME/.local/golang/pkgs"
 
 # Load all proxy settings
 if ( -f "$HOME/.config/shell/host/proxy.csh" ) then
@@ -141,6 +142,11 @@ if ($?prompt) then
     # # Load host settings (override general alias and functions
     if ( -f  "$HOME/.config/shell/host/settings.csh" ) then
         source "$HOME/.config/shell/host/settings.csh"
+    endif
+
+    # Load host alias (override general alias and functions
+    if ( -f  "$HOME/.config/shell/host/alias.csh" ) then
+        source "$HOME/.config/shell/host/alias.csh"
     endif
 
     if ( -f "$HOME/.config/shell/banner" ) then

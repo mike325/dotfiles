@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+function __load_shell_script() {
+    local script="$1"
+    if [[ -n "$script" ]] && [[ -f "$script" ]]; then
+        # shellcheck disable=SC1090,SC1091
+        source "$script"
+    fi
+}
+
 # Use <C-s> in terminal vim
 [[ $- == *i* ]] && stty -ixon
 
@@ -21,53 +29,50 @@ if [[ -z $XDG_CACHE_HOME ]]; then
     [[ ! -d $XDG_CACHE_HOME ]] && mkdir -p "$XDG_CACHE_HOME"
 fi
 
-[[ ! -d "$HOME/.local/bin" ]] && mkdir -p "$HOME/.local/bin"
-[[ ! -d "$HOME/.local/lib" ]] && mkdir -p "$HOME/.local/lib"
-[[ ! -d "$HOME/.local/share" ]] && mkdir -p "$HOME/.local/share"
-[[ ! -d "$HOME/.local/golang/src" ]] && mkdir -p "$HOME/.local/golang/src"
-[[ ! -d "$HOME/.local/golang/pkgs" ]] && mkdir -p "$HOME/.local/golang/pkgs"
-# [[ ! -d "$HOME/.local/git/template" ]] && mkdir -p "$HOME/.local/git/template"
-# [[ ! -d "$HOME/.local/git/hooks" ]] && mkdir -p "$HOME/.local/git/hooks"
-# [[ ! -d "$HOME/.local/git/bin" ]] && mkdir -p "$HOME/.local/git/bin"
+__common_dirs=(
+    "$HOME/.local/bin"
+    "$HOME/.local/lib"
+    "$HOME/.local/share"
+    "$HOME/.local/golang/src"
+    "$HOME/.local/golang/pkgs"
+    # "$HOME/.local/git/template"
+    # "$HOME/.local/git/hooks"
+    # "$HOME/.local/git/bin"
+)
+for common_dir in "${__common_dirs[@]}"; do
+    [[ ! -d "$common_dir" ]] && mkdir -p "$common_dir"
+done
 
-# Load profile settings
-# if [[ -f $HOME/.profile ]]; then
-#     source $HOME/.profile
-# fi
+# # Load profile settings
+# __load_shell_script "$HOME/.profile"
 
 # Load all proxy settings
-if [[ -f "$HOME/.config/shell/host/proxy.sh" ]]; then
-    # We already checked the file exists so its "safe"
-    # shellcheck disable=SC1090,SC1091
-    if [[ -z $PROXY_DISABLE ]]; then
-        source "$HOME/.config/shell/host/proxy.sh"
-    fi
+if [[ -z $PROXY_DISABLE ]]; then
+    __load_shell_script "$HOME/.config/shell/host/proxy.sh"
 fi
 
-# Load all ENV variables
-# We already checked the file exists so its "safe"
-# shellcheck disable=SC1090,SC1091
-[[ -f "$HOME/.config/shell/host/env.sh" ]] && source "$HOME/.config/shell/host/env.sh"
-[[ -d "/usr/sbin/" ]] && export PATH="/usr/sbin/:$PATH"
-[[ -d "$HOME/.config/git/bin" ]] && export PATH="$HOME/.config/git/bin:$PATH"
-[[ -d "$HOME/.local/bin/" ]] && export PATH="$HOME/.local/bin/:$PATH"
-[[ -d "$HOME/.fzf/bin/" ]] && export PATH="$HOME/.fzf/bin/:$PATH"
-[[ -d "$HOME/.luarocks/bin" ]] && export PATH="$HOME/.luarocks/bin/:$PATH"
-[[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin/:$PATH"
-[[ -d "/opt/homebrew/bin" ]] && export PATH="/opt/homebrew/bin:$PATH"
+__load_shell_script "$HOME/.config/shell/host/env.sh"
+
+__path_dirs=(
+    "/usr/sbin/"
+    "$HOME/.config/git/bin"
+    "$HOME/.local/bin/"
+    "$HOME/.fzf/bin/"
+    "$HOME/.luarocks/bin"
+    "$HOME/.cargo/bin"
+    "/opt/homebrew/bin"
+    # NOTE: I'm not sure about adding this directly to the PATH
+    "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/"
+)
+for path_dir in "${__path_dirs[@]}"; do
+    [[ -d "$path_dir" ]] && export PATH="$path_dir:$PATH"
+done
 
 [[ -d "$HOME/.local/share/man/" ]] && export MANPATH="$HOME/.local/share/man/:$MANPATH"
 
-# NOTE: I'm not sure about adding this directly to the PATH
-[[ -d "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/" ]] && export PATH="$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/:$PATH"
-
 # shellcheck disable=SC1090,SC1091
-[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
-
-if [[ -f "$HOME/.cargo/env" ]]; then
-    # shellcheck disable=SC1090,SC1091
-    source "$HOME/.cargo/env"
-fi
+__load_shell_script "$HOME/.gvm/scripts/gvm"
+__load_shell_script "$HOME/.cargo/env"
 
 # If you have a custom pythonstartup script, you could set it in "env" file
 if [[ -f "$HOME/.local/lib/pythonstartup.py" ]]; then
@@ -200,6 +205,7 @@ if is_windows; then
     export USER="$USERNAME"
 fi
 
+_python_versions=("15" "14" "13" "12" "11" "10" "9" "8" "7" "6")
 if is_windows; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then
@@ -218,8 +224,7 @@ if is_windows; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    _python=("12" "11" "10" "9" "8" "7" "6")
-    for version in "${_python[@]}"; do
+    for version in "${_python_versions[@]}"; do
         if [[ -d "${windows_root}/Python3${version}/Scripts" ]]; then
             export PATH="${windows_root}/Python3${version}/Scripts:$PATH"
             break
@@ -236,9 +241,8 @@ if is_windows; then
 
 elif is_osx; then
     # $HOME/Library/Python/3.8/bin
-    _python=("12" "11" "10" "9" "8" "7" "6")
     _osx_root="$HOME/Library/"
-    for version in "${_python[@]}"; do
+    for version in "${_python_versions[@]}"; do
         if [[ -d "${_osx_root}/Python/3.${version}/bin" ]]; then
             export PATH="${_osx_root}/Python/3.${version}/bin:$PATH"
             break
@@ -276,17 +280,11 @@ if [[ $- == *i* ]]; then
     export LESS=' -R '
 
     # Load custom shell framework settings (override default shell framework settings)
-    if [[ -f "$HOME/.config/shell/host/framework.sh" ]]; then
-        # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/host/framework.sh"
-    fi
+    __load_shell_script "$HOME/.config/shell/host/framework.sh"
 
     # Configure shell framework and specific shell settings
     if [[ -f "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh" ]]; then
-        # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh"
+        __load_shell_script "$HOME/.config/shell/settings/${CURRENT_SHELL}.sh"
 
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage del down4me)
@@ -302,23 +300,24 @@ if [[ $- == *i* ]]; then
     fi
 
     # Load alias after bash-it to give them higher priority
-    if [[ -f "$HOME/.config/shell/alias/alias.sh" ]]; then
-        # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/alias/alias.sh"
-    fi
+    __config_shell_scripts=(
+        "$HOME/.config/shell/alias/alias.sh"
+    )
+    for script in "${__config_shell_scripts[@]}"; do
+        __load_shell_script "$script"
+    done
 
     # Load host settings (override general alias and functions)
-    if [[ -f "$HOME/.config/shell/host/settings.sh" ]]; then
-        # We already checked the file exists so its "safe"
-        # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/host/settings.sh"
-    fi
+    __host_shell_scripts=(
+        "$HOME/.config/shell/host/settings.sh"
+        "$HOME/.config/shell/host/alias.sh"
+    )
+    for script in "${__host_shell_scripts[@]}"; do
+        __load_shell_script "$script"
+    done
 
-    if [[ -f "$HOME/.config/shell/scripts/z.sh" ]]; then
-        # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/scripts/z.sh"
-    fi
+    # Load Z script
+    __load_shell_script "$HOME/.config/shell/scripts/z.sh"
 
     # shellcheck disable=SC1090,SC1091
     [[ -n $VIRTUAL_ENV ]] && source "$VIRTUAL_ENV/bin/activate"
