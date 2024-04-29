@@ -2,7 +2,7 @@
 
 function __load_shell_script() {
     local script="$1"
-    if [[ -n "$script" ]] && [[ -f "$script" ]]; then
+    if [[ -n $script   ]] && [[ -f $script   ]]; then
         # shellcheck disable=SC1090,SC1091
         source "$script"
     fi
@@ -40,7 +40,7 @@ __common_dirs=(
     # "$HOME/.local/git/bin"
 )
 for common_dir in "${__common_dirs[@]}"; do
-    [[ ! -d "$common_dir" ]] && mkdir -p "$common_dir"
+    [[ ! -d $common_dir   ]] && mkdir -p "$common_dir"
 done
 
 # # Load profile settings
@@ -65,7 +65,7 @@ __path_dirs=(
     "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/"
 )
 for path_dir in "${__path_dirs[@]}"; do
-    [[ -d "$path_dir" ]] && export PATH="$path_dir:$PATH"
+    [[ -d $path_dir   ]] && export PATH="$path_dir:$PATH"
 done
 
 [[ -d "$HOME/.local/share/man/" ]] && export MANPATH="$HOME/.local/share/man/:$MANPATH"
