@@ -330,10 +330,8 @@ function toggleProxy() {
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
     if [[ -d "$HOME/.local/share/completions/" ]]; then
-        for cfile in "$HOME/.local/share/completions/"*; do
-            if [[ $cfile =~ .*\.bash$ ]]; then
-                source "$cfile" 2>/dev/null
-            fi
+        for cfile in "$HOME/.local/share/completions/"*.bash; do
+            source "$cfile" 2>/dev/null
         done
     fi
 
