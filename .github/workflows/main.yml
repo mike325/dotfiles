@@ -10,7 +10,7 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: OS update
         run: |
           sudo apt-get update --fix-missing
@@ -76,7 +76,7 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: OS Info
         run: |
           sudo apt install -y wget
@@ -107,12 +107,12 @@ jobs:
 
     strategy:
       matrix:
-        os: [ macOS-latest, macos-12 ]
+        os: [ macOS-latest, macos-13 ]
     env:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           brew install shellcheck
@@ -134,7 +134,7 @@ jobs:
       GITHUB: true
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # - name: Enable Chocolatey and Scoop
       #   shell: powershell
       #   run: |
