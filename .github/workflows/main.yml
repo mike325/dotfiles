@@ -102,7 +102,7 @@ jobs:
           sudo ./install.sh --verbose --packages --only
 
   linux-arm-build:
-    name: Testing install script in ${{ matrix.os }}
+    name: Testing install script in Raspbian lite ARM64
     runs-on: ubuntu-latest
 
     env:
@@ -119,8 +119,8 @@ jobs:
             wget https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch && chmod +x ./neofetch && ./neofetch
 
             # OS update
-            sudo apt update --fix-missing
-            sudo apt upgrade -y
+            # sudo apt update --fix-missing
+            # sudo apt upgrade -y
 
             # Install dependencies
             sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
