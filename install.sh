@@ -105,13 +105,13 @@ if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
-        case "$OSTYPE" in
+        case "$(uname -o)" in
             *'linux'*)    export SHELL_PLATFORM='linux' ;;
             *'darwin'*)   export SHELL_PLATFORM='osx' ;;
-            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
             *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
             *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
             *)            export SHELL_PLATFORM='unknown' ;;
         esac
     fi
@@ -124,8 +124,10 @@ case "$SHELL_PLATFORM" in
             OS='arch'
         elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
             OS='ubuntu'
+        elif [[ "$(cat /etc/redhat-release)" == Red\ Hat* ]]; then
+            OS='redhat'
         elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
-            if [[ $ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+            if [[ $ARCH =~ armv.* ]] || [[ $ARCH == aarch64 ]]; then
                 OS='raspbian'
             else
                 OS='debian'
@@ -140,6 +142,9 @@ case "$SHELL_PLATFORM" in
         ;;
     bsd)
         OS='bsd'
+        ;;
+    *)
+        OS="$(uname -o)"
         ;;
 esac
 
@@ -310,7 +315,7 @@ Usage:
 
         --fonts, --powerline    Install the powerline patched fonts
                                     - Since the patched fonts have different install method for Windows
-                                    they are just download
+                                      they are just download
                                     - This options is ignored if the install script is executed in a SSH session
 
         --python                If no version is given install python2 and python3 dependencies from:
@@ -1304,16 +1309,21 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | command grep -oE '0\.[0-9]{1,2}\.[0-9]{1,2}' | sort -ruh | head -n 1)"
         fi
         status_msg "Downloading delta version: ${version}"
-        if [[ $ARCH =~ ^arm   ]]; then
-            local os_type='arm-unknown-linux-gnueabihf'
-        else
-            local os_type="${ARCH}-unknown-linux-musl"
-        fi
+        local os_type="${ARCH}-unknown-linux-gnu"
         if download_asset "delta" "${url}/releases/download/${version}/delta-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-            chmod u+x "$TMP/delta-${version}-${os_type}/delta"
-            mv "$TMP/delta-${version}-${os_type}/delta" "$HOME/.local/bin/"
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if  tar xf "$TMP/${pkg}"; then
+                if chmod u+x "$TMP/delta-${version}-${os_type}/delta"; then
+                    if ! mv "$TMP/delta-${version}-${os_type}/delta" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move delta to $HOME/.local/bin/"
+                    fi
+                else
+                    error_msg "Failed to make delta executable!"
+                fi
+            else
+                error_msg "Failed to extract delta!"
+            fi
             verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleaning up data $TMP/delta-${version}-${os_type}" && rm -rf "$TMP/delta-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
@@ -1339,18 +1349,21 @@ function _linux_portables() {
         fi
 
         status_msg "Downloading rg version: ${version}"
-
-        if [[ $ARCH =~ ^arm   ]]; then
-            local os_type='arm-unknown-linux-gnueabihf'
-        else
-            local os_type="${ARCH}-unknown-linux-musl"
-        fi
-
+        local os_type="${ARCH}-unknown-linux-gnu"
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-            chmod u+x "$TMP/ripgrep-${version}-${os_type}/rg"
-            mv "$TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if tar xf "$TMP/${pkg}"; then
+                if chmod u+x "$TMP/ripgrep-${version}-${os_type}/rg"; then
+                    if ! mv "$TMP/ripgrep-${version}-${os_type}/rg" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move ripgrep executable to $HOME/.local/bin/"
+                    fi
+                else
+                    error_msg "Failed to make ripgrep executable"
+                fi
+            else
+                error_msg "Failed to extract ripgrep"
+            fi
             verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleaning up data $TMP/ripgrep-${version}-${os_type}" && rm -rf "$TMP/ripgrep-${version}-${os_type}"
             popd 1>/dev/null  || return 1
@@ -1375,16 +1388,21 @@ function _linux_portables() {
             local version="$(wget -qO- ${url}/tags | command grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | tail -n 1)"
         fi
         status_msg "Downloading fd version: ${version}"
-        if [[ $ARCH =~ ^arm   ]]; then
-            local os_type='arm-unknown-linux-gnueabihf'
-        else
-            local os_type="${ARCH}-unknown-linux-musl"
-        fi
+        local os_type="${ARCH}-unknown-linux-gnu"
         if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-            chmod u+x "$TMP/fd-${version}-${os_type}/fd"
-            mv "$TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if tar xf "$TMP/${pkg}"; then
+                if ! chmod u+x "$TMP/fd-${version}-${os_type}/fd"; then
+                    if ! mv "$TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move fd-find executable to $HOME/.local/bin/"
+                    fi
+                else
+                    error_msg "Failed to make fd-find executable"
+                fi
+            else
+                error_msg "Failed to extract fd-find"
+            fi
             verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
             verbose_msg "Cleaning up data $TMP/fd-${version}-${os_type}" && rm -rf "$TMP/fd-${version}-${os_type}/"
             popd 1>/dev/null  || return 1
@@ -1636,7 +1654,7 @@ function get_portables() {
 
     local github='https://github.com'
 
-    if ! [[ $ARCH =~ ^arm ]] && { ! hash nvim 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
+    if ! is_arm && { ! hash nvim 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing Neovim install'
         status_msg "Getting Neovim"
 
@@ -1651,7 +1669,7 @@ function get_portables() {
             error_msg "Fail to install Neovim"
             rst=1
         fi
-    elif [[ $ARCH =~ ^arm ]]; then
+    elif is_arm; then
         warn_msg "Skipping neovim install, Portable not available for ARM systemas"
     else
         warn_msg "Skipping Neovim, already installed"
@@ -2282,7 +2300,7 @@ if [[ $ALL -eq 1 ]]; then
     get_portables
     get_nvim_dotfiles
     get_emacs_dotfiles
-    get_cool_fonts
+    # get_cool_fonts
     setup_systemd
     setup_python
 else
@@ -2293,7 +2311,7 @@ else
     [[ $PORTABLES -eq 1 ]] && get_portables
     [[ $NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $EMACS -eq 1 ]] && get_emacs_dotfiles
-    [[ $COOL_FONTS -eq 1 ]] && get_cool_fonts
+    # [[ $COOL_FONTS -eq 1 ]] && get_cool_fonts
     [[ $SYSTEMD -eq 1 ]] && setup_systemd
     [[ $PYTHON -eq 1 ]] && setup_python
 fi
