@@ -105,7 +105,7 @@ if [ -z "$SHELL_PLATFORM" ]; then
     if [[ -n $TRAVIS_OS_NAME ]]; then
         export SHELL_PLATFORM="$TRAVIS_OS_NAME"
     else
-        case "$(uname -o)" in
+        case "$OSTYPE" in
             *'linux'*)    export SHELL_PLATFORM='linux' ;;
             *'darwin'*)   export SHELL_PLATFORM='osx' ;;
             *'msys'*)     export SHELL_PLATFORM='msys' ;;
@@ -309,7 +309,9 @@ Usage:
         -t, --portables         Install isolated/portable programs into $HOME/.local/bin
                                     - neovim            - shellcheck
                                     - texlab            - fd
-                                    - stylua            - fd
+                                    - stylua            - lazygit
+                                    - bat               - delta
+                                    - gh                - shfmt
                                     - ripgrep           - pip2 and pip3
                                     - fzf (Linux only)  - jq (Linux only)
 
