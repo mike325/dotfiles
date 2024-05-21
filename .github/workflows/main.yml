@@ -101,6 +101,42 @@ jobs:
         run: |
           sudo ./install.sh --verbose --packages --only
 
+  linux-arm-build:
+    name: Testing install script in ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pguyot/arm-runner-action@v2
+        with:
+          base_image: raspios_lite_arm64:latest
+          commands: |
+            # OS Info
+            sudo apt install -y wget
+            wget https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch && chmod +x ./neofetch && ./neofetch
+
+            # OS update
+            sudo apt update --fix-missing
+            sudo apt upgrade -y
+
+            # Install dependencies
+            sudo apt install -y curl git shellcheck python3-setuptools python-setuptools
+            sudo apt install -y python3-pip
+            sudo pip3 install --upgrade pip
+            pip3 --version
+
+            # Full install
+            ./install.sh --verbose
+
+            # Full force install
+            ./install.sh --verbose --force
+
+            # Packages install
+            sudo ./install.sh --verbose --packages --only
+
   osx-build:
     name: Testing install script in ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
