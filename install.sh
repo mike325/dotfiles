@@ -185,10 +185,19 @@ function is_osx() {
 #     return 1
 # }
 
+function is_arm() {
+    local arch
+    arch="$(uname -m)"
+    if [[ $arch =~ ^arm ]] || [[ $arch =~ ^aarch ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function is_64bits() {
     local arch
     arch="$(uname -m)"
-    if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
+    if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]] || [[ $arch == 'aarch64' ]] || [[ $arch == 'armv7' ]]; then
         return 0
     fi
     return 1
@@ -295,6 +304,7 @@ Usage:
         -t, --portables         Install isolated/portable programs into $HOME/.local/bin
                                     - neovim            - shellcheck
                                     - texlab            - fd
+                                    - stylua            - fd
                                     - ripgrep           - pip2 and pip3
                                     - fzf (Linux only)  - jq (Linux only)
 
@@ -1386,7 +1396,81 @@ function _linux_portables() {
         rst=2
     fi
 
-    if [[ $ARCH =~ ^arm ]]; then
+    if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
+        status_msg "Getting gh"
+        local pkg='gh.tar.gz'
+        local url="${github}/cli/cli"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
+        fi
+        status_msg "Downloading github cli version: ${version}"
+        local os_type
+        if [[ $ARCH == 'x86_64' ]]; then
+            os_type="linux_amd64"
+        elif [[ $ARCH == 'x86' ]]; then
+            os_type="linux_386"
+        elif is_arm && is_64bits; then
+            os_type="linux_arm64"
+        else
+            os_type="linux_arm6"
+        fi
+        if download_asset "gh" "${url}/releases/download/v${version}/gh_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
+            chmod u+x "$TMP/gh_${version}_${os_type}/bin/gh"
+            mv "$TMP/gh_${version}_${os_type}/bin/gh" "$HOME/.local/bin/"
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping gh, already installed"
+        rst=2
+    fi
+
+    if ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
+        status_msg "Getting shfmt"
+        local pkg='shfmt'
+        local url="${github}/mvdan/sh"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+        fi
+        status_msg "Downloading shfmt version: ${version}"
+        local os_type
+        if [[ $ARCH == 'x86_64' ]]; then
+            os_type="linux_amd64"
+        elif [[ $ARCH == 'x86' ]]; then
+            os_type="linux_386"
+        elif is_arm && is_64bits; then
+            os_type="linux_arm64"
+        else
+            os_type="linux_arm"
+        fi
+        if download_asset "shfmt" "${url}/releases/download/${version}/shfmt_${version}_${os_type}" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            chmod u+x "$TMP/${pkg}"
+            mv "$TMP/${pkg}" "$HOME/.local/bin/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping shfmt, already installed"
+        rst=2
+    fi
+
+    if [[ $ARCH =~ ^arm ]] || [[ $ARCH =~ ^aarch ]]; then
         warn_msg "Skipping no ARM compatible portables"
         return 2
     fi
@@ -1440,7 +1524,7 @@ function _linux_portables() {
             rst=1
         fi
     elif ! is_64bits; then
-        error_msg "Texlab portable is only Available for x86 64 bits"
+        warn_msg "Texlab portable is only Available for x86 64 bits"
         rst=1
     else
         warn_msg "Skipping texlab, already installed"
@@ -1493,80 +1577,6 @@ function _linux_portables() {
         rst=2
     fi
 
-    if  ! hash gh 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing github cli install'
-        status_msg "Getting gh"
-        local pkg='gh.tar.gz'
-        local url="${github}/cli/cli"
-        if hash curl 2>/dev/null; then
-            # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
-        else
-            # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sort -uh | head -n 1 | cut -dv -f2)"
-        fi
-        status_msg "Downloading github cli version: ${version}"
-        local os_type
-        if [[ $ARCH == 'x86_64' ]]; then
-            os_type="linux_amd64"
-        elif [[ $ARCH == 'x86' ]]; then
-            os_type="linux_386"
-        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]]; then
-            os_type="linux_arm64"
-        else
-            os_type="linux_arm6"
-        fi
-        if download_asset "gh" "${url}/releases/download/v${version}/gh_${version}_${os_type}.tar.gz" "$TMP/${pkg}"; then
-            pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}" && tar xf "$TMP/${pkg}"
-            chmod u+x "$TMP/gh_${version}_${os_type}/bin/gh"
-            mv "$TMP/gh_${version}_${os_type}/bin/gh" "$HOME/.local/bin/"
-            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1>/dev/null  || return 1
-        else
-            rst=1
-        fi
-    else
-        warn_msg "Skipping gh, already installed"
-        rst=2
-    fi
-
-    if ! hash shfmt 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing shfmt install'
-        status_msg "Getting shfmt"
-        local pkg='shfmt'
-        local url="${github}/mvdan/sh"
-        if hash curl 2>/dev/null; then
-            # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        else
-            # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        fi
-        status_msg "Downloading shfmt version: ${version}"
-        local os_type
-        if [[ $ARCH == 'x86_64' ]]; then
-            os_type="linux_amd64"
-        elif [[ $ARCH == 'x86' ]]; then
-            os_type="linux_386"
-        elif [[ $ARCH == 'armv7' ]] || [[ $ARCH == 'arm64' ]]; then
-            os_type="linux_arm64"
-        else
-            os_type="linux_arm"
-        fi
-        if download_asset "shfmt" "${url}/releases/download/${version}/shfmt_${version}_${os_type}" "$TMP/${pkg}"; then
-            pushd "$TMP" 1>/dev/null  || return 1
-            chmod u+x "$TMP/${pkg}"
-            mv "$TMP/${pkg}" "$HOME/.local/bin/${pkg}"
-            popd 1>/dev/null  || return 1
-        else
-            rst=1
-        fi
-    else
-        warn_msg "Skipping shfmt, already installed"
-        rst=2
-    fi
-
     if [[ $ARCH == 'x86_64' ]] && { ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
         status_msg "Getting stylua"
@@ -1609,7 +1619,7 @@ function _linux_portables() {
             rst=1
         fi
     elif ! [[ $ARCH == 'x86_64' ]]; then
-        error_msg "stylua portable is only Available for x86 64 bits"
+        warn_msg "stylua portable is only Available for x86 64 bits"
         rst=1
     else
         warn_msg "Skipping stylua, already installed"
