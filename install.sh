@@ -49,7 +49,7 @@ NOCOLOR=0
 NOLOG=0
 PYTHON=0
 PKGS=0
-TMP="/tmp/"
+TMP="${TMPDIR:-/tmp/}"
 PKG_FILE=""
 NEOVIM_DOTFILES=0
 
@@ -575,8 +575,8 @@ function download_asset() {
             verbose_msg "Backing up $dest into $BACKUP_DIR"
             mv --backup=numbered "$dest" "$BACKUP_DIR"
         fi
-    elif [[ $FORCE_INSTALL -eq 1 ]]; then
-        verbose_msg "Removing $dest"
+    elif [[ $FORCE_INSTALL -eq 1 ]] && [[ -f "$dest" ]]; then
+        verbose_msg "Removing $dest before re-download"
         rm -rf "$dest"
     elif [[ -e $dest ]] || [[ -d $dest ]]; then
         warn_msg "Skipping $asset, already exists in ${dest%/*}"
@@ -1340,7 +1340,7 @@ function _linux_portables() {
     if ! hash rg 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing rg install'
         status_msg "Getting rg"
-        local pkg='rg.tar.xz'
+        local pkg='rg.tar.gz'
         local url="${github}/BurntSushi/ripgrep"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
@@ -1351,7 +1351,11 @@ function _linux_portables() {
         fi
 
         status_msg "Downloading rg version: ${version}"
-        local os_type="${ARCH}-unknown-linux-gnu"
+        if is_arm; then
+            local os_type="${ARCH}-unknown-linux-gnu"
+        else
+            local os_type="${ARCH}-unknown-linux-musl"
+        fi
         if download_asset "Ripgrep" "${url}/releases/download/${version}/ripgrep-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
@@ -1380,7 +1384,7 @@ function _linux_portables() {
     if ! hash fd 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing fd install'
         status_msg "Getting fd"
-        local pkg='fd.tar.xz'
+        local pkg='fd.tar.gz'
         local url="${github}/sharkdp/fd"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
@@ -1391,11 +1395,11 @@ function _linux_portables() {
         fi
         status_msg "Downloading fd version: ${version}"
         local os_type="${ARCH}-unknown-linux-gnu"
-        if download_asset "Fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
+        if download_asset "fd" "${url}/releases/download/${version}/fd-${version}-${os_type}.tar.gz" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if tar xf "$TMP/${pkg}"; then
-                if ! chmod u+x "$TMP/fd-${version}-${os_type}/fd"; then
+                if chmod u+x "$TMP/fd-${version}-${os_type}/fd"; then
                     if ! mv "$TMP/fd-${version}-${os_type}/fd" "$HOME/.local/bin/"; then
                         error_msg "Failed to move fd-find executable to $HOME/.local/bin/"
                     fi
