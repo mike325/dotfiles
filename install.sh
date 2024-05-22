@@ -122,9 +122,9 @@ case "$SHELL_PLATFORM" in
     linux)
         if [[ -f /etc/arch-release ]]; then
             OS='arch'
-        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+        elif [[ -f /etc/issue ]] &&  [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
             OS='ubuntu'
-        elif [[ "$(cat /etc/redhat-release)" == Red\ Hat* ]]; then
+        elif [[ -f /etc/redhat-release ]] && [[ "$(cat /etc/redhat-release)" == Red\ Hat* ]]; then
             OS='redhat'
         elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
             if [[ $ARCH =~ armv.* ]] || [[ $ARCH == aarch64 ]]; then

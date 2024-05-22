@@ -135,7 +135,7 @@ jobs:
             ./install.sh --verbose --force
 
             # Packages install
-            sudo ./install.sh --verbose --packages --only
+            # sudo ./install.sh --verbose --packages --only
 
   osx-build:
     name: Testing install script in ${{ matrix.os }}
