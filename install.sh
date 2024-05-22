@@ -575,7 +575,7 @@ function download_asset() {
             verbose_msg "Backing up $dest into $BACKUP_DIR"
             mv --backup=numbered "$dest" "$BACKUP_DIR"
         fi
-    elif [[ $FORCE_INSTALL -eq 1 ]] && [[ -f "$dest" ]]; then
+    elif [[ $FORCE_INSTALL -eq 1 ]] && [[ -f $dest   ]]; then
         verbose_msg "Removing $dest before re-download"
         rm -rf "$dest"
     elif [[ -e $dest ]] || [[ -d $dest ]]; then
