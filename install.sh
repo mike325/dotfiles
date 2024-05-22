@@ -1832,12 +1832,12 @@ function _get_pip() {
         else
             status_msg "Installing pip2"
             if [[ $VERBOSE -eq 1 ]]; then
-                if ! python2 $TMP/get-pip.py --user; then
+                if ! python2 "$TMP/get-pip.py" --user; then
                     error_msg "Fail to install pip for python2"
                     return 1
                 fi
             else
-                if ! python2 $TMP/get-pip.py --user 1>/dev/null; then
+                if ! python2 "$TMP/get-pip.py" --user 1>/dev/null; then
                     error_msg "Fail to install pip for python2"
                     return 1
                 fi
@@ -2317,7 +2317,7 @@ else
     [[ $PORTABLES -eq 1 ]] && get_portables
     [[ $NVIM -eq 1 ]] && get_nvim_dotfiles
     [[ $EMACS -eq 1 ]] && get_emacs_dotfiles
-    # [[ $COOL_FONTS -eq 1 ]] && get_cool_fonts
+    [[ $COOL_FONTS -eq 1 ]] && true # get_cool_fonts
     [[ $SYSTEMD -eq 1 ]] && setup_systemd
     [[ $PYTHON -eq 1 ]] && setup_python
 fi
