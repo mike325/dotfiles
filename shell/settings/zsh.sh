@@ -113,17 +113,19 @@ if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     bindkey '^ ' autosuggest-execute
 fi
 
-autoload -Uz compinit
-# compinit -d
-compinit
+if hash gh 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_gh" ]]; then
+    gh completion --shell zsh > "$HOME/.zsh/zfunctions/_gh"
+fi
 
-# # pip zsh completion start
-# if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null ; then
-#     hash pip 2>/dev/null && eval "$(pip completion --zsh)"
-#     hash pip2 2>/dev/null && eval "$(pip2 completion --zsh 2>/dev/null)"
-#     hash pip3 2>/dev/null && eval "$(pip3 completion --zsh)"
-# fi
-# # pip zsh completion end
+if hash ruff 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_ruff" ]]; then
+    ruff generate-shell-completion zsh > "$HOME/.zsh/zfunctions/_ruff"
+fi
+
+autoload -Uz compinit
+compinit # -d
+
+autoload -Uz bashcompinit
+bashcompinit
 
 # Case insensitive tab completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

@@ -321,6 +321,10 @@ function toggleProxy() {
     fi
 }
 
+if hash gh 2>/dev/null; then
+    eval "$(gh completion --shell bash)"
+fi
+
 #######################################################################
 #                          Bash Completion                            #
 #######################################################################
