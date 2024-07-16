@@ -114,11 +114,11 @@ if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
 fi
 
 if hash gh 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_gh" ]]; then
-    gh completion --shell zsh > "$HOME/.zsh/zfunctions/_gh"
+    gh completion --shell zsh >"$HOME/.zsh/zfunctions/_gh"
 fi
 
 if hash ruff 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_ruff" ]]; then
-    ruff generate-shell-completion zsh > "$HOME/.zsh/zfunctions/_ruff"
+    ruff generate-shell-completion zsh >"$HOME/.zsh/zfunctions/_ruff"
 fi
 
 autoload -Uz compinit
