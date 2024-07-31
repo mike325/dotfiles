@@ -1,6 +1,6 @@
 # Extra modules
 wheel>=0.29.0
-setuptools==65.5.1
+setuptools==70.0.0
 
 # http querys
 httpie>=1.0.3
@@ -38,7 +38,7 @@ ntfy[telegram,emoji,pid]>=2.7.0
 # Misc
 Pygments>=2.3.1
 chardet==3.0.2
-requests==2.31.0
+requests==2.32.2
 thefuck>=3.27
 
 # HW dev
