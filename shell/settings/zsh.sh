@@ -46,6 +46,13 @@ setopt hist_verify            # Do not execute immediately upon history expansio
 
 fpath+="$HOME/.config/shell/zfunctions"
 fpath+="$HOME/.zsh/zfunctions"
+if hash brew 2>/dev/null && [[ -d "$(brew --prefix)/share/zsh-completions" ]]; then
+    fpath+="$(brew --prefix)/share/zsh-completions"
+fi
+
+if [[ -d /opt/homebrew/share/zsh/site-functions ]]; then
+    fpath+="/opt/homebrew/share/zsh/site-functions"
+fi
 
 # Color man pages
 export LESS_TERMCAP_mb=$'\E[01;32m'
