@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2317
 
 #
 #                              -`
@@ -22,6 +23,7 @@
 #            .`                                 `/
 
 VERBOSE=0
+QUIET=0
 NOCOLOR=0
 NOLOG=1
 WARN_COUNT=0
@@ -87,10 +89,12 @@ case "$SHELL_PLATFORM" in
     linux)
         if [[ -f /etc/arch-release ]]; then
             OS='arch'
-        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+        elif [[ -f /etc/redhat-release ]] && [[ "$(cat /etc/redhat-release)" == Red\ Hat* ]]; then
+            OS='redhat'
+        elif [[ -f /etc/issue ]] && [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
             OS='ubuntu'
         elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
-            if [[ $ARCH == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
+            if [[ $ARCH =~ armv.* ]] || [[ $ARCH == aarch64 ]]; then
                 OS='raspbian'
             else
                 OS='debian'
@@ -108,12 +112,72 @@ case "$SHELL_PLATFORM" in
         ;;
 esac
 
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_wls 2>/dev/null; then
+    function is_wls() {
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_osx 2>/dev/null; then
 function is_osx() {
     if [[ $SHELL_PLATFORM == 'osx' ]]; then
         return 0
     fi
     return 1
 }
+fi
+
+if ! hash is_root 2>/dev/null; then
+    function is_root() {
+        if ! is_windows && [[ $EUID -eq 0 ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash has_sudo 2>/dev/null; then
+    function has_sudo() {
+        if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_arm 2>/dev/null ; then
+    function is_arm() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch =~ ^arm ]] || [[ $arch =~ ^aarch ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_64bits 2>/dev/null; then
+    function is_64bits() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
 
 # colors
 # shellcheck disable=SC2034
@@ -150,16 +214,19 @@ Usage:
         --nolog         Disable log writing
         --nocolor       Disable color output
         -v, --verbose   Enable debug messages
+        -q, --quiet     Suppress all output but the errors
         -h, --help      Display this help message
 EOF
 }
 
 function warn_msg() {
     local msg="$1"
+    if [[ $QUIET -eq 0 ]]; then
     if [[ $NOCOLOR -eq 0 ]]; then
         printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
     else
         printf "[!] Warning:\t %s\n" "$msg"
+    fi
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
@@ -184,10 +251,12 @@ function error_msg() {
 
 function status_msg() {
     local msg="$1"
+    if [[ $QUIET -eq 0 ]]; then
     if [[ $NOCOLOR -eq 0 ]]; then
         printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
     else
         printf "[*] Info:\t %s\n" "$msg"
+    fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
         printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
@@ -268,6 +337,38 @@ function exit_append() {
     return 0
 }
 
+function raw_output() {
+    local msg="echo \"$1\""
+    if [[ $NOLOG -eq 0 ]]; then
+        msg="$msg | tee ${LOG}"
+    fi
+    if ! sh -c "$msg"; then
+            return 1
+    fi
+    return 0
+}
+
+function shell_exec() {
+        local cmd="$1"
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOLOG -eq 0 ]]; then
+            cmd="$cmd | tee ${LOG}"
+        fi
+        if ! sh -c "$cmd"; then
+            return 1
+        fi
+    elif [[ $NOLOG -eq 0 ]]; then
+        if ! sh -c "$cmd >> ${LOG}"; then
+            return 1
+        fi
+    else
+        if ! sh -c "$cmd &>/dev/null"; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
@@ -279,6 +380,9 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v | --verbose)
             VERBOSE=1
+            ;;
+        -q | --quiet)
+            QUIET=1
             ;;
         -h | --help)
             help_user
@@ -292,6 +396,12 @@ while [[ $# -gt 0 ]]; do
             DRIVE_NAME="$2"
             shift
             ;;
+        # -)
+        #     while read -r from_stdin; do
+        #         FROM_STDIN=("$from_stdin")
+        #     done
+        #     break
+        #     ;;
         *)
             initlog
             error_msg "Unknown argument $key"
@@ -309,9 +419,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-#######################################################################
-#                           CODE Goes Here                            #
-#######################################################################
 
 if [[ ! -f $NTFS_EXE ]]; then
     error_msg "Missing ntfs-3g, cannot re-mount the drives"
@@ -341,9 +448,9 @@ if [[ -z $DRIVE_DEV ]] || [[ -z $DRIVE_NAME ]] || [[ -z $DISK_INFO ]]; then
 fi
 
 # status_msg "Drive name: $DRIVE_NAME, located in $DRIVE_DEV"
-if ! eval '$(df -h | grep -qi "/Volumes/$DRIVE_NAME")'; then
+if [[ ! $(shell_exec "df -h | grep -i \"/Volumes/$DRIVE_NAME\"") == "" ]] ; then
     status_msg "Unmounting ${DRIVE_DEV}"
-    if ! sudo diskutil unmount "$DRIVE_DEV"; then
+    if ! shell_exec "sudo diskutil unmount \"$DRIVE_DEV\""; then
         error_msg "Failed to unmount $DRIVE_NAME"
         exit 1
     fi
@@ -351,16 +458,14 @@ fi
 
 sleep 1
 status_msg "Creating mouting point"
-sudo mkdir -p "/Volumes/$DRIVE_NAME"
+shell_exec "sudo mkdir -p \"/Volumes/$DRIVE_NAME\""
 status_msg "Remounting disk as ${DRIVE_NAME}"
 if ! sudo "$NTFS_EXE" "$DRIVE_DEV" "/Volumes/$DRIVE_NAME" -o local -o allow_other -o auto_xattr -o auto_cache -o uid="$(id -u)"; then
     error_msg "Failed to mount $DRIVE_NAME with write permissions"
     exit 1
 fi
 
-#######################################################################
-#                           CODE Goes Here                            #
-#######################################################################
+
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
 fi

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2317
 
 #
 #                                     -`
@@ -21,8 +22,28 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
+VERBOSE=0
+QUIET=0
+NOCOLOR=0
+NOLOG=0
+WARN_COUNT=0
+ERR_COUNT=0
+# FROM_STDIN=()
+
 NAME="$0"
 NAME="${NAME##*/}"
+LOG="${NAME%%.*}.log"
+
+SCRIPT_PATH="$0"
+
+SCRIPT_PATH="${SCRIPT_PATH%/*}"
+
+OS='unknown'
+ARCH="$(uname -m)"
+
+trap '{ exit_append; }' EXIT
+
+TMP='/tmp/'
 URL="https://github.com/neovim/neovim"
 PYTHON_LIBS=0
 RUBY_LIBS=0
@@ -30,25 +51,140 @@ RUBY_LIBS=0
 CLONE=0
 FORCE_INSTALL=0
 PORTABLE=0
-VERBOSE=0
+INSTALL_DIR="$HOME/.local"
 DEV=0
 STABLE=0
-NOLOG=1
-NOCOLOR=0
-INSTALL_DIR="$HOME/.local"
-
-NAME="$0"
-NAME="${NAME##*/}"
-LOG="${NAME%%.*}.log"
-
-WARN_COUNT=0
-ERR_COUNT=0
-
 NVIM_VERSION="latest"
 
-OS='unknown'
+if hash realpath 2>/dev/null; then
+    SCRIPT_PATH=$(realpath "$SCRIPT_PATH")
+else
+    pushd "$SCRIPT_PATH" 1>/dev/null  || exit 1
+    SCRIPT_PATH="$(pwd -P)"
+    popd 1>/dev/null  || exit 1
+fi
 
-TMP='/tmp/'
+if [[ -n $ZSH_NAME ]]; then
+    CURRENT_SHELL="zsh"
+elif [[ -n $BASH ]]; then
+    CURRENT_SHELL="bash"
+else
+    # shellcheck disable=SC2009,SC2046
+    if [[ -z $CURRENT_SHELL ]]; then
+        CURRENT_SHELL="${SHELL##*/}"
+    fi
+fi
+
+if [ -z "$SHELL_PLATFORM" ]; then
+    if [[ -n $TRAVIS_OS_NAME ]]; then
+        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
+    else
+        case "$OSTYPE" in
+            *'linux'*)    export SHELL_PLATFORM='linux' ;;
+            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
+            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
+            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
+            *'msys'*)     export SHELL_PLATFORM='msys' ;;
+            *'windows'*)  export SHELL_PLATFORM='windows' ;;
+            *)            export SHELL_PLATFORM='unknown' ;;
+        esac
+    fi
+fi
+
+case "$SHELL_PLATFORM" in
+    # TODO: support more linux distros
+    linux)
+        if [[ -f /etc/arch-release ]]; then
+            OS='arch'
+        elif [[ -f /etc/redhat-release ]] && [[ "$(cat /etc/redhat-release)" == Red\ Hat* ]]; then
+            OS='redhat'
+        elif [[ -f /etc/issue ]] && [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
+            OS='ubuntu'
+        elif [[ -f /etc/debian_version ]] || [[ "$(cat /etc/issue)" == Debian* ]]; then
+            if [[ $ARCH =~ armv.* ]] || [[ $ARCH == aarch64 ]]; then
+                OS='raspbian'
+            else
+                OS='debian'
+            fi
+        fi
+        ;;
+    cygwin | msys | windows)
+        OS='windows'
+        ;;
+    osx)
+        OS='macos'
+        ;;
+    bsd)
+        OS='bsd'
+        ;;
+esac
+
+if ! hash is_windows 2>/dev/null; then
+    function is_windows() {
+        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_wls 2>/dev/null; then
+    function is_wls() {
+        if [[ "$(uname -r)" =~ Microsoft ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_osx 2>/dev/null; then
+    function is_osx() {
+        if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_root 2>/dev/null; then
+    function is_root() {
+        if ! is_windows && [[ $EUID -eq 0 ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash has_sudo 2>/dev/null; then
+    function has_sudo() {
+        if ! is_windows && hash sudo 2>/dev/null && [[ "$(groups)" =~ sudo ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_arm 2>/dev/null; then
+    function is_arm() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch =~ ^arm ]] || [[ $arch =~ ^aarch ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
+
+if ! hash is_64bits 2>/dev/null; then
+    function is_64bits() {
+        local arch
+        arch="$(uname -m)"
+        if [[ $arch == 'x86_64' ]] || [[ $arch == 'arm64' ]]; then
+            return 0
+        fi
+        return 1
+    }
+fi
 
 # colors
 # shellcheck disable=SC2034
@@ -74,79 +210,19 @@ normal="\033[0m"
 # shellcheck disable=SC2034
 reset_color="\033[39m"
 
-if [ -z "$SHELL_PLATFORM" ]; then
-    if [[ -n $TRAVIS_OS_NAME ]]; then
-        export SHELL_PLATFORM="$TRAVIS_OS_NAME"
-    else
-        case "$OSTYPE" in
-            *'linux'*)    export SHELL_PLATFORM='linux' ;;
-            *'darwin'*)   export SHELL_PLATFORM='osx' ;;
-            *'freebsd'*)  export SHELL_PLATFORM='bsd' ;;
-            *'cygwin'*)   export SHELL_PLATFORM='cygwin' ;;
-            *'msys'*)     export SHELL_PLATFORM='msys' ;;
-            *'windows'*)  export SHELL_PLATFORM='windows' ;;
-            *)            export SHELL_PLATFORM='unknown' ;;
-        esac
-    fi
-fi
-
-case "$SHELL_PLATFORM" in
-    # TODO: support more linux distros
-    linux)
-        if [[ -f /etc/arch-release ]]; then
-            OS='arch'
-        elif [[ "$(cat /etc/issue)" == Ubuntu* ]]; then
-            OS='ubuntu'
-        elif [[ -f /etc/debian_version ]]; then
-            if [[ "$(uname -a)" == *\ armv7* ]]; then # Raspberry pi 3 uses armv7 cpu
-                OS='raspbian'
-            else
-                OS='debian'
-            fi
-        fi
-        ;;
-    cygwin | msys | windows)
-        OS='windows'
-        ;;
-    osx)
-        OS='macos'
-        ;;
-    bsd)
-        OS='bsd'
-        ;;
-esac
-
-# _ARCH="$(uname -m)"
-
-if ! hash is_windows 2>/dev/null; then
-    function is_windows() {
-        if [[ $SHELL_PLATFORM =~ (msys|cygwin|windows) ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-if ! hash is_osx 2>/dev/null; then
-    function is_osx() {
-        if [[ $SHELL_PLATFORM == 'osx' ]]; then
-            return 0
-        fi
-        return 1
-    }
-fi
-
-function show_help() {
+function help_user() {
     cat <<EOF
-Simple script to build and install Neovim directly from the source
-with some pretty basic options.
+Description
+    Simple script to build and install Neovim directly from the source
+    with some pretty basic options.
 
 Usage:
-    $NAME [OPTIONS]
+    $NAME [OPTIONAL]
 
     Optional Flags
-        --portable
-            Download the portable version and place it in $HOME/.local/bin
+        --nolog                 Disable log writing
+        --nocolor               Disable color output
+        --portable              Download the portable version and place it in $HOME/.local/bin
 
         -c, --clone             By default this script expect to run under a git directory with
                                 the Neovim's source code, this options clone Neovim's repo and move
@@ -155,6 +231,7 @@ Usage:
         -d, --dir <DIR>         Choose the base root of the repo and move to it before compile
                                 the source code, if this options is used with -c/--clone flag
                                 it will clone the repo in the desire <DIR>
+
         -i, --install <PATH>    Path where neovim will be install, default: $INSTALL_DIR
         -p, --python            Install Neovim's python package for python2 and python3
         -r, --ruby              Install Neovim's ruby package
@@ -163,17 +240,20 @@ Usage:
         --stable                Use stable builds/portables instead of stable
         -C                      Set the compiler, gcc/clang
         -v, --verbose           Enable debug messages
-        -h, --help              Displays help
+        -q, --quiet             Suppress all output but the errors
+        -h, --help              Display this help message
 EOF
     # _show_nvim_help
 }
 
 function warn_msg() {
     local msg="$1"
-    if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
-    else
-        printf "[!] Warning:\t %s\n" "$msg"
+    if [[ $QUIET -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
+        else
+            printf "[!] Warning:\t %s\n" "$msg"
+        fi
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
@@ -198,10 +278,12 @@ function error_msg() {
 
 function status_msg() {
     local msg="$1"
-    if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
-    else
-        printf "[*] Info:\t %s\n" "$msg"
+    if [[ $QUIET -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
+        else
+            printf "[*] Info:\t %s\n" "$msg"
+        fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
         printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
@@ -223,6 +305,232 @@ function verbose_msg() {
     fi
     return 0
 }
+
+function __parse_args() {
+    if [[ $# -lt 2 ]]; then
+        error_msg "Internal error in __parse_args function trying to parse $1"
+        exit 1
+    fi
+
+    local flag="$2"
+    local value="$1"
+
+    local pattern="^--${flag}=[a-zA-Z0-9.:@_/~-]+$"
+
+    if [[ -n $3   ]]; then
+        local pattern="^--${flag}=$3$"
+    fi
+
+    if [[ $value =~ $pattern ]]; then
+        local left_side="${value#*=}"
+        echo "${left_side/#\~/$HOME}"
+    else
+        echo "$value"
+    fi
+}
+
+function initlog() {
+    if [[ $NOLOG -eq 0 ]]; then
+        [[ -n $LOG ]] && rm -f "${LOG}" 2>/dev/null
+        if ! touch "${LOG}" &>/dev/null; then
+            error_msg "Fail to init log file"
+            NOLOG=1
+            return 1
+        fi
+        if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
+            cat "${SCRIPT_PATH}/shell/banner" >"${LOG}"
+        fi
+        if ! is_osx; then
+            LOG=$(readlink -e "${LOG}")
+        fi
+        verbose_msg "Using log at ${LOG}"
+    fi
+    return 0
+}
+
+function exit_append() {
+    if [[ $NOLOG -eq 0 ]]; then
+        if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
+            printf "\n\n" >>"${LOG}"
+        fi
+
+        if [[ $WARN_COUNT -gt 0 ]]; then
+            printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
+        fi
+        if [[ $ERR_COUNT -gt 0 ]]; then
+            printf "[*] Errors:\t%s\n" "$ERR_COUNT" >>"${LOG}"
+        fi
+    fi
+    return 0
+}
+
+function raw_output() {
+    local msg="echo \"$1\""
+    if [[ $NOLOG -eq 0 ]]; then
+        msg="$msg | tee ${LOG}"
+    fi
+    if ! sh -c "$msg"; then
+            return 1
+    fi
+    return 0
+}
+
+function shell_exec() {
+    local cmd="$1"
+    if [[ $VERBOSE -eq 1 ]]; then
+        if [[ $NOLOG -eq 0 ]]; then
+            cmd="$cmd | tee ${LOG}"
+        fi
+        if ! sh -c "$cmd"; then
+            return 1
+        fi
+    elif [[ $NOLOG -eq 0 ]]; then
+        if ! sh -c "$cmd >> ${LOG}"; then
+            return 1
+        fi
+    else
+        if ! sh -c "$cmd &>/dev/null"; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+        --nolog)
+            NOLOG=1
+            ;;
+        --nocolor)
+            NOCOLOR=1
+            ;;
+        --portable=*)
+            PORTABLE=1
+            _result=$(__parse_args "$key" "portable" '[0-9]\.[0-9](\.[0-9])?')
+            if [[ $_result == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            NVIM_VERSION="v$_result"
+            ;;
+        --portable)
+            PORTABLE=1
+            if [[ $2 =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
+                NVIM_VERSION="v$2"
+                shift
+            fi
+            ;;
+        -f | --force)
+            FORCE_INSTALL=1
+            ;;
+        --compiler=*)
+            _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
+            if [[ $_result == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            export CC="$_result"
+            if [[ $CC == gcc ]]; then
+                export CXX=g++
+            elif [[ $CC == clang ]]; then
+                export CXX=clang++
+            fi
+            if ! hash "$CC" 2>/dev/null; then
+                error_msg "Missing compiler C $CC in PATH"
+                exit 1
+            elif ! hash "$CXX" 2>/dev/null; then
+                error_msg "Missing compiler C++ $CXX in PATH"
+                exit 1
+            fi
+            ;;
+        -C | --compiler)
+            if [[ -z $2 ]]; then
+                error_msg "Missing compiler"
+                exit 1
+            elif [[ ! $2 =~ ^(gcc|clang)$ ]]; then
+                error_msg "Invalid compiler $2, please select gcc or clang "
+                exit 1
+            fi
+            export CC="$2"
+            shift
+            if [[ $CC == gcc ]]; then
+                export CXX=g++
+            elif [[ $CC == clang ]]; then
+                export CXX=clang++
+            fi
+            if ! hash "$CC" 2>/dev/null; then
+                error_msg "Missing compiler C $CC in PATH"
+                exit 1
+            elif ! hash "$CXX" 2>/dev/null; then
+                error_msg "Missing compiler C++ $CXX in PATH"
+                exit 1
+            fi
+            ;;
+        --clone=*)
+            CLONE=1
+            _result=$(__parse_args "$key" "clone" '.+')
+            if [[ $_result == "$key" ]]; then
+                error_msg "Not a valid version ${_result##*=}"
+                exit 1
+            fi
+            CLONE_LOC="$_result"
+            ;;
+        -c | --clone)
+            CLONE=1
+            ;;
+        -i | --install)
+            if [[ -z $2 ]]; then
+                error_msg "Missing install path"
+                exit 1
+            fi
+            INSTALL_DIR="$2"
+            shift
+            ;;
+        -p | --python)
+            PYTHON_LIBS=1
+            ;;
+        -r | --ruby)
+            RUBY_LIBS=1
+            ;;
+        # -b | --build)
+        #     BUILD_LIBS=1
+        #     ;;
+        -v | --verbose)
+            VERBOSE=1
+            ;;
+        -q | --quiet)
+            QUIET=1
+            ;;
+        --stable)
+            DEV=0
+            STABLE=1
+            ;;
+        --dev)
+            DEV=1
+            STABLE=0
+            ;;
+        -h | --help)
+            help_user
+            exit 0
+            ;;
+        *)
+            initlog
+            error_msg "Unknown argument $key"
+            help_user
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+initlog
+verbose_msg "Log Disable   : ${NOLOG}"
+verbose_msg "Current Shell : ${CURRENT_SHELL}"
+verbose_msg "Platform      : ${SHELL_PLATFORM}"
+verbose_msg "Architecture  : ${ARCH}"
+verbose_msg "OS            : ${OS}"
+
 
 function get_portable() {
     local dir
@@ -368,150 +676,6 @@ function get_libs() {
     fi
 }
 
-function __parse_args() {
-    if [[ $# -lt 2 ]]; then
-        error_msg "Internal error in __parse_args function trying to parse $1"
-        exit 1
-    fi
-
-    local arg="$1"
-    local name="$2"
-
-    local pattern="^--${name}=[a-zA-Z0-9.:@_/~-]+$"
-
-    if [[ -n $3 ]]; then
-        local pattern="^--${name}=$3$"
-    fi
-
-    if [[ $arg =~ $pattern ]]; then
-        local left_side="${arg#*=}"
-        echo "${left_side/#\~/$HOME}"
-    else
-        echo "$arg"
-    fi
-}
-
-while [[ $# -gt 0 ]]; do
-    key="$1"
-    case "$key" in
-        --nocolor)
-            NOCOLOR=1
-            ;;
-        --portable=*)
-            PORTABLE=1
-            _result=$(__parse_args "$key" "portable" '[0-9]\.[0-9](\.[0-9])?')
-            if [[ $_result == "$key" ]]; then
-                error_msg "Not a valid version ${_result##*=}"
-                exit 1
-            fi
-            NVIM_VERSION="v$_result"
-            ;;
-        --portable)
-            PORTABLE=1
-            if [[ $2 =~ ^[0-9]\.[0-9](\.[0-9])?$ ]]; then
-                NVIM_VERSION="v$2"
-                shift
-            fi
-            ;;
-        -f | --force)
-            FORCE_INSTALL=1
-            ;;
-        --compiler=*)
-            _result=$(__parse_args "$key" "clone" '^(gcc|clang)$')
-            if [[ $_result == "$key" ]]; then
-                error_msg "Not a valid version ${_result##*=}"
-                exit 1
-            fi
-            export CC="$_result"
-            if [[ $CC == gcc ]]; then
-                export CXX=g++
-            elif [[ $CC == clang ]]; then
-                export CXX=clang++
-            fi
-            if ! hash "$CC" 2>/dev/null; then
-                error_msg "Missing compiler C $CC in PATH"
-                exit 1
-            elif ! hash "$CXX" 2>/dev/null; then
-                error_msg "Missing compiler C++ $CXX in PATH"
-                exit 1
-            fi
-            ;;
-        -C | --compiler)
-            if [[ -z $2 ]]; then
-                error_msg "Missing compiler"
-                exit 1
-            elif [[ ! $2 =~ ^(gcc|clang)$ ]]; then
-                error_msg "Invalid compiler $2, please select gcc or clang "
-                exit 1
-            fi
-            export CC="$2"
-            shift
-            if [[ $CC == gcc ]]; then
-                export CXX=g++
-            elif [[ $CC == clang ]]; then
-                export CXX=clang++
-            fi
-            if ! hash "$CC" 2>/dev/null; then
-                error_msg "Missing compiler C $CC in PATH"
-                exit 1
-            elif ! hash "$CXX" 2>/dev/null; then
-                error_msg "Missing compiler C++ $CXX in PATH"
-                exit 1
-            fi
-            ;;
-        --clone=*)
-            CLONE=1
-            _result=$(__parse_args "$key" "clone" '.+')
-            if [[ $_result == "$key" ]]; then
-                error_msg "Not a valid version ${_result##*=}"
-                exit 1
-            fi
-            CLONE_LOC="$_result"
-            ;;
-        -c | --clone)
-            CLONE=1
-            ;;
-        -i | --install)
-            if [[ -z $2 ]]; then
-                error_msg "Missing install path"
-                exit 1
-            fi
-            INSTALL_DIR="$2"
-            shift
-            ;;
-        -p | --python)
-            PYTHON_LIBS=1
-            ;;
-        -r | --ruby)
-            RUBY_LIBS=1
-            ;;
-        # -b | --build)
-        #     BUILD_LIBS=1
-        #     ;;
-        -v | --verbose)
-            VERBOSE=1
-            ;;
-        --stable)
-            DEV=0
-            STABLE=1
-            ;;
-        --dev)
-            DEV=1
-            STABLE=0
-            ;;
-        -h | --help)
-            show_help
-            exit 0
-            ;;
-        *)
-            error_msg "Unknown argument $key"
-            show_help
-            exit 1
-            ;;
-    esac
-    shift
-done
-
 if [[ $PORTABLE -eq 1 ]]; then
     if get_portable; then
         if get_libs; then
@@ -535,7 +699,7 @@ fi
 
 if [[ $CLONE -eq 1 ]]; then
     status_msg "Cloning neovim repo"
-    if ! git clone --recursive https://github.com/neovim/neovim "${CLONE_LOC:-.}"; then
+    if ! shell_exec "git clone --recursive https://github.com/neovim/neovim \"${CLONE_LOC:-.}\""; then
         error_msg "Failed to clone neovim"
         exit 2
     fi
@@ -543,7 +707,7 @@ if [[ $CLONE -eq 1 ]]; then
 fi
 
 status_msg "Cleaning current build"
-make clean
+shell_exec "make clean"
 
 BUILD_TYPE="Release"
 
@@ -564,17 +728,17 @@ fi
 if [[ $BRANCH != "$current_branch" ]]; then
     status_msg "Checking out to $BRANCH"
     if [[ $BRANCH =~ ^origin/ ]]; then
-        git branch --track "${BRANCH#origin/}" "remotes/$BRANCH"
+        shell_exec "git branch --track \"${BRANCH#origin/}\" \"remotes/$BRANCH\""
     fi
-    git switch "${BRANCH#origin/}"
+    shell_exec "git switch \"${BRANCH#origin/}\""
 fi
 
 status_msg "Building neovim"
 verbose_msg "Building $BUILD_TYPE on $BRANCH"
-if make CMAKE_BUILD_TYPE="$BUILD_TYPE" -j; then
+if shell_exec "make CMAKE_BUILD_TYPE=$BUILD_TYPE -j"; then
     INSTALL_DIR="${INSTALL_DIR:-$HOME/.local}"
     status_msg "Installing neovim into $INSTALL_DIR"
-    if ! make  CMAKE_BUILD_TYPE="$BUILD_TYPE" CMAKE_INSTALL_PREFIX="$INSTALL_DIR" install; then
+    if ! shell_exec "make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_INSTALL_PREFIX=\"$INSTALL_DIR\" install"; then
         error_msg "Failed to install neovim"
     fi
 else
@@ -584,6 +748,7 @@ fi
 if [[ $CLONE -eq 1 ]]; then
     popd >/dev/null  || exit 1
 fi
+
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
