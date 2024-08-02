@@ -321,10 +321,10 @@ fkill() {
     local fzf_filter='fzf --multi --exit-0'
 
     local filter
-    if hash fzf 2>/dev/null; then
-        filter="$fzf_filter"
-    elif hash gum 2>/dev/null; then
+    if hash gum 2>/dev/null; then
         filter="$gum_filter"
+    elif hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
         return 1
@@ -347,10 +347,10 @@ plist() {
     local fzf_filter='fzf --multi --exit-0'
 
     local filter
-    if hash fzf 2>/dev/null; then
-        filter="$fzf_filter"
-    elif hash gum 2>/dev/null; then
+    if hash gum 2>/dev/null; then
         filter="$gum_filter"
+    elif hash fzf 2>/dev/null; then
+        filter="$fzf_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
         return 1
@@ -374,10 +374,10 @@ if  hash ssh 2>/dev/null && [[ -f "$HOME/.ssh/config" ]]; then
         local fzf_filter='fzf --exit-0'
 
         local filter
-        if hash fzf 2>/dev/null; then
-            filter="$fzf_filter"
-        elif hash gum 2>/dev/null; then
+        if hash gum 2>/dev/null; then
             filter="$gum_filter"
+        elif hash fzf 2>/dev/null; then
+            filter="$fzf_filter"
         else
             error_msg "Missing fzf and gum, cannot continue"
             return 1
@@ -726,20 +726,17 @@ function bk() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
+                cat<<EOF
+    Function to go back any number of dirs
 
-                echo ""
-                echo "  Function to go back any number of dirs"
-                echo ""
-                echo "  Usage:"
-                echo "      $ bk [Number of nodes to move back] [OPTIONAL]"
-                echo "          Ex."
-                echo "          $ bk 2 # = cd ../../"
-                echo ""
-                echo "      Optional Flags"
-                echo "          -h, --help"
-                echo "              Display help and exit. If you are seeing this,"
-                echo "              that means that you already know it (nice)"
-                echo ""
+    Usage:
+        $ bk [Number of nodes to move back] [OPTIONAL]
+            Ex.
+            $ bk 2 # = cd ../../
+
+        Optional Flags
+            -h, --help      Display help and exit.
+EOF
 
                 return 0
                 ;;
@@ -766,20 +763,17 @@ function mkcd() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
+                cat<<EOF
+    Create a dir an move to it
 
-                echo ""
-                echo "  Create a dir an move to it"
-                echo ""
-                echo "  Usage:"
-                echo "      mkcd NEW_DIR [OPTIONAL]"
-                echo "          Ex."
-                echo "          $ mkcd new_foo"
-                echo ""
-                echo "      Optional Flags"
-                echo "          -h, --help"
-                echo "              Display help and exit."
-                echo ""
+    Usage:
+        mkcd NEW_DIR [OPTIONAL]
+            Ex.
+            $ mkcd new_foo
 
+        Optional Flags
+            -h, --help      Display help and exit.
+EOF
                 return 0
                 ;;
         esac
@@ -839,21 +833,18 @@ function replace_base() {
         case "$key" in
             -h | --help)
 
-                echo ""
-                echo "  Function to look for the nearest ancestor with the full given path"
-                echo ""
-                echo "  Usage:"
-                echo "      $ replace_base DIR [OPTIONAL]"
-                echo "          Ex."
-                echo "          /home/$USER/foo/dummy $ replace_base bar"
-                echo "          /home/$USER/bar/dummy $"
-                echo ""
-                echo "      Optional Flags"
-                echo "          -h, --help"
-                echo "              Display help and exit. If you are seeing this,"
-                echo "              that means that you already know it (nice)"
-                echo ""
+                cat<<EOF
+    Function to look for the nearest ancestor with the full given path
 
+    Usage:
+        $ replace_base DIR [OPTIONAL]
+            Ex.
+            /home/$USER/foo/dummy $ replace_base bar
+            /home/$USER/bar/dummy $
+
+        Optional Flags
+            -h, --help      Display help and exit.
+EOF
                 return 0
                 ;;
         esac
@@ -896,22 +887,18 @@ function change_base() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
+                cat<<EOF
+    Function to look for the nearest ancestor of given dir
 
-                echo ""
-                echo "  Function to look for the nearest ancestor of given dir"
-                echo ""
-                echo "  Usage:"
-                echo "      $ change_base DIR [OPTIONAL]"
-                echo "          Ex."
-                echo "          /home/$USER/foo $ change_base bar"
-                echo "          /home/$USER/bar $"
-                echo ""
-                echo "      Optional Flags"
-                echo "          -h, --help"
-                echo "              Display help and exit. If you are seeing this,"
-                echo "              that means that you already know it (nice)"
-                echo ""
+    Usage:
+        $ change_base DIR [OPTIONAL]
+            Ex.
+            /home/$USER/foo $ change_base bar
+            /home/$USER/bar $
 
+        Optional Flags
+            -h, --help      Display help and exit.
+EOF
                 return 0
                 ;;
         esac
