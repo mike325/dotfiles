@@ -23,6 +23,8 @@ if ( `where nvim` != "" ) then
     alias bim "nvim"
     alias cim "nvim"
     alias im "nvim"
+
+    setenv MANPAGER 'nvim --noplugin --cmd "let g:minimal=v:true" -c "Man!"'
 else
     setenv EDITOR "vim"
 
@@ -48,7 +50,13 @@ endif
 
 if ( `where bat` != "" ) then
     alias cat bat
-    setenv MANPAGER "sh -c 'col -bx | bat -l man -p'"
+    if (! $?MANPAGER) then
+        setenv MANPAGER "sh -c 'col -bx | bat -l man -p'"
+    else
+        if ("$MANPAGER" == "")  then
+            setenv MANPAGER "sh -c 'col -bx | bat -l man -p'"
+        endif
+    endif
 endif
 
 ################################################################################

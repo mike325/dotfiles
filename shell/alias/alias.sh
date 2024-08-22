@@ -85,7 +85,7 @@ if hash nvim 2>/dev/null; then
     alias im="nvim"
 
     # shellcheck disable=SC2016
-    export MANPAGER='nvim --cmd "let g:minimal=v:true" +Man!'
+    export MANPAGER='nvim --noplugin --cmd "let g:minimal=v:true" +Man!'
 
 else
     export EDITOR="vim"
