@@ -531,7 +531,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 function get_portable() {
     local dir
     local exe_path
@@ -748,7 +747,6 @@ fi
 if [[ $CLONE -eq 1 ]]; then
     popd >/dev/null  || exit 1
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

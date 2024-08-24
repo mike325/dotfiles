@@ -336,10 +336,10 @@ function raw_output() {
         local msg="echo \"$1\""
         if [[ $NOLOG -eq 0 ]]; then
             msg="$msg | tee ${LOG}"
-        fi
+    fi
         if ! sh -c "$msg"; then
             return 1
-        fi
+    fi
     return 0
 }
 
@@ -406,7 +406,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 # TODO: Add commit log as preview
 checkout() {
     local gum_filter='gum filter --fuzzy --height=20 --width=0 --limit=1 --header "Select branch"'
@@ -448,7 +447,6 @@ else
     error_msg "Missing FZF and gum"
     exit 1
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

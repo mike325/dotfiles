@@ -131,12 +131,12 @@ if ! hash is_wls 2>/dev/null; then
 fi
 
 if ! hash is_osx 2>/dev/null; then
-function is_osx() {
-    if [[ $SHELL_PLATFORM == 'osx' ]]; then
-        return 0
-    fi
-    return 1
-}
+    function is_osx() {
+        if [[ $SHELL_PLATFORM == 'osx' ]]; then
+            return 0
+        fi
+        return 1
+    }
 fi
 
 if ! hash is_root 2>/dev/null; then
@@ -157,7 +157,7 @@ if ! hash has_sudo 2>/dev/null; then
     }
 fi
 
-if ! hash is_arm 2>/dev/null ; then
+if ! hash is_arm 2>/dev/null; then
     function is_arm() {
         local arch
         arch="$(uname -m)"
@@ -222,11 +222,11 @@ EOF
 function warn_msg() {
     local msg="$1"
     if [[ $QUIET -eq 0 ]]; then
-    if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
-    else
-        printf "[!] Warning:\t %s\n" "$msg"
-    fi
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
+        else
+            printf "[!] Warning:\t %s\n" "$msg"
+        fi
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
@@ -252,11 +252,11 @@ function error_msg() {
 function status_msg() {
     local msg="$1"
     if [[ $QUIET -eq 0 ]]; then
-    if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
-    else
-        printf "[*] Info:\t %s\n" "$msg"
-    fi
+        if [[ $NOCOLOR -eq 0 ]]; then
+            printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
+        else
+            printf "[*] Info:\t %s\n" "$msg"
+        fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
         printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
@@ -419,7 +419,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 if [[ ! -f $NTFS_EXE ]]; then
     error_msg "Missing ntfs-3g, cannot re-mount the drives"
     exit 1
@@ -448,7 +447,7 @@ if [[ -z $DRIVE_DEV ]] || [[ -z $DRIVE_NAME ]] || [[ -z $DISK_INFO ]]; then
 fi
 
 # status_msg "Drive name: $DRIVE_NAME, located in $DRIVE_DEV"
-if [[ ! $(shell_exec "df -h | grep -i \"/Volumes/$DRIVE_NAME\"") == "" ]] ; then
+if [[ $(  shell_exec "df -h | grep -i \"/Volumes/$DRIVE_NAME\"") != "" ]]; then
     status_msg "Unmounting ${DRIVE_DEV}"
     if ! shell_exec "sudo diskutil unmount \"$DRIVE_DEV\""; then
         error_msg "Failed to unmount $DRIVE_NAME"
@@ -464,7 +463,6 @@ if ! sudo "$NTFS_EXE" "$DRIVE_DEV" "/Volumes/$DRIVE_NAME" -o local -o allow_othe
     error_msg "Failed to mount $DRIVE_NAME with write permissions"
     exit 1
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

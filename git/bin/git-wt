@@ -419,7 +419,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select worktree"'
 fzf_filter='fzf --select-1 --exit-0 --height=60% '
 
@@ -505,7 +504,6 @@ else
         [ ! -d ./.cache/clangd/pchs ] && shell_exec "mkdir -p './.cache/clangd/pchs/'"
     fi
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

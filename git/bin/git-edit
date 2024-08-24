@@ -276,7 +276,7 @@ function verbose_msg() {
             printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
         else
             printf "[+] Debug:\t %s\n" "$msg"
-    fi
+        fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
         printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
@@ -421,7 +421,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 # _GITDIR="$(git rev-parse --git-dir)"
 IFS=$'\n' read -r -d '' -a worklist < <(git worktree list 2>/dev/null | awk '{print $1}')
 for i in "${worklist[@]}"; do
@@ -441,7 +440,6 @@ if [[ -n ${FILES[0]} ]]; then
 else
     warn_msg "No files to edit"
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1

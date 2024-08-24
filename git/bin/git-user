@@ -221,11 +221,11 @@ EOF
 function warn_msg() {
     local msg="$1"
     if [[ $QUIET -eq 0 ]]; then
-    if [[ $NOCOLOR -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
-    else
+        else
             printf "[!] Warning:\t %s\n" "$msg"
-    fi
+        fi
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
     if [[ $NOLOG -eq 0 ]]; then
@@ -251,11 +251,11 @@ function error_msg() {
 function status_msg() {
     local msg="$1"
     if [[ $QUIET -eq 0 ]]; then
-    if [[ $NOCOLOR -eq 0 ]]; then
+        if [[ $NOCOLOR -eq 0 ]]; then
             printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
-    else
+        else
             printf "[*] Info:\t %s\n" "$msg"
-    fi
+        fi
     fi
     if [[ $NOLOG -eq 0 ]]; then
         printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
@@ -424,7 +424,6 @@ verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
 
-
 if ! hash git 2>/dev/null; then
     error_msg "Missig git"
     exit 1
@@ -443,7 +442,6 @@ else
     shell_exec "git config --global user.name \"$USER\""
     shell_exec "git config --global user.email \"$EMAIL\""
 fi
-
 
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
