@@ -24,7 +24,7 @@ if ( `where nvim` != "" ) then
     alias cim "nvim"
     alias im "nvim"
 
-    setenv MANPAGER 'nvim --noplugin --cmd "let g:minimal=v:true" -c "Man!"'
+    setenv MANPAGER 'nvim --cmd "let g:minimal=v:true"  +Man!'
 else
     setenv EDITOR "vim"
 

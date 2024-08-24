@@ -85,7 +85,7 @@ if hash nvim 2>/dev/null; then
     alias im="nvim"
 
     # shellcheck disable=SC2016
-    export MANPAGER='nvim --noplugin --cmd "let g:minimal=v:true" +Man!'
+    export MANPAGER='nvim --cmd "let g:minimal=v:true"  +Man!'
 
 else
     export EDITOR="vim"
@@ -725,7 +725,7 @@ function bk() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
-                cat<<EOF
+                cat <<EOF
     Function to go back any number of dirs
 
     Usage:
@@ -762,7 +762,7 @@ function mkcd() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
-                cat<<EOF
+                cat <<EOF
     Create a dir an move to it
 
     Usage:
@@ -832,7 +832,7 @@ function replace_base() {
         case "$key" in
             -h | --help)
 
-                cat<<EOF
+                cat <<EOF
     Function to look for the nearest ancestor with the full given path
 
     Usage:
@@ -886,7 +886,7 @@ function change_base() {
     for key in "$@"; do
         case "$key" in
             -h | --help)
-                cat<<EOF
+                cat <<EOF
     Function to look for the nearest ancestor of given dir
 
     Usage:
