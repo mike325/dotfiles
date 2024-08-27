@@ -1,34 +1,17 @@
 #!/usr/bin/env tcsh
 
-################################################################################
-#                                                                              #
-#  NOT TESTED!!!! Draft of a simple/basic port of my shellrc                   #
-#                                                                              #
-#   Author: Mike 8a                                                            #
-#   Description: Small shell configs                                           #
-#                                                                              #
-#                                     -`                                       #
-#                     ...            .o+`                                      #
-#                  .+++s+   .h`.    `ooo/                                      #
-#                 `+++%++  .h+++   `+oooo:                                     #
-#                 +++o+++ .hhs++. `+oooooo:                                    #
-#                 +s%%so%.hohhoo'  'oooooo+:                                   #
-#                 `+ooohs+h+sh++`/:  ++oooo+:                                  #
-#                  hh+o+hoso+h+`/++++.+++++++:                                 #
-#                   `+h+++h.+ `/++++++++++++++:                                #
-#                            `/+++ooooooooooooo/`                              #
-#                           ./ooosssso++osssssso+`                             #
-#                          .oossssso-````/osssss::`                            #
-#                         -osssssso.      :ssss``to.                           #
-#                        :osssssss/  Mike  osssl   +                           #
-#                       /ossssssss/   8a   +sssslb                             #
-#                     `/ossssso+/:-        -:/+ossss'.-                        #
-#                    `+sso+:-`                 `.-/+oso:                       #
-#                   `++:.                           `-/+/                      #
-#                   .`   github.com/mike325/dotfiles   `/                      #
-#                                                                              #
-################################################################################
-
 # Magic tcsh stuff
 set autolist
-set prompt="%B`whoami`%b@`hostname -s` at %B[$CWD:t]%b -> "
+if ($?CLEARCASE_ROOT) then
+    setenv CC_VIEW_NAME `echo "$CLEARCASE_ROOT" | awk -F/ -v pat="${USER}_at_" '{gsub(pat, "", $3 ) ; print $3}'`
+    set prompt="\n%B`[ $USER = root ] && echo $USER@`%b%m: %B[%~]%b - CC: %B$CC_VIEW_NAME%b\n> "
+else
+    set prompt="\n%B`[ $USER = root ] && echo $USER@`%b%m: %B[%~]%b\n> "
+endif
+
+if ( -d "$HOME/.fzf/bin/" ) then
+    setenv PATH "$HOME/.fzf/bin/:${PATH}"
+endif
+if ( `where tmux` != "" ) then
+    bindkey -c ^a "tmux a || tmux new -s main"
+endif

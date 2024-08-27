@@ -265,8 +265,8 @@ else
     # }
 
     function __cc_view() {
-        if [[ -n $CLEARCASE_CMDLINE ]]; then
-            echo -e "${echo_red}($(echo "$CLEARCASE_CMDLINE" | awk "{ \$2 = substr(\$2,${#USER}+5) } {print \$2}"))${echo_reset_color}"
+        if [[ -n $CLEARCASE_ROOT ]]; then
+            echo -e "${echo_red}($(echo "$CLEARCASE_ROOT" | awk -F/ -v pat="${USER}_at_" '{gsub(pat, "", $3 ) ; print $3}'))${echo_reset_color}"
         fi
     }
 
