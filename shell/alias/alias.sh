@@ -1004,3 +1004,7 @@ fi
 if is_windows; then
     export CYGWIN=winsymlinks:native
 fi
+
+if hash bcompare 2>/dev/null ; then
+    export CLEARCASE_USE_DIFF=bcompare
+fi

@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 _cwd
 _cwd="$(pwd -P)"
 _cwd="${_cwd/$HOME/~}"

@@ -284,7 +284,6 @@ if [[ $- == *i* ]]; then
 
         # I prefer the cool sl and the bins in my path
         _kill_alias=(ips usage del down4me)
-
         for i in "${_kill_alias[@]}"; do
             if [[ "$(command -V "$i")" =~ function ]]; then
                 unset -f "$i"

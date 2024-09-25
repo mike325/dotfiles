@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 if [[ -n $CLEARCASE_ROOT ]]; then
     echo "%F{red}($(echo "$CLEARCASE_ROOT" | awk -F/ -v pat="${USER}_at_" '{gsub(pat, "", $3 ) ; print $3}'))%f"
 fi

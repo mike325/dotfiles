@@ -169,3 +169,7 @@ if ( `where tmux` != "" ) then
     alias tms "tmux new -s main"
     alias tmn "tmux new "
 endif
+
+if ( `where bcompare` != "" ) then
+    setenv CLEARCASE_USE_DIFF bcompare
+endif

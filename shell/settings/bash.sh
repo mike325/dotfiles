@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2139,SC1090,SC1117
 
+[[ ! -d $HOME/.local/share/completions/ ]] && mkdir -p $HOME/.local/share/completions/
+
 ! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
 ! hash is_64bits 2>/dev/null && is_64bits() { return 0; }
 ! hash is_windows 2>/dev/null && is_windows() { return 0; }
@@ -126,14 +128,6 @@ unset MAILCHECK
 # Set vcprompt executable path for scm advance info in prompt (demula theme)
 # https://github.com/djl/vcprompt
 # export VCPROMPT_EXECUTABLE=~/.vcprompt/bin/vcprompt
-
-# # pip bash completion start
-# if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null; then
-#     hash pip 2>/dev/null && eval "$(pip completion --bash)"
-#     hash pip2 2>/dev/null && eval "$(pip2 completion --bash 2>/dev/null)"
-#     hash pip3 2>/dev/null && eval "$(pip3 completion --bash)"
-# fi
-# # pip bash completion end
 
 if hash fzf 2>/dev/null; then
     # shellcheck disable=SC1091
@@ -293,10 +287,6 @@ else
 
 fi
 
-if hash kitty 2>/dev/null; then
-    source <(kitty + complete setup bash)
-fi
-
 if hash tmux 2>/dev/null; then
     bind '"\C-a":"tmux attach -t main || tmux new -s main\n"'
 fi
@@ -321,6 +311,21 @@ function toggleProxy() {
     fi
 }
 
+
+# # pip bash completion start
+# if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null; then
+#     hash pip 2>/dev/null && eval "$(pip completion --bash)"
+#     hash pip2 2>/dev/null && eval "$(pip2 completion --bash 2>/dev/null)"
+#     hash pip3 2>/dev/null && eval "$(pip3 completion --bash)"
+# fi
+# # pip bash completion end
+
+if hash kitty 2>/dev/null; then
+    if [[ ! -f $HOME/.local/share/completions/kitty.bash ]]; then
+        kitty + complete setup bash > $HOME/.local/share/completions/kitty.bash
+    fi
+fi
+
 if hash gh 2>/dev/null; then
     eval "$(gh completion --shell bash)"
 fi
@@ -333,6 +338,7 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
+
     if [[ -d "$HOME/.local/share/completions/" ]]; then
         for cfile in "$HOME/.local/share/completions/"*.bash; do
             source "$cfile" 2>/dev/null
@@ -341,10 +347,10 @@ if ! shopt -oq posix; then
 
     if [[ -f /etc/bash_completion ]]; then
         # shellcheck disable=SC1091
-        source /etc/bash_completion
+        source /etc/bash_completion 2>/dev/null
     elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
         # shellcheck disable=SC1091
-        source /usr/share/bash-completion/bash_completion
+        source /usr/share/bash-completion/bash_completion 2>/dev/null
     else
         # TODO: This may be too slow in some systems
         completion_dirs=(
