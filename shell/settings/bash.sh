@@ -311,7 +311,6 @@ function toggleProxy() {
     fi
 }
 
-
 # # pip bash completion start
 # if hash pip 2>/dev/null || hash pip2 2>/dev/null || hash pip3 2>/dev/null; then
 #     hash pip 2>/dev/null && eval "$(pip completion --bash)"
@@ -322,7 +321,7 @@ function toggleProxy() {
 
 if hash kitty 2>/dev/null; then
     if [[ ! -f $HOME/.local/share/completions/kitty.bash ]]; then
-        kitty + complete setup bash > $HOME/.local/share/completions/kitty.bash
+        kitty + complete setup bash >$HOME/.local/share/completions/kitty.bash
     fi
 fi
 
