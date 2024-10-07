@@ -423,15 +423,22 @@ checkout() {
 
     local branch
     branch=$(git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
-    # NOTE: Assuming we just have 1 remote
-    # remote="$(git remote show)"
     if [[ -n $branch ]]; then
-        if [[ $branch =~ ^[a-zA-Z0-9_]/ ]]; then
-            verbose_msg "creating branch ${branch#*/}"
-            shell_exec "git branch --track \"${branch#*/}\" \"remotes/$branch\""
+        branch_remote=""
+        for remote in $(git remote -v | awk '{print $1}' | uniq); do
+            remote_regex="^${remote}/"
+            if [[ $branch =~ $remote_regex ]]; then
+                branch_remote="$remote"
+                branch="${branch#"${remote}"/}"
+                break
+            fi
+        done
+        verbose_msg "Switching to ${branch}"
+        if [[ -n $branch_remote ]]; then
+            shell_exec "git switch --track  -c \"${branch}\" \"remotes/${branch_remote}/$branch\""
+        else
+            shell_exec "git switch \"${branch}\""
         fi
-        verbose_msg "Switching to ${branch#*/}"
-        shell_exec "git switch \"${branch#*/}\""
     fi
 }
 

@@ -18,8 +18,9 @@
 ;        `++:.                           `-/+/
 ;        .`   github.com/mike325/dotfiles   `/
 
-; [init]
-;   templatedir = ~/.config/git/templates/
+[init]
+    defaultBranch = main
+    ; templatedir = ~/.config/git/templates/
 
 [core]
     editor = $EDITOR
