@@ -461,11 +461,10 @@ else
         verbose_msg "Selected branch: $branch"
         if ! git worktree list | awk '{print $3}' | command grep -q "$branch"; then
             if [[ -n $branch_remote ]]; then
-                    status_msg "Creating local branch from remote $branch"
-                    if ! shell_exec "git branch --track \"${branch}\" \"remotes/${branch_remote}/$branch\""; then
-                        error_msg "Failed to create local branch"
-                        exit 1
-                    fi
+                status_msg "Creating local branch from remote $branch"
+                if ! shell_exec "git branch --track \"${branch}\" \"remotes/${branch_remote}/$branch\""; then
+                    error_msg "Failed to create local branch"
+                    exit 1
                 fi
             fi
             status_msg "Creating worktree"
