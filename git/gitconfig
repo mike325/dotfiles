@@ -26,6 +26,8 @@
     editor = $EDITOR
     autocrlf = input
     symlinks = true
+    untrackedCache = true
+    fsmonitor = true
     ; excludesFile = $HOME/.config/git/ignore
     ; pager = bat --style full
     ; pager = delta --24-bit-color always
