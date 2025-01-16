@@ -486,13 +486,17 @@ else
         verbose_msg "Git dir: $git_dir"
 
         project_files=(
+            ".clangd"
             ".clang-format"
             ".clang-tidy"
+            ".pylintrc"
+            "ruff.toml"
+            ".flake8"
+            "pyproject.toml"
             ".editorconfig"
             ".project.lua"
             ".projections.json"
             ".pre-commit-config.yaml"
-            "pyproject.toml"
             "reviewers.json"
             "typos.toml"
             ".vscode"
@@ -500,9 +504,9 @@ else
 
         status_msg "Copying project files"
         for i in "${project_files[@]}"; do
-            if [[ -f "$git_dir/../../$i" ]]; then
+            if [[ -f "$git_dir/../../$i" ]] && [[ ! -e "./$i" ]]; then
                 verbose_msg "linking $i"
-                shell_exec "ln \"$git_dir/../../$i\" ./"
+                shell_exec "ln -f \"$git_dir/../../$i\" ./"
             fi
         done
 
