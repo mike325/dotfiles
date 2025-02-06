@@ -293,6 +293,7 @@ fi
 
 function toggleProxy() {
     # shellcheck disable=SC2154
+    local proxy="$HOME/.config/shell/host/proxy.sh"
     if [[ -n $http_proxy ]]; then
         unset "http_proxy"
         unset "https_proxy"
@@ -301,9 +302,9 @@ function toggleProxy() {
         unset "no_proxy"
         export PROXY_DISABLE=1
         echo -e " ${echo_yellow}Proxy disable${echo_reset_color}"
-    elif [[ -f "$HOME/.config/shell/host/proxy.sh" ]]; then
+    elif [[ -f "$proxy" ]]; then
         # shellcheck disable=SC1090,SC1091
-        source "$HOME/.config/shell/host/proxy.sh"
+        source "$proxy"
         unset PROXY_DISABLE
         echo -e " ${echo_green}Proxy enable${echo_reset_color}"
     else

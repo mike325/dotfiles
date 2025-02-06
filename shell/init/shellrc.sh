@@ -46,12 +46,12 @@ done
 # # Load profile settings
 # __load_shell_script "$HOME/.profile"
 
+__load_shell_script "$HOME/.config/shell/host/env.sh"
+
 # Load all proxy settings
 if [[ -z $PROXY_DISABLE ]]; then
     __load_shell_script "$HOME/.config/shell/host/proxy.sh"
 fi
-
-__load_shell_script "$HOME/.config/shell/host/env.sh"
 
 __path_dirs=(
     "/usr/sbin/"

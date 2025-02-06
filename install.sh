@@ -1149,17 +1149,17 @@ function _windows_portables() {
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
         status_msg "Getting stylua"
         local pkg='stylua.zip'
-        local url="${github}/johnnymorganz/stylua"
+        local url="${github}/JohnnyMorganz/stylua"
         if hash curl 2>/dev/null; then
             # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | uniq | sort -h | tail -n1)"
         else
             # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | uniq | sort -h | tail -n1)"
         fi
-        # FIX: this version is not getting parse correctly, using latest as a WA
+        local os_type="windows-${ARCH}"
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/latest/download/stylua-win64.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${os_type}.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if unzip -o "$TMP/${pkg}" -d "$TMP/"; then
@@ -1494,7 +1494,7 @@ function _linux_portables() {
         rst=2
     fi
 
-    if ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];; then
+    if ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]]; then
         [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
         status_msg "Getting stylua"
         local pkg='stylua.zip'
@@ -1508,7 +1508,7 @@ function _linux_portables() {
         fi
         local os_type="linux-${ARCH}"
         status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/${version}/download/stylua-${os_type}.zip" "$TMP/${pkg}"; then
+        if download_asset "stylua" "${url}/releases/download/${version}/stylua-${os_type}.zip" "$TMP/${pkg}"; then
             pushd "$TMP" 1>/dev/null  || return 1
             verbose_msg "Extracting into $TMP/${pkg}"
             if unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null; then

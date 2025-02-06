@@ -81,6 +81,8 @@ if [[ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]]; then
     source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
 else
     setopt prompt_subst
+
+    ## Prompt components
     # autoload _cwd
     autoload _cc_view
     autoload _username
@@ -88,8 +90,11 @@ else
     autoload _git_info
     autoload _venv
     autoload _proxy
+
+    ## Scripts
     autoload toggleProxy
 
+    ## Helper functions
     autoload status_msg warn_msg error_msg
 
     _prompt_command() {
