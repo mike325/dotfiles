@@ -1494,6 +1494,52 @@ function _linux_portables() {
         rst=2
     fi
 
+    if ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];; then
+        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
+        status_msg "Getting stylua"
+        local pkg='stylua.zip'
+        local url="${github}/JohnnyMorganz/stylua"
+        if hash curl 2>/dev/null; then
+            # shellcheck disable=SC2155
+            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | uniq | sort -h | tail -n1)"
+        else
+            # shellcheck disable=SC2155
+            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | uniq | sort -h | tail -n1)"
+        fi
+        local os_type="linux-${ARCH}"
+        status_msg "Downloading stylua version: ${version}"
+        if download_asset "stylua" "${url}/releases/${version}/download/stylua-${os_type}.zip" "$TMP/${pkg}"; then
+            pushd "$TMP" 1>/dev/null  || return 1
+            verbose_msg "Extracting into $TMP/${pkg}"
+            if unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null; then
+                # if unzip -o "$TMP/release.zip" -d "$TMP/" &>/dev/null; then
+                if chmod u+x "$TMP/stylua"; then
+                    if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
+                        error_msg "Failed to move stylua executable"
+                        rst=1
+                    fi
+                else
+                        error_msg "Failed to make stylua executable"
+                        rst=1
+                fi
+                # else
+                #     error_msg "Failed to unzip stylua"
+                #     rst=1
+                # fi
+            else
+                error_msg "Failed to unzip stylua"
+                rst=1
+            fi
+            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
+            popd 1>/dev/null  || return 1
+        else
+            rst=1
+        fi
+    else
+        warn_msg "Skipping stylua, already installed"
+        rst=2
+    fi
+
     if [[ $ARCH =~ ^arm ]] || [[ $ARCH =~ ^aarch ]]; then
         warn_msg "Skipping no ARM compatible portables"
         return 2
@@ -1598,55 +1644,6 @@ function _linux_portables() {
         fi
     else
         warn_msg "Skipping jq, already installed"
-        rst=2
-    fi
-
-    if [[ $ARCH == 'x86_64' ]] && { ! hash stylua 2>/dev/null || [[ $FORCE_INSTALL -eq 1 ]];  }; then
-        [[ $FORCE_INSTALL -eq 1 ]] && status_msg 'Forcing stylua install'
-        status_msg "Getting stylua"
-        local pkg='stylua.zip'
-        local url="${github}/johnnymorganz/stylua"
-        if hash curl 2>/dev/null; then
-            # shellcheck disable=SC2155
-            local version="$(curl -Ls ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        else
-            # shellcheck disable=SC2155
-            local version="$(wget -qO- ${url}/tags | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' | sort -uh | head -n 1)"
-        fi
-        # FIX: this version is not getting parse correctly, using latest as a WA
-        status_msg "Downloading stylua version: ${version}"
-        if download_asset "stylua" "${url}/releases/latest/download/stylua-linux.zip" "$TMP/${pkg}"; then
-            pushd "$TMP" 1>/dev/null  || return 1
-            verbose_msg "Extracting into $TMP/${pkg}"
-            if unzip -o "$TMP/${pkg}" -d "$TMP/" &>/dev/null; then
-                # if unzip -o "$TMP/release.zip" -d "$TMP/" &>/dev/null; then
-                if chmod u+x "$TMP/stylua"; then
-                    if ! mv "$TMP/stylua" "$HOME/.local/bin/"; then
-                        error_msg "Failed to move stylua executable"
-                        rst=1
-                    fi
-                else
-                        error_msg "Failed to make stylua executable"
-                        rst=1
-                fi
-                # else
-                #     error_msg "Failed to unzip stylua"
-                #     rst=1
-                # fi
-            else
-                error_msg "Failed to unzip stylua"
-                rst=1
-            fi
-            verbose_msg "Cleaning up pkg ${TMP}/${pkg}" && rm -rf "${TMP:?}/${pkg}"
-            popd 1>/dev/null  || return 1
-        else
-            rst=1
-        fi
-    elif ! [[ $ARCH == 'x86_64' ]]; then
-        warn_msg "stylua portable is only Available for x86 64 bits"
-        rst=1
-    else
-        warn_msg "Skipping stylua, already installed"
         rst=2
     fi
 
