@@ -302,7 +302,7 @@ function toggleProxy() {
         unset "no_proxy"
         export PROXY_DISABLE=1
         echo -e " ${echo_yellow}Proxy disable${echo_reset_color}"
-    elif [[ -f "$proxy" ]]; then
+    elif [[ -f $proxy   ]]; then
         # shellcheck disable=SC1090,SC1091
         source "$proxy"
         unset PROXY_DISABLE
