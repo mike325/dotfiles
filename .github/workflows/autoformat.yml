@@ -19,7 +19,6 @@ jobs:
           git                \
           shellcheck         \
           python3-setuptools \
-          python-setuptools  \
           python3-pip        \
           python3-virtualenv \
           luarocks           \
