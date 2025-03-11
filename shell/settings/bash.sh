@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2139,SC1090,SC1117
 
-[[ ! -d $HOME/.local/share/completions/ ]] && mkdir -p $HOME/.local/share/completions/
+[[ ! -d "$HOME/.local/share/completions/" ]] && mkdir -p "$HOME/.local/share/completions/"
 
 ! hash is_wsl 2>/dev/null && is_wsl() { return 0; }
 ! hash is_64bits 2>/dev/null && is_64bits() { return 0; }
@@ -69,7 +69,7 @@ fi
 function error_msg() {
     local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
+        printf "${echo_red}[X] Error:${echo_reset_color}\t %s\n" "$msg" 1>&2
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
@@ -78,7 +78,7 @@ function error_msg() {
 function warn_msg() {
     local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
+        printf "${echo_yellow}[!] Warning:${echo_reset_color}\t %s\n" "$msg"
     else
         printf "[!] Warning:\t %s\n" "$msg"
     fi
@@ -87,7 +87,7 @@ function warn_msg() {
 function status_msg() {
     local msg="$1"
     if [[ $NOCOLOR -eq 0 ]]; then
-        printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
+        printf "${echo_green}[*] Info:${echo_reset_color}\t %s\n" "$msg"
     else
         printf "[*] Info:\t %s\n" "$msg"
     fi
@@ -292,20 +292,61 @@ if hash tmux 2>/dev/null; then
 fi
 
 function toggleProxy() {
+
     # shellcheck disable=SC2154
     local proxy="$HOME/.config/shell/host/proxy.sh"
     if [[ -n $http_proxy ]]; then
+        unset "HTTP_PROXY"
         unset "http_proxy"
+        unset "HTTPS_PROXY"
         unset "https_proxy"
         unset "ftp_proxy"
         unset "socks_proxy"
         unset "no_proxy"
+        unset "NO_PROXY"
         export PROXY_DISABLE=1
         echo -e " ${echo_yellow}Proxy disable${echo_reset_color}"
     elif [[ -f $proxy   ]]; then
         # shellcheck disable=SC1090,SC1091
         source "$proxy"
         unset PROXY_DISABLE
+        echo -e " ${echo_green}Proxy enable${echo_reset_color}"
+    elif hash keepassxc 2>/dev/null && [[ -n $PROXY_DB ]]; then
+        local cmd="keepassxc cli show -a Password "
+
+        if [[ -n $PROXY_KEY ]]; then
+            cmd="$cmd -k $PROXY_KEY"
+        fi
+        if [[ -n $PROXY_NOPASS ]]; then
+            cmd="$cmd  --no-password"
+        fi
+
+        local proxy_cmd="$cmd -a Username -a Url $PROXY_DB"
+        mapfile -t proxy_variable_array < <(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!" )
+        if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[0]} ]] ; then
+            return 1
+        fi
+
+        local noproxy_cmd="$cmd $PROXY_DB"
+        local noproxy_hosts
+        noproxy_hosts="$(sh -c "$noproxy_cmd noproxy" || error_msg "KeepassXC - Cannot find credentials for no_proxy config!")"
+
+        local proxy="http://${proxy_variable_array[1]}:${proxy_variable_array[0]}@${proxy_variable_array[2]}"
+
+        export http_proxy="$proxy"
+        export https_proxy="$proxy"
+        export ftp_proxy="$proxy"
+        export HTTPS_PROXY="$https_proxy"
+        export HTTP_PROXY="$http_proxy"
+        # TODO:
+        if [[ -n $noproxy_hosts ]]; then
+            export no_proxy="${noproxy_hosts}"
+            export NO_PROXY="${NO_PROXY}"
+        fi
+
+        unset PROXY_DISABLE
+        unset proxy_variable_array
+        unset noproxy_hosts
         echo -e " ${echo_green}Proxy enable${echo_reset_color}"
     else
         echo -e " ${echo_red}Missing proxy file !!${echo_reset_color}"
@@ -321,13 +362,17 @@ function toggleProxy() {
 # # pip bash completion end
 
 if hash kitty 2>/dev/null; then
-    if [[ ! -f $HOME/.local/share/completions/kitty.bash ]]; then
-        kitty + complete setup bash >$HOME/.local/share/completions/kitty.bash
+    if [[ ! -f "$HOME/.local/share/completions/kitty.bash" ]]; then
+        kitty + complete setup bash >"$HOME/.local/share/completions/kitty.bash"
     fi
 fi
 
 if hash gh 2>/dev/null; then
     eval "$(gh completion --shell bash)"
+fi
+
+if hash ruff 2>/dev/null; then
+    eval "$(ruff generate-shell-completion bash)"
 fi
 
 #######################################################################
