@@ -107,17 +107,14 @@ if hash npm 2>/dev/null; then
     export PATH="$HOME/.npm-global/bin:$PATH"
 fi
 
-if hash nvm 2>/dev/null; then
-    [[ -d "$HOME/.nvm" ]] && mkdir -p "$HOME/.nvm"
-    export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.config/nvm"
+[[ ! -d $NVM_DIR ]] && mkdir -p "$NVM_DIR"
 
-    _NVM="/opt/homebrew/opt/nvm"
+# shellcheck disable=SC1090,SC1091
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"  # This loads nvm
 
-    # shellcheck disable=SC1090,SC1091
-    [ -s "${_NVM}/nvm.sh" ] && . "${_NVM}/nvm.sh" # This loads nvm
-    # shellcheck disable=SC1090,SC1091
-    [ -s "${_NVM}/etc/bash_completion.d/nvm" ] && . "${_NVM}/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-fi
+# shellcheck disable=SC1090,SC1091
+[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 ################################################################################
 #                       Load the settings, alias and framework                 #

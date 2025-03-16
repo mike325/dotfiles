@@ -22,8 +22,12 @@
 #                   `++:.                           `-/+/
 #                   .`   github.com/mike325/dotfiles   `/
 
+VERSION="0.1"
+AUTHOR=""
+
 VERBOSE=0
 QUIET=0
+PRINT_VERSION=0
 NOCOLOR=0
 NOLOG=0
 WARN_COUNT=0
@@ -241,6 +245,7 @@ Usage:
         -C                      Set the compiler, gcc/clang
         -v, --verbose           Enable debug messages
         -q, --quiet             Suppress all output but the errors
+        -V, --version           Print script version and exits
         -h, --help              Display this help message
 EOF
     # _show_nvim_help
@@ -367,7 +372,7 @@ function exit_append() {
 function raw_output() {
     local msg="echo \"$1\""
     if [[ $NOLOG -eq 0 ]]; then
-        msg="$msg | tee ${LOG}"
+        msg="$msg | tee -a ${LOG}"
     fi
     if ! sh -c "$msg"; then
             return 1
@@ -379,7 +384,7 @@ function shell_exec() {
     local cmd="$1"
     if [[ $VERBOSE -eq 1 ]]; then
         if [[ $NOLOG -eq 0 ]]; then
-            cmd="$cmd | tee ${LOG}"
+            cmd="$cmd | tee -a ${LOG}"
         fi
         if ! sh -c "$cmd"; then
             return 1
@@ -394,6 +399,20 @@ function shell_exec() {
         fi
     fi
     return 0
+}
+
+# mapfile -t VAR < <(cmd)
+function parse_cmd_output() {
+    local cmd="$1"
+    local exit_with_error=0
+
+    # TODO: Read cmd exit code
+    while IFS= read -r line; do
+        raw_output "$line"
+    done < <(sh -c "$cmd")
+
+    # shellcheck disable=SC2086
+    return $exit_with_error
 }
 
 while [[ $# -gt 0 ]]; do
@@ -510,6 +529,9 @@ while [[ $# -gt 0 ]]; do
             DEV=1
             STABLE=0
             ;;
+        -V | --version)
+            PRINT_VERSION=1
+            ;;
         -h | --help)
             help_user
             exit 0
@@ -524,12 +546,30 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+if [[ ! -t 1 ]]; then
+    NOCOLOR=1
+fi
+
+if [[ $PRINT_VERSION -eq 1 ]]; then
+    echo -e "\n$NAME version: ${VERSION}"
+    exit 0
+fi
+
 initlog
+if [[ -n $AUTHOR ]]; then
+    verbose_msg "Author         : ${AUTHOR}"
+fi
+verbose_msg "Script version : ${VERSION}"
+verbose_msg "Date           : $(date)"
 verbose_msg "Log Disable   : ${NOLOG}"
 verbose_msg "Current Shell : ${CURRENT_SHELL}"
 verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
+
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
 
 function get_portable() {
     local dir
@@ -748,6 +788,9 @@ if [[ $CLONE -eq 1 ]]; then
     popd >/dev/null  || exit 1
 fi
 
+#######################################################################
+#                           CODE Goes Here                            #
+#######################################################################
 if [[ $ERR_COUNT -gt 0 ]]; then
     exit 1
 fi

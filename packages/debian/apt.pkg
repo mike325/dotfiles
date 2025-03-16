@@ -34,8 +34,6 @@ initramfs-tools
 exfat-fuse
 btrfs-progs
 btrbk
-zfs-dkms
-zfsutils-linux
 nfs-common
 apt-transport-https
 ca-certificates

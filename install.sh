@@ -1726,36 +1726,36 @@ function get_dotfiles() {
     return 1
 }
 
-function get_cool_fonts() {
-    local github='https://github.com'
-    if [[ -z $SSH_CONNECTION ]]; then
-        status_msg "Getting powerline fonts"
-        if clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"; then
-            if is_windows; then
-                # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
-                # BUT administrator promp will pop up for EVERY font (too fucking much)
-                warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
-            else
-                if is_osx; then
-                    mkdir -p "$HOME/Library/Fonts"
-                fi
-                # TODO: This exceeds the xargs arguments, needs debugging
-                # status_msg "Installing cool fonts"
-                # if [[ $VERBOSE -eq 1 ]]; then
-                #     "$HOME"/.local/fonts/install.sh
-                # else
-                #     "$HOME"/.local/fonts/install.sh 1>/dev/null
-                # fi
-            fi
-        else
-            error_msg "Fail to install cool fonts"
-        fi
-
-    else
-        warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
-    fi
-    return 0
-}
+# function get_cool_fonts() {
+#     local github='https://github.com'
+#     if [[ -z $SSH_CONNECTION ]]; then
+#         status_msg "Getting powerline fonts"
+#         if clone_repo "${github}/powerline/fonts" "$HOME/.local/fonts"; then
+#             if is_windows; then
+#                 # We could indeed run $ powershell $HOME/.local/fonts/install.ps1
+#                 # BUT administrator promp will pop up for EVERY font (too fucking much)
+#                 warn_msg "Please run $HOME/.local/fonts/install.ps1 inside administrator's powershell"
+#             else
+#                 if is_osx; then
+#                     mkdir -p "$HOME/Library/Fonts"
+#                 fi
+#                 # TODO: This exceeds the xargs arguments, needs debugging
+#                 # status_msg "Installing cool fonts"
+#                 # if [[ $VERBOSE -eq 1 ]]; then
+#                 #     "$HOME"/.local/fonts/install.sh
+#                 # else
+#                 #     "$HOME"/.local/fonts/install.sh 1>/dev/null
+#                 # fi
+#             fi
+#         else
+#             error_msg "Fail to install cool fonts"
+#         fi
+#
+#     else
+#         warn_msg "We cannot install cool fonts in a remote session, please run this in you desktop environment"
+#     fi
+#     return 0
+# }
 
 function setup_systemd() {
     if ! is_windows && ! is_osx; then
@@ -2302,10 +2302,10 @@ if [[ $ALL -eq 1 ]]; then
     setup_shell_scripts
     get_portables
     get_nvim_dotfiles
-    get_emacs_dotfiles
+    # get_emacs_dotfiles
     # get_cool_fonts
     setup_systemd
-    setup_python
+    # setup_python
 else
     [[ $BIN -eq 1 ]] && setup_bin
     [[ $GIT -eq 1 ]] && setup_git
