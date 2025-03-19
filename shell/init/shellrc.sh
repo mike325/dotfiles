@@ -116,6 +116,16 @@ export NVM_DIR="$HOME/.config/nvm"
 # shellcheck disable=SC1090,SC1091
 [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# if hash nvm 2>/dev/null; then
+#     [[ -d "$HOME/.nvm" ]] && mkdir -p "$HOME/.nvm"
+#     export NVM_DIR="$HOME/.nvm"
+#     _NVM="/opt/homebrew/opt/nvm"
+#     # # shellcheck disable=SC1090,SC1091
+#     [ -s "${_NVM}/nvm.sh" ] && . "${_NVM}/nvm.sh" # This loads nvm
+#     # # shellcheck disable=SC1090,SC1091
+#     [ -s "${_NVM}/etc/bash_completion.d/nvm" ] && . "${_NVM}/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+# fi
+
 ################################################################################
 #                       Load the settings, alias and framework                 #
 ################################################################################

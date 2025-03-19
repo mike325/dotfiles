@@ -382,6 +382,15 @@
 ;                 Custom functions                                             #
 ;###############################################################################
 
+    ; Checkout to a remote branch
+    rw  = "!f(){ \
+        if [[ -z $1 ]]; then \
+            echo 'Missing remote branch name' 1>&2 && return 1; \
+        else \
+            git switch --track -c \"$([[ -n $2 ]] && echo \"$2\" || echo \"$1\" | awk -F/ -v OFS=/ '{$1=\"\"; gsub(\"^/\", \"\", $0); print $0}')\" \"$1\"; \
+        fi ;\
+    }; f"
+
     ; NOTE: Does this work with HEAD?
     psu = "!f(){ git push --set-upstream ${1:-origin} $(git branch --show-current); }; f"
 

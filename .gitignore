@@ -1,7 +1,13 @@
 .ropeproject/
 
-# Each host can have custom commands
+# zsh completion scripts
+/shell/zfunctions/__pip
+/shell/zfunctions/__pip3
+/shell/zfunctions/_gh
+/shell/zfunctions/_gum
+/shell/zfunctions/_ruff
 
+# Each host can have custom commands
 /shell/scripts/
 /shell/host
 /git/host/

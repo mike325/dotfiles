@@ -1519,8 +1519,8 @@ function _linux_portables() {
                         rst=1
                     fi
                 else
-                        error_msg "Failed to make stylua executable"
-                        rst=1
+                    error_msg "Failed to make stylua executable"
+                    rst=1
                 fi
                 # else
                 #     error_msg "Failed to unzip stylua"
