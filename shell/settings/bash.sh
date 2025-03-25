@@ -322,7 +322,7 @@ function toggleProxy() {
         fi
 
         local proxy_cmd="$cmd -a Username -a Url $PROXY_DB"
-        mapfile -t proxy_variable_array < <(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!" )
+        mapfile -t proxy_variable_array < <(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!")
         if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[0]} ]] ; then
             return 1
         fi
