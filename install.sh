@@ -854,6 +854,7 @@ function get_nvim_dotfiles() {
         local args="--portable"
 
         [[ $FORCE_INSTALL -eq 1 ]] && args=" --force $args"
+        [[ $NOLOG -eq 1 ]] && args=" --nolog $args"
         [[ $NOCOLOR -eq 1 ]] && args=" --nocolor $args"
         [[ $VERBOSE -eq 1 ]] && args=" --verbose $args"
         [[ $NEOVIM_DEV -eq 1 ]] && args=" --dev $args"

@@ -24,16 +24,16 @@ jobs:
           sudo apt-get install -y curl git shellcheck python3-setuptools python3-pip
       - name: Full install
         run: |
-          ./install.sh --verbose --portables
-          ./install.sh --verbose --bin
-          ./install.sh --verbose --shell  --shell_scripts --shell_frameworks=bash
-          ./install.sh --verbose --emacs
-          ./install.sh --verbose --python=3
-          ./install.sh --verbose --neovim dev
-          ./install.sh --verbose --git
+          ./install.sh --nolog --verbose --portables
+          ./install.sh --nolog --verbose --bin
+          ./install.sh --nolog --verbose --shell  --shell_scripts --shell_frameworks=bash
+          ./install.sh --nolog --verbose --emacs
+          ./install.sh --nolog --verbose --python=3
+          ./install.sh --nolog --verbose --neovim dev
+          ./install.sh --nolog --verbose --git
       - name: Full force install
         run: |
-          sudo ./install.sh --force --packages
+          sudo ./install.sh --nolog --force --packages
 
   linux-standalone:
     name: Testing standalone script installation in Ubuntu latest
@@ -63,7 +63,7 @@ jobs:
           chmod +x ./install.sh
       - name: Full install
         run: |
-          ./install.sh --verbose
+          ./install.sh --nolog --verbose
 
   linux-build:
     name: Testing install script in ${{ matrix.os }}
@@ -93,13 +93,13 @@ jobs:
           pip3 --version
       - name: Full install
         run: |
-          ./install.sh --verbose
+          ./install.sh --nolog --verbose
       - name: Full force install
         run: |
-          ./install.sh --verbose --force
+          ./install.sh --nolog --verbose --force
       - name: Packages install
         run: |
-          sudo ./install.sh --verbose --packages --only
+          sudo ./install.sh --nolog --verbose --packages --only
 
   linux-arm-build:
     name: Testing install script in Raspbian lite ARM64
@@ -129,13 +129,13 @@ jobs:
             pip3 --version
 
             # Full install
-            ./install.sh --verbose
+            ./install.sh --nolog --verbose
 
             # Full force install
-            ./install.sh --verbose --force
+            ./install.sh --nolog --verbose --force
 
             # Packages install
-            # sudo ./install.sh --verbose --packages --only
+            # sudo ./install.sh --nolog --verbose --packages --only
 
   osx-build:
     name: Testing install script in ${{ matrix.os }}
@@ -154,10 +154,10 @@ jobs:
           brew install shellcheck
       - name: Full install
         run: |
-          ./install.sh --verbose
+          ./install.sh --nolog --verbose
       - name: Full force install
         run: |
-          ./install.sh --verbose --force
+          ./install.sh --nolog --verbose --force
 
   windows-build:
     name: Testing install script in ${{ matrix.os }}
@@ -186,12 +186,12 @@ jobs:
       - name: Full install
         shell: bash
         run: |
-          ./install.sh --verbose
+          ./install.sh --nolog --verbose
       - name: Force install
         shell: bash
         run: |
-          ./install.sh --verbose --force
+          ./install.sh --nolog --verbose --force
       - name: Packages install
         shell: bash
         run: |
-          ./install.sh --verbose --packages scoop --only
+          ./install.sh --nolog --verbose --packages scoop --only
