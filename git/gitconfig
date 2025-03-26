@@ -332,7 +332,8 @@
 ;###############################################################################
 
     sc = stash clear
-    sl = !git --no-pager stash list --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs'
+    sl = !git --no-pager stash list --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%C(green)%cr %C(blue)%gs%C(reset)'
+    sln = !git --no-pager stash list --stat --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%C(green)%cr %C(blue)%gs%C(reset)'
 
 ;###############################################################################
 ;                 rev-parse shortcuts                                          #
