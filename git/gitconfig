@@ -402,7 +402,9 @@
 
     ; Apply, pop or drop a specific stash
     sw  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{${1:-0}}; }; f"
+    swn = "!f(){ git show stash@{${1:-0}} --stat; }; f"
     sa  = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
+    saf = "!f(){ git --no-pager stash apply stash@{${1:-0}}; }; f"
     sp  = "!f(){ git --no-pager stash pop --index stash@{${1:-0}}; }; f"
     spf = "!f(){ git stash show -p stash@{${1:-0}} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
     sd  = "!f(){ git --no-pager stash drop stash@{${1:-0}}; }; f"
@@ -410,7 +412,9 @@
 
     ; Manage last stash
     swl  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    swln = "!f(){ git show stash@{$(($(git stash list | wc -l) - 1))} --stat; }; f"
     sal  = "!f(){ git --no-pager stash apply --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    salf = "!f(){ git --no-pager stash apply stash@{$(($(git stash list | wc -l) - 1))}; }; f"
     spl  = "!f(){ git --no-pager stash pop --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
     splf = "!f(){ git --no-pager stash show -p stash@{$(($(git stash list | wc -l) - 1))} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
     sdl  = "!f(){ git --no-pager stash drop stash@{$(($(git stash list | wc -l) - 1))}; }; f"
