@@ -757,7 +757,7 @@ if [[ -z $current_branch ]]; then
 fi
 
 if [[ $STABLE -eq 1 ]]; then
-    BRANCH="${BRANCH:-origin/release-0.$(git branch --all | awk '/remotes\/origin\/release-/{ gsub("[* ]+remotes/origin/release-0.", "", $0); print $0 }' | sort -n | tail -n1)}"
+    BRANCH="${BRANCH:-v0.$(git tag | awk '/^v[0-9]/{gsub("v0\.", "", $0);  print $0 }' | sort -h | tail -n1)}"
 elif [[ $DEV -eq 1 ]]; then
     BRANCH="master"
     BUILD_TYPE="RelWithDebInfo"
@@ -767,10 +767,10 @@ fi
 
 if [[ $BRANCH != "$current_branch" ]]; then
     status_msg "Checking out to $BRANCH"
-    if [[ $BRANCH =~ ^origin/ ]]; then
-        shell_exec "git branch --track \"${BRANCH#origin/}\" \"remotes/$BRANCH\""
+    if ! shell_exec "git checkout \"${BRANCH}\""; then
+        error_msg "Failed to checkout to ${BRANCH}"
+        exit 1
     fi
-    shell_exec "git switch \"${BRANCH#origin/}\""
 fi
 
 status_msg "Building neovim"
