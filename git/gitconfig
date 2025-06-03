@@ -365,17 +365,17 @@
 
     ; NOTE: requires nvim and gh
     pro = "!f(){ \
-        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.open_pr()\" +q; \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'utils.gh'.open_pr()\" +q; \
     }; f"
 
     prr = "!f(){ \
-        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.pr_ready(true)\" +q && \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'utils.gh'.pr_ready(true)\" +q && \
         gh pr view; \
     }; f"
 
     prp = "!f(){ \
         git push --set-upstream ${1:-origin} $(git branch --show-current) && \
-        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'cli'\" +\"lua require'utils.gh'.create_pr()\" +q && \
+        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'utils.gh'.create_pr()\" +q && \
         gh pr view; \
     }; f"
 

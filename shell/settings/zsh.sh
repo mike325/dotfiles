@@ -99,9 +99,17 @@ else
 
     _prompt_command() {
         local EXIT_CODE="$?"
-        local prompt=""
+        # 133;A - Mark prompt start
+        # 133;B - Mark prompt end
+        # 133;C - Mark pre-execution
+        # 133;D;exit - Mark execution finished with exit code
+        local __PROMPT_BEG='\x1b]133;A\x1b\\'
+        local __PROMPT_END='\x1b]133;B\x1b\\'
+        # \x1bPtmux;\x1b\x1b]52;;%s\b\x1b\\
 
+        local prompt=""
         prompt="\n"
+        prompt+="${__PROMPT_BEG}"
         # prompt+="$(__schroot_name)"
         prompt+="$(_username)"
         prompt+="%F{cyan}%m%f: "
@@ -113,6 +121,7 @@ else
         prompt+="$(_cc_view) "
         prompt+="$(_git_info) "
         prompt+="\n$(_exit_code $EXIT_CODE)"
+        prompt+="${__PROMPT_END}"
         # prompt+="\n$ "
 
         echo "$prompt"
@@ -138,6 +147,15 @@ compinit # -d
 
 autoload -Uz bashcompinit
 bashcompinit
+# # load legacy bash completions
+# if [[ -d "$HOME/.local/share/completions/" ]]; then
+#     for cfile in "$HOME/.local/share/completions/"*.bash; do
+#         source "$cfile" 2>/dev/null
+#     done
+#     # for cfile in "$HOME/.local/share/completions/"*.zsh; do
+#     #     source "$cfile" 2>/dev/null
+#     # done
+# fi
 
 # Case insensitive tab completion
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

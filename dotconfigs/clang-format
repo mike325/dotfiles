@@ -1,5 +1,4 @@
-﻿# BasedOnStyle:  WebKit
-AccessModifierOffset: -2
+﻿AccessModifierOffset: -2
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
