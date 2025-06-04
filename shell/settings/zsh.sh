@@ -121,7 +121,7 @@ else
         prompt+="$(_cc_view) "
         prompt+="$(_git_info) "
         prompt+="\n$(_exit_code $EXIT_CODE)"
-        prompt+="${__PROMPT_END}"
+        # prompt+="${__PROMPT_END}"
         # prompt+="\n$ "
 
         echo "$prompt"

@@ -469,7 +469,8 @@ else
             fi
             status_msg "Creating worktree"
             branch_dir="${branch#FER-[0-9]*-}"
-            for i in feature fix bug feat refactor; do
+            branch_dir="${branch#BALI-[0-9]*-}"
+            for i in fix bug feat feature refactor story ticket; do
                 branch_dir="${branch_dir#"$i"/}"
             done
             verbose_msg "Dir location: ${branch_dir} set to branch $branch"
