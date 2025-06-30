@@ -427,7 +427,7 @@
     updatef  = "!f() { git fetch $1 && git checkout $1 -- $2; }; f"
 
     ; Reset a staged file to its original state (index)
-    rf  = "!f() { git reset HEAD $1 && git checkout -- $1; }; f"
+    rf  = "!f() { git reset HEAD ${1:-.} && git checkout -- ${1:-.}; }; f"
 
     ; Remove any given number of commits
     rlc  = "!f(){ git reset --hard HEAD~${1}; }; f"
