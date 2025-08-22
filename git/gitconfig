@@ -135,8 +135,10 @@
 ;###############################################################################
 ;                 Just a status                                                #
 ;###############################################################################
-
     s = status --show-stash --renames --branch
+    sv = status --show-stash --renames --branch --porcelain=v2
+    sn = "!f() { git status --show-stash --renames --branch --porcelain=v2 | awk '/^[0-9]/{print $9}'; }; f"
+    parent = "!f() { git log --pretty=format:'%D' HEAD | command grep -E 'origin/' | head -n1; }; f"
 
 ;###############################################################################
 ;                 Get the tag of the current commit                            #
@@ -188,6 +190,7 @@
     ba  = branch --all         ; Show all local and remote branches
     bdr = push origin --delete ; Delete remote branch
     br  = branch -m            ; Rename a branch
+    bn = rev-parse --abbrev-ref HEAD
 
 ;###############################################################################
 ;                 Commit shortcuts                                             #
@@ -331,7 +334,20 @@
 ;                 Stash stuff                                                  #
 ;###############################################################################
 
-    sc = stash clear
+    sc = "!f(){ \
+        if hash gum 2>/dev/null; then\
+            if gum confirm 'Clear stash?'; then\
+                git stash clear;\
+                echo \"Stash cleared!\"; \
+            fi;\
+        else\
+            read -r -p 'Clear stash? [y/N] ' response; \
+            if [[ $response =~ ^[yY]([eE][sS])?$ ]]; then\
+                git stash clear;\
+                echo \"Stash cleared!\"; \
+            fi;\
+        fi;\
+    }; f"
     sl = !git --no-pager stash list --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%C(green)%cr %C(blue)%gs%C(reset)'
     sln = !git --no-pager stash list --stat --pretty='%C(magenta)%gd %C(yellow)%h %>(14)%C(green)%cr %C(blue)%gs%C(reset)'
 
@@ -357,9 +373,16 @@
     ; TODO: Add new shell script to handle arguments in a single git-pr entry point
     prl = "!gh pr list"
 
-    ; NOTE: requires gum
+    ; NOTE: requires gum/fzf
     prco = "!f(){ \
-        local pr=\"$(gh pr list | cut -f1,2 | gum filter --fuzzy --limit=1 --height=20 --header='Select PR' | cut -f1)\"; \
+        [[ -n $1 ]] && gh pr checkout \"$1\" && return 0; \
+        filter=\"\";\
+        if hash fzf 2>/dev/null; then\
+            filter=\"fzf --exit-0 --layout=reverse --border --ansi --height=20% --prompt='Select PR > '\";\
+        elif hash gum 2>/dev/null; then\
+            filter=\"gum filter --fuzzy --limit=1 --height=20 --header='Select PR > ' \";\
+        fi;\
+        local pr=\"$(gh pr list | cut -f1,2 | sh -c \"$filter\" | cut -f1)\"; \
         [[ -n $pr ]] && gh pr checkout \"$pr\"; \
     }; f"
 
@@ -374,9 +397,14 @@
     }; f"
 
     prp = "!f(){ \
-        git push --set-upstream ${1:-origin} $(git branch --show-current) && \
-        nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'utils.gh'.create_pr()\" +q && \
-        gh pr view; \
+        local branch=\"$(git branch --show-current)\"; \
+        if [[ $branch != main ]] && [[ $branch != master ]]; then \
+            git push --set-upstream ${1:-origin} $branch && \
+            nvim --headless --clean +\"lua vim.opt.runtimepath:append { vim.fn.stdpath 'config' }\" +\"lua require'utils.gh'.create_pr()\" +q && \
+            gh pr view; \
+        else \
+            echo \"Cannot create PR from $branch\" 1>&2 && return 1; \
+        fi; \
     }; f"
 
 ;###############################################################################

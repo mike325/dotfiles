@@ -42,9 +42,10 @@ setopt hist_save_no_dups      # Do not write duplicate entries in the history fi
 setopt hist_reduce_blanks     # Remove superfluous blanks before recording entry.
 setopt hist_verify            # Do not execute immediately upon history expansion.
 
-[[ ! -d "$HOME/.zsh/zfunctions" ]] && mkdir -p "$HOME/.zsh/zfunctions"
+_ZFUNC_SCRIPTS="$HOME/.zsh/zfunctions"
+[[ ! -d "$_ZFUNC_SCRIPTS" ]] && mkdir -p "$_ZFUNC_SCRIPTS"
 
-fpath+="$HOME/.config/shell/zfunctions"
+fpath+="$_ZFUNC_SCRIPTS"
 fpath+="$HOME/.zsh/zfunctions"
 if hash brew 2>/dev/null && [[ -d "$(brew --prefix)/share/zsh-completions" ]]; then
     fpath+="$(brew --prefix)/share/zsh-completions"
@@ -134,12 +135,16 @@ if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     bindkey '^ ' autosuggest-execute
 fi
 
-if hash gh 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_gh" ]]; then
-    gh completion --shell zsh >"$HOME/.zsh/zfunctions/_gh"
+if hash gh 2>/dev/null && [[ ! -f "$_ZFUNC_SCRIPTS/_gh" ]]; then
+    gh completion --shell zsh >"$_ZFUNC_SCRIPTS/_gh"
 fi
 
-if hash ruff 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_ruff" ]]; then
-    ruff generate-shell-completion zsh >"$HOME/.zsh/zfunctions/_ruff"
+if hash ruff 2>/dev/null && [[ ! -f "$_ZFUNC_SCRIPTS/_ruff" ]]; then
+    ruff generate-shell-completion zsh >"$_ZFUNC_SCRIPTS/_ruff"
+fi
+
+if hash jira 2>/dev/null && [[ ! -f "$_ZFUNC_SCRIPTS/_jira" ]]; then
+    jira completion zsh > "$_ZFUNC_SCRIPTS/_jira"
 fi
 
 autoload -Uz compinit
@@ -232,4 +237,8 @@ bindkey -M viins 'jj' vi-cmd-mode
 if hash fzf 2>/dev/null; then
     [[ -f "$HOME/.fzf.zsh" ]] && source "$HOME/.fzf.zsh"
     bindkey -v
+fi
+
+if hash bat 2>/dev/null ; then
+    autoload disable_help_alias enable_help_alias
 fi

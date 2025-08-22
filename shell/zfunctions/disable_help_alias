@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+unalias -m '*-*'
+printf "$fg[gren] Alias disable\n"

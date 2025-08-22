@@ -273,8 +273,14 @@ fi
 
 if hash fzf 2>/dev/null; then
 
-    export FZF_CTRL_R_OPTS='--sort'
+    export FZF_CTRL_R_OPTS='--sort --prompt="Select cmd > "'
     export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi --height=60%'
+
+    if hash bat 2>/dev/null ; then
+        FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview \"[ -f {} ] && bat --color=always --style=numbers --line-range=:500 {}\""
+    elif hash cat 2>/dev/null ; then
+        FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview \"[ -f {} ] && cat {}\""
+    fi
 
     if ! is_windows; then
         export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
@@ -301,7 +307,7 @@ if hash fzf 2>/dev/null; then
             export FZF_DEFAULT_COMMAND="fd --ignore-file ~/.config/git/ignore --type f --hidden --follow --color always -E '*.spl' -E '*.aux' -E '*.out' -E '*.o' -E '*.pyc' -E '*.gz' -E '*.pdf' -E '*.sw' -E '*.swp' -E '*.swap' -E '*.com' -E '*.exe' -E '*.so' -E '*/cache/*' -E '*/__pycache__/*' -E '*/tmp/*' -E '.git/*' -E '.svn/*' -E '.xml' -E '*.bin' -E '*.7z' -E '*.dmg' -E '*.gz' -E '*.iso' -E '*.jar' -E '*.rar' -E '*.tar' -E '*.zip' -E 'TAGS' -E 'tags' -E 'GTAGS' -E 'COMMIT_EDITMSG' . . 2> /dev/null"
             export FZF_ALT_C_COMMAND="fd --ignore-file ~/.config/git/ignore --color always -t d . $HOME"
         elif hash rg 2>/dev/null; then
-            export FZF_DEFAULT_COMMAND='rg --line-number --column --with-filename --color always --no-search-zip --hidden --trim --files . 2> /dev/null'
+            export FZF_DEFAULT_COMMAND='rg --color never --no-search-zip --hidden --trim . . 2> /dev/null'
         elif hash ag 2>/dev/null; then
             export FZF_DEFAULT_COMMAND='ag -l --follow --color --nogroup --hidden -g "" 2> /dev/null'
         else

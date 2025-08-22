@@ -56,6 +56,6 @@ function toggleProxy() {
         unset noproxy_hosts
         echo " ${fg[green]}Proxy enable"
     else
-        echo " ${fg[red]}Missing proxy file in ${proxy}!!"
+        echo " ${fg[red]}Missing proxy file in ${proxy}!!" 1>&2
     fi
 }

@@ -22,12 +22,17 @@
 #            `++:.                           `-/+/
 #            .`                                 `/
 
-VERBOSE=0
-QUIET=0
-NOCOLOR=0
-NOLOG=1
-WARN_COUNT=0
-ERR_COUNT=0
+VERSION="0.1"
+AUTHOR=""
+
+VERBOSE=false
+QUIET=false
+PRINT_VERSION=false
+NOCOLOR=false
+NOLOG=true
+DRY_RUN=false
+WARN_COUNT=false
+ERR_COUNT=false
 # FROM_STDIN=()
 
 NAME="$0"
@@ -36,7 +41,6 @@ NAME="${NAME##*-}"
 LOG="${NAME%%.*}.log"
 
 SCRIPT_PATH="$0"
-
 SCRIPT_PATH="${SCRIPT_PATH%/*}"
 
 OS='unknown'
@@ -206,25 +210,28 @@ Usage:
     $NAME [OPTIONAL]
 
     Optional Flags
+        --log               Enable log writing
         --nolog         Disable log writing
         --nocolor       Disable color output
         -v, --verbose   Enable debug messages
-        -q, --quiet     Suppress all output but the errors
+        -q, --quiet         Suppress most output
+        -V, --version       Print script version and exits
+        --dry, --dry-run    Enable dry run
         -h, --help      Display this help message
 EOF
 }
 
 function warn_msg() {
     local msg="$1"
-    if [[ $QUIET -eq 0 ]]; then
-        if [[ $NOCOLOR -eq 0 ]]; then
+    if [[ $QUIET == false ]]; then
+        if [[ $NOCOLOR == false ]]; then
             printf "${yellow}[!] Warning:${reset_color}\t %s\n" "$msg"
         else
             printf "[!] Warning:\t %s\n" "$msg"
         fi
     fi
     WARN_COUNT=$((WARN_COUNT + 1))
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         printf "[!] Warning:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
@@ -232,13 +239,13 @@ function warn_msg() {
 
 function error_msg() {
     local msg="$1"
-    if [[ $NOCOLOR -eq 0 ]]; then
+    if [[ $NOCOLOR == false ]]; then
         printf "${red}[X] Error:${reset_color}\t %s\n" "$msg" 1>&2
     else
         printf "[X] Error:\t %s\n" "$msg" 1>&2
     fi
     ERR_COUNT=$((ERR_COUNT + 1))
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         printf "[X] Error:\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
@@ -246,14 +253,14 @@ function error_msg() {
 
 function status_msg() {
     local msg="$1"
-    if [[ $QUIET -eq 0 ]]; then
-        if [[ $NOCOLOR -eq 0 ]]; then
+    if [[ $QUIET == false ]]; then
+        if [[ $NOCOLOR == false ]]; then
             printf "${green}[*] Info:${reset_color}\t %s\n" "$msg"
         else
             printf "[*] Info:\t %s\n" "$msg"
         fi
     fi
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         printf "[*] Info:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
@@ -261,14 +268,14 @@ function status_msg() {
 
 function verbose_msg() {
     local msg="$1"
-    if [[ $VERBOSE -eq 1 ]]; then
-        if [[ $NOCOLOR -eq 0 ]]; then
+    if [[ $VERBOSE == true ]]; then
+        if [[ $NOCOLOR == false ]]; then
             printf "${purple}[+] Debug:${reset_color}\t %s\n" "$msg"
         else
             printf "[+] Debug:\t %s\n" "$msg"
         fi
     fi
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         printf "[+] Debug:\t\t %s\n" "$msg" >>"${LOG}"
     fi
     return 0
@@ -298,11 +305,11 @@ function __parse_args() {
 }
 
 function initlog() {
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         [[ -n $LOG ]] && rm -f "${LOG}" 2>/dev/null
         if ! touch "${LOG}" &>/dev/null; then
             error_msg "Fail to init log file"
-            NOLOG=1
+            NOLOG=true
             return 1
         fi
         if [[ -f "${SCRIPT_PATH}/shell/banner" ]]; then
@@ -317,11 +324,10 @@ function initlog() {
 }
 
 function exit_append() {
-    if [[ $NOLOG -eq 0 ]]; then
+    if [[ $NOLOG == false ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
             printf "\n\n" >>"${LOG}"
         fi
-
         if [[ $WARN_COUNT -gt 0 ]]; then
             printf "[*] Warnings:\t%s\n" "$WARN_COUNT" >>"${LOG}"
         fi
@@ -334,8 +340,8 @@ function exit_append() {
 
 function raw_output() {
         local msg="echo \"$1\""
-        if [[ $NOLOG -eq 0 ]]; then
-            msg="$msg | tee ${LOG}"
+        if [[ $NOLOG == false ]]; then
+        msg="$msg | tee -a ${LOG}"
     fi
         if ! sh -c "$msg"; then
             return 1
@@ -344,15 +350,23 @@ function raw_output() {
 }
 
 function shell_exec() {
+    # TODO: Redirect stderr to stdout?  2>&1
     local cmd="$1"
-    if [[ $VERBOSE -eq 1 ]]; then
-        if [[ $NOLOG -eq 0 ]]; then
-            cmd="$cmd | tee ${LOG}"
+    local verbose="${2:-$VERBOSE}"
+    verbose_msg "cmd: $cmd"
+    if [[ $DRY_RUN == true ]]; then
+        return 0
+    fi
+
+    if [[ $verbose == true ]]; then
+        if [[ $NOLOG == false ]]; then
+            cmd="$cmd | tee -a ${LOG}"
+            cmd="$cmd; test \${PIPESTATUS[0]} -eq 0"
         fi
         if ! sh -c "$cmd"; then
             return 1
         fi
-    elif [[ $NOLOG -eq 0 ]]; then
+    elif [[ $NOLOG == false ]]; then
         if ! sh -c "$cmd >> ${LOG}"; then
             return 1
         fi
@@ -367,17 +381,26 @@ function shell_exec() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+        --log)
+            NOLOG=false
+            ;;
         --nolog)
-            NOLOG=1
+            NOLOG=true
             ;;
         --nocolor)
-            NOCOLOR=1
+            NOCOLOR=true
             ;;
         -v | --verbose)
-            VERBOSE=1
+            VERBOSE=true
             ;;
         -q | --quiet)
-            QUIET=1
+            QUIET=true
+            ;;
+        -V | --version)
+            PRINT_VERSION=true
+            ;;
+        --dry |--dry-run | --dry_run | --dryrun)
+            DRY_RUN=true
             ;;
         -h | --help)
             help_user
@@ -399,30 +422,48 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
+if [[ ! -t 1 ]]; then
+    NOCOLOR=true
+fi
+
+if [[ $PRINT_VERSION == true ]]; then
+    echo -e "\n$NAME version: ${VERSION}"
+    exit 0
+fi
+
 initlog
+if [[ -n $AUTHOR ]]; then
+    verbose_msg "Author         : ${AUTHOR}"
+fi
+verbose_msg "Script version : ${VERSION}"
+verbose_msg "Date           : $(date)"
 verbose_msg "Log Disable   : ${NOLOG}"
+if [[ $NOLOG == false ]]; then
+    verbose_msg "Log location   : ${LOG}"
+fi
 verbose_msg "Current Shell : ${CURRENT_SHELL}"
 verbose_msg "Platform      : ${SHELL_PLATFORM}"
 verbose_msg "Architecture  : ${ARCH}"
 verbose_msg "OS            : ${OS}"
+verbose_msg "DRY RUN        : ${DRY_RUN}"
 
 # TODO: Add commit log as preview
 checkout() {
-    local gum_filter='gum filter --fuzzy --height=20 --width=0 --limit=1 --header "Select branch"'
-    local fzf_filter='fzf --select-1 --exit-0  --height=60%'
-
+    local gum_filter='gum filter --fuzzy --height=60 --width=0 --limit=1 --header "Select branch"'
+    # local fzf_filter='fzf --select-1 --exit-0 --layout=reverse --border --ansi --height=60% --preview-window=right:0% --prompt="Select branch > "'
+    local fzf_filter='fzf --select-1 --exit-0 --layout=reverse --border --ansi --height=60% --preview "git diff --name-only --find-copies-harder --color=auto HEAD...{}" --prompt="Select branch > "'
     local filter
-    if hash gum 2>/dev/null; then
-        filter="$gum_filter"
-    elif hash fzf 2>/dev/null; then
+    if hash fzf 2>/dev/null; then
         filter="$fzf_filter"
+    elif hash gum 2>/dev/null; then
+        filter="$gum_filter"
     else
         error_msg "Missing fzf and gum, cannot continue"
         return 1
     fi
 
     local branch
-    branch=$(git branch --all | tr -d '*' | tr -d '+' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
+    branch=$(git branch --all | tr -d '*' | tr -d '+' | sed -e 's/^\t*|\t*$//g' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
     if [[ -n $branch ]]; then
         branch_remote=""
         for remote in $(git remote -v | awk '{print $1}' | uniq); do
@@ -435,9 +476,9 @@ checkout() {
         done
         verbose_msg "Switching to ${branch}"
         if [[ -n $branch_remote ]]; then
-            shell_exec "git switch --track  -c \"${branch}\" \"remotes/${branch_remote}/$branch\""
+            shell_exec "git switch --track  -c \"${branch}\" \"remotes/${branch_remote}/$branch\"" true
         else
-            shell_exec "git switch \"${branch}\""
+            shell_exec "git switch \"${branch}\"" true
         fi
     fi
 }

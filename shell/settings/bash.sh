@@ -268,8 +268,16 @@ else
     # TODO: Add support for custom host prompt segments
     _prompt_command() {
         local EXIT_CODE="$?"
+        # 133;A - Mark prompt start
+        # 133;B - Mark prompt end
+        # 133;C - Mark pre-execution
+        # 133;D;exit - Mark execution finished with exit code
+        local __PROMPT_BEG='\[\e]133;A\]'
+        # \x1b]133;A\x1b\\
+        # local __PROMPT_END='\033]133;B'
 
         PS1="\n"
+        # PS1+="${__PROMPT_BEG}"
         # PS1+="$(__schroot_name)"
         PS1+="$(__user)"
         PS1+="${cyan}\h${reset_color}: "
@@ -281,6 +289,7 @@ else
         PS1+="$(__cc_view) "
         PS1+="$(__git_info) "
         PS1+="\n$(__exit_code "$EXIT_CODE")"
+        # PS1+="${__PROMPT_END}"
         # PS1+="\n$ "
     }
     PROMPT_COMMAND=_prompt_command
@@ -373,6 +382,10 @@ fi
 
 if hash ruff 2>/dev/null; then
     eval "$(ruff generate-shell-completion bash)"
+fi
+
+if hash jira 2>/dev/null; then
+    eval "$(jira completion bash )"
 fi
 
 #######################################################################
