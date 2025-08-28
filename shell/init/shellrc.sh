@@ -61,6 +61,7 @@ __path_dirs=(
     "$HOME/.luarocks/bin"
     "$HOME/.cargo/bin"
     "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
     # NOTE: I'm not sure about adding this directly to the PATH
     "$HOME/.cache/nvim/packer_hererocks/2.1.0-beta3/bin/"
 )
@@ -212,7 +213,8 @@ if is_windows; then
     export USER="$USERNAME"
 fi
 
-_python_versions=("15" "14" "13" "12" "11" "10" "9" "8" "7" "6")
+_old_python3=6
+_latest_python3=15
 if is_windows; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then
@@ -231,7 +233,7 @@ if is_windows; then
         export PATH="${windows_user}/Python/Python27/Scripts:$PATH"
     fi
 
-    for version in "${_python_versions[@]}"; do
+    for version in $(seq "$_latest_python3" "$_old_python3"); do
         if [[ -d "${windows_root}/Python3${version}/Scripts" ]]; then
             export PATH="${windows_root}/Python3${version}/Scripts:$PATH"
             break
@@ -249,7 +251,7 @@ if is_windows; then
 elif is_osx; then
     # $HOME/Library/Python/3.8/bin
     _osx_root="$HOME/Library/"
-    for version in "${_python_versions[@]}"; do
+    for version in $(seq "$_latest_python3" "$_old_python3"); do
         if [[ -d "${_osx_root}/Python/3.${version}/bin" ]]; then
             export PATH="${_osx_root}/Python/3.${version}/bin:$PATH"
             break
