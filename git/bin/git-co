@@ -463,7 +463,7 @@ checkout() {
     fi
 
     local branch
-    branch=$(git branch --all | tr -d '*' | tr -d '+' | sed -e 's/^\t*|\t*$//g' | awk '{gsub("remotes/", "", $1) ; print $1}' | bash -c "$filter")
+    branch=$(git branch --all | cut -d' ' -f2,3 | awk '{$1=$1; gsub("remotes/", "", $1); print}' | bash -c "$filter")
     if [[ -n $branch ]]; then
         branch_remote=""
         for remote in $(git remote -v | awk '{print $1}' | uniq); do

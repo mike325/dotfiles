@@ -137,7 +137,7 @@
 ;###############################################################################
     s = status --show-stash --renames --branch
     sv = status --show-stash --renames --branch --porcelain=v2
-    sn = "!f() { git status --show-stash --renames --branch --porcelain=v2 | awk '/^[0-9]/{print $9}'; }; f"
+    ; sn = "!f() { git status --show-stash --renames --branch --porcelain=v2 | awk '/^[0-9]/{print $9}'; }; f"
     parent = "!f() { git log --pretty=format:'%D' HEAD | command grep -E 'origin/' | head -n1; }; f"
 
 ;###############################################################################
@@ -196,9 +196,10 @@
 ;                 Commit shortcuts                                             #
 ;###############################################################################
 
-    c   = commit            ; Normal commit
-    cm  = commit -m         ; Short commit
-    ca  = commit --amend    ; Commit over the last commit
+    c   = commit                      ; Normal commit
+    cm  = commit -m                   ; Short commit
+    ca  = commit --amend              ; Commit over the last commit
+    ce  = commit --amend --no-edit    ; Amend no edit, mimic vim-fugitive mapping
 
 ;###############################################################################
 ;                 Cherry pick commits                                          #
@@ -212,10 +213,11 @@
 ;                 Diff stuff                                                   #
 ;###############################################################################
 
-    d   = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto
-    dc  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --cached
-    dk  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --check
-    dn  = diff --diff-algorithm=patience -M -B -C --find-copies-harder --color=auto --name-only
+    d   = diff --diff-algorithm=patience --find-renames --find-copies-harder --color=auto
+    dc  = diff --diff-algorithm=patience --find-renames --find-copies-harder --color=auto --cached
+    dk  = diff --diff-algorithm=patience --find-renames --find-copies-harder --color=auto --check
+    dn  = diff --diff-algorithm=patience --find-renames --find-copies-harder --color=auto --name-only
+    dcn = diff --diff-algorithm=patience --find-renames --find-copies-harder --color=auto --cached --name-only
     ds  = diff --find-copies-harder --shortstat
 
 ;###############################################################################
@@ -255,7 +257,7 @@
     ms = merge --skip
 
 ;###############################################################################
-;                 Checkout ** TODO add more shortcuts                          #
+;                 Checkout
 ;###############################################################################
 
     o  = checkout       ; checkout shortcut
@@ -322,13 +324,13 @@
 ;                 Remotes management                                           #
 ;###############################################################################
 
-    r   = remote             ; remote shortcut
-    ra  = remote add         ; Add remote
-    rr  = remote rm          ; remove remote
-    rm  = remote rename      ; rename remote
-    rs  = remote show        ; show info if remote
-    rao = remote add origin  ; add origin remote
-    rso = remote show origin ; Show origin remote info
+    ; r   = remote
+    ; rr  = remote rename
+    ; rm  = remote remove
+    ; rs  = remote show
+    ra  = remote add
+    rao = remote add origin
+    rso = remote show origin
 
 ;###############################################################################
 ;                 Stash stuff                                                  #
@@ -375,12 +377,14 @@
 
     ; NOTE: requires gum/fzf
     prco = "!f(){ \
-        [[ -n $1 ]] && gh pr checkout \"$1\" && return 0; \
-        filter=\"\";\
+        [[ -n $1 ]] && gh pr checkout \"$1\" && return $?; \
+        local filter=\"\";\
         if hash fzf 2>/dev/null; then\
-            filter=\"fzf --exit-0 --layout=reverse --border --ansi --height=20% --prompt='Select PR > '\";\
+            filter=\"fzf --exit-0 --layout=reverse --border --ansi --height=40% --prompt='Select PR > '\";\
         elif hash gum 2>/dev/null; then\
-            filter=\"gum filter --fuzzy --limit=1 --height=20 --header='Select PR > ' \";\
+            filter=\"gum filter --fuzzy --limit=1 --height=40 --header='Select PR > ' \";\
+        else\
+            echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
         fi;\
         local pr=\"$(gh pr list | cut -f1,2 | sh -c \"$filter\" | cut -f1)\"; \
         [[ -n $pr ]] && gh pr checkout \"$pr\"; \
@@ -411,8 +415,62 @@
 ;                 Custom functions                                             #
 ;###############################################################################
 
+    ; Reset worktree
+    r = "!f(){ \
+        if [[ -n $1 ]]; then \
+            git restore \"${1}\"; \
+            return $?; \
+        fi; \
+        local filter=\"\";\
+        if hash fzf 2>/dev/null; then\
+            filter=\"fzf --multi --exit-0 --layout=reverse --border --ansi --height=60% --preview 'git diff --diff-algorithm=patience {}' --prompt='Select files > '\";\
+        elif hash gum 2>/dev/null; then\
+            filter=\"gum filter --no-limit --fuzzy --height=60 --header='Select files > ' \";\
+        else\
+            echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
+        fi;\
+        local filename=\"$(git diff --name-only | sh -c \"$filter\")\"; \
+        [[ -n ${filename[*]} ]] && git restore ${filename[*]}; \
+    }; f"
+
+    ; Reset staged files
+    rs = "!f(){ \
+        if [[ -n $1 ]]; then \
+            git restore --staged \"${1}\"; \
+            return $?; \
+        fi; \
+        local filter=\"\";\
+        if hash fzf 2>/dev/null; then\
+            filter=\"fzf --multi --exit-0 --layout=reverse --border --ansi --height=60% --preview 'git diff --diff-algorithm=patience --cached {}' --prompt='Select files > '\";\
+        elif hash gum 2>/dev/null; then\
+            filter=\"gum filter --no-limit --fuzzy --height=60 --header='Select files > ' \";\
+        else\
+            echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
+        fi;\
+        local filename=\"$(git diff --cached --name-only | sh -c \"$filter\")\"; \
+        [[ -n ${filename[*]} ]] && git restore --staged ${filename[*]}; \
+    }; f"
+
+    ; Revert changes of file
+    rr = "!f(){ \
+        if [[ -n $1 ]]; then \
+            git restore --staged \"${1}\" && git restore \"${1}\"; \
+            return $?; \
+        fi; \
+        local filter=\"\";\
+        if hash fzf 2>/dev/null; then\
+            filter=\"fzf --multi --exit-0 --layout=reverse --border --ansi --height=60% --preview 'git diff --diff-algorithm=patience --cached {}' --prompt='Select files > '\";\
+        elif hash gum 2>/dev/null; then\
+            filter=\"gum filter --no-limit --fuzzy --height=60 --header='Select files > ' \";\
+        else\
+            echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
+        fi;\
+        local filename=\"$(git diff --cached --name-only | sh -c \"$filter\")\"; \
+        [[ -n ${filename[*]} ]] && git restore --staged ${filename[*]}; git restore ${filename[*]}; \
+    }; f"
+
     ; Checkout to a remote branch
-    rw  = "!f(){ \
+    wr  = "!f(){ \
         if [[ -z $1 ]]; then \
             echo 'Missing remote branch name' 1>&2 && return 1; \
         else \
@@ -423,14 +481,15 @@
     ; NOTE: Does this work with HEAD?
     psu = "!f(){ git push --set-upstream ${1:-origin} $(git branch --show-current); }; f"
 
-    patch = "!f(){ git diff --diff-algorithm=patience -B -C --find-copies-harder --color=never $1 > \"${2:-$(basename $(pwd))}.patch\"; }; f"
+    patch = "!f(){ git diff --diff-algorithm=patience $1 > \"${2:-$(basename $(pwd))}.patch\"; }; f"
     slc = "!f(){ git log --show-signature --color=auto -p ${1:--1}; }; f"
 
     ; Create a stash of the current changes and then reapply them
     snapshot = !git stash push --keep-index --message "snapshot: $(date)" && git stash apply --index "stash@{0}"
 
     ; Apply, pop or drop a specific stash
-    sw  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{${1:-0}}; }; f"
+    sw  = "!f(){ git stash show --diff-algorithm=patience -p stash@{${1:-0}}; }; f"
+    sco = "!f(){ git stash branch ${2:-stash${1:-0}-branch} stash@{${1:-0}}; }; f"
     swn = "!f(){ git show stash@{${1:-0}} --stat; }; f"
     sa  = "!f(){ git --no-pager stash apply --index stash@{${1:-0}}; }; f"
     saf = "!f(){ git --no-pager stash apply stash@{${1:-0}}; }; f"
@@ -440,12 +499,13 @@
     ss  = "!f(){ git --no-pager stash save $1; }; f"
 
     ; Manage last stash
-    swl  = "!f(){ git stash show --diff-algorithm=patience -B -C --find-copies-harder -p stash@{$(($(git stash list | wc -l) - 1))}; }; f"
+    swl  = "!f(){ git stash show --diff-algorithm=patience -p stash@{$(($(git stash list | wc -l) - 1))}; }; f"
     swln = "!f(){ git show stash@{$(($(git stash list | wc -l) - 1))} --stat; }; f"
+    slco = "!f(){ local stash_nr=$(($(git stash list | wc -l) - 1)); git stash branch ${2:-stash${stash_nr}-branch} stash@{${stash_nr}}; }; f"
     sal  = "!f(){ git --no-pager stash apply --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
     salf = "!f(){ git --no-pager stash apply stash@{$(($(git stash list | wc -l) - 1))}; }; f"
     spl  = "!f(){ git --no-pager stash pop --index stash@{$(($(git stash list | wc -l) - 1))}; }; f"
-    splf = "!f(){ git --no-pager stash show -p stash@{$(($(git stash list | wc -l) - 1))} | git apply -3 && git stash drop stash@{${1:-0}}; }; f"
+    splf = "!f(){ local stash_nr=$(($(git stash list | wc -l) - 1)); git --no-pager stash show -p stash@{${stash_nr}} | git apply -3 && git stash drop stash@{${stash_nr}}; }; f"
     sdl  = "!f(){ git --no-pager stash drop stash@{$(($(git stash list | wc -l) - 1))}; }; f"
 
     # Convert a git repo into a bare git folder, to pull and push changes from
@@ -490,7 +550,15 @@
         if [[ -n $1 ]]; then \
             git branch -d "$1"; \
         else \
-            local branch=$(git branch | cut -d' ' -f2,3 | awk '{$1=$1;print}' | gum filter --fuzzy --limit=1 --height=20 --header='Delete Branch'); \
+            local filter=\"\";\
+            if hash fzf 2>/dev/null; then\
+                filter=\"fzf --exit-0 --layout=reverse --border --ansi --height=40% --prompt='Delete Branch > '\";\
+            elif hash gum 2>/dev/null; then\
+                filter=\"gum filter --fuzzy --limit=1 --height=40 --header='Delete Branch > ' \";\
+            else\
+                echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
+            fi;\
+            local branch=$(git branch | cut -d' ' -f2,3 | awk '{$1=$1;print}' | sh -c \"$filter\"); \
             [[ -n $branch ]] && git branch -d "$branch";\
         fi ;\
     }; f"
@@ -499,7 +567,15 @@
         if [[ -n $1 ]]; then \
             git branch -D "$1"; \
         else \
-            local branch=$(git branch | cut -d' ' -f2,3 | awk '{$1=$1;print}' | gum filter --fuzzy --limit=1 --height=20 --header='Force Delete Branch'); \
+            local filter=\"\";\
+            if hash fzf 2>/dev/null; then\
+                filter=\"fzf --exit-0 --layout=reverse --border --ansi --height=40% --prompt='Force delete Branch > '\";\
+            elif hash gum 2>/dev/null; then\
+                filter=\"gum filter --fuzzy --limit=1 --height=40 --header='Force delete Branch > ' \";\
+            else\
+                echo \"Missing gum/fzf fuzzy finders!\" 1>&2 && return 1; \
+            fi;\
+            local branch=$(git branch | cut -d' ' -f2,3 | awk '{$1=$1;print}' | sh -c \"$filter\"); \
             [[ -n $branch ]] && git branch -D "$branch";\
         fi ;\
     }; f"
