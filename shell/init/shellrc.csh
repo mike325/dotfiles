@@ -105,7 +105,7 @@ endif
 ################################################################################
 
 if ($?prompt) then
-    setenv CURRENT_SHELL `echo $shell | sed 's/.*\///g'`
+    setenv CURRENT_SHELL `echo "$shell" | sed 's/.*\///g'`
 
     # Make less colorful
     setenv LESS ' -R '
@@ -121,10 +121,8 @@ if ($?prompt) then
     # are supported
     if ( -f  "$HOME/.config/shell/settings/${CURRENT_SHELL}.csh" ) then
         source "$HOME/.config/shell/settings/${CURRENT_SHELL}.csh"
-
         # # I prefer the cool sl and the bins in my path
         # set _kill_alias = ( ips usage myip del down4me sl )
-
         # foreach i ($_kill_alias)
         #     if ( `command -V $i` =~ function ) then
         #         unset -f $i
@@ -134,7 +132,7 @@ if ($?prompt) then
         # end
     endif
 
-    # Load alias after bash-it to give them higher priority
+    # Load alias after shellrc to give them higher priority
     if ( -f "$HOME/.config/shell/alias/alias.csh"  ) then
         source "$HOME/.config/shell/alias/alias.csh"
     endif

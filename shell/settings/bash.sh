@@ -320,6 +320,31 @@ function toggleProxy() {
         source "$proxy"
         unset PROXY_DISABLE
         echo -e " ${echo_green}Proxy enable${echo_reset_color}"
+    elif hash secret-tool 2>/dev/null; then
+        local PROXY_PASSWORD PROXY_SERVER PROXY_PORT
+
+        local PROXY_USER="$USER"
+        local PROXY_PASSWORD="$(secret-tool lookup proxy password)"
+        local PROXY_SERVER="$(secret-tool lookup proxy server)"
+        local PROXY_PORT="$(secret-tool lookup proxy port)"
+        if [[ -z $PROXY_SERVER ]] || [[ -z $PROXY_PASSWORD ]]; then
+            echo "Cannot retrieve proxy values" 1>&2
+            return 1
+        fi
+
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\@/%40}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\$/%24}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\#/%23}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\:/%3A}
+        export http_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export https_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export ftp_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export no_proxy="$(secret-tool lookup proxy noproxy)"
+        unset PROXY_PASSWORD
+        unset PROXY_SERVER
+        unset PROXY_PORT
+        unset PROXY_DISABLE
+        echo -e " ${echo_green}Proxy enable${echo_reset_color}"
     elif hash keepassxc 2>/dev/null && [[ -n $PROXY_DB ]]; then
         local cmd="keepassxc cli show -a Password "
 
@@ -332,7 +357,8 @@ function toggleProxy() {
 
         local proxy_cmd="$cmd -a Username -a Url $PROXY_DB"
         mapfile -t proxy_variable_array < <(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!")
-        if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[0]} ]] ; then
+        if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[0]} ]]; then
+            echo "Cannot retrieve proxy values" 1>&2
             return 1
         fi
 
@@ -385,7 +411,7 @@ if hash ruff 2>/dev/null; then
 fi
 
 if hash jira 2>/dev/null; then
-    eval "$(jira completion bash )"
+    eval "$(jira completion bash)"
 fi
 
 #######################################################################

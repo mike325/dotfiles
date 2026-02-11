@@ -276,15 +276,16 @@ if hash fzf 2>/dev/null; then
     export FZF_CTRL_R_OPTS='--sort --prompt="Select cmd > "'
     export FZF_DEFAULT_OPTS='--layout=reverse --border --ansi --height=60%'
 
-    if hash bat 2>/dev/null ; then
-        FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview \"[ -f {} ] && bat --color=always --style=numbers --line-range=:500 {}\""
-    elif hash cat 2>/dev/null ; then
-        FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview \"[ -f {} ] && cat {}\""
-    fi
-
     if ! is_windows; then
         export FZF_DEFAULT_OPTS="--height 70% $FZF_DEFAULT_OPTS"
     fi
+
+    # PREViEW_CMD=""
+    # if hash bat 2>/dev/null ; then
+    #     PREViEW_CMD="--preview \"[ -f {} ] && bat --color=always --style=numbers --line-range=:500 {}\""
+    # elif hash cat 2>/dev/null ; then
+    #     PREViEW_CMD=" --preview \"[ -f {} ] && cat {}\""
+    # fi
 
     export FZF_COMPLETION_TRIGGER='**'
 

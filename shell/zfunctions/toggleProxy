@@ -19,6 +19,28 @@ function toggleProxy() {
         source "$proxy"
         unset PROXY_DISABLE
         echo " ${fg[green]}Proxy enable"
+    elif hash secret-tool 2>/dev/null; then
+        local PROXY_PASSWORD PROXY_SERVER PROXY_PORT
+
+        local PROXY_USER="$USER"
+        local PROXY_PASSWORD="$(secret-tool lookup proxy password)"
+        local PROXY_SERVER="$(secret-tool lookup proxy server)"
+        local PROXY_PORT="$(secret-tool lookup proxy port)"
+        if [[ -z $PROXY_SERVER ]] || [[ -z $PROXY_PASSWORD ]]; then
+            echo "Cannot retrieve proxy values" 1>&2
+            return 1
+        fi
+
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\@/%40}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\$/%24}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\#/%23}
+        local PROXY_PASSWORD=${PROXY_PASSWORD//\:/%3A}
+        export http_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export https_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export ftp_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
+        export no_proxy="$(secret-tool lookup proxy noproxy)"
+        PROXY_PASSWORD=''
+        echo " ${fg[green]}Proxy enable"
     elif hash keepassxc 2>/dev/null && [[ -n $PROXY_DB ]]; then
         local cmd="keepassxc cli show -a Password "
 
@@ -32,6 +54,7 @@ function toggleProxy() {
         local proxy_cmd="$cmd -a Username -a Url $PROXY_DB"
         local proxy_variable_array=( "${(@f)$(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!")}" )
         if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[1]} ]] ; then
+            echo "Cannot retrieve proxy values" 1>&2
             return 1
         fi
 

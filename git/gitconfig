@@ -224,8 +224,10 @@
 ;                 Grep something in the current repo                           #
 ;###############################################################################
 
-    g  = grep -nI --color=auto   ; Grep showing the line number and ignore binaries
-    gi = grep -nIi --color=auto  ; Same as above but ignore case
+    g   = grep -p --column -nIi --color=auto                    ; Grep showing the linenr, column and func context
+    gc  = grep -p --column -nI --color=auto                     ; Same as above but case sensitive
+    gn  = !git --no-pager grep -p --column -nIi --color=auto    ; Ignore case, ignore pager
+    gcn = !git --no-pager grep -p --column -nI --color=auto     ; Ignore pager
 
 ;###############################################################################
 ;                 Git log stuff                                                #
