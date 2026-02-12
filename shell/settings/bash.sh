@@ -16,12 +16,12 @@ stty erase '^?'
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
-shopt -s autocd
-shopt -s globstar
 shopt -s cdspell
-shopt -s direxpand
-shopt -s dirspell
 shopt -s nocaseglob
+shopt -s autocd 2>/dev/null
+shopt -s globstar 2>/dev/null
+shopt -s direxpand 2>/dev/null
+shopt -s dirspell 2>/dev/null
 
 # HISTCONTROL=ignoreboth
 HISTCONTROL='erasedups:ignoreboth'
@@ -322,24 +322,26 @@ function toggleProxy() {
         echo -e " ${echo_green}Proxy enable${echo_reset_color}"
     elif hash secret-tool 2>/dev/null; then
         local PROXY_PASSWORD PROXY_SERVER PROXY_PORT
+        local PROXY_USER PROXY_PASSWORD PROXY_SERVER PROXY_PORT
 
-        local PROXY_USER="$USER"
-        local PROXY_PASSWORD="$(secret-tool lookup proxy password)"
-        local PROXY_SERVER="$(secret-tool lookup proxy server)"
-        local PROXY_PORT="$(secret-tool lookup proxy port)"
+        PROXY_USER="$USER"
+        PROXY_PASSWORD="$(secret-tool lookup proxy password)"
+        PROXY_SERVER="$(secret-tool lookup proxy server)"
+        PROXY_PORT="$(secret-tool lookup proxy port)"
         if [[ -z $PROXY_SERVER ]] || [[ -z $PROXY_PASSWORD ]]; then
             echo "Cannot retrieve proxy values" 1>&2
             return 1
         fi
 
-        local PROXY_PASSWORD=${PROXY_PASSWORD//\@/%40}
-        local PROXY_PASSWORD=${PROXY_PASSWORD//\$/%24}
-        local PROXY_PASSWORD=${PROXY_PASSWORD//\#/%23}
-        local PROXY_PASSWORD=${PROXY_PASSWORD//\:/%3A}
+        PROXY_PASSWORD=${PROXY_PASSWORD//\@/%40}
+        PROXY_PASSWORD=${PROXY_PASSWORD//\$/%24}
+        PROXY_PASSWORD=${PROXY_PASSWORD//\#/%23}
+        PROXY_PASSWORD=${PROXY_PASSWORD//\:/%3A}
         export http_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
         export https_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
         export ftp_proxy="http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_SERVER}:${PROXY_PORT:-80}"
-        export no_proxy="$(secret-tool lookup proxy noproxy)"
+        no_proxy="$(secret-tool lookup proxy noproxy)"
+        export no_proxy
         unset PROXY_PASSWORD
         unset PROXY_SERVER
         unset PROXY_PORT
@@ -406,13 +408,16 @@ if hash gh 2>/dev/null; then
     eval "$(gh completion --shell bash)"
 fi
 
-if hash ruff 2>/dev/null; then
-    eval "$(ruff generate-shell-completion bash)"
-fi
-
 if hash jira 2>/dev/null; then
     eval "$(jira completion bash)"
 fi
+
+astral_cmds=(ruff uv ty)
+for cmd in "${astral_cmds[@]}"; do
+    if hash "$cmd" 2>/dev/null; then
+        eval "$("$cmd" generate-shell-completion bash)"
+    fi
+done
 
 #######################################################################
 #                          Bash Completion                            #
@@ -424,7 +429,7 @@ fi
 if ! shopt -oq posix; then
 
     if [[ -d "$HOME/.local/share/completions/" ]]; then
-        for cfile in "$HOME/.local/share/completions/"*.bash; do
+        for cfile in "$HOME/.local/share/completions/bash/"*; do
             source "$cfile" 2>/dev/null
         done
     fi

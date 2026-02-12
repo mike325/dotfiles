@@ -442,7 +442,7 @@ function initlog() {
     return 0
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2329
 function exit_append() {
     if [[ $NOLOG -eq 0 ]]; then
         if [[ $WARN_COUNT -gt 0 ]] || [[ $ERR_COUNT -gt 0 ]]; then
@@ -459,7 +459,7 @@ function exit_append() {
     return 0
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2329
 function clean_up() {
     verbose_msg "Cleaning up by interrupt"
     verbose_msg "Cleaning up rg ${TMP}/rg.*" && rm -rf "${TMP}/rg.*" 2>/dev/null
@@ -764,6 +764,17 @@ function setup_dotconfigs() {
     else
         warn_msg "Skipping tmux configs, tmux is not installed"
     fi
+
+    status_msg "Setting up completions"
+
+    local COMPLETION_DIR="$HOME/.local/share/completions"
+    [[ ! -d "$COMPLETION_DIR/zsh" ]] && mkdir -p "$COMPLETION_DIR/zsh"
+    [[ ! -d "$COMPLETION_DIR/bash" ]] && mkdir -p "$COMPLETION_DIR/bash"
+    for script in "${SCRIPT_PATH}/shell/completions/"*; do
+        local script_name="${script##*/}"
+        setup_config "$script" "$COMPLETION_DIR/zsh/$script_name"
+        setup_config "$script" "$COMPLETION_DIR/bash/$script_name"
+    done
 
     return $rst
 }

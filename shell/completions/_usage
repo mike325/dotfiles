@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+_USAGE_ARGS=(
+    "-s[Sort the results]"
+    "--sort[Sort the results]"
+    "-f[Include files]"
+    "--files[Include files]"
+    "-x[One File System]"
+    "-h[Display this help message]"
+    "--help[Display this help message]"
+)
+
+_bash_usage() {
+    local cur opts # prev
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    # prev="${COMP_WORDS[COMP_CWORD - 1]}"
+
+    opts=()
+    for opt in "${_USAGE_ARGS[@]}"; do
+        opts+=("${opt%%\[*}")
+    done
+
+    if [[ ${cur} == -* ]]; then
+        # shellcheck disable=SC2207
+        COMPREPLY=($(compgen -W "${opts[*]}" -- "${cur}"))
+        return 0
+    fi
+}
+
+_zsh_usage() {
+    declare -a opts
+    opts+=("${_USAGE_ARGS[@]}")
+    opts+=('*::args:->args')
+    _arguments -C "${opts[@]}"
+}
+
+if [[ -n $ZSH_NAME ]]; then
+    compdef _zsh_usage usage
+elif [[ -n $BASH ]]; then
+    complete -F _bash_usage usage
+fi

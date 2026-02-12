@@ -214,7 +214,7 @@ if is_windows; then
 fi
 
 _old_python3=6
-_latest_python3=15
+_latest_python3=20
 if is_windows; then
     # Windows user paths where pip install python packages
     if [[ -d "$HOME/AppData/Roaming/Python/Scripts" ]]; then

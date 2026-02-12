@@ -129,22 +129,6 @@ else
     PROMPT='$(_prompt_command)'
 fi
 
-if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-    source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    bindkey '^ ' autosuggest-execute
-fi
-
-if hash gh 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_gh" ]]; then
-    gh completion --shell zsh >"$HOME/.zsh/zfunctions/_gh"
-fi
-
-if hash ruff 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_ruff" ]]; then
-    ruff generate-shell-completion zsh >"$HOME/.zsh/zfunctions/_ruff"
-fi
-
-if hash jira 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_jira" ]]; then
-    jira completion zsh > "$_ZFUNC_SCRIPTS/_jira"
-fi
 
 autoload -Uz compinit
 compinit # -d
@@ -176,16 +160,34 @@ zstyle ':completion:*' accept-exact '*(N)'
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
+if [[ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    bindkey '^ ' autosuggest-execute
+fi
+
+if hash gh 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_gh" ]]; then
+    gh completion --shell zsh >"$HOME/.zsh/zfunctions/_gh"
+fi
+
+if hash jira 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_jira" ]]; then
+    jira completion zsh >"$HOME/.zsh/zfunctions/_jira"
+fi
+
 if hash kitty 2>/dev/null; then
     # Completion for kitty
     kitty + complete setup zsh | source /dev/stdin
 fi
 
-if [[ -d "$HOME/.local/share/completions/" ]]; then
-    for cfile in "$HOME/.local/share/completions/"*; do
-        if [[ $cfile =~ .*\.zsh$ ]]; then
-            source "$cfile" 2>/dev/null
-        fi
+astral_cmds=(ruff uv ty)
+for cmd in "${astral_cmds[@]}"; do
+    if hash "$cmd" 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_$cmd" ]]; then
+        $cmd generate-shell-completion zsh >"$HOME/.zsh/zfunctions/_$cmd"
+    fi
+done
+
+if [[ -d "$HOME/.local/share/completions/zsh" ]]; then
+    for cfile in "$HOME/.local/share/completions/zsh/"*; do
+        source "$cfile" 2>/dev/null
     done
 fi
 
