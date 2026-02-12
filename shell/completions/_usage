@@ -29,10 +29,7 @@ _bash_usage() {
 }
 
 _zsh_usage() {
-    declare -a opts
-    opts+=("${_USAGE_ARGS[@]}")
-    opts+=('*::args:->args')
-    _arguments -C "${opts[@]}"
+    _arguments -C "${_USAGE_ARGS[@]}" '*::args:->args'
 }
 
 if [[ -n $ZSH_NAME ]]; then
