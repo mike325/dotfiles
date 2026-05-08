@@ -1,0 +1,144 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "qwen3.5:2b",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3.5:0.8b": {
+          "name": "qwen3.5:0.8b"
+        },
+        "qwen3.5:2b": {
+          "name": "qwen3.5:2b"
+        },
+        "qwen3.5:4b": {
+          "name": "qwen3.5:4b"
+        },
+        "qwen3.5:4b-mlx-bf16": {
+          "name": "qwen3.5:4b-mlx-bf16"
+        }
+      }
+    }
+  },
+  "lsp": {
+    "clangd": {
+      "command": [
+        "clangd",
+        "--fallback-style=Google",
+        "--clang-tidy",
+        "--header-insertion=iwyu",
+        "--function-arg-placeholders",
+        "--completion-style=bundled",
+        "--background-index",
+        "--pch-storage=disk"
+      ]
+    },
+    "lua-ls": {
+      "command": ["lua-language-server"],
+      "initialization": {
+        "Lua": {
+          "hint": {
+            "enable": true
+          },
+          "runtime": {
+            "version": "LuaJIT"
+          },
+          "workspace": {
+            "checkThirdParty": true
+          },
+          "diagnostics": {
+            "globals": [
+              "vim",
+              "nvim",
+              "bit",
+              "python",
+              "describe",
+              "it",
+              "before_each",
+              "after_each",
+              "setup",
+              "teardown",
+              "assert"
+            ]
+          }
+        }
+      }
+    },
+    "ty": {
+      "command": ["ty", "server"],
+      "extensions": [".py"]
+    },
+    "ruff": {
+      "command": ["ruff", "server", "--preview"],
+      "extensions": [".py"]
+    },
+    "robotframework_ls": {
+      "command": ["robotframework_ls"],
+      "extensions": [".robot"],
+      "env": {
+        "ROBOTFRAMEWORK_LS_WATCH_IMPL": "fsnotify",
+        "ROBOTFRAMEWORK_LS_IGNORE_DIRS": "[\"**/xifs/**\",\"**/xtst/**\",\"**/xtestdoubles/**\",\"**/xifs-global/**\",\"**/clang/**\",\"**/matlab_mcr/**\",\"**/lxsr_glp_ls1046a/**\",\"**/lxsr_glp_ppce6500/**\",\"**/vxworks7/**\",\"**/.vscode_clangd_setup/**\",\"**/.vscode/**\"]"
+      },
+      "initialization": {
+        "robot": {
+          "python": {
+            "env": {
+              "ROBOTFRAMEWORK_LS_WATCH_IMPL": "fsnotify",
+              "ROBOTFRAMEWORK_LS_IGNORE_DIRS": "[\"**/xifs/**\",\"**/xtst/**\",\"**/xtestdoubles/**\",\"**/xifs-global/**\",\"**/clang/**\",\"**/matlab_mcr/**\",\"**/lxsr_glp_ls1046a/**\",\"**/lxsr_glp_ppce6500/**\",\"**/vxworks7/**\",\"**/.vscode_clangd_setup/**\",\"**/.vscode/**\"]"
+            }
+          },
+          "lint": {
+            "undefinedLibraries": false,
+            "undefinedResources": false,
+            "undefinedKeywords": false,
+            "variables": false
+          }
+        }
+      }
+    }
+  },
+  "formatter": {
+    "shfmt": {
+      "command": ["shfmt", "-i", "4", "-s", "-ci"]
+    },
+    "ruff": {
+      "command": ["ruff", "format", "--preview"],
+      "extensions": [".py", ".pyi"]
+    },
+    "clang-format": {
+      "command": ["clang-format", "--sort-includes"]
+    },
+    "rustfmt": {
+      "command": ["rustfmt"],
+      "extensions": [".rs"]
+    },
+    "stylua": {
+      "command": [
+        "stylua",
+        "--indent-type",
+        "Spaces",
+        "--indent-width",
+        "4",
+        "--quote-style",
+        "AutoPreferSingle",
+        "--column-width",
+        "120",
+        "--call-parentheses",
+        "None"
+      ],
+      "extensions": [".lua"]
+    },
+    "black": {
+      "command": ["black"],
+      "extensions": [".py", ".pyi"]
+    },
+    "robotidy": {
+      "command": ["robotidy", "--overwrite", "--no-color", "--indent", "4"],
+      "extensions": [".robot"]
+    }
+  }
+}

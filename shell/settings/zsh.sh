@@ -178,6 +178,10 @@ if hash kitty 2>/dev/null; then
     kitty + complete setup zsh | source /dev/stdin
 fi
 
+if hash opencode 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_opencode" ]]; then
+    opencode completion >"$HOME/.zsh/zfunctions/_opencode"
+fi
+
 astral_cmds=(ruff uv ty)
 for cmd in "${astral_cmds[@]}"; do
     if hash "$cmd" 2>/dev/null && [[ ! -f "$HOME/.zsh/zfunctions/_$cmd" ]]; then

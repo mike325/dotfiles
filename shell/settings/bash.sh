@@ -412,6 +412,10 @@ if hash jira 2>/dev/null; then
     eval "$(jira completion bash)"
 fi
 
+if hash opencode 2>/dev/null; then
+    eval "$(opencode completion)"
+fi
+
 astral_cmds=(ruff uv ty)
 for cmd in "${astral_cmds[@]}"; do
     if hash "$cmd" 2>/dev/null; then
