@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-if hash bat 2>/dev/null ; then
+if hash bat 2>/dev/null; then
     unalias -m '*-*'
     alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
     alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'

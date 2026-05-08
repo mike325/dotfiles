@@ -1,0 +1,17 @@
+[+] Debug:		 Using log at /home/runner/work/dotfiles/dotfiles/get_nvim.log
+[+] Debug:		 Script version : 0.1
+[+] Debug:		 Date           : Fri May  8 21:16:13 UTC 2026
+[+] Debug:		 Log Disable   : 0
+[+] Debug:		 Current Shell : bash
+[+] Debug:		 Platform      : linux
+[+] Debug:		 Architecture  : x86_64
+[+] Debug:		 OS            : ubuntu
+[+] Debug:		 Using curl -L as command
+[+] Debug:		 Fetching latest stable from https://github.com/neovim/neovim/tags/
+[*] Info:		 Downloading version: 
+[+] Debug:		 Downloading nvim.appimage from https://github.com/neovim/neovim/releases/download//nvim.appimage to /tmp//nvim
+[+] Debug:		 Installing into /home/runner/.local/bin/nvim
+[X] Error:	 Failed to execute neovim
+
+
+[*] Errors:	1

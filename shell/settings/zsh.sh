@@ -129,7 +129,6 @@ else
     PROMPT='$(_prompt_command)'
 fi
 
-
 autoload -Uz compinit
 compinit # -d
 
@@ -244,6 +243,6 @@ if hash fzf 2>/dev/null; then
     bindkey -v
 fi
 
-if hash bat 2>/dev/null ; then
+if hash bat 2>/dev/null; then
     autoload disable_help_alias enable_help_alias
 fi

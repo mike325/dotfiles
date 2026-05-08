@@ -52,8 +52,8 @@ function toggleProxy() {
         fi
 
         local proxy_cmd="$cmd -a Username -a Url $PROXY_DB"
-        local proxy_variable_array=( "${(@f)$(sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!")}" )
-        if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[1]} ]] ; then
+        local proxy_variable_array=("${(@f)$( sh -c "$proxy_cmd proxy" || error_msg "KeepassXC - Cannot find credentials for proxy!")}")
+        if [[ ${#proxy_variable_array} -eq 0 ]] || [[ -z ${proxy_variable_array[1]} ]]; then
             echo "Cannot retrieve proxy values" 1>&2
             return 1
         fi
