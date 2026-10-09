@@ -20,7 +20,48 @@
         },
         "qwen3.5:4b-mlx-bf16": {
           "name": "qwen3.5:4b-mlx-bf16"
+        },
+        "ornith:9b": {
+          "name": "ornith:9b"
+        },
+        "glm-5.1:cloud": {
+          "name": "glm-5.1:cloud"
         }
+      }
+    }
+  },
+  "mcp": {
+    "home-assistant": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "ha-mcp@latest"
+      ],
+      "enabled": false,
+      "environment": {
+        "HOMEASSISTANT_URL": "http://localhost:8123",
+        "HOMEASSISTANT_TOKEN": "{env:HA_TOKEN}"
+      }
+    },
+    "home-assistant-builtin": {
+      "type": "remote",
+      "url": "http://localhost:8123/api/mcp",
+      "enabled": false,
+      "headers": {
+        "Authorization": "Bearer {env:HA_TOKEN}",
+        "Content-Type": "application/json"
+      }
+    },
+    "resend": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "resend-mcp"
+      ],
+      "enabled": false,
+      "environment": {
+        "RESEND_API_KEY": "{env:RESEND_API_KEY}"
       }
     }
   },
@@ -38,7 +79,9 @@
       ]
     },
     "lua-ls": {
-      "command": ["lua-language-server"],
+      "command": [
+        "lua-language-server"
+      ],
       "initialization": {
         "Lua": {
           "hint": {
@@ -69,16 +112,31 @@
       }
     },
     "ty": {
-      "command": ["ty", "server"],
-      "extensions": [".py"]
+      "command": [
+        "ty",
+        "server"
+      ],
+      "extensions": [
+        ".py"
+      ]
     },
     "ruff": {
-      "command": ["ruff", "server", "--preview"],
-      "extensions": [".py"]
+      "command": [
+        "ruff",
+        "server",
+        "--preview"
+      ],
+      "extensions": [
+        ".py"
+      ]
     },
     "robotframework_ls": {
-      "command": ["robotframework_ls"],
-      "extensions": [".robot"],
+      "command": [
+        "robotframework_ls"
+      ],
+      "extensions": [
+        ".robot"
+      ],
       "env": {
         "ROBOTFRAMEWORK_LS_WATCH_IMPL": "fsnotify",
         "ROBOTFRAMEWORK_LS_IGNORE_DIRS": "[\"**/xifs/**\",\"**/xtst/**\",\"**/xtestdoubles/**\",\"**/xifs-global/**\",\"**/clang/**\",\"**/matlab_mcr/**\",\"**/lxsr_glp_ls1046a/**\",\"**/lxsr_glp_ppce6500/**\",\"**/vxworks7/**\",\"**/.vscode_clangd_setup/**\",\"**/.vscode/**\"]"
@@ -103,18 +161,44 @@
   },
   "formatter": {
     "shfmt": {
-      "command": ["shfmt", "-i", "4", "-s", "-ci"]
+      "command": [
+        "shfmt",
+        "-i",
+        "4",
+        "-s",
+        "-ci",
+        "-w",
+        "$FILE"
+      ]
     },
     "ruff": {
-      "command": ["ruff", "format", "--preview"],
-      "extensions": [".py", ".pyi"]
+      "command": [
+        "ruff",
+        "format",
+        "--preview",
+        "$FILE"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
     },
     "clang-format": {
-      "command": ["clang-format", "--sort-includes"]
+      "command": [
+        "clang-format",
+        "-i",
+        "--sort-includes",
+        "$FILE"
+      ]
     },
     "rustfmt": {
-      "command": ["rustfmt"],
-      "extensions": [".rs"]
+      "command": [
+        "rustfmt",
+        "$FILE"
+      ],
+      "extensions": [
+        ".rs"
+      ]
     },
     "stylua": {
       "command": [
@@ -128,17 +212,36 @@
         "--column-width",
         "120",
         "--call-parentheses",
-        "None"
+        "None",
+        "$FILE"
       ],
-      "extensions": [".lua"]
+      "extensions": [
+        ".lua"
+      ]
     },
     "black": {
-      "command": ["black"],
-      "extensions": [".py", ".pyi"]
+      "enabled": false,
+      "command": [
+        "black",
+        "$FILE"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ]
     },
     "robotidy": {
-      "command": ["robotidy", "--overwrite", "--no-color", "--indent", "4"],
-      "extensions": [".robot"]
+      "command": [
+        "robotidy",
+        "--overwrite",
+        "--no-color",
+        "--indent",
+        "4",
+        "$FILE"
+      ],
+      "extensions": [
+        ".robot"
+      ]
     }
   }
 }
